@@ -1,0 +1,61 @@
+package com.yuan.skeleton.common;
+
+
+/**
+ * Created by Alsor Zhou on 2/13/15.
+ */
+public class Constants {
+    public static String kApplicationId = "com.mowelltech.threec";
+
+    // Production Server
+    public static String kPrefsFirstLaunch = "kPrefsFirstLaunch";
+
+    public static int kSplashTimeInterval = 20;
+
+    public static String kLocalWebHTMLFolder = "file:///android_asset/html";
+
+    public static String kLocalWebHTMLPageFolder = "file:///android_asset/3c_html";
+
+//TODO: not working with query parameters..
+    public static String kWebPageEntry = "nearby.html";
+
+    // Web package version
+    public static String kWebPackageVersionCached = "kWebPackageVersionCached";
+    public static String kWebLaunchImageVersionCached = "kWebLaunchImageVersionCached";
+
+    public static String kWebPackageExtracted = "kWebPackageExtracted";
+
+    // Native app version
+    public static String kApplicationPackageVersion = "0.0.1";
+//    public static String kApplicationLaunchImageVersion = "0.0.1";
+
+    /**
+     * LeanCloud Application Settings.
+     * https://leancloud.cn/app.html?appid=9hk99pr7gknwj83tdmfbbccqar1x2myge00ulspafnpcbab8#/key
+     */
+    public static String kAVApplicationId = "2flg9asqjtczbilzi7d5svu4bad0a1d1lou1mxcfv3oyk2qq";
+    public static String kAVClientKey = "vcrsb5tgevi4l165zh7o4da2pz571z4q04oa0dqreqyp3qm5";
+
+    public static final String kServiceCheckUpdate = "checkupdate";
+    public static final String kServiceLogin = "login";
+
+    public static String kCheckTypeHtml = "KidsParentHtmlPackage";
+    public static String kCheckTypeLaunchImage = "KidsParentLaunchImage";
+
+    /**
+     * Fragment Identifiers
+     */
+    public static String kFragmentTagConversation = "kFragmentTagConversation";
+    public static String kFragmentTagContacts = "kFragmentTagContacts";
+    public static String kFragmentTagWebView = "kFragmentTagWebView";
+    public static String kFragmentTagPopUpSelection = "kFragmentTagPopUpSelection";
+
+    public static String kServiceHost = "http://3c.ieyuan.com";
+    public static String kServiceUploadImage = "/upload-image";
+    public static String kFragmentTagNearby = "kFragmentTagNearby";
+    public static String kFragmentTagSocial = "kFragmentTagSocial";
+    public static String kFragmentTagProfile = "kFragmentTagProfile";
+    public static String kBugTagsKey = "644d24cf6972f42c2d51b7f0ba72e71f";
+
+    public static String kLeanChatCurrentUserObjectId = "kLeanChatCurrentUserObjectId";
+}

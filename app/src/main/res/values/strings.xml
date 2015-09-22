@@ -1,0 +1,135 @@
+<resources>
+    <string name="app_name">YUAN</string>
+
+    <string name="action_settings">Settings</string>
+
+    <string name="tabbar_item_txt_nearby">附近</string>
+    <string name="tabbar_item_txt_community">圈子</string>
+    <string name="tabbar_item_txt_relation">关注</string>
+    <string name="tabbar_item_txt_msg">消息</string>
+    <string name="tabbar_item_txt_profile">我</string>
+    <string name="txt_share">分享</string>
+
+    <string name="setting_preference_voice">语音</string>
+
+    <string name="update_service_versionIsAlreadyNew">已经是最新版本了</string>
+    <string name="update_service_sureToUpdate">确定更新版本吗</string>
+    <string name="update_service_updateLog">更新日志</string>
+    <string name="update_service_installNewVersion">安装新版本</string>
+    <string name="update_service_laterNotify">稍后提醒</string>
+    <string name="update_service_haveNewVersion">版本更新</string>
+    <string name="update_service_failedToGetData">获取数据失败</string>
+
+    <string name="entry_register_activity_password">密码</string>
+    <string name="login">登录</string>
+    <string name="profile_sex">性别</string>
+    <string name="conversation_messages">消息</string>
+    <string name="contact">联系人</string>
+    <string name="profile_settings">Settings</string>
+    <string name="profile_title">我</string>
+    <string name="discover_title">发现</string>
+
+    <string name="login_username_hint">请输入用户名</string>
+    <string name="ensurePasswordHint">请在此输入密码</string>
+    <string name="login_password_hint">请输入密码</string>
+    <string name="ensurePassword">确认密码 </string>
+    <string name="register">注册</string>
+
+    <string name="password_can_not_null">密码不能为空</string>
+    <string name="username_cannot_null">用户名不能为空</string>
+    <string name="password_not_consistent">输入的两次密码不一致</string>
+    <string name="registerSucceed">注册成功</string>
+    <string name="registerFailed">注册失败。</string>
+
+    <string name="not_have_account">还没有账号？</string>
+    <string name="register_rightnow">立即注册 &gt;</string>
+    <string name="discover_metres">米</string>
+    <string name="discover_unknown">未知</string>
+    <string name="discover_recent_login_time">最近登录时间:</string>
+    <string name="contact_account">账号 </string>
+    <string name="contact_search">搜索</string>
+    <string name="profile_vibrate">震动</string>
+    <string name="contact_chat">发起会话</string>
+    <string name="contact_add_friend">添加好友</string>
+    <string name="contact_new_friends">新朋友</string>
+    <string name="contact_deleteFriendRequest">删除好友请求</string>
+    <string name="contact_agreed">已同意</string>
+    <string name="contact_deleteContact">删除联系人</string>
+    <string name="common_sure">确定</string>
+    <string name="contact_deleteSucceed">删除成功</string>
+    <string name="contact_findFriends">查找好友</string>
+    <string name="contact_add">添加</string>
+    <string name="contact_sendRequestSucceed">发送请求成功，等待对方验证</string>
+    <string name="contact_personalInfo">个人资料</string>
+    <string name="contact_detailInfo">详细资料</string>
+    <string name="contact_male">男</string>
+    <string name="contact_female">女</string>
+    <string name="profile_notifySetting">提醒设置</string>
+    <string name="profile_notifyWhenNews">接收新消息通知</string>
+    <string name="conversation_group">群组</string>
+    <string name="conversation_name">群组名称</string>
+    <string name="conversation_create">创建</string>
+    <string name="conversation_Members">群组成员</string>
+    <string name="conversation_inviteSucceed">已发出邀请</string>
+    <string name="conversation_inviteMembers">邀请群成员</string>
+    <string name="conversation_kickTips">确认要踢走该成员吗</string>
+    <string name="conversation_detail_invite">邀请</string>
+    <string name="conversation_quitGroup">退群</string>
+
+    <string name="utils_kilometres">公里</string>
+    <string name="refreshable_view_pull_to_refresh">下拉可以刷新</string>
+    <string name="refreshable_view_release_to_refresh">释放立即刷新</string>
+    <string name="refreshable_view_refreshing">正在刷新…</string>
+    <string name="profile_fragment_checkUpdate">检查更新</string>
+    <string name="discover_fragment_sort">排序</string>
+    <string name="discover_fragment_loginTime">登录时间</string>
+    <string name="discover_fragment_distance">距离</string>
+    <string name="contact_alreadyCreateAddRequest">已经请求过了</string>
+    <string name="conversation_alreadyQuitConv">已退出群</string>
+    <string name="conversation_detail_kickSucceed">已踢走该成员</string>
+    <string name="conversation_detail_title">详情</string>
+
+    <string name="chat_location_activity_send">发送</string>
+    <string name="chat_getGeoInfoFailed">获取地理位置信息失败!</string>
+    <string name="chat_geoIsSame">获取坐标相同</string>
+    <string name="chat_location_mapKeyErrorTips">key 验证出错! 请在 AndroidManifest.xml 文件中检查 key 设置</string>
+    <string name="chat_reverseGeoCodeResultIs">反编码得到的地址：</string>
+    <string name="chat_cannotGetYourAddressInfo">无法获取到您的位置信息！</string>
+    <string name="confirm_dial">确认拨打电话</string>
+    <string name="ok">确认</string>
+    <string name="no">不了</string>
+    <string name="dial">拨打</string>
+
+    <!--map activity-->
+    <string name="map_search_placeholder">搜索</string>
+    <string name="add_to_fav_location">收藏位置</string>
+    <string name="map_confirm_location">选定位置</string>
+    <string name="map_search_loc_button_text">搜索</string>
+    <string name="map_no_location_found">没有找到相似的地址</string>
+    <string name="hint_input_text">在这里输入你想说的话...</string>
+    <string name="save">保存</string>
+    <string name="text_category">分类</string>
+    <string name="use_camera">照相机</string>
+    <string name="use_gallery">图库</string>
+    <string name="use_camera_or_gallery">选择从哪里获取图片</string>
+    <string name="confirm">确定</string>
+    <string name="cancel">取消</string>
+    <string name="title_get_photo">图片选择</string>
+    <string name="txt_current_location">当前位置</string>
+    <string name="post_new_info">发布信息</string>
+    <string name="post_new_activity">发布活动</string>
+    <string name="post_new_free_ride">顺风车</string>
+    <string name="draft_box">草稿箱</string>
+    <string name="txt_me">我</string>
+    <string name="group">分组</string>
+    <string name="msg_manage">整理</string>
+    <string name="group_chat">群聊</string>
+    <string name="txt_profile">我</string>
+    <string name="txt_social">圈子</string>
+    <string name="sign_in_title">登录</string>
+
+
+    <string name="error_can_not_connect_server">无法访问网络</string>
+
+
+</resources>

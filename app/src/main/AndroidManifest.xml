@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.yuan.skeleton">
+
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!--<uses-permission android:name="android.permission.GET_TASKS" />-->
+
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+
+    <!-- baidumap 所需的权限 -start -->
+    <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.BROADCAST_STICKY" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+
+    <!-- 这个权限用于进行网络定位-->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- 这个权限用于访问GPS定位-->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- SD卡读取权限，用户写入离线定位数据-->
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <!-- baidumap 所需的权限 -end -->
+    <application
+        android:name=".application.DMApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme">
+
+        <activity
+            android:name=".activities.SplashActivity"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".activities.TutorialActivity"/>
+
+        <activity
+            android:name=".activities.MainActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".activities.WebViewActivity"
+            android:screenOrientation="portrait" />
+
+        <activity android:name=".activities.SignInActivity" android:screenOrientation="portrait" />
+
+        <activity
+            android:name="com.avoscloud.chat.ui.chat.ChatRoomActivity"
+            android:launchMode="singleTask"
+            android:theme="@style/ChatMainTheme" />
+
+        <activity android:name="com.avoscloud.leanchatlib.activity.ImageBrowserActivity"
+            android:launchMode="singleTask"
+            android:theme="@style/ChatMainTheme"/>
+
+        <service android:name="com.avos.avoscloud.PushService" />
+
+        <receiver android:name="com.dimo.receiver.Receiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="com.mowelltech.threec.UPDATE_STATUS" />
+                <action android:name="com.mowelltech.threec.action" />
+            </intent-filter>
+        </receiver>
+
+        <meta-data android:value="558bab2e67e58ee449003198" android:name="UMENG_APPKEY"/>
+        <meta-data android:value="Website" android:name="UMENG_CHANNEL"/>
+        <service
+            android:name="com.umeng.update.net.DownloadingService"
+            android:process=":DownloadingService" >
+        </service>
+        <activity
+            android:name="com.umeng.update.UpdateDialogActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+        </activity>
+
+        <!--baidu location service-->
+        <!--<meta-data-->
+            <!--android:name="com.baidu.lbsapi.API_KEY"-->
+            <!--android:value="0IDGYMrRuOOuMrSERGgbFwzq" />&lt;!&ndash; key for yang's mac &ndash;&gt;-->
+        <meta-data
+            android:name="com.baidu.lbsapi.API_KEY"
+            android:value="PNnEj0Mo1gqAcwmhHvMLVycB" /><!-- key for yang's home -->
+        <service android:name="com.baidu.location.f" android:enabled="true" android:process=":remote">
+        </service>
+
+    </application>
+
+</manifest>
