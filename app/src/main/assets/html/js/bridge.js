@@ -144,6 +144,18 @@ var bridge = {
 
     gBridge.callHandler('selectPhoto', string, callback);
   },
+  showImagePicker: function (params, callback) {
+    var obj = params;
+    var string = JSON.stringify(obj);
+
+    gBridge.callHandler('showImagePicker', string, callback);
+  },
+  uploadFile: function (params, callback) {
+    var obj = params;
+    var string = JSON.stringify(obj);
+
+    gBridge.callHandler('uploadFile', string, callback);
+  },
   setTitle: function (params, callback) {
     var obj = params;
     var string = JSON.stringify(obj);

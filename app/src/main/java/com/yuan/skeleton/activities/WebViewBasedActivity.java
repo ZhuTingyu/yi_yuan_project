@@ -35,6 +35,7 @@ import com.dimo.web.WebViewJavascriptBridge;
 import com.gitonway.lee.niftymodaldialogeffects.lib.Effectstype;
 import com.gitonway.lee.niftymodaldialogeffects.lib.NiftyDialogBuilder;
 import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.yuan.skeleton.R;
@@ -52,6 +53,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -60,6 +62,7 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import me.nereo.multi_image_selector.MultiImageSelectorActivity;
 import timber.log.Timber;
 
 /**
@@ -73,6 +76,8 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
     public static final int kActivityRequestCodeEditText = 5;
     public static final int kActivityRequestCodeDateTimePicker = 6;
     public static final int kActivityRequestCodeDialog = 7;
+    public static final int kActivityRequestCodeImagePicker = 9;
+
     public WebViewJavascriptBridge bridge;
     protected FragmentManager mFragmentManager;
     protected FragmentTransaction mFragmentTransaction;
@@ -352,6 +357,59 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                             }
                         })
                         .show();
+            }
+        });
+
+        bridge.registerHandler("showImagePicker", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
+                Timber.v("showImagePicker got:" + data);
+                mCallback = callback;
+
+                startImagePicker();
+            }
+        });
+
+        bridge.registerHandler("uploadFile", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
+                Timber.v("uploadFile got:" + data);
+
+                if (null != callback) {
+                    HashMap<String, String> stringStringHashMap = null;
+                    try {
+                        stringStringHashMap = StringUtil.JSONString2HashMap(data);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    String filePath = stringStringHashMap.get("fileUrl");
+
+                    File file = new File(filePath);
+                    RequestParams params = new RequestParams();
+                    try {
+                        params.put("image", file);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
+                    //TODO: update file url
+                    RestClient.getInstance().post(null, params, new AsyncHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                            Timber.v("Success");
+
+                            //TODO: upload file
+                            callback.callback(null);
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                            Timber.e("Failed");
+                        }
+                    });
+
+                }
             }
         });
 
@@ -969,6 +1027,21 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
         });
     }
 
+    protected void startImagePicker() {
+        Intent intent = new Intent(mContext, MultiImageSelectorActivity.class);
+
+        // whether show camera
+        intent.putExtra(MultiImageSelectorActivity.EXTRA_SHOW_CAMERA, true);
+
+        // max select image amount
+        intent.putExtra(MultiImageSelectorActivity.EXTRA_SELECT_COUNT, 9);
+
+        // select mode (MultiImageSelectorActivity.MODE_SINGLE OR MultiImageSelectorActivity.MODE_MULTI)
+        intent.putExtra(MultiImageSelectorActivity.EXTRA_SELECT_MODE, MultiImageSelectorActivity.MODE_MULTI);
+
+        startActivityForResult(intent, kActivityRequestCodeImagePicker);
+    }
+
     /**
      * Invoke from JS script interaction
      *
@@ -1065,6 +1138,21 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                 Timber.w("gallery cancelled");
             } else {
                 Timber.e("GALLERY - SHOULD NEVER REACH");
+            }
+        } else if (requestCode == kActivityRequestCodeImagePicker) {
+            // 使用微信风格的集成拍照/图库的图片选择器
+            if (resultCode == RESULT_OK) {
+                // Get the result list of select image paths
+                List<String> path = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
+                StringBuilder csvList = new StringBuilder();
+                for (String s : path) {
+                    csvList.append(s);
+                    csvList.append(",");
+                }
+                prefs.edit().putString("cached_selected_images", csvList.toString()).commit();
+
+                // 选择图片之后保留在本地页面, 并通知页面
+                bridge.callHandler("activetyFinished");
             }
         } else if (requestCode == kActivityRequestCodeWebActivity) {
             String result = null;
