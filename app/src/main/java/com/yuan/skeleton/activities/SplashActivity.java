@@ -78,11 +78,11 @@ public class SplashActivity extends FragmentActivity implements Handler.Callback
         }
 
         final Class nextClass;
-        if (userLogin == null) {
-            nextClass = SignInActivity.class;
-        } else {
+//        if (userLogin == null) {
+//            nextClass = SignInActivity.class;
+//        } else {
             nextClass = MainActivity.class;
-        }
+//        }
 
         mHandler.postDelayed(new Runnable() {
             @Override

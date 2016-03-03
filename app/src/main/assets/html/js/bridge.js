@@ -263,5 +263,11 @@ var bridge = {
     var string = JSON.stringify(obj);
 
     gBridge.callHandler('saveImageDataToGallery', string, callback);
-  }
+  },
+  cutImage: function (params, callback) {
+      var obj = params;
+      var string = JSON.stringify(obj);
+
+      gBridge.callHandler('cutImage', string, callback);
+    }
 };

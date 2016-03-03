@@ -29,6 +29,15 @@ import timber.log.Timber;
  */
 public class FileUtil {
     private static String TAG = FileUtil.class.getSimpleName();
+    private static String path = "";
+
+    static {
+        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+            path = Environment.getExternalStorageDirectory() + "/3c";
+        } else {
+            path = Environment.getDataDirectory().getAbsolutePath() + "/3c";
+        }
+    }
 
     /**
      * Find the files under folder which matched the pattern
@@ -269,5 +278,25 @@ public class FileUtil {
         //Make sure you close all streams.
         fin.close();
         return ret;
+    }
+
+    /**
+     * 拍照路径
+     * @return
+     */
+    public static String getPhotoPath(){
+        File file = new File(path + "/photo/");
+        if(!file.exists()){
+            file.mkdirs();
+        }
+        return path + "/photo/";
+    }
+
+    public static String getClipPath(){
+        File file = new File(path + "/clip/");
+        if(!file.exists()){
+            file.mkdirs();
+        }
+        return path + "/clip/";
     }
 }

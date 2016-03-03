@@ -260,12 +260,15 @@ public class DMApplication extends Application {
         rootDataFolder = FileUtil.getDataDirectory(getApplicationContext());
         htmlExtractedFolder = String.format("%s/%s", FileUtil.getDataDirectory(getApplicationContext()), "html");
 
-        if (!prefs.getBoolean(Constants.kWebPackageExtracted, false)) {
+        /*if (!prefs.getBoolean(Constants.kWebPackageExtracted, false)) {
             Timber.v("Copy HTML asset to folder : " + htmlExtractedFolder);
 
-            FileUtil.copyAssetFolder(getAssets(), "3c_html", htmlExtractedFolder);
+            FileUtil.copyAssetFolder(getAssets(), "html", htmlExtractedFolder);
             prefs.edit().putBoolean(Constants.kWebPackageExtracted, true).commit();
-        }
+        }*/
+        Timber.v("Copy HTML asset to folder : " + htmlExtractedFolder);
+        FileUtil.copyAssetFolder(getAssets(), "html", htmlExtractedFolder);
+        prefs.edit().putBoolean(Constants.kWebPackageExtracted, true).commit();
     }
 
     public void openStrictMode() {

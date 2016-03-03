@@ -1,11 +1,14 @@
 package com.yuan.skeleton.activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -16,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVUser;
@@ -30,6 +34,7 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.dimo.http.RestClient;
 import com.dimo.utils.DeviceUtil;
+import com.dimo.utils.FileUtil;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.gitonway.lee.niftymodaldialogeffects.lib.Effectstype;
@@ -38,6 +43,7 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.yuan.cp.activity.ClipPictureActivity;
 import com.yuan.skeleton.R;
 import com.yuan.skeleton.application.Injector;
 import com.yuan.skeleton.base.BaseFragmentActivity;
@@ -57,6 +63,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 
@@ -77,6 +84,15 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
     public static final int kActivityRequestCodeDateTimePicker = 6;
     public static final int kActivityRequestCodeDialog = 7;
     public static final int kActivityRequestCodeImagePicker = 9;
+
+    private final int SYS_INTENT_REQUEST = 0XFF01;
+    private final int CAMERA_INTENT_REQUEST = 0XFF02;
+    private final int FILE_INTENT_REQUEST = 0XFF03;
+
+    private String capturePath;
+    private Double clipRatio;
+    private String clipHeight;
+    private String clipWidth;
 
     public WebViewJavascriptBridge bridge;
     protected FragmentManager mFragmentManager;
@@ -1025,6 +1041,43 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                 locationClient.start();
             }
         });
+
+        bridge.registerHandler("cutImage", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                mCallback = jsCallback;
+
+                try {
+                    HashMap<String, String> hashMap = StringUtil.JSONString2HashMap(data);
+                    clipHeight = hashMap.get("height");
+                    clipWidth = hashMap.get("width");
+                    clipRatio = Integer.valueOf(clipHeight).doubleValue() / Integer.valueOf(clipWidth).doubleValue();
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                //1.弹出选择图片功能
+                new AlertDialog.Builder(mContext).setTitle(R.string.dialog_title)
+                        .setPositiveButton(R.string.dialog_camera, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //进入相机
+                                systemCamera();
+                                dialog.dismiss();
+                            }
+                        }).setNegativeButton(R.string.dialog_photo, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //进入相册
+                        systemPhoto();
+                        dialog.dismiss();
+                    }
+                }).show();
+
+            }
+        });
     }
 
     protected void startImagePicker() {
@@ -1099,7 +1152,7 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
         registerHandle();
     }
 
-    @Override
+    /*@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Timber.v("REQUEST CODE - " + requestCode);
 
@@ -1195,7 +1248,7 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
         }
 
         super.onActivityResult(requestCode, resultCode, data);
-    }
+    }*/
 
     //FIXME: use updated photo selection widget
     public void startActivityGallery() {
@@ -1302,5 +1355,59 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                 mCallback.callback(ret.toString());
             }
         });
+    }
+
+    /**
+     * 打开系统相册
+     */
+    private void systemPhoto() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, SYS_INTENT_REQUEST);
+
+    }
+
+    private void systemCamera(){
+        String sdStatus = Environment.getExternalStorageState();
+		/* 检测sd是否可用 */
+        if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) {
+            Toast.makeText(this, "SD卡不可用！", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+        String name = formatter.format(System.currentTimeMillis()) + ".jpg";
+        capturePath = FileUtil.getPhotoPath() + name;
+
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(capturePath)));
+        startActivityForResult(intent, CAMERA_INTENT_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Intent intent = new Intent(mContext, ClipPictureActivity.class);
+        intent.putExtra("clipRatio",clipRatio);
+        intent.putExtra("clipHeight",clipHeight);
+        intent.putExtra("clipWidth",clipWidth);
+        if(requestCode == CAMERA_INTENT_REQUEST && resultCode == RESULT_OK){
+            intent.putExtra("type","camera");
+            intent.putExtra("imageFilePath",capturePath);
+            startActivityForResult(intent,FILE_INTENT_REQUEST);
+        } else if (requestCode == SYS_INTENT_REQUEST && resultCode == RESULT_OK && data != null){
+            Uri uri = data.getData();
+            intent.putExtra("type","photo");
+            intent.putExtra("imageFilePath",uri.toString());
+            startActivityForResult(intent,FILE_INTENT_REQUEST);
+        } else if (requestCode == FILE_INTENT_REQUEST
+                && resultCode == RESULT_OK) {
+            String filePath = data.getStringExtra("filePath");
+            mCallback.callback(filePath);
+            intent = null;
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

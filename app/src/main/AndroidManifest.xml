@@ -66,6 +66,10 @@
             android:launchMode="singleTask"
             android:theme="@style/ChatMainTheme"/>
 
+        <activity android:name="com.yuan.cp.activity.ClipPictureActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+
         <service android:name="com.avos.avoscloud.PushService" />
 
         <receiver android:name="com.dimo.receiver.Receiver">

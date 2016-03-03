@@ -51,6 +51,8 @@ public class WebViewFragment extends WebViewBaseFragment {
 
         Timber.v("onCreateView");
 
+        redirectToLoadUrl("page/index.html");
+
         return view;
     }
 }

@@ -114,6 +114,13 @@ $(function () {
       });
     });
 
+    $('#btn_cut_img').click(function () {
+          bridge.cutImage({
+              width:'200',
+              height:'200'
+          });
+    });
+
     $('#btn_login_leanchat').click(function () {
       bridge.reverseLeanChatLogin({'user':"111", 'passwd':"111"}, function(data) {
         debug(data);

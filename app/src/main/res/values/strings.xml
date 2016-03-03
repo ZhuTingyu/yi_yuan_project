@@ -9,6 +9,9 @@
     <string name="tabbar_item_txt_msg">消息</string>
     <string name="tabbar_item_txt_profile">我</string>
     <string name="txt_share">分享</string>
+    <string name="dialog_title">选择上传方式</string>
+    <string name="dialog_camera">相机</string>
+    <string name="dialog_photo">相册</string>
 
     <string name="setting_preference_voice">语音</string>
 

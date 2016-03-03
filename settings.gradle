@@ -3,4 +3,5 @@ include ':libraries:leanchatlib'
 include ':libraries:ShareCode'
 include ':libraries:Loading'
 include ':libraries:MultiImageSelector'
+include ':libraries:clippicture'
 
