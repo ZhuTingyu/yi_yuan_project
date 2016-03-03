@@ -121,6 +121,10 @@ $(function () {
           });
     });
 
+    $('#btn_broadcast').click(function () {
+              bridge.broadcast("12345","this is broadcast");
+    });
+
     $('#btn_login_leanchat').click(function () {
       bridge.reverseLeanChatLogin({'user':"111", 'passwd':"111"}, function(data) {
         debug(data);

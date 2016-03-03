@@ -264,6 +264,22 @@ var bridge = {
 
     gBridge.callHandler('saveImageDataToGallery', string, callback);
   },
+
+  /**
+     * 广播，bridge.registerHandler("onBroadcast", function(result){})
+     * result.code 广播类型; result.data 数据
+     * @param code
+     * @param data
+     * @param callback
+     */
+    broadcast: function(code, data, callback) {
+      var params = {
+        "code": code,
+        "data": data
+      };
+      gBridge.callHandler("broadcast", JSON.stringify(params), callback);
+    },
+
   cutImage: function (params, callback) {
       var obj = params;
       var string = JSON.stringify(obj);

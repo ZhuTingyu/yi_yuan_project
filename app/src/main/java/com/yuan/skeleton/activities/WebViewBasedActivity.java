@@ -464,7 +464,7 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
             }
         });
 
-        bridge.registerHandler("setRightItem", new WebViewJavascriptBridge.WVJBHandler() {
+        /*bridge.registerHandler("setRightItem", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("setRightItem got:" + data);
@@ -502,7 +502,7 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                     });
                 }
             }
-        });
+        });*/
 
         bridge.registerHandler("getAOSPVersion", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
@@ -1236,6 +1236,11 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
 
     public void startActivityCamera() {
 
+    }
+
+    //TODO: 接收Web端触发的Event事件
+    public void onEvent(WebBroadcastEvent event){
+        Toast.makeText(mContext,event.result,Toast.LENGTH_SHORT).show();
     }
 
     public void uploadImage(InputStream is, JSONArray imgResizeCfg) {
