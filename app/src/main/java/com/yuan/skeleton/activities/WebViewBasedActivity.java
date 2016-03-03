@@ -3,6 +3,7 @@ package com.yuan.skeleton.activities;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -48,6 +49,7 @@ import com.yuan.skeleton.R;
 import com.yuan.skeleton.application.Injector;
 import com.yuan.skeleton.base.BaseFragmentActivity;
 import com.yuan.skeleton.common.Constants;
+import com.yuan.skeleton.event.WebBroadcastEvent;
 import com.yuan.skeleton.ui.fragment.WebViewBaseFragment;
 import com.yuan.skeleton.ui.fragment.WebViewFragment;
 import com.victor.loading.rotate.RotateLoading;
@@ -69,6 +71,7 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import de.greenrobot.event.EventBus;
 import me.nereo.multi_image_selector.MultiImageSelectorActivity;
 import timber.log.Timber;
 
@@ -465,65 +468,34 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("setRightItem got:" + data);
-
-                HashMap<String, String> stringStringHashMap = null;
+                HashMap<String, String> params = null;
                 try {
-                    stringStringHashMap = StringUtil.JSONString2HashMap(data);
+                    params = StringUtil.JSONString2HashMap(data);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
-                final String text = stringStringHashMap.get("text");
-
-                JSONArray menu = null;
-                try {
-                    menu = new JSONArray(stringStringHashMap.get("menu"));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                if (TextUtils.isEmpty(text) && menu != null && menu.length() != 0) {
-                    // show a '...' image button
-                    final JSONArray finalMenu = menu;
-                    setRightItem(R.drawable.ic_more, new View.OnClickListener() {
+                final String text = params.get("type");
+//                final String content = params.get("content").toString().substring(0,params.get("content").indexOf("."));
+                final String content = params.get("content").toString();
+                if (!TextUtils.isEmpty(text) && text.equals("icon")) {
+                    Resources resources = getResources();
+                    String icon = content.substring(0,params.get("content").indexOf("."));
+                    int resourceId = resources.getIdentifier(icon,"drawable",getPackageName());
+                    setRightItem(resourceId, new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            // show a dropdown menu based on the list
-                            ImageButton button = ButterKnife.findById(mTopBar, R.id.topbar_right_btn);
-
-                            PopupMenu popupMenu = new PopupMenu(mContext, button);
-
-                            for (int i = 0; i < finalMenu.length(); i++) {
-                                try {
-                                    String item = finalMenu.getString(i);
-                                    popupMenu.getMenu().add(item);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-
-                            popupMenu.show();
-
-                            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                                @Override
-                                public boolean onMenuItemClick(MenuItem item) {
-                                    Timber.v("onMenuItemClick title : " + item.getTitle().toString());
-                                    bridge.callHandler("rightItemClick", item.getTitle().toString(), null);
-                                    return false;
-                                }
-                            });
-                            if (null != callback) {
-                                callback.callback("right image button clicked");
-                            }
+                            callback.callback("onRightItemClick");
                         }
                     });
                 } else {
                     // show a text button
-                    setRightItem(text, new View.OnClickListener() {
+                    setRightItem(content, new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            bridge.callHandler("rightItemClick", text, null);
+                            bridge.callHandler("onRightItemClick", content, null);
                             if (null != callback) {
-                                bridge.callHandler("rightItemClick", text, null);
+                                bridge.callHandler("onRightItemClick", content, null);
                                 callback.callback("right text button clicked");
                             }
                         }
@@ -1076,6 +1048,13 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                     }
                 }).show();
 
+            }
+        });
+
+        bridge.registerHandler("broadcast", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(final String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
+                EventBus.getDefault().post(new WebBroadcastEvent(data, WebViewBasedActivity.this));
             }
         });
     }
