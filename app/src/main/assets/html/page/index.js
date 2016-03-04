@@ -131,6 +131,12 @@ $(function () {
         })
     });
 
+    $('#btn_showImagePicker').click(function () {
+            bridge.showImagePicker("showImagePicker",function(data){
+                alert(data);
+            })
+    });
+
     $('#btn_login_leanchat').click(function () {
       bridge.reverseLeanChatLogin({'user':"111", 'passwd':"111"}, function(data) {
         debug(data);

@@ -70,6 +70,10 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
 
+        <activity android:name="me.nereo.multi_image_selector.MultiImageSelectorActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+
         <service android:name="com.avos.avoscloud.PushService" />
 
         <receiver android:name="com.dimo.receiver.Receiver">

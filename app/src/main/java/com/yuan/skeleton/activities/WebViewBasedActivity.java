@@ -3,9 +3,6 @@ package com.yuan.skeleton.activities;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -43,6 +40,7 @@ import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.gitonway.lee.niftymodaldialogeffects.lib.Effectstype;
 import com.gitonway.lee.niftymodaldialogeffects.lib.NiftyDialogBuilder;
+import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -1454,6 +1452,23 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
             String filePath = data.getStringExtra("filePath");
             mCallback.callback(filePath);
             intent = null;
+        } else if (requestCode == kActivityRequestCodeImagePicker) {
+            // 使用微信风格的集成拍照/图库的图片选择器
+            if (resultCode == RESULT_OK) {
+                // Get the result list of select image paths
+                List<String> path = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
+                StringBuilder csvList = new StringBuilder();
+                for (String s : path) {
+                    csvList.append(s);
+                    csvList.append(",");
+                }
+                Gson gson = new Gson();
+
+//                prefs.edit().putString("cached_selected_images", csvList.toString()).commit();
+                mCallback.callback(gson.toJson(path));
+                // 选择图片之后保留在本地页面, 并通知页面
+//                bridge.callHandler("activetyFinished");
+            }
         }
 
         super.onActivityResult(requestCode, resultCode, data);
