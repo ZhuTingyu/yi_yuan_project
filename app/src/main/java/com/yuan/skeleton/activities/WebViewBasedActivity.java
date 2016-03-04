@@ -10,12 +10,15 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.PopupMenu;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
@@ -48,11 +51,14 @@ import com.yuan.cp.activity.ClipPictureActivity;
 import com.yuan.skeleton.R;
 import com.yuan.skeleton.application.Injector;
 import com.yuan.skeleton.base.BaseFragmentActivity;
+import com.yuan.skeleton.bean.PayInfo;
 import com.yuan.skeleton.common.Constants;
 import com.yuan.skeleton.event.WebBroadcastEvent;
+import com.yuan.skeleton.payment.AliPay;
 import com.yuan.skeleton.ui.fragment.WebViewBaseFragment;
 import com.yuan.skeleton.ui.fragment.WebViewFragment;
 import com.victor.loading.rotate.RotateLoading;
+import com.yuan.skeleton.utils.JsonUtils;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
@@ -64,10 +70,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -109,6 +117,19 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
     WebViewJavascriptBridge.WVJBResponseCallback mCallback;
     Uri fileUri;
     JSONArray mImgResizeCfg;
+    private AliPay aliPay;
+    private String pay_type;
+
+    private Handler mHandler = new Handler() {
+        public void handleMessage(Message msg) {
+            if (pay_type.equals("alipay")) {
+                aliPay.AlipayResultProcess(msg);
+            }
+            else if (pay_type.equals("wechatpay")) {
+//                WechatpayResultProcess(msg);
+            }
+        };
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -199,6 +220,49 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
     }
 
     protected void registerHandle() {
+
+        bridge.registerHandler("purchase", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                Log.i("reponse.data",data);
+                Map<String,Object> params = null;
+                Map<String,Object> orderMap = null;
+                Map<String,Object> orderPackagesMap = null;
+                try {
+//                    params = (Map<String, Object>) JsonUtils.newInstance().readJson2List(data);
+//                    orderMap = (Map<String, Object>) params.get("order");
+//                    List<Object> orderPackagesList = (List<Object>) orderMap.get("order_packages");
+//                    orderPackagesMap = (Map<String, Object>) orderPackagesList.get(0);
+                }  catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                String type = "alipay";
+//                String type = (String) params.get("type");
+                pay_type = type;
+                if (type.equals("alipay")) {
+                    PayInfo payInfo = new PayInfo();
+//                    payInfo.setOrderNo(orderMap.get("order_no").toString());
+//                    payInfo.setProduct_desc(orderPackagesMap.get("package_name").toString()+ orderPackagesMap.get("total_num").toString() + "张");
+                    payInfo.setOrderNo("123332222");
+                    payInfo.setProduct_desc("测试测试测试");
+                    payInfo.setProduct_name("支付Title");
+                    payInfo.setTotal_fee("0.01");
+//                    payInfo.setTotal_fee(String.valueOf(((Integer) orderMap.get("total_fee") / 100)));
+                    aliPay = new AliPay(
+                            payInfo,
+                            mContext,
+                            WebViewBasedActivity.this
+                    );
+                    aliPay.setHandler(mHandler);
+                    aliPay.setPayCallback(jsCallback);
+                    aliPay.pay();       //支付
+                }
+
+            }
+        });
+
+
         bridge.registerHandler("redirectPage", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {

@@ -285,5 +285,10 @@ var bridge = {
       var string = JSON.stringify(obj);
 
       gBridge.callHandler('cutImage', string, callback);
-    }
+  },
+  purchase: function (params, callback) {
+      var string = JSON.stringify(params);
+
+      gBridge.callHandler("purchase", string, callback);
+  }
 };

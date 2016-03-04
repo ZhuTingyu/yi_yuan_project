@@ -7,6 +7,8 @@ package com.yuan.skeleton.common;
 public class Constants {
     public static String kApplicationId = "com.mowelltech.threec";
 
+    public static String kWebServiceAPIEndpoint = "http://www.bigbuschina.com/data";
+
     // Production Server
     public static String kPrefsFirstLaunch = "kPrefsFirstLaunch";
 

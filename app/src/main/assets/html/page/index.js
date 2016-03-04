@@ -125,6 +125,12 @@ $(function () {
               bridge.broadcast("12345","this is broadcast");
     });
 
+    $('#btn_ali_pay').click(function () {
+        bridge.purchase("hello",function(data){
+            alert(data);
+        })
+    });
+
     $('#btn_login_leanchat').click(function () {
       bridge.reverseLeanChatLogin({'user':"111", 'passwd':"111"}, function(data) {
         debug(data);

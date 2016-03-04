@@ -101,33 +101,33 @@ dependencies {
     compile project(':libraries:clippicture')
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:23.0.1'
-    /** Annotations . */
+    /** Annotations .      */
     apt "org.androidannotations:androidannotations:3.3.2"
     compile 'org.androidannotations:androidannotations-api:3.3.2'
     compile 'com.android.support:support-v4:23.0.1'
-    /** Core . */
+    /** Core .      */
     compile 'org.apache.commons:commons-lang3:3.3.1'
     compile 'commons-io:commons-io:2.4'
     compile 'com.google.code.gson:gson:2.3.1'
     compile 'com.orhanobut:hawk:1.17'
     //    compile 'jp.co.cyberagent.android.gpuimage:gpuimage-library:1.2.3'
     //    compile 'org.apache.httpcomponents:httpcomponents-core:4.4.3'
-    /** Injection . */
+    /** Injection .      */
     apt "com.squareup.dagger:dagger-compiler:1.2.2"
     compile 'com.squareup.dagger:dagger:1.2.2'
     //    compile 'com.jakewharton:butterknife:6.1.0'
     // otto is dead, long live eventbus
     compile 'de.greenrobot:eventbus:2.3.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
-    /** Logging . */
+    /** Logging .      */
     compile 'com.jakewharton.timber:timber:3.1.0'
-    /** Social . */
+    /** Social .      */
     //    compile 'com.facebook.android:facebook-android-sdk:3.23.0'
-    /** Network . */
+    /** Network .      */
     compile 'com.github.kevinsawicki:http-request:6.0'
     compile 'com.loopj.android:android-async-http:1.4.6'
     compile 'com.mani:thindownloadmanager:1.0.0'
-    /** UI . */
+    /** UI .      */
     compile 'com.github.johnpersano:supertoasts:1.3.4@aar'
     compile 'com.metrekare:contentloadingprogressdialog:0.1'
     //    compile 'eu.inmite.android.lib:android-styled-dialogs:1.2.0'
@@ -142,6 +142,7 @@ dependencies {
     //    compile 'net.kianoni:fontloader:0.3.0'
     compile 'com.bugtags.library:bugtags-lib:latest.integration'
     compile project(':libraries:clippicture')
+    compile files('libs/alipaySDK-20150818.jar')
 }
 
 android.applicationVariants.all { variant ->
