@@ -1,0 +1,3 @@
+[submodule "app/src/main/assets/html"]
+	path = app/src/main/assets/html
+	url = git@git.ieyuan.com:house.sale/house.sale.web.git
