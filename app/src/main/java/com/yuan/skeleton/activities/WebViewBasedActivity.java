@@ -1057,6 +1057,10 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                             obj.put("lng", location.getLongitude());
                             obj.put("lat", location.getLatitude());
                             obj.put("addr", location.getAddrStr());
+                            obj.put("city",location.getCity());
+                            obj.put("district",location.getDistrict());
+                            obj.put("province",location.getProvince());
+                            obj.put("street",location.getStreet());
                             obj.put("success", true);
                         } catch (Exception e) {
                             obj = null;

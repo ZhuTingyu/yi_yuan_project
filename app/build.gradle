@@ -45,8 +45,18 @@ android {
     }
 
     signingConfigs {
-        release {
+        debug {
+            storeFile file("../house.jks")
+            storePassword "house888"
+            keyAlias "house"
+            keyPassword "house888"
+        }
 
+        release {
+            storeFile file("../house.jks")
+            storePassword "house888"
+            keyAlias "house"
+            keyPassword "house888"
         }
     }
 
