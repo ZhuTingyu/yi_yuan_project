@@ -103,7 +103,7 @@
             <!--android:value="0IDGYMrRuOOuMrSERGgbFwzq" />&lt;!&ndash; key for yang's mac &ndash;&gt;-->
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="PNnEj0Mo1gqAcwmhHvMLVycB" /><!-- key for yang's home -->
+            android:value="EAsWQelCGVqigficOcu92fOmrWec1Eh5" /><!-- key for yang's home -->
         <service android:name="com.baidu.location.f" android:enabled="true" android:process=":remote">
         </service>
 

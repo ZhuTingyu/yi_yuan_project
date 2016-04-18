@@ -1,13 +1,6 @@
 package com.yuan.skeleton.activities;
 
-
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
@@ -15,27 +8,21 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.avos.avoscloud.AVAnalytics;
 import com.avos.avoscloud.AVGeoPoint;
 import com.avos.avoscloud.AVInstallation;
 import com.avos.avoscloud.AVUser;
 import com.avos.avoscloud.PushService;
-import com.avoscloud.chat.service.CacheService;
 import com.avoscloud.chat.service.PreferenceMap;
 import com.avoscloud.chat.service.UserService;
 import com.avoscloud.chat.ui.contact.ContactFragment;
 import com.avoscloud.chat.ui.conversation.ConversationRecentFragment;
-import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
-import com.dimo.utils.FileUtil;
-import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
-import com.yuan.cp.activity.ClipPictureActivity;
 import com.yuan.skeleton.R;
 import com.yuan.skeleton.application.DMApplication;
 import com.yuan.skeleton.application.Injector;
@@ -44,12 +31,6 @@ import com.yuan.skeleton.event.PageEvent;
 import com.yuan.skeleton.ui.fragment.WebViewBaseFragment;
 import com.yuan.skeleton.ui.fragment.WebViewFragment;
 import com.umeng.update.UmengUpdateAgent;
-
-import org.json.JSONException;
-
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
 
 import butterknife.ButterKnife;
 import de.greenrobot.event.EventBus;
