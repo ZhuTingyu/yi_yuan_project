@@ -9,6 +9,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import com.ashokvarma.bottomnavigation.BottomNavigationBar;
+import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.avos.avoscloud.AVAnalytics;
 import com.avos.avoscloud.AVGeoPoint;
 import com.avos.avoscloud.AVInstallation;
@@ -47,6 +49,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
     public TCLocationListener locationListener;
 
     String cachedNotificationPayload;
+    private BottomNavigationBar bottomNavigationBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +98,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 //        updateService.checkUpdate();
 //        CacheService.registerUser(AVUser.getCurrentUser());
 
-        ButterKnife.findById(getTabBar(), R.id.tabbar_btn_1).performClick();
+//        ButterKnife.findById(getTabBar(), R.id.tabbar_btn_1).performClick();
 
         switchToFragment(Constants.kFragmentTagNearby);
     }
@@ -179,55 +182,39 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
     // FIXME: ugly implementation, need dynamic adapt the tab bar items.
     private void setupTabbarClickListener() {
-        ButterKnife.findById(getTabBar(), R.id.tabbar_btn_1).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                changeButtonTextColor(R.id.tabbar_btn_1);
-                changeButtonIconDrawable(R.id.tabbar_btn_1, R.drawable.ic_home_p);
+        this.bottomNavigationBar = ButterKnife.findById(getTabBar(),R.id.bottom_navigation_bar);
+        bottomNavigationBar
+                .addItem(new BottomNavigationItem(R.drawable.ic_home,"房源")).setActiveColor(R.color.primary_color_scheme)
+                .addItem(new BottomNavigationItem(R.drawable.ic_suggest,"建议")).setActiveColor(R.color.primary_color_scheme)
+                .addItem(new BottomNavigationItem(R.drawable.ic_chat,"消息")).setActiveColor(R.color.primary_color_scheme)
+                .setFirstSelectedPosition(0)
+                .initialise();
 
-                switchToFragment(Constants.kFragmentTagNearby);
+        bottomNavigationBar.setTabSelectedListener(new BottomNavigationBar.OnTabSelectedListener(){
+
+            @Override
+            public void onTabSelected(int position) {
+                switch (position){
+                    case 0:
+                        switchToFragment(Constants.kFragmentTagNearby);
+                        break;
+                    case 1:
+                        break;
+                    case 2:
+                        break;
+                }
+            }
+
+            @Override
+            public void onTabUnselected(int position) {
+
+            }
+
+            @Override
+            public void onTabReselected(int position) {
+
             }
         });
-
-        ButterKnife.findById(getTabBar(), R.id.tabbar_btn_2).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                changeButtonTextColor(R.id.tabbar_btn_2);
-                changeButtonIconDrawable(R.id.tabbar_btn_2, R.drawable.ic_suggest_p);
-
-                switchToFragment(Constants.kFragmentTagSocial);
-            }
-        });
-
-        ButterKnife.findById(getTabBar(), R.id.tabbar_btn_3).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                changeButtonTextColor(R.id.tabbar_btn_3);
-                changeButtonIconDrawable(R.id.tabbar_btn_3, R.drawable.ic_chat_p);
-
-                switchToFragment(Constants.kFragmentTagContacts);
-            }
-        });
-    }
-
-    private void setupDefaultApperance() {
-        changeButtonTextColor(R.id.tabbar_btn_1);
-    }
-
-    private void changeButtonTextColor(int resId) {
-        ((Button) ButterKnife.findById(getTabBar(), R.id.tabbar_btn_1)).setTextColor(getResources().getColor(R.color.text_default_gray));
-        ((Button) ButterKnife.findById(getTabBar(), R.id.tabbar_btn_2)).setTextColor(getResources().getColor(R.color.text_default_gray));
-        ((Button) ButterKnife.findById(getTabBar(), R.id.tabbar_btn_3)).setTextColor(getResources().getColor(R.color.text_default_gray));
-
-        ((Button) ButterKnife.findById(getTabBar(), resId)).setTextColor(getResources().getColor(R.color.primary_color_scheme));
-    }
-
-    private void changeButtonIconDrawable(int resId, int resIconId) {
-        ((Button) ButterKnife.findById(getTabBar(), R.id.tabbar_btn_1)).setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_home), null, null);
-        ((Button) ButterKnife.findById(getTabBar(), R.id.tabbar_btn_2)).setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_suggest), null, null);
-        ((Button) ButterKnife.findById(getTabBar(), R.id.tabbar_btn_3)).setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_chat), null, null);
-
-        ((Button) ButterKnife.findById(getTabBar(), resId)).setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(resIconId), null, null);
     }
 
     @Override

@@ -10,64 +10,9 @@
         android:layout_height="1dp"
         android:background="@color/primary_color_scheme"/>
 
-    <LinearLayout
+    <com.ashokvarma.bottomnavigation.BottomNavigationBar
+        android:id="@+id/bottom_navigation_bar"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:orientation="horizontal"
-        android:weightSum="10">
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
-
-            <Button
-                android:id="@+id/tabbar_btn_1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:background="@android:color/transparent"
-                android:drawableTop="@drawable/ic_home"
-                android:text="@string/tabbar_item_txt_house"
-                android:textSize="@dimen/dim_tabbar_font_size"
-                android:textColor="@drawable/tabbar_title_selector"/>
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@android:color/transparent">
-
-            <Button
-                android:id="@+id/tabbar_btn_2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:background="@android:color/transparent"
-                android:drawableTop="@drawable/ic_suggest"
-                android:text="@string/tabbar_item_txt_proposal"
-                android:textSize="@dimen/dim_tabbar_font_size"
-                android:textColor="@drawable/tabbar_title_selector"/>
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
-
-            <Button
-                android:id="@+id/tabbar_btn_3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:background="@android:color/transparent"
-                android:drawableTop="@drawable/ic_chat"
-                android:text="@string/tabbar_item_txt_msg"
-                android:textSize="@dimen/dim_tabbar_font_size"
-                android:textColor="@drawable/tabbar_title_selector"/>
-
-        </RelativeLayout>
-    </LinearLayout>
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>
