@@ -56,7 +56,7 @@ import com.yuan.skeleton.payment.AliPay;
 import com.yuan.skeleton.ui.fragment.WebViewBaseFragment;
 import com.yuan.skeleton.ui.fragment.WebViewFragment;
 import com.victor.loading.rotate.RotateLoading;
-import com.yuan.skeleton.utils.JsonUtils;
+import com.yuan.skeleton.utils.JsonParse;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
@@ -1478,7 +1478,12 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    protected boolean isUserType(){
-        return prefs.getString("userType","user") == "user" ? true : false;
+    protected boolean isUserType() {
+        try {
+            return JsonParse.getInstance().judgeUserType();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return true;
     }
 }

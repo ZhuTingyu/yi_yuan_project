@@ -50,7 +50,9 @@
 
         <activity
             android:name=".activities.MainActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden"
+            android:configChanges="orientation|keyboardHidden"/>
 
         <activity android:name=".activities.WebViewActivity"
             android:screenOrientation="portrait" />

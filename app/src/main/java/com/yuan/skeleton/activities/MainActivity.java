@@ -30,6 +30,7 @@ import com.yuan.skeleton.application.DMApplication;
 import com.yuan.skeleton.application.Injector;
 import com.yuan.skeleton.common.Constants;
 import com.yuan.skeleton.event.PageEvent;
+import com.yuan.skeleton.ui.fragment.AgencyMainFragment;
 import com.yuan.skeleton.ui.fragment.UserMainFragment;
 import com.yuan.skeleton.ui.fragment.WebViewBaseFragment;
 import com.yuan.skeleton.ui.fragment.WebViewFragment;
@@ -156,6 +157,8 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         if (tag.equals(Constants.kFragmentTagNearby)) {
             if(isUserType())
                 f = UserMainFragment.newInstance();
+            else
+                f = AgencyMainFragment.newInstance();
         }  else {
             f = WebViewFragment.newInstance();
         }

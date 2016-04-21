@@ -14,10 +14,10 @@ import butterknife.ButterKnife;
 /**
  * Created by KevinLee on 2016/4/21.
  */
-public class UserMainFragment extends WebViewBaseFragment{
+public class AgencyMainFragment extends WebViewBaseFragment {
 
-    public static UserMainFragment newInstance() {
-        UserMainFragment fragment = new UserMainFragment();
+    public static AgencyMainFragment newInstance() {
+        AgencyMainFragment fragment = new AgencyMainFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -26,14 +26,14 @@ public class UserMainFragment extends WebViewBaseFragment{
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = createView(inflater, R.layout.fragment_main_user, container, savedInstanceState);
+        View view = createView(inflater, R.layout.fragment_main_agency, container, savedInstanceState);
 
         Injector.inject(this);
 
         ButterKnife.reset(this);
         ButterKnife.inject(this, view);
 
-        redirectToLoadUrl("user_index.html");
+        redirectToLoadUrl("agency_index.html");
         return view;
     }
 
