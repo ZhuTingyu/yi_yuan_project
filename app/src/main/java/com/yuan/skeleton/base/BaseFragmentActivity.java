@@ -121,7 +121,7 @@ public class BaseFragmentActivity extends FragmentActivity {
 
             int raw = (int) (getResources().getDimension(R.dimen.tabbar_height) / getResources().getDisplayMetrics().density);
             int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, raw, getResources().getDisplayMetrics());
-            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, height);
+            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, height + 20);
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 
             viewGroup.addView(mTabBar, layoutParams);

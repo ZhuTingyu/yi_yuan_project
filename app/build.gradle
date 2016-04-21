@@ -154,6 +154,7 @@ dependencies {
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.github.sd6352051.niftydialogeffects:niftydialogeffects:1.0.0@aar'
     compile 'com.baoyz.actionsheet:library:1.1.1'
+    compile 'com.ashokvarma.android:bottom-navigation-bar:1.0.0'
     //    compile 'com.github.JayFang1993:DropDownMenu:fb80ee7'
 
     //    compile 'net.kianoni:fontloader:0.3.0'

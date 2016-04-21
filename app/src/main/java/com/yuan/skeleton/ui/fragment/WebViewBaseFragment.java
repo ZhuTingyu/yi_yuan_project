@@ -57,7 +57,9 @@ public class WebViewBaseFragment extends Fragment {
     public void onDestroyView() {
         WebStorage.getInstance().deleteAllData();
         ViewGroup holder = ButterKnife.findById(getActivity(), R.id.webview_parent);
-        holder.removeView(webView);
+        if (holder != null) {
+            holder.removeView(webView);
+        }
         webView.removeAllViews();
         webView.destroy();
 

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 
 import com.yuan.skeleton.R;
+import com.yuan.skeleton.activities.MainActivity;
 import com.yuan.skeleton.application.Injector;
 
 import butterknife.ButterKnife;
@@ -50,8 +51,6 @@ public class WebViewFragment extends WebViewBaseFragment {
         ButterKnife.inject(this, view);
 
         Timber.v("onCreateView");
-
-        redirectToLoadUrl("page/index.html");
 
         return view;
     }

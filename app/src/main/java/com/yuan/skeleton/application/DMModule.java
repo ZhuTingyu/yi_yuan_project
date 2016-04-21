@@ -9,6 +9,7 @@ import com.yuan.skeleton.activities.TutorialActivity;
 import com.yuan.skeleton.activities.WebViewActivity;
 import com.yuan.skeleton.activities.WebViewBasedActivity;
 import com.yuan.skeleton.ui.dialog.PopUpDialog;
+import com.yuan.skeleton.ui.fragment.UserMainFragment;
 import com.yuan.skeleton.ui.fragment.WebViewBaseFragment;
 import com.yuan.skeleton.ui.fragment.WebViewFragment;
 
@@ -34,6 +35,7 @@ import dagger.Module;
 
                         WebViewBaseFragment.class,
                         WebViewFragment.class,
+                        UserMainFragment.class,
 
                         PopUpDialog.class
                 }

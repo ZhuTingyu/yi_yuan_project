@@ -24,7 +24,6 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="20dp"
                 android:background="@android:color/transparent"
-                android:src="@drawable/ic_backarrow"
                 android:visibility="gone" />
 
             <Button
@@ -32,7 +31,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
-                android:drawableTop="@drawable/ic_backarrow"
                 android:text="@string/text_category"
                 android:textSize="@dimen/text_size_small"
                 android:textColor="@color/white" />

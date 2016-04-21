@@ -13,14 +13,13 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:gravity="center"
         android:orientation="horizontal"
         android:weightSum="10">
 
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight="2">
+            android:layout_weight="1">
 
             <Button
                 android:id="@+id/tabbar_btn_1"
@@ -28,8 +27,8 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:background="@android:color/transparent"
-                android:drawableTop="@drawable/ic_nearby_p"
-                android:text="@string/tabbar_item_txt_nearby"
+                android:drawableTop="@drawable/ic_home"
+                android:text="@string/tabbar_item_txt_house"
                 android:textSize="@dimen/dim_tabbar_font_size"
                 android:textColor="@drawable/tabbar_title_selector"/>
         </RelativeLayout>
@@ -37,7 +36,7 @@
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight="2"
+            android:layout_weight="1"
             android:background="@android:color/transparent">
 
             <Button
@@ -46,8 +45,8 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:background="@android:color/transparent"
-                android:drawableTop="@drawable/ic_circle"
-                android:text="@string/tabbar_item_txt_community"
+                android:drawableTop="@drawable/ic_suggest"
+                android:text="@string/tabbar_item_txt_proposal"
                 android:textSize="@dimen/dim_tabbar_font_size"
                 android:textColor="@drawable/tabbar_title_selector"/>
         </RelativeLayout>
@@ -55,28 +54,10 @@
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight="2">
+            android:layout_weight="1">
 
             <Button
                 android:id="@+id/tabbar_btn_3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:background="@android:color/transparent"
-                android:drawableTop="@drawable/ic_relation"
-                android:text="@string/tabbar_item_txt_relation"
-                android:textSize="@dimen/dim_tabbar_font_size"
-                android:textColor="@drawable/tabbar_title_selector"/>
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="2">
-
-            <Button
-                android:id="@+id/tabbar_btn_4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
@@ -86,23 +67,6 @@
                 android:textSize="@dimen/dim_tabbar_font_size"
                 android:textColor="@drawable/tabbar_title_selector"/>
 
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="2">
-
-            <Button
-                android:id="@+id/tabbar_btn_5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:background="@android:color/transparent"
-                android:drawableTop="@drawable/ic_user"
-                android:text="@string/tabbar_item_txt_profile"
-                android:textSize="@dimen/dim_tabbar_font_size"
-                android:textColor="@drawable/tabbar_title_selector"/>
         </RelativeLayout>
     </LinearLayout>
 

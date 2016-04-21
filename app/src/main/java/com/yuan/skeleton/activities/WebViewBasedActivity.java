@@ -1477,4 +1477,8 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
 
         super.onActivityResult(requestCode, resultCode, data);
     }
+
+    protected boolean isUserType(){
+        return prefs.getString("userType","user") == "user" ? true : false;
+    }
 }
