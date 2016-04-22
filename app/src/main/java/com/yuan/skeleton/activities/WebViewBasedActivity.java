@@ -25,10 +25,13 @@ import android.widget.Toast;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVUser;
 import com.avos.avoscloud.FindCallback;
+import com.avos.avoscloud.LogInCallback;
 import com.avos.avoscloud.SaveCallback;
+import com.avoscloud.chat.service.CacheService;
 import com.avoscloud.chat.service.UserService;
 import com.avoscloud.chat.ui.chat.ChatRoomActivity;
 import com.avoscloud.chat.util.Utils;
+import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
@@ -57,6 +60,7 @@ import com.yuan.skeleton.ui.fragment.WebViewBaseFragment;
 import com.yuan.skeleton.ui.fragment.WebViewFragment;
 import com.victor.loading.rotate.RotateLoading;
 import com.yuan.skeleton.utils.JsonParse;
+import com.yuan.skeleton.utils.ToastUtil;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
@@ -804,25 +808,31 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("setData got:" + data);
-
                 HashMap<String, String> params = null;
                 try {
                     params = StringUtil.JSONString2HashMap(data);
+
+                    String key = params.get("key");
+                    String value = params.get("value");
+
+                    if (value == null || value.equals("null"))
+                        prefs.edit().remove(key).commit();
+                    else
+                        prefs.edit().putString(key, value).commit();
+
+                    if("userLogin".equals(key)){
+                        params = StringUtil.JSONString2HashMap(data);
+                        String userName = params.get("lean_user");
+                        String passwd = params.get("lean_passwd");
+                        avUserLogin(userName,passwd);
+                    }
+
+                    if (null != callback) {
+                        callback.callback(null);
+                    }
+
                 } catch (JSONException e) {
                     e.printStackTrace();
-                }
-
-                String key = params.get("key");
-                String value = params.get("value");
-
-//TODO: impl
-                if (value == null)
-                    prefs.edit().remove(key).commit();
-                else
-                    prefs.edit().putString(key, value).commit();
-
-                if (null != callback) {
-                    callback.callback(null);
                 }
             }
         });
@@ -1123,6 +1133,31 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                 EventBus.getDefault().post(new WebBroadcastEvent(data, WebViewBasedActivity.this));
             }
         });
+    }
+
+    private void avUserLogin(final String userName, String userPass){
+        //TODO: handler after login to own server success
+        AVUser.logInInBackground(userName,userPass,
+                new LogInCallback<AVUser>() {
+                    @Override
+                    public void done(AVUser avUser, AVException e) {
+                        if (avUser != null) {
+                            String chatUserId = avUser.getObjectId();
+                            prefs.edit().putString("userLogin", userName)
+                                    .putString(Constants.kLeanChatCurrentUserObjectId, chatUserId)
+                                    .apply();
+                            UserService.updateUserLocation();
+                            ChatManager chatManager = ChatManager.getInstance();
+                            chatManager.setupDatabaseWithSelfId(AVUser.getCurrentUser().getObjectId());
+                            chatManager.openClientWithSelfId(AVUser.getCurrentUser().getObjectId(), null);
+                            CacheService.registerUser(AVUser.getCurrentUser());
+                            prefs.edit().putBoolean("isLogin",true).commit();
+                            onCreate(null);
+                        }else {
+                            ToastUtil.showShort(mContext,"leancould登陆失败");
+                        }
+                    }
+                });
     }
 
     protected void startImagePicker() {

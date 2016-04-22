@@ -35,8 +35,8 @@ public class Constants {
      * LeanCloud Application Settings.
      * https://leancloud.cn/app.html?appid=9hk99pr7gknwj83tdmfbbccqar1x2myge00ulspafnpcbab8#/key
      */
-    public static String kAVApplicationId = "2flg9asqjtczbilzi7d5svu4bad0a1d1lou1mxcfv3oyk2qq";
-    public static String kAVClientKey = "vcrsb5tgevi4l165zh7o4da2pz571z4q04oa0dqreqyp3qm5";
+    public static String kAVApplicationId = "IwzlUusBdjf4bEGlypaqNRIx-gzGzoHsz";
+    public static String kAVClientKey = "KLhHUoBqw5G1uMjrTsEqbaVR";
 
     public static final String kServiceCheckUpdate = "checkupdate";
     public static final String kServiceLogin = "login";
@@ -55,6 +55,8 @@ public class Constants {
     public static String kServiceHost = "http://3c.ieyuan.com";
     public static String kServiceUploadImage = "/upload-image";
     public static String kFragmentTagNearby = "kFragmentTagNearby";
+    public static String kFragmentTagLogin = "kFragmentTagLogin";
+    public static String kFragmentTagMessage = "kFragmentTagMessage";
     public static String kFragmentTagSocial = "kFragmentTagSocial";
     public static String kFragmentTagProfile = "kFragmentTagProfile";
     public static String kBugTagsKey = "644d24cf6972f42c2d51b7f0ba72e71f";

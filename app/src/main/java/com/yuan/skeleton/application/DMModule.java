@@ -10,7 +10,9 @@ import com.yuan.skeleton.activities.WebViewActivity;
 import com.yuan.skeleton.activities.WebViewBasedActivity;
 import com.yuan.skeleton.ui.dialog.PopUpDialog;
 import com.yuan.skeleton.ui.fragment.AgencyMainFragment;
+import com.yuan.skeleton.ui.fragment.LoginFragment;
 import com.yuan.skeleton.ui.fragment.UserMainFragment;
+import com.yuan.skeleton.ui.fragment.UserMessageFragment;
 import com.yuan.skeleton.ui.fragment.WebViewBaseFragment;
 import com.yuan.skeleton.ui.fragment.WebViewFragment;
 import com.yuan.skeleton.utils.JsonParse;
@@ -39,6 +41,8 @@ import dagger.Module;
                         WebViewFragment.class,
                         UserMainFragment.class,
                         AgencyMainFragment.class,
+                        UserMessageFragment.class,
+                        LoginFragment.class,
 
                         PopUpDialog.class,
                         JsonParse.class

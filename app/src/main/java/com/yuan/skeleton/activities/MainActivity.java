@@ -16,10 +16,13 @@ import com.avos.avoscloud.AVGeoPoint;
 import com.avos.avoscloud.AVInstallation;
 import com.avos.avoscloud.AVUser;
 import com.avos.avoscloud.PushService;
+import com.avoscloud.chat.service.CacheService;
 import com.avoscloud.chat.service.PreferenceMap;
 import com.avoscloud.chat.service.UserService;
+import com.avoscloud.chat.ui.chat.ChatRoomActivity;
 import com.avoscloud.chat.ui.contact.ContactFragment;
 import com.avoscloud.chat.ui.conversation.ConversationRecentFragment;
+import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
@@ -31,7 +34,9 @@ import com.yuan.skeleton.application.Injector;
 import com.yuan.skeleton.common.Constants;
 import com.yuan.skeleton.event.PageEvent;
 import com.yuan.skeleton.ui.fragment.AgencyMainFragment;
+import com.yuan.skeleton.ui.fragment.LoginFragment;
 import com.yuan.skeleton.ui.fragment.UserMainFragment;
+import com.yuan.skeleton.ui.fragment.UserMessageFragment;
 import com.yuan.skeleton.ui.fragment.WebViewBaseFragment;
 import com.yuan.skeleton.ui.fragment.WebViewFragment;
 import com.umeng.update.UmengUpdateAgent;
@@ -90,9 +95,12 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         initBaiduLocClient();
 
         // configure chat service
-//        ChatManager chatManager = ChatManager.getInstance();
-//        chatManager.setupDatabaseWithSelfId(AVUser.getCurrentUser().getObjectId());
-//        chatManager.openClientWithSelfId(AVUser.getCurrentUser().getObjectId(), null);
+        if(AVUser.getCurrentUser()!=null) {
+            ChatManager chatManager = ChatManager.getInstance();
+            chatManager.setupDatabaseWithSelfId(AVUser.getCurrentUser().getObjectId());
+            chatManager.openClientWithSelfId(AVUser.getCurrentUser().getObjectId(), null);
+            CacheService.registerUser(AVUser.getCurrentUser());
+        }
 
 // FIXME: crash here
 //        UpdateService updateService = UpdateService.getInstance(this);
@@ -100,8 +108,11 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 //        CacheService.registerUser(AVUser.getCurrentUser());
 
 //        ButterKnife.findById(getTabBar(), R.id.tabbar_btn_1).performClick();
+        if(prefs.getBoolean("isLogin",false))
+            switchToFragment(Constants.kFragmentTagNearby);
+        else
+            switchToFragment(Constants.kFragmentTagLogin);
 
-        switchToFragment(Constants.kFragmentTagNearby);
     }
 
     @Override
@@ -159,7 +170,14 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                 f = UserMainFragment.newInstance();
 //            else
 //                f = AgencyMainFragment.newInstance();
-        }  else {
+        } else if(tag.equals(Constants.kFragmentTagMessage)){
+//            if(isUserType())
+                f = UserMessageFragment.newInstance();
+//            else
+//                f = AgencyMainFragment.newInstance();
+        } else if(tag.equals(Constants.kFragmentTagLogin)){
+            f = LoginFragment.newInstance();
+        }else {
             f = WebViewFragment.newInstance();
         }
 
@@ -193,15 +211,20 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                 .setFirstSelectedPosition(0)
                 .initialise();
 
+        if(!prefs.getBoolean("isLogin",false))
+            return;
+
         bottomNavigationBar.setTabSelectedListener(new BottomNavigationBar.OnTabSelectedListener(){
 
             @Override
             public void onTabSelected(int position) {
+
                 switch (position){
                     case 0:
                         switchToFragment(Constants.kFragmentTagNearby);
                         break;
                     case 1 :
+                        switchToFragment(Constants.kFragmentTagMessage);
                         break;
                     case 2:
                         break;
