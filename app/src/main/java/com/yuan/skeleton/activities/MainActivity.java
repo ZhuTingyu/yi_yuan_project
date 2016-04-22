@@ -139,7 +139,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
     private void callbackWhenGetNotification(String notif) {
         bridge.callHandler("callbackWhenGetNotification", notif, new WebViewJavascriptBridge.WVJBResponseCallback() {
             @Override
-            public void callback(String data) {
+            public void callback(Object data) {
                 Timber.v("Transfer notification to JS successed");
             }
         });
@@ -201,8 +201,12 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         locClient.start();
     }
 
+    public BottomNavigationBar getBottomNavigationBar(){
+        return bottomNavigationBar;
+    }
+
     // FIXME: ugly implementation, need dynamic adapt the tab bar items.
-    private void setupTabbarClickListener() {
+    public void setupTabbarClickListener() {
         this.bottomNavigationBar = ButterKnife.findById(getTabBar(),R.id.bottom_navigation_bar);
         bottomNavigationBar
                 .addItem(new BottomNavigationItem(R.drawable.ic_home,"房源")).setActiveColor(R.color.primary_color_scheme)
@@ -260,7 +264,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         return super.onOptionsItemSelected(item);
     }
 
-    private void switchToFragment(String tag) {
+    public void switchToFragment(String tag) {
         // use other method to keep the old fragment than use this simple and rude `replace`
         mFragmentTransaction = mFragmentManager.beginTransaction();
         mFragmentTransaction.replace(R.id.content_frame, getFragment(tag), tag);

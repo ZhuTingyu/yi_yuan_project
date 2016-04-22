@@ -1,9 +1,7 @@
 package com.yuan.skeleton.ui.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,18 +9,20 @@ import android.view.ViewGroup;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVUser;
 import com.avos.avoscloud.LogInCallback;
-import com.avoscloud.chat.entity.avobject.User;
+import com.avoscloud.chat.service.CacheService;
 import com.avoscloud.chat.service.UserService;
-import com.avoscloud.leanchatlib.utils.NetAsyncTask;
-import com.dimo.http.RestClient;
+import com.avoscloud.leanchatlib.controller.ChatManager;
+import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.yuan.skeleton.R;
 import com.yuan.skeleton.activities.MainActivity;
 import com.yuan.skeleton.application.Injector;
 import com.yuan.skeleton.common.Constants;
+import com.yuan.skeleton.utils.ToastUtil;
 
 import org.json.JSONException;
-import org.json.JSONObject;
+
+import java.util.HashMap;
 
 import butterknife.ButterKnife;
 import timber.log.Timber;
@@ -56,6 +56,66 @@ public class LoginFragment extends WebViewBaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        ((MainActivity)getActivity()).bridge.registerHandler("setData", new WebViewJavascriptBridge.WVJBHandler() {
+
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                Timber.v("setData got:" + data);
+                HashMap<String, String> params = null;
+                try {
+                    params = StringUtil.JSONString2HashMap(data);
+
+                    String key = params.get("key");
+                    String value = params.get("value");
+
+                    if (value == null || value.equals("null"))
+                        ((MainActivity)getActivity()).prefs.edit().remove(key).commit();
+                    else
+                        ((MainActivity)getActivity()).prefs.edit().putString(key, value).commit();
+
+                    if("userLogin".equals(key)){
+                        params = StringUtil.JSONString2HashMap(data);
+                        params = StringUtil.JSONString2HashMap(params.get("value"));
+                        params = StringUtil.JSONString2HashMap(params.get("user_info"));
+                        String userName = params.get("lean_user");
+                        String passwd = params.get("lean_passwd");
+                        avUserLogin(userName,passwd);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+    }
+
+    private void avUserLogin(final String userName, String userPass){
+        //TODO: handler after login to own server success
+        AVUser.logInInBackground(userName,userPass,
+                new LogInCallback<AVUser>() {
+                    @Override
+                    public void done(AVUser avUser, AVException e) {
+                        if (avUser != null) {
+                            String chatUserId = avUser.getObjectId();
+                            ((MainActivity)getActivity()).prefs.edit().putString("userLogin", userName)
+                                    .putString(Constants.kLeanChatCurrentUserObjectId, chatUserId)
+                                    .apply();
+                            UserService.updateUserLocation();
+                            ChatManager chatManager = ChatManager.getInstance();
+                            chatManager.setupDatabaseWithSelfId(AVUser.getCurrentUser().getObjectId());
+                            chatManager.openClientWithSelfId(AVUser.getCurrentUser().getObjectId(), null);
+                            CacheService.registerUser(AVUser.getCurrentUser());
+                            ((MainActivity)getActivity()).prefs.edit().putBoolean("isLogin",true).commit();
+                            ((MainActivity)getActivity()).switchToFragment(Constants.kFragmentTagNearby);
+                            ((MainActivity)getActivity()).getBottomNavigationBar().clearAll();
+                            ((MainActivity)getActivity()).setupTabbarClickListener();
+                        }else {
+                            ToastUtil.showShort(getContext(),"leancould登陆失败");
+                        }
+                    }
+                });
     }
 
 }

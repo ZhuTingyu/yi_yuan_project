@@ -186,6 +186,7 @@ public class DMApplication extends Application {
 
         String avInstallId = AVInstallation.getCurrentInstallation().getInstallationId();
         prefs.edit().putString("AVInstallationId", avInstallId).commit();
+        RestClient.getInstance().setkHost(Constants.kWebServiceAPIEndpoint);
 
 //        AVInstallation.getCurrentInstallation().saveInBackground(new SaveCallback() {
 //            @Override

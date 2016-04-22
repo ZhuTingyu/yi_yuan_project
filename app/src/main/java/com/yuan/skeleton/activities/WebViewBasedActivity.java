@@ -646,6 +646,27 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                     e.printStackTrace();
                 }
                 RestClient.getInstance().bridgeRequest(params, RestClient.METHOD_GET, callback);
+
+//                try {
+//                    JSONObject jo = new JSONObject(data);
+//                    JSONObject object = jo.getJSONObject("headers");
+//                    if (object == null || object.length() == 0) {
+//                        return;
+//                    } else {
+////                        String token = object.getString("authtoken");
+//
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                JSONObject params = null;
+//                try {
+//                    params = new JSONObject(data);
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//                RestClient.getInstance().bridgeRequest(params, RestClient.METHOD_GET, callback);
             }
         });
 
@@ -819,13 +840,6 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                         prefs.edit().remove(key).commit();
                     else
                         prefs.edit().putString(key, value).commit();
-
-                    if("userLogin".equals(key)){
-                        params = StringUtil.JSONString2HashMap(data);
-                        String userName = params.get("lean_user");
-                        String passwd = params.get("lean_passwd");
-                        avUserLogin(userName,passwd);
-                    }
 
                     if (null != callback) {
                         callback.callback(null);
@@ -1133,31 +1147,6 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                 EventBus.getDefault().post(new WebBroadcastEvent(data, WebViewBasedActivity.this));
             }
         });
-    }
-
-    private void avUserLogin(final String userName, String userPass){
-        //TODO: handler after login to own server success
-        AVUser.logInInBackground(userName,userPass,
-                new LogInCallback<AVUser>() {
-                    @Override
-                    public void done(AVUser avUser, AVException e) {
-                        if (avUser != null) {
-                            String chatUserId = avUser.getObjectId();
-                            prefs.edit().putString("userLogin", userName)
-                                    .putString(Constants.kLeanChatCurrentUserObjectId, chatUserId)
-                                    .apply();
-                            UserService.updateUserLocation();
-                            ChatManager chatManager = ChatManager.getInstance();
-                            chatManager.setupDatabaseWithSelfId(AVUser.getCurrentUser().getObjectId());
-                            chatManager.openClientWithSelfId(AVUser.getCurrentUser().getObjectId(), null);
-                            CacheService.registerUser(AVUser.getCurrentUser());
-                            prefs.edit().putBoolean("isLogin",true).commit();
-                            onCreate(null);
-                        }else {
-                            ToastUtil.showShort(mContext,"leancould登陆失败");
-                        }
-                    }
-                });
     }
 
     protected void startImagePicker() {

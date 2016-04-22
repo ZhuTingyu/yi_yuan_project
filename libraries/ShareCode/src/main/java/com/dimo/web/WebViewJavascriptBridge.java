@@ -120,7 +120,7 @@ public class WebViewJavascriptBridge implements Serializable {
     }
 
     public interface WVJBResponseCallback {
-        void callback(String data);
+        void callback(Object data);
     }
 
     public void registerHandler(String handlerName, WVJBHandler handler) {
@@ -135,20 +135,19 @@ public class WebViewJavascriptBridge implements Serializable {
         }
 
         @Override
-        public void callback(String data) {
+        public void callback(Object data) {
             _callbackJs(callbackIdJs, data);
         }
     }
 
 
-    private void _callbackJs(String callbackIdJs, String data) {
+    private void _callbackJs(String callbackIdJs, Object data) {
         //TODO: CALL js to call back;
-        Map<String, String> message = new HashMap<>();
+        Map<String, Object> message = new HashMap<>();
         message.put("responseId", callbackIdJs);
         message.put("responseData", data);
         _dispatchMessage(message);
     }
-
     @JavascriptInterface
     public void _handleMessageFromJs(final String data, String responseId,
                                      String responseData, String callbackId, String handlerName) {
@@ -194,7 +193,7 @@ public class WebViewJavascriptBridge implements Serializable {
     }
 
     private void _sendData(String data, WVJBResponseCallback responseCallback, String handlerName) {
-        Map<String, String> message = new HashMap<>();
+        Map<String, Object> message = new HashMap<>();
         message.put("data", data);
         if (null != responseCallback) {
             String callbackId = "java_cb_" + (++_uniqueId);
@@ -207,7 +206,7 @@ public class WebViewJavascriptBridge implements Serializable {
         _dispatchMessage(message);
     }
 
-    private void _dispatchMessage(Map<String, String> message) {
+    private void _dispatchMessage(Map<String, Object> message) {
         String messageJSON = new JSONObject(message).toString();
         Timber.v("Web View sending:" + messageJSON);
         final String javascriptCommand =

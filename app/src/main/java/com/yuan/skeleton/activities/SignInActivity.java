@@ -87,9 +87,9 @@ public class SignInActivity extends WebViewBasedActivity {
                                     request.put("data", new JSONObject("{\"chat_user_id\":\"" + avUser.getObjectId() + "\"}"));
                                     RestClient.getInstance().bridgeRequest(request, RestClient.METHOD_PUT, new WebViewJavascriptBridge.WVJBResponseCallback() {
                                         @Override
-                                        public void callback(String data) {
+                                        public void callback(Object data) {
                                             try {
-                                                JSONObject response = new JSONObject(data);
+                                                JSONObject response = new JSONObject(data.toString());
                                                 if(response.getInt("status")==200) {
                                                     userLogin.put("chat_user_id", avUser.getObjectId());
                                                     prefs.edit().putString(Constants.kLeanChatCurrentUserObjectId, avUser.getObjectId()).commit();
