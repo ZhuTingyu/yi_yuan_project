@@ -155,10 +155,10 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         }
 
         if (tag.equals(Constants.kFragmentTagNearby)) {
-            if(isUserType())
+//            if(isUserType())
                 f = UserMainFragment.newInstance();
-            else
-                f = AgencyMainFragment.newInstance();
+//            else
+//                f = AgencyMainFragment.newInstance();
         }  else {
             f = WebViewFragment.newInstance();
         }
@@ -188,8 +188,8 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         this.bottomNavigationBar = ButterKnife.findById(getTabBar(),R.id.bottom_navigation_bar);
         bottomNavigationBar
                 .addItem(new BottomNavigationItem(R.drawable.ic_home,"房源")).setActiveColor(R.color.primary_color_scheme)
-                .addItem(new BottomNavigationItem(R.drawable.ic_suggest,"建议")).setActiveColor(R.color.primary_color_scheme)
                 .addItem(new BottomNavigationItem(R.drawable.ic_chat,"消息")).setActiveColor(R.color.primary_color_scheme)
+                .addItem(new BottomNavigationItem(R.drawable.ic_suggest,"建议")).setActiveColor(R.color.primary_color_scheme)
                 .setFirstSelectedPosition(0)
                 .initialise();
 
@@ -201,7 +201,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                     case 0:
                         switchToFragment(Constants.kFragmentTagNearby);
                         break;
-                    case 1:
+                    case 1 :
                         break;
                     case 2:
                         break;

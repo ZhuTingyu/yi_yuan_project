@@ -31,7 +31,7 @@ public class JsonParse {
     }
 
     private void initLoginJson(){
-        String json = sp.getString("userLogin",null);
+        String json = sp.getString("userType",null);
         if(TextUtils.isEmpty(json))
             return;
 
@@ -44,8 +44,8 @@ public class JsonParse {
 
     //TODO 获取登录类型
     public boolean judgeUserType() throws JSONException {
-        initLoginJson();
-        if(jsonObject !=null && "1".equals(String.valueOf(jsonObject.get("user_type"))))
+//        initLoginJson();
+        if("user".equals(sp.getString("loginType",null)))
             return true;
         else
             return false;
