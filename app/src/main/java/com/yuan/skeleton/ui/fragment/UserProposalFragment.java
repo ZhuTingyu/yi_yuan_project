@@ -7,11 +7,14 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
@@ -19,6 +22,7 @@ import com.yuan.skeleton.R;
 import com.yuan.skeleton.activities.MainActivity;
 import com.yuan.skeleton.application.Injector;
 import com.yuan.skeleton.utils.JsonParse;
+import com.yuan.skeleton.utils.ToastUtil;
 
 import org.json.JSONException;
 
@@ -36,8 +40,12 @@ public class UserProposalFragment extends WebViewBaseFragment {
     Button proposal;
     @InjectView(R.id.complaint)
     Button complaint;
+    @InjectView(R.id.et_info)
+    EditText info;
+
     private View mPopView;
     private PopupWindow mPopupWindow;
+    private WindowManager.LayoutParams params;
     TextView app_upload_image,app_complaint,app_cancle;
 
     public static UserProposalFragment newInstance() {
@@ -72,8 +80,26 @@ public class UserProposalFragment extends WebViewBaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         proposal.performClick();
+        this.params = getActivity().getWindow().getAttributes();
         initPopupView();
         initPopupViewConfig();
+        initOnClickListener();
+    }
+
+    private void initOnClickListener(){
+        //TODO 监听软键盘回车按钮
+        info.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId== EditorInfo.IME_ACTION_SEND
+                        ||(event!=null&&event.getKeyCode()== KeyEvent.KEYCODE_ENTER)){
+                    //触发软键盘回车事件，上传服务器;
+                    ToastUtil.showShort(getContext(),"监听到回车键啦");
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     private void initPopupView(){
@@ -126,10 +152,8 @@ public class UserProposalFragment extends WebViewBaseFragment {
                 mPopupWindow.setOutsideTouchable(true);
                 mPopupWindow.setFocusable(true);
                 mPopupWindow.update();
-
-                WindowManager.LayoutParams params = getActivity().getWindow().getAttributes();
                 params.alpha = 0.7f;
-                getActivity().getWindow().setAttributes(params);
+                setWindowAttributes();
                 break;
         }
     }
@@ -137,10 +161,12 @@ public class UserProposalFragment extends WebViewBaseFragment {
     private void closePopupWindow(){
         if(mPopupWindow != null && mPopupWindow.isShowing()){
             mPopupWindow.dismiss();
-            WindowManager.LayoutParams params = getActivity().getWindow().getAttributes();
             params.alpha = 1;
-            getActivity().getWindow().setAttributes(params);
+            setWindowAttributes();
         }
+    }
+    private void setWindowAttributes(){
+        getActivity().getWindow().setAttributes(params);
     }
 
 }
