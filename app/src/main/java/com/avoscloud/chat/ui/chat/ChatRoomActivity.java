@@ -5,9 +5,16 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.view.View;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.im.v2.AVIMConversation;
@@ -24,16 +31,29 @@ import com.avoscloud.leanchatlib.activity.LocationHandler;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.ConversationHelper;
 import com.avoscloud.leanchatlib.utils.Logger;
+import com.dimo.utils.StringUtil;
+import com.dimo.web.WebViewJavascriptBridge;
 import com.yuan.skeleton.R;
+import com.yuan.skeleton.application.DMApplication;
+
+import org.json.JSONException;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import timber.log.Timber;
 
 /**
  * Created by lzw on 15/4/24.
  */
 public class ChatRoomActivity extends ChatActivity {
     public static final int LOCATION_REQUEST = 100;
+    private RelativeLayout chatroom;
+    private LinearLayout bottomLayout;
+    private SharedPreferences prefs;
+    public WebViewJavascriptBridge bridge;
+    private WebView webView;
+    private String value;
 
     public static void chatByConversation(Context from, AVIMConversation conv) {
         CacheService.registerConv(conv);
@@ -59,7 +79,130 @@ public class ChatRoomActivity extends ChatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        chatroom = (RelativeLayout) findViewById(R.id.rl_chatroom);
+        bottomLayout = (LinearLayout) findViewById(R.id.bottomLayout);
         initLocation();
+        initWebView();
+    }
+
+    private void initWebView(){
+        this.webView = (WebView) findViewById(R.id.webview);
+        this.webView.getSettings().setJavaScriptEnabled(true);
+        this.webView.getSettings().setAllowFileAccess(true);
+        this.webView.setWebChromeClient(new WebChromeClient());
+        this.webView.setHorizontalScrollBarEnabled(false);
+        this.webView.setVerticalScrollBarEnabled(false);
+        this.bridge = new WebViewJavascriptBridge(this, webView, null);
+        registerBridge();
+        redirectToLoadUrl("agency_bbs.html");
+
+    }
+
+    private void registerBridge(){
+        bridge.registerHandler("setData", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
+                Timber.v("setData got:" + data);
+                HashMap<String, String> params = null;
+                try {
+                    params = StringUtil.JSONString2HashMap(data);
+
+                    String key = params.get("key");
+                    value = params.get("value");
+
+                    if (value == null || value.equals("null"))
+                        prefs.edit().remove(key).commit();
+                    else
+                        prefs.edit().putString(key, value).commit();
+
+                    if (null != callback) {
+                        callback.callback(null);
+                    }
+
+                    RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) webView.getLayoutParams();
+                    params = StringUtil.JSONString2HashMap(value);
+//                    layoutParams.height = Integer.parseInt(params.get("height_s"));
+                    layoutParams.height = 110;
+
+//                    DisplayMetrics dm = new DisplayMetrics();//获取当前显示的界面大小
+//                    getWindowManager().getDefaultDisplay().getMetrics(dm);
+//
+//                    layoutParams.height = dm.heightPixels;
+                    webView.setLayoutParams(layoutParams);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        bridge.registerHandler("showSampleMessageBoard",new WebViewJavascriptBridge.WVJBHandler() {
+
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) webView.getLayoutParams();
+                HashMap<String, String> params = null;
+                try {
+                    params = StringUtil.JSONString2HashMap(value);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+//                layoutParams.height = Integer.parseInt(params.get("height_s"));
+                layoutParams.height = 110;
+                webView.setLayoutParams(layoutParams);
+            }
+        });
+
+        bridge.registerHandler("showHalfMessageBoard",new WebViewJavascriptBridge.WVJBHandler() {
+
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) webView.getLayoutParams();
+                HashMap<String, String> params = null;
+                try {
+                    params = StringUtil.JSONString2HashMap(value);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                int height = Integer.parseInt(params.get("height_m"));
+                layoutParams.height = ((int)((height+10) * getResources().getDisplayMetrics().density));
+//                    layoutParams.height = 350;
+                webView.setLayoutParams(layoutParams);
+                bottomLayout.setVisibility(View.VISIBLE);
+            }
+        });
+
+        bridge.registerHandler("showFullMessageBoard",new WebViewJavascriptBridge.WVJBHandler() {
+
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) webView.getLayoutParams();
+
+                DisplayMetrics dm = new DisplayMetrics();//获取当前显示的界面大小
+                getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+                layoutParams.height = dm.heightPixels;
+
+//                    layoutParams.height = 200;
+                webView.setLayoutParams(layoutParams);
+                bottomLayout.setVisibility(View.INVISIBLE);
+            }
+        });
+    }
+
+    public void redirectToLoadUrl(String url) {
+        String mUrl = "";
+        if (webView == null) {
+            return;
+        }
+        String htmlExtractedFolder = DMApplication.getInstance().getHtmlExtractedFolder();
+        mUrl = htmlExtractedFolder + "/pages/" + url;
+        Timber.i("URL - " + mUrl);
+        if (StringUtil.isValidHTTPUrl(url)) {
+            webView.loadUrl(mUrl);
+        } else {
+            webView.loadUrl("file:///" + mUrl);
+        }
     }
 
     private void initLocation() {

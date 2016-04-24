@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rl_chatroom"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="#fff">
@@ -16,6 +17,10 @@
         android:dividerHeight="5dp"
         android:scrollbarStyle="outsideOverlay"
         android:stackFromBottom="true" />
+    <WebView
+        android:id="@+id/webview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
     <LinearLayout
         android:id="@+id/bottomLayout"
