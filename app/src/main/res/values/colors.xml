@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-
+    <color name="devide_line">#CBCED2</color>
     <color name="apptheme_color">#33b5e5</color>
     <color name="main_gray">#E3E1E2</color>
     <color name="list_item_selection">#ADACAC</color>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:id="@+id/ll_exit"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/app_upload_image"
+            android:layout_height="45dp"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:text="上传图片"/>
+        <View
+            android:layout_height="0.5dp"
+            android:layout_width="match_parent"
+            android:background="@color/devide_line"
+            android:alpha="0.5"/>
+        <TextView
+            android:id="@+id/app_complaint"
+            android:layout_height="45dp"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:text="投诉经纪人"/>
+
+        <View
+            android:layout_height="15dp"
+            android:layout_width="match_parent"
+            android:background="#BFC0C0"
+            android:alpha="0.5"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/app_cancle"
+        android:layout_below="@id/ll_exit"
+        android:layout_height="40dp"
+        android:layout_width="match_parent"
+        android:layout_margin="5dp"
+        android:textSize="16sp"
+        android:text="取消"
+        android:gravity="center"/>
+    <View
+        android:layout_below="@id/app_cancle"
+        android:layout_height="1dp"
+        android:layout_width="match_parent"
+        android:layout_marginTop="5dp"/>
+</RelativeLayout>

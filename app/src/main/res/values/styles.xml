@@ -194,4 +194,9 @@
         <item name="android:background">@drawable/complaint_background</item>
     </style>
 
+    <style name="app_pop">
+        <item name="android:windowEnterAnimation">@anim/pop_up</item>
+        <item name="android:windowExitAnimation">@anim/pop_down</item>
+    </style>
+
 </resources>
