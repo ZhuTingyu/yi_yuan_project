@@ -70,17 +70,68 @@
         </LinearLayout>
     </RelativeLayout>
 
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="135dp"
+        android:background="#FFFFFF"
+        android:textSize="14dp"
+        android:padding="10dp"
+        android:gravity="top"
+        android:hint="  在这里说说你的看法或建议"/>
 
-    <FrameLayout
-        android:id="@+id/child_fragment"
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#BABABA"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="#F0F0F0">
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/btn_keybord_switchover"
+            android:layout_marginLeft="10dp"
+            android:scaleType="fitXY"/>
+
+        <Button
+            android:layout_margin="10dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="按下说话"
+            android:textColor="#C4C4C4"
+            android:background="@drawable/proposal_send_background"/>
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/btn_other"
+            android:scaleType="fitXY"/>
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/btn_question"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:scaleType="fitXY"/>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#BABABA"/>
 
     <WebView
         android:id="@+id/webview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/topbar"
-        android:visibility="gone"/>
+        android:layout_below="@id/topbar"/>
 
 </LinearLayout>
