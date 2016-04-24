@@ -56,6 +56,7 @@ public class Constants {
     public static String kServiceUploadImage = "/upload-image";
     public static String kFragmentTagNearby = "kFragmentTagNearby";
     public static String kFragmentTagLogin = "kFragmentTagLogin";
+    public static String kFragmentTagProposal = "kFragmentTagProposal";
     public static String kFragmentTagMessage = "kFragmentTagMessage";
     public static String kFragmentTagSocial = "kFragmentTagSocial";
     public static String kFragmentTagProfile = "kFragmentTagProfile";

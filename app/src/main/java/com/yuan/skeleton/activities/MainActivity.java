@@ -34,9 +34,11 @@ import com.yuan.skeleton.application.Injector;
 import com.yuan.skeleton.common.Constants;
 import com.yuan.skeleton.event.PageEvent;
 import com.yuan.skeleton.ui.fragment.AgencyMainFragment;
+import com.yuan.skeleton.ui.fragment.AgencyMessageFragment;
 import com.yuan.skeleton.ui.fragment.LoginFragment;
 import com.yuan.skeleton.ui.fragment.UserMainFragment;
 import com.yuan.skeleton.ui.fragment.UserMessageFragment;
+import com.yuan.skeleton.ui.fragment.UserProposalFragment;
 import com.yuan.skeleton.ui.fragment.WebViewBaseFragment;
 import com.yuan.skeleton.ui.fragment.WebViewFragment;
 import com.umeng.update.UmengUpdateAgent;
@@ -166,18 +168,22 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         }
 
         if (tag.equals(Constants.kFragmentTagNearby)) {
-//            if(isUserType())
+            if(isUserType())
                 f = UserMainFragment.newInstance();
-//            else
-//                f = AgencyMainFragment.newInstance();
+            else
+                f = AgencyMainFragment.newInstance();
         } else if(tag.equals(Constants.kFragmentTagMessage)){
-//            if(isUserType())
+            if(isUserType())
                 f = UserMessageFragment.newInstance();
-//            else
-//                f = AgencyMainFragment.newInstance();
+            else
+                f = AgencyMessageFragment.newInstance();
         } else if(tag.equals(Constants.kFragmentTagLogin)){
             f = LoginFragment.newInstance();
-        }else {
+        } else if(tag.equals(Constants.kFragmentTagProposal)){
+            if(isUserType())
+                f= UserProposalFragment.newInstance();
+//            else
+        } else {
             f = WebViewFragment.newInstance();
         }
 
@@ -231,6 +237,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                         switchToFragment(Constants.kFragmentTagMessage);
                         break;
                     case 2:
+                        switchToFragment(Constants.kFragmentTagProposal);
                         break;
                 }
             }

@@ -45,7 +45,7 @@ public class JsonParse {
     //TODO 获取登录类型
     public boolean judgeUserType() throws JSONException {
 //        initLoginJson();
-        if("user".equals(sp.getString("loginType",null)))
+        if("user".equals(sp.getString("LoginType",null)))
             return true;
         else
             return false;
