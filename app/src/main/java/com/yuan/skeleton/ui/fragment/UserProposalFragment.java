@@ -10,13 +10,18 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.yuan.skeleton.R;
+import com.yuan.skeleton.activities.MainActivity;
 import com.yuan.skeleton.application.Injector;
+import com.yuan.skeleton.utils.JsonParse;
+
+import org.json.JSONException;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
 /**
+ * 用户端和中介端合并在一个Fragment里
  * Created by KevinLee on 2016/4/24.
  */
 public class UserProposalFragment extends WebViewBaseFragment {
@@ -42,8 +47,15 @@ public class UserProposalFragment extends WebViewBaseFragment {
 
         ButterKnife.reset(this);
         ButterKnife.inject(this, view);
-
-        redirectToLoadUrl("user_center.html");
+        try {
+            //TODO 根据登陆账户加载不同的页面
+            if(JsonParse.getInstance().judgeUserType())
+                redirectToLoadUrl("user_center.html");
+            else
+                redirectToLoadUrl("agency_center.html");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         return view;
     }
 

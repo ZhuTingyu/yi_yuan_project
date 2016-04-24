@@ -180,9 +180,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         } else if(tag.equals(Constants.kFragmentTagLogin)){
             f = LoginFragment.newInstance();
         } else if(tag.equals(Constants.kFragmentTagProposal)){
-            if(isUserType())
-                f= UserProposalFragment.newInstance();
-//            else
+            f= UserProposalFragment.newInstance();
         } else {
             f = WebViewFragment.newInstance();
         }
