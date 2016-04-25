@@ -34,6 +34,7 @@ import com.yuan.skeleton.application.Injector;
 import com.yuan.skeleton.common.Constants;
 import com.yuan.skeleton.ui.view.AudioRecorderButton;
 import com.yuan.skeleton.utils.JsonParse;
+import com.yuan.skeleton.utils.OkHttpClientManager;
 import com.yuan.skeleton.utils.ToastUtil;
 
 import org.json.JSONException;
@@ -153,7 +154,7 @@ public class UserProposalFragment extends WebViewBaseFragment {
         RequestBody fileBody = RequestBody.create(MediaType.parse("application/octet-stream"), new File(filePath));
         RequestBody requestBody = new MultipartBuilder()
                 .type(MultipartBuilder.FORM)
-                .addPart(Headers.of("Content-Disposition","form-data"),fileBody)
+                .addPart(Headers.of("Content-Disposition","form-data; name=\"file[]\";filename=\"test\""),fileBody)
                 .build();
 
         Request request = new Request.Builder()
@@ -179,7 +180,31 @@ public class UserProposalFragment extends WebViewBaseFragment {
                 Log.i("responseHeader",response.headers().toString());
             }
         });
+//        try {
+//            OkHttpClientManager.postAsyn(Constants.kWebServiceFileUpload,
+//                    new UploadResultCallBack(),
+//                    new File[]{new File(filePath)},
+//                    new String[]{"file"},
+//                    new OkHttpClientManager.Param[]{
+//                            new OkHttpClientManager.Param("token", "token:" + token),
+//                            new OkHttpClientManager.Param("Content-Type", "multipart/form-data")});
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
+    }
+
+    private class UploadResultCallBack extends OkHttpClientManager.ResultCallback<String>{
+
+        @Override
+        public void onError(Request request, Exception e) {
+
+        }
+
+        @Override
+        public void onResponse(String response) {
+            Log.i("response",response);
+        }
     }
 
     private String getUserToken() throws JSONException {
