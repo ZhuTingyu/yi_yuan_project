@@ -18,13 +18,22 @@ import android.widget.EditText;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.dimo.utils.StringUtil;
+import com.squareup.okhttp.Request;
 import com.yuan.skeleton.R;
 import com.yuan.skeleton.activities.MainActivity;
 import com.yuan.skeleton.application.Injector;
+import com.yuan.skeleton.common.Constants;
+import com.yuan.skeleton.ui.view.AudioRecorderButton;
 import com.yuan.skeleton.utils.JsonParse;
+import com.yuan.skeleton.utils.OkHttpClientManager;
 import com.yuan.skeleton.utils.ToastUtil;
 
 import org.json.JSONException;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -42,6 +51,8 @@ public class UserProposalFragment extends WebViewBaseFragment {
     Button complaint;
     @InjectView(R.id.et_info)
     EditText info;
+    @InjectView(R.id.btn_recorder)
+    AudioRecorderButton recorderButton;
 
     private View mPopView;
     private PopupWindow mPopupWindow;
@@ -100,6 +111,35 @@ public class UserProposalFragment extends WebViewBaseFragment {
                 return false;
             }
         });
+
+        recorderButton.setAudioFinishRecorderListener(new AudioRecorderButton.AudioFinishRecorderListener() {
+            @Override
+            public void onFinish(float seconds, String filePath) {
+                //上传到服务端
+                try {
+                    uploadFile(filePath);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+    }
+
+    /**
+     * 上传文件
+     * @param filePath
+     */
+    private void uploadFile(String filePath) throws JSONException {
+       String token = getUserToken();
+    }
+
+    private String getUserToken() throws JSONException {
+        String json = ((MainActivity)getActivity()).prefs.getString("userLogin","");
+        HashMap<String, String> params = StringUtil.JSONString2HashMap(json);
+        String value = params.get("value");
+        params = StringUtil.JSONString2HashMap(value);
+        return params.get("token");
     }
 
     private void initPopupView(){

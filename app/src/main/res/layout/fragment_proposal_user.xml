@@ -99,7 +99,8 @@
             android:layout_marginLeft="10dp"
             android:scaleType="fitXY"/>
 
-        <Button
+        <com.yuan.skeleton.ui.view.AudioRecorderButton
+            android:id="@+id/btn_recorder"
             android:layout_margin="10dp"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

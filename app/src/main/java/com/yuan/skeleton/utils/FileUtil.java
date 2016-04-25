@@ -14,19 +14,19 @@ public class FileUtil {
 		}
 	}
 	
-	public static String getCacheFile(){
-		File file=new File(path+"/CACHE/Files/");
+	public static String getAudioFile(){
+		File file=new File(path+"/house/audios/");
 		if(!file.exists()){
 			file.mkdirs();
 		}
-		return path+"/CACHE/Files/";
+		return path+"/house/audios/";
 	}
 	
 	public static String getWaterPhotoPath(){
-		File file=new File(path+"/Photo/");
+		File file=new File(path+"/house/photo/");
 		if(!file.exists()){
 			file.mkdirs();
 		}
-		return path+"/Photo/";
+		return path+"/house/photo/";
 	}
 }

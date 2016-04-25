@@ -159,6 +159,7 @@ dependencies {
 
     //    compile 'net.kianoni:fontloader:0.3.0'
     compile 'com.bugtags.library:bugtags-lib:latest.integration'
+    compile 'com.squareup.okhttp:okhttp:2.4.0'
     compile project(':libraries:clippicture')
     compile files('libs/alipaySDK-20150818.jar')
 }

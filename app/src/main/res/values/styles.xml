@@ -199,4 +199,13 @@
         <item name="android:windowExitAnimation">@anim/pop_down</item>
     </style>
 
+    <style name="AudioDialog">
+        <item name = "android:windowBackground">@drawable/dialog_content_bg</item>
+        <item name = "android:windowFrame">@null</item><!-- 设为无边框 -->
+        <item name = "android:windowIsFloating">true</item><!-- 设定为浮动的 -->
+        <item name = "android:windowIsTranslucent">false</item>
+        <item name = "android:backgroundDimEnabled">false</item>
+        <item name="android:alpha">0.9</item>
+    </style>
+
 </resources>
