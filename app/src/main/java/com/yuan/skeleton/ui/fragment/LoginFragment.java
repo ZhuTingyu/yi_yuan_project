@@ -99,7 +99,7 @@ public class LoginFragment extends WebViewBaseFragment {
                     public void done(AVUser avUser, AVException e) {
                         if (avUser != null) {
                             String chatUserId = avUser.getObjectId();
-                            ((MainActivity)getActivity()).prefs.edit().putString("userLogin", userName)
+                            ((MainActivity)getActivity()).prefs.edit().putString("avUserLogin", userName)
                                     .putString(Constants.kLeanChatCurrentUserObjectId, chatUserId)
                                     .apply();
                             UserService.updateUserLocation();

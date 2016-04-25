@@ -93,7 +93,7 @@ public class SignInActivity extends WebViewBasedActivity {
                                                 if(response.getInt("status")==200) {
                                                     userLogin.put("chat_user_id", avUser.getObjectId());
                                                     prefs.edit().putString(Constants.kLeanChatCurrentUserObjectId, avUser.getObjectId()).commit();
-                                                    prefs.edit().putString("userLogin", userLogin.toString()).commit();
+                                                    prefs.edit().putString("avUserLogin", userLogin.toString()).commit();
                                                     startActivity(new Intent(SignInActivity.this, MainActivity.class));
                                                     finish();
                                                 }
@@ -120,7 +120,7 @@ public class SignInActivity extends WebViewBasedActivity {
                                     public void done(AVUser avUser, AVException e) {
                                         if (avUser != null) {
                                             String chatUserId = avUser.getObjectId();
-                                            prefs.edit().putString("userLogin", data).apply();
+                                            prefs.edit().putString("avUserLogin", data).apply();
                                             prefs.edit().putString(Constants.kLeanChatCurrentUserObjectId, chatUserId).commit();
                                             UserService.updateUserLocation();
                                         }
