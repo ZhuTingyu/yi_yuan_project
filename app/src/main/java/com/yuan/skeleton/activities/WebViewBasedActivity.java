@@ -445,7 +445,7 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
             }
         });
 
-        bridge.registerHandler("showImagePicker", new WebViewJavascriptBridge.WVJBHandler() {
+        bridge.registerHandler("selectImages", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("showImagePicker got:" + data);
@@ -1434,7 +1434,7 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
     /**
      * 打开系统相册
      */
-    public void systemPhoto() {
+    private void systemPhoto() {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
