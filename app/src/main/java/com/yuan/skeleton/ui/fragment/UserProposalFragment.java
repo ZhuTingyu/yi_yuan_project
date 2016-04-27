@@ -1,5 +1,7 @@
 package com.yuan.skeleton.ui.fragment;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
@@ -7,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -39,6 +42,8 @@ import com.yuan.skeleton.activities.MainActivity;
 import com.yuan.skeleton.application.Injector;
 import com.yuan.skeleton.common.Constants;
 import com.yuan.skeleton.ui.view.AudioRecorderButton;
+import com.yuan.skeleton.utils.FileUtil;
+import com.yuan.skeleton.utils.ImageUtil;
 import com.yuan.skeleton.utils.JsonParse;
 import com.yuan.skeleton.utils.OkHttpClientManager;
 import com.yuan.skeleton.utils.ToastUtil;
@@ -48,7 +53,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -189,6 +196,7 @@ public class UserProposalFragment extends WebViewBaseFragment {
                     @Override
                     public void run() {
                         try {
+                            msg_type = 2;
                             uploadFile(path);
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -209,7 +217,8 @@ public class UserProposalFragment extends WebViewBaseFragment {
     private void uploadFile(String filePath) throws JSONException {
         String token = getUserToken();
         try {
-            this.duration = MediaPlayer.create(getActivity(), Uri.parse(filePath)).getDuration();
+            if(msg_type == 2)
+                this.duration = MediaPlayer.create(getActivity(), Uri.parse(filePath)).getDuration();
             OkHttpClientManager.postAsyn(Constants.kWebServiceFileUpload,
                     new UploadResultCallBack(),
                     new File[]{new File(filePath)},
@@ -239,7 +248,6 @@ public class UserProposalFragment extends WebViewBaseFragment {
 //                Log.i("original",jsonObject.getJSONArray("original").getString(0));
                 String responseUrl = jsonObject.getJSONArray("original").getString(0);
                 Map<String,Object> params = new HashMap<>();
-                msg_type = 2;
                 params.put("msg_type",msg_type);
                 params.put("type",type);
                 params.put("content",responseUrl);
@@ -305,6 +313,7 @@ public class UserProposalFragment extends WebViewBaseFragment {
             @Override
             public void onClick(View v) {
                 closePopupWindow();
+                systemPhoto();
             }
         });
 
@@ -355,4 +364,42 @@ public class UserProposalFragment extends WebViewBaseFragment {
         getActivity().getWindow().setAttributes(params);
     }
 
+
+    private final int SYS_INTENT_REQUEST = 0XFF01;
+    /**
+     * 打开系统相册
+     */
+    public void systemPhoto() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, SYS_INTENT_REQUEST);
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == SYS_INTENT_REQUEST && resultCode == getActivity().RESULT_OK && data != null){
+            Uri uri = data.getData();
+            try {
+                msg_type = 3;
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+                String fileName = formatter.format(System.currentTimeMillis()) + ".jpg";
+                bitmap = ImageUtil.getInstance().compressImage(bitmap);
+                FileUtil.saveMyBitmap(FileUtil.getWaterPhotoPath(),fileName,bitmap);
+                //上传至服务器
+                uploadFile(FileUtil.getWaterPhotoPath() + fileName);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
 }

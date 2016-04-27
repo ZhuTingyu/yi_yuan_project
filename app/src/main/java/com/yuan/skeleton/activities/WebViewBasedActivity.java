@@ -1434,7 +1434,7 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
     /**
      * 打开系统相册
      */
-    private void systemPhoto() {
+    public void systemPhoto() {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -1442,7 +1442,7 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
 
     }
 
-    private void systemCamera(){
+    protected void systemCamera(){
         String sdStatus = Environment.getExternalStorageState();
 		/* 检测sd是否可用 */
         if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) {
