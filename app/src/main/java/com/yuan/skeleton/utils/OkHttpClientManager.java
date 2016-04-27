@@ -2,6 +2,7 @@ package com.yuan.skeleton.utils;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.internal.$Gson$Types;
@@ -39,6 +40,8 @@ public class OkHttpClientManager {
     private OkHttpClient mOkHttpClient;
     private Handler mDelivery;
     private Gson mGson;
+
+    public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
 
     private static final String TAG = "OkHttpClientManager";
@@ -127,6 +130,16 @@ public class OkHttpClientManager {
     private String _postAsString(String url, Param... params) throws IOException {
         Response response = _post(url, params);
         return response.body().string();
+    }
+
+    private void _postJson(String url,String json,String token,Callback callback) throws IOException {
+        RequestBody body = RequestBody.create(JSON,json);
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("token",token)
+                .post(body)
+                .build();
+        mOkHttpClient.newCall(request).enqueue(callback);
     }
 
     /**
@@ -294,6 +307,10 @@ public class OkHttpClientManager {
         return getInstance()._post(url, params);
     }
 
+    public static void postJson(String url,String json,String token,Callback callBack) throws IOException {
+        getInstance()._postJson(url,json,token,callBack);
+    }
+
     public static String postAsString(String url, Param... params) throws IOException {
         return getInstance()._postAsString(url, params);
     }
@@ -349,10 +366,10 @@ public class OkHttpClientManager {
         MultipartBuilder builder = new MultipartBuilder()
                 .type(MultipartBuilder.FORM);
 
-        for (Param param : params) {
-            builder.addPart(Headers.of("Content-Disposition", "form-data; name=\"" + param.key + "\""),
-                    RequestBody.create(null, param.value));
-        }
+//        for (Param param : params) {
+//            builder.addPart(Headers.of("Content-Disposition", "form-data; name=\"" + param.key + "\""),
+//                    RequestBody.create(null, param.value));
+//        }
         if (files != null) {
             RequestBody fileBody = null;
             for (int i = 0; i < files.length; i++) {
@@ -361,7 +378,7 @@ public class OkHttpClientManager {
                 fileBody = RequestBody.create(MediaType.parse(guessMimeType(fileName)), file);
                 //TODO 根据文件名设置contentType
                 builder.addPart(Headers.of("Content-Disposition",
-                        "form-data; file[]=\"" + fileKeys[i] + "\"; filename=\"" + fileName + "\""),
+                        "form-data; name=\"" + fileKeys[i] + "\"; filename=\"" + fileName + "\""),
                         fileBody);
             }
         }
@@ -369,6 +386,8 @@ public class OkHttpClientManager {
         RequestBody requestBody = builder.build();
         return new Request.Builder()
                 .url(url)
+                .addHeader("token",params[0].value)
+                .addHeader("Content-Type",params[1].value)
                 .post(requestBody)
                 .build();
     }

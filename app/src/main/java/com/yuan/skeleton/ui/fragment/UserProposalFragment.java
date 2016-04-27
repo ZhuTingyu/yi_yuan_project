@@ -2,10 +2,15 @@ package com.yuan.skeleton.ui.fragment;
 
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -20,6 +25,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.dimo.utils.StringUtil;
+import com.google.gson.JsonObject;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.Headers;
 import com.squareup.okhttp.MediaType;
@@ -37,7 +43,9 @@ import com.yuan.skeleton.utils.JsonParse;
 import com.yuan.skeleton.utils.OkHttpClientManager;
 import com.yuan.skeleton.utils.ToastUtil;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,6 +55,7 @@ import java.util.Map;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import de.greenrobot.event.EventBus;
 
 /**
  * 用户端和中介端合并在一个Fragment里
@@ -63,10 +72,34 @@ public class UserProposalFragment extends WebViewBaseFragment {
     @InjectView(R.id.btn_recorder)
     AudioRecorderButton recorderButton;
 
+    private int type = 0;       //1:用户发的，2：中介发的
+    private int msg_type = 0;           //1:文本，2：语音，3：图片
+    private int category = 1;           //0：投诉；1：建议；2：BUG
+    private int duration = 0;       //录音时长
+
     private View mPopView;
     private PopupWindow mPopupWindow;
     private WindowManager.LayoutParams params;
     TextView app_upload_image, app_complaint, app_cancle;
+
+    private Handler handler = new Handler(){
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what){
+                case 0:
+                    ToastUtil.showShort(getContext(),"发送超时");
+                    break;
+                case 1:
+                    if(msg.arg1 == 1)
+                        ToastUtil.showShort(getContext(),"发送成功");
+                    else
+                        ToastUtil.showShort(getContext(),"发送失败");
+                    break;
+            }
+        }
+    };
 
     private final OkHttpClient client = new OkHttpClient();
 
@@ -86,12 +119,16 @@ public class UserProposalFragment extends WebViewBaseFragment {
 
         ButterKnife.reset(this);
         ButterKnife.inject(this, view);
+
         try {
             //TODO 根据登陆账户加载不同的页面
-            if (JsonParse.getInstance().judgeUserType())
+            if (JsonParse.getInstance().judgeUserType()) {
                 redirectToLoadUrl("user_center.html");
-            else
+                type = 1;
+            }else {
                 redirectToLoadUrl("agency_center.html");
+                type = 2;
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -114,9 +151,29 @@ public class UserProposalFragment extends WebViewBaseFragment {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEND
-                        || (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+                        ||  (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
+
+                    if(TextUtils.isEmpty(info.getText()))
+                        return false;
+                    Map<String,Object> params = new HashMap<>();
+                    msg_type = 1;
+                    params.put("msg_type",msg_type);
+                    params.put("type",type);
+                    params.put("content",info.getText().toString());
+                    params.put("complain_agency_id",0);
+                    params.put("category",category);
+                    params.put("duration",duration);
                     //触发软键盘回车事件，上传服务器;
-                    ToastUtil.showShort(getContext(), "监听到回车键啦");
+                    try {
+                        OkHttpClientManager.postJson(Constants.kWebServiceSendFeedback,
+                                com.alibaba.fastjson.JSONObject.toJSONString(params),
+                                getUserToken(),
+                                new SendFeedBackCallBack());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     return true;
                 }
                 return false;
@@ -151,46 +208,18 @@ public class UserProposalFragment extends WebViewBaseFragment {
      */
     private void uploadFile(String filePath) throws JSONException {
         String token = getUserToken();
-        RequestBody fileBody = RequestBody.create(MediaType.parse("application/octet-stream"), new File(filePath));
-        RequestBody requestBody = new MultipartBuilder()
-                .type(MultipartBuilder.FORM)
-                .addPart(Headers.of("Content-Disposition","form-data; name=\"file[]\";filename=\"test\""),fileBody)
-                .build();
-
-        Request request = new Request.Builder()
-                .url(Constants.kWebServiceFileUpload)
-                .addHeader("Content-Type","multipart/form-data")
-                .addHeader("token",token)
-                .post(requestBody)
-                .build();
-
-        Headers headers = request.headers();
-        Log.i("NativeHeaders",headers.toString());
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Request request, IOException e) {
-                Log.i("uploadresponse",e.getMessage());
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                Log.i("uploadresponse",response.isSuccessful() + "");
-                Log.i("responseCode",response.code() + "");
-                Log.i("responseBody",response.body().string() + "");
-                Log.i("responseHeader",response.headers().toString());
-            }
-        });
-//        try {
-//            OkHttpClientManager.postAsyn(Constants.kWebServiceFileUpload,
-//                    new UploadResultCallBack(),
-//                    new File[]{new File(filePath)},
-//                    new String[]{"file"},
-//                    new OkHttpClientManager.Param[]{
-//                            new OkHttpClientManager.Param("token", "token:" + token),
-//                            new OkHttpClientManager.Param("Content-Type", "multipart/form-data")});
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            this.duration = MediaPlayer.create(getActivity(), Uri.parse(filePath)).getDuration();
+            OkHttpClientManager.postAsyn(Constants.kWebServiceFileUpload,
+                    new UploadResultCallBack(),
+                    new File[]{new File(filePath)},
+                    new String[]{"file[]"},
+                    new OkHttpClientManager.Param[]{
+                            new OkHttpClientManager.Param("token", token),
+                            new OkHttpClientManager.Param("Content-Type", "multipart/form-data")});
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -204,6 +233,49 @@ public class UserProposalFragment extends WebViewBaseFragment {
         @Override
         public void onResponse(String response) {
             Log.i("response",response);
+            try {
+                JSONArray jsonArray = new JSONArray(response);
+                JSONObject jsonObject = jsonArray.getJSONObject(0);
+//                Log.i("original",jsonObject.getJSONArray("original").getString(0));
+                String responseUrl = jsonObject.getJSONArray("original").getString(0);
+                Map<String,Object> params = new HashMap<>();
+                msg_type = 2;
+                params.put("msg_type",msg_type);
+                params.put("type",type);
+                params.put("content",responseUrl);
+                params.put("complain_agency_id",0);
+                params.put("category",category);
+                params.put("duration",duration);
+                OkHttpClientManager.postJson(Constants.kWebServiceSendFeedback,
+                        com.alibaba.fastjson.JSONObject.toJSONString(params),
+                        getUserToken(),
+                        new SendFeedBackCallBack());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private class SendFeedBackCallBack implements Callback{
+
+        @Override
+        public void onFailure(Request request, IOException e) {
+            Message message = handler.obtainMessage();
+            message.what = 0;
+            handler.sendMessage(message);
+        }
+
+        @Override
+        public void onResponse(Response response) throws IOException {
+            Message message = handler.obtainMessage();
+            message.what = 1;
+            if(response.isSuccessful())
+                message.arg1 = 1;
+            else
+                message.arg1 = 0;
+            handler.sendMessage(message);
         }
     }
 
@@ -252,10 +324,12 @@ public class UserProposalFragment extends WebViewBaseFragment {
             case R.id.proposal:
                 proposal.setEnabled(false);
                 complaint.setEnabled(true);
+                category = 1;
                 break;
             case R.id.complaint:
                 proposal.setEnabled(true);
                 complaint.setEnabled(false);
+                category = 0;
                 break;
             case R.id.btn_other:
                 mPopupWindow.showAtLocation(webView, Gravity.BOTTOM, 0, 0);
