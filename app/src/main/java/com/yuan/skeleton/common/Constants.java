@@ -10,6 +10,7 @@ public class Constants {
     public static String kWebServiceAPIEndpoint = "http://house.ieyuan.com/api";
 
     public static String kWebServiceFileUpload = kWebServiceAPIEndpoint + "/file-upload/feedback";
+    public static String kWebServiceUploadCommon = kWebServiceAPIEndpoint + "/file-upload/common";
     public static String kWebServiceSendFeedback = kWebServiceAPIEndpoint + "/feedback";
 
     // Production Server

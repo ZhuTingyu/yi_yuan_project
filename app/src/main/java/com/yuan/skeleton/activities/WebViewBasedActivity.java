@@ -48,6 +48,7 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.squareup.okhttp.Request;
 import com.yuan.cp.activity.ClipPictureActivity;
 import com.yuan.skeleton.R;
 import com.yuan.skeleton.application.Injector;
@@ -60,6 +61,7 @@ import com.yuan.skeleton.ui.fragment.WebViewBaseFragment;
 import com.yuan.skeleton.ui.fragment.WebViewFragment;
 import com.victor.loading.rotate.RotateLoading;
 import com.yuan.skeleton.utils.JsonParse;
+import com.yuan.skeleton.utils.OkHttpClientManager;
 import com.yuan.skeleton.utils.ToastUtil;
 
 import org.apache.http.Header;
@@ -1147,6 +1149,58 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                 EventBus.getDefault().post(new WebBroadcastEvent(data, WebViewBasedActivity.this));
             }
         });
+
+        //TODO 代码已完善，待测试。
+        bridge.registerHandler("uploadFiles",new WebViewJavascriptBridge.WVJBHandler() {
+
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                mCallback = jsCallback;
+
+                try {
+                    JSONArray jsonArray = new JSONArray(data);
+                    File[] files = new File[jsonArray.length()];
+                    String [] fileKeys = new String[jsonArray.length()];
+                    for (int i = 0; i < jsonArray.length(); i++){
+                        String fileUrl = (String) jsonArray.get(i);
+                        files[i] = new File(fileUrl);
+                        fileKeys[i] = "file[]";
+                    }
+                    String token = getUserToken();
+                    OkHttpClientManager.postAsyn(Constants.kWebServiceUploadCommon,
+                            new UploadResultCallBack(),
+                            files,
+                            fileKeys,
+                            new OkHttpClientManager.Param[]{
+                                    new OkHttpClientManager.Param("token", token),
+                                    new OkHttpClientManager.Param("Content-Type", "multipart/form-data")});
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    protected String getUserToken() throws JSONException {
+        String json = prefs.getString("userLogin", "");
+        HashMap<String, String> params = StringUtil.JSONString2HashMap(json);
+        return params.get("token");
+    }
+
+    private class UploadResultCallBack extends OkHttpClientManager.ResultCallback<String>{
+
+        @Override
+        public void onError(Request request, Exception e) {
+
+        }
+
+        @Override
+        public void onResponse(String response) {
+            Log.i("response",response);
+            mCallback.callback(response);
+        }
     }
 
     protected void startImagePicker() {
