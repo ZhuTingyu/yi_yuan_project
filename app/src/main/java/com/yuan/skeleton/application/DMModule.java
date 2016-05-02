@@ -3,6 +3,7 @@ package com.yuan.skeleton.application;
 
 
 import com.yuan.skeleton.activities.MainActivity;
+import com.yuan.skeleton.activities.MapActivity;
 import com.yuan.skeleton.activities.SignInActivity;
 import com.yuan.skeleton.activities.SplashActivity;
 import com.yuan.skeleton.activities.TutorialActivity;
@@ -38,6 +39,7 @@ import dagger.Module;
                         WebViewBasedActivity.class,
                         WebViewActivity.class,
                         SignInActivity.class,
+                        MapActivity.class,
 
                         WebViewBaseFragment.class,
                         WebViewFragment.class,

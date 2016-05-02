@@ -36,6 +36,12 @@
         android:layout_below="@+id/map_topbar"
         android:layout_above="@+id/map_control" />
 
+    <WebView
+        android:id="@+id/webview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -59,7 +65,8 @@
                 android:layout_height="wrap_content"
                 android:text="@string/add_to_fav_location"
                 android:id="@+id/add_fav_location"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:visibility="gone"/>
 
             <Button
                 android:layout_width="wrap_content"
@@ -67,8 +74,21 @@
                 android:text="@string/map_confirm_location"
                 android:id="@+id/confirm_location"
                 android:layout_weight="1"
-                android:enabled="false" />
+                android:enabled="true" />
         </LinearLayout>
     </LinearLayout>
+
+    <ImageView
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/pin"
+        android:layout_centerInParent="true"/>
+
+    <com.victor.loading.rotate.RotateLoading
+        android:id="@+id/rotateloading"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_centerInParent="true"
+        />
 
 </RelativeLayout>

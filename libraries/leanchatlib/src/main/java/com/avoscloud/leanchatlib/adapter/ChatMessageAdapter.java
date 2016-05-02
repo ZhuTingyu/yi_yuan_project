@@ -221,6 +221,19 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     AudioHelper audioHelper = AudioHelper.getInstance();
     playBtn.setAudioHelper(audioHelper);
     playBtn.setPath(MessageHelper.getFilePath(msg));
+    setItemOnLongClickListener(playBtn);
+  }
+
+  private void setItemOnLongClickListener(PlayButton playBtn){
+    playBtn.setOnLongClickListener(new View.OnLongClickListener() {
+      @Override
+      public boolean onLongClick(View v) {
+        if (clickListener != null) {
+          clickListener.onAudioLongClick();
+        }
+        return false;
+      }
+    });
   }
 
   private void setImageOnClickListener(ImageView imageView, final AVIMImageMessage imageMsg) {
@@ -295,5 +308,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     void onLocationViewClick(AVIMLocationMessage locMsg);
 
     void onImageViewClick(AVIMImageMessage imageMsg);
+
+    void onAudioLongClick();
   }
 }
