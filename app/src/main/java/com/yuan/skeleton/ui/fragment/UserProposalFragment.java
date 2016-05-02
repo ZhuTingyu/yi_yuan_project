@@ -89,16 +89,19 @@ public class UserProposalFragment extends WebViewBaseFragment {
     private WindowManager.LayoutParams params;
     TextView app_upload_image, app_complaint, app_cancle;
 
+    private static final int SUCCESS = 1;
+    private static final int TIMEOUT = 0;
+
     private Handler handler = new Handler(){
 
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what){
-                case 0:
+                case TIMEOUT:
                     ToastUtil.showShort(getContext(),"发送超时");
                     break;
-                case 1:
+                case SUCCESS:
                     if(msg.arg1 == 1)
                         ToastUtil.showShort(getContext(),"发送成功");
                     else
@@ -271,14 +274,14 @@ public class UserProposalFragment extends WebViewBaseFragment {
         @Override
         public void onFailure(Request request, IOException e) {
             Message message = handler.obtainMessage();
-            message.what = 0;
+            message.what = TIMEOUT;
             handler.sendMessage(message);
         }
 
         @Override
         public void onResponse(Response response) throws IOException {
             Message message = handler.obtainMessage();
-            message.what = 1;
+            message.what = SUCCESS;
             if(response.isSuccessful())
                 message.arg1 = 1;
             else
