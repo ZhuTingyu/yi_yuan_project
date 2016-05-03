@@ -1206,6 +1206,7 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 Log.i("showDateTimePicker",data);
+                mCallback = jsCallback;
                 try {
                     HashMap<String, String> map = StringUtil.JSONString2HashMap(data);
                     String date = map.get("pick_date");
@@ -1610,7 +1611,13 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
 
         @Override
         public void onDateSet(DatePickerDialog datePickerDialog, int year, int month, int day) {
-
+            StringBuffer sb = new StringBuffer();
+            sb.append(year);
+            sb.append("-");
+            sb.append(month);
+            sb.append("-");
+            sb.append(day);
+            mCallback.callback(sb.toString());
         }
     }
 
