@@ -2,6 +2,7 @@ package com.avoscloud.leanchatlib.activity;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.test.suitebuilder.annotation.Suppress;
 import android.text.Editable;
 import android.text.Selection;
@@ -19,6 +21,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -305,9 +308,19 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
             }
 
             @Override
-            public void onAudioLongClick() {
+            public void onAudioLongClick(AVIMAudioMessage audioMessage) {
                 //弹出编辑文本(语音附加消息)，确认后上传。
-                Toast.makeText(ChatActivity.this, "语音长按", Toast.LENGTH_SHORT).show();
+                final EditText inputServer = new EditText(ChatActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(ChatActivity.this);
+                builder.setTitle("附加消息").setIcon(android.R.drawable.ic_dialog_info).setView(inputServer)
+                        .setNegativeButton("取消", null);
+                builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int which) {
+                        inputServer.getText().toString();
+                    }
+                });
+                builder.show();
             }
         });
         xListView.setAdapter(adapter);

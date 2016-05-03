@@ -41,6 +41,7 @@ import com.dimo.utils.DeviceUtil;
 import com.dimo.utils.FileUtil;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
+import com.fourmob.datetimepicker.date.DatePickerDialog;
 import com.gitonway.lee.niftymodaldialogeffects.lib.Effectstype;
 import com.gitonway.lee.niftymodaldialogeffects.lib.NiftyDialogBuilder;
 import com.google.gson.Gson;
@@ -48,6 +49,8 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.sleepbot.datetimepicker.time.RadialPickerLayout;
+import com.sleepbot.datetimepicker.time.TimePickerDialog;
 import com.squareup.okhttp.Request;
 import com.yuan.cp.activity.ClipPictureActivity;
 import com.yuan.skeleton.R;
@@ -76,9 +79,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import butterknife.ButterKnife;
@@ -123,6 +129,9 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
     JSONArray mImgResizeCfg;
     private AliPay aliPay;
     private String pay_type;
+
+    private Calendar calendar;
+
 
     private Handler mHandler = new Handler() {
         public void handleMessage(Message msg) {
@@ -1181,6 +1190,38 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                 }
             }
         });
+
+        bridge.registerHandler("reviewImages",new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                Log.i("图片预览",data);
+                Intent intent = new Intent(mContext, ImagePagerActivity.class);
+                intent.putExtra("json",data);
+                startActivity(intent);
+            }
+        });
+
+        bridge.registerHandler("showDateTimePicker",new WebViewJavascriptBridge.WVJBHandler(){
+
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                Log.i("showDateTimePicker",data);
+                try {
+                    HashMap<String, String> map = StringUtil.JSONString2HashMap(data);
+                    String date = map.get("pick_date");
+                    calendar = Calendar.getInstance();
+                    if(date.equals("true")){
+                        //选择日期
+                        DatePickerDialog.newInstance(new DataPickerOnClickListener(), calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show(mFragmentManager, "datePicker");
+                    }else{
+                        //选择时间
+                        TimePickerDialog.newInstance(new TimePickerOnClickListener(), calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show(mFragmentManager, "timePicker");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     protected String getUserToken() throws JSONException {
@@ -1564,4 +1605,21 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
         }
         return true;
     }
+
+    private class DataPickerOnClickListener implements DatePickerDialog.OnDateSetListener{
+
+        @Override
+        public void onDateSet(DatePickerDialog datePickerDialog, int year, int month, int day) {
+
+        }
+    }
+
+    private class TimePickerOnClickListener implements TimePickerDialog.OnTimeSetListener{
+
+        @Override
+        public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute) {
+
+        }
+    }
+
 }

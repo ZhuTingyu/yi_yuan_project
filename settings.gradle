@@ -4,4 +4,4 @@ include ':libraries:ShareCode'
 include ':libraries:Loading'
 include ':libraries:MultiImageSelector'
 include ':libraries:clippicture'
-
+include ':libraries:pinchimageview'

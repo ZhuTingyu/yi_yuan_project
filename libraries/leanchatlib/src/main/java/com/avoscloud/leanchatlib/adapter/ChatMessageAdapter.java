@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.avos.avoscloud.im.v2.AVIMReservedMessageType;
 import com.avos.avoscloud.im.v2.AVIMTypedMessage;
+import com.avos.avoscloud.im.v2.messages.AVIMAudioMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMImageMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMLocationMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
@@ -155,7 +156,8 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         setImageOnClickListener(imageView, imageMsg);
         break;
       case AudioMessageType:
-        initPlayBtn(msg, playBtn);
+        AVIMAudioMessage audioMessage = (AVIMAudioMessage) msg;
+        initPlayBtn(msg, playBtn,audioMessage);
         break;
       case LocationMessageType:
         setLocationView(msg, locationView);
@@ -216,20 +218,20 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     });
   }
 
-  private void initPlayBtn(AVIMTypedMessage msg, PlayButton playBtn) {
+  private void initPlayBtn(AVIMTypedMessage msg, PlayButton playBtn, AVIMAudioMessage audioMessage) {
     playBtn.setLeftSide(isComeMsg(msg));
     AudioHelper audioHelper = AudioHelper.getInstance();
     playBtn.setAudioHelper(audioHelper);
     playBtn.setPath(MessageHelper.getFilePath(msg));
-    setItemOnLongClickListener(playBtn);
+    setItemOnLongClickListener(playBtn,audioMessage);
   }
 
-  private void setItemOnLongClickListener(PlayButton playBtn){
+  private void setItemOnLongClickListener(PlayButton playBtn,final AVIMAudioMessage audioMessage){
     playBtn.setOnLongClickListener(new View.OnLongClickListener() {
       @Override
       public boolean onLongClick(View v) {
         if (clickListener != null) {
-          clickListener.onAudioLongClick();
+          clickListener.onAudioLongClick(audioMessage);
         }
         return false;
       }
@@ -309,6 +311,6 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
 
     void onImageViewClick(AVIMImageMessage imageMsg);
 
-    void onAudioLongClick();
+    void onAudioLongClick(AVIMAudioMessage audioMessage);
   }
 }
