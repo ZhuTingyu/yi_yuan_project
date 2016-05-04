@@ -970,7 +970,7 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                     e.printStackTrace();
                 }
 
-                String objectId = params.get("objectId");
+                String objectId = params.get("user_id");
 
                 ChatRoomActivity.chatByUserId(WebViewBasedActivity.this, objectId);
 
@@ -1221,6 +1221,20 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+            }
+        });
+
+        bridge.registerHandler("logout", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                prefs.edit().putBoolean("isLogin", false).commit();
+                if (WebViewActivity.instance != null)
+                    WebViewActivity.instance.finish();
+                if (MainActivity.instance != null)
+                    MainActivity.instance.finish();
+                Intent intent = new Intent(mContext, SignInActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
     }

@@ -52,7 +52,7 @@ import timber.log.Timber;
  */
 
 public class MainActivity extends WebViewBasedActivity implements WebViewFragment.OnFragmentInteractionListener {
-
+    public static MainActivity instance;
     public LocationClient locClient;
     public TCLocationListener locationListener;
 
@@ -68,6 +68,8 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         if (bundle != null) {
             cachedNotificationPayload = bundle.getString("payload");
         }
+
+        instance = this;
 
         UmengUpdateAgent.update(this);
 

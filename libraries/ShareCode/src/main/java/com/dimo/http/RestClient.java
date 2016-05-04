@@ -137,7 +137,7 @@ public class RestClient {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                callback.callback(ret.toString());
+                callback.callback(ret);
             }
 
             @Override
@@ -162,7 +162,7 @@ public class RestClient {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                callback.callback(ret.toString());
+                callback.callback(ret);
             }
 
             @Override
@@ -183,7 +183,7 @@ public class RestClient {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                callback.callback(ret.toString());
+                callback.callback(ret);
             }
         });
     }
