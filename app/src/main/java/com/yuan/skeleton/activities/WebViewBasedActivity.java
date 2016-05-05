@@ -313,6 +313,13 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
             }
         });
 
+        bridge.registerHandler("showToast", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
+                ToastUtil.showShort(mContext,data);
+            }
+        });
+
         bridge.registerHandler("showConfirmDialog", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {

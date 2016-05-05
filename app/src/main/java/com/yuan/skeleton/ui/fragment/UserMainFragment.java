@@ -11,10 +11,19 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.avos.avoscloud.AVGeoPoint;
+import com.avos.avoscloud.AVUser;
+import com.avoscloud.chat.service.PreferenceMap;
+import com.avoscloud.chat.service.UserService;
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
 import com.dimo.utils.StringUtil;
 import com.yuan.skeleton.R;
 import com.yuan.skeleton.activities.MainActivity;
 import com.yuan.skeleton.activities.MapActivity;
+import com.yuan.skeleton.application.DMApplication;
 import com.yuan.skeleton.application.Injector;
 import com.yuan.skeleton.utils.ToastUtil;
 
@@ -25,6 +34,7 @@ import java.util.HashMap;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import timber.log.Timber;
 
 /**
  * Created by KevinLee on 2016/4/21.
@@ -35,6 +45,8 @@ public class UserMainFragment extends WebViewBaseFragment{
     LinearLayout center;
     @InjectView(R.id.address)
     TextView address;
+    public LocationClient locClient;
+    public TCLocationListener locationListener;
 
     private static final int REQUEST_MAP_CODE = 0XFF01;
 
@@ -56,6 +68,9 @@ public class UserMainFragment extends WebViewBaseFragment{
         ButterKnife.inject(this, view);
 
         redirectToLoadUrl("user_index.html");
+
+        initBaiduLocClient();
+
         return view;
     }
 
@@ -95,6 +110,35 @@ public class UserMainFragment extends WebViewBaseFragment{
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void initBaiduLocClient() {
+        locClient = new LocationClient(getContext());
+        locClient.setDebug(true);
+        LocationClientOption option = new LocationClientOption();
+        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
+        option.setScanSpan(5000);
+        option.setCoorType("bd09ll");
+        option.setIsNeedAddress(true);
+        locClient.setLocOption(option);
+
+        locationListener = new TCLocationListener();
+        locClient.registerLocationListener(locationListener);
+        locClient.start();
+    }
+
+    public class TCLocationListener implements BDLocationListener {
+        @Override
+        public void onReceiveLocation(BDLocation location) {
+            double latitude = location.getLatitude();
+            double longitude = location.getLongitude();
+            int locType = location.getLocType();
+
+            Timber.v("onReceiveLocation latitude=" + latitude + " longitude=" + longitude
+                    + " locType=" + locType + " address=" + location.getAddrStr());
+            address.setText(location.getStreet());
+            locClient.stop();
         }
     }
 }

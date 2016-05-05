@@ -195,8 +195,8 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         Log.i("street",reverseGeoCodeResult.getAddressDetail().street);
 
         Map<String,String> map = new HashMap<>();
-        map.put("Address",reverseGeoCodeResult.getAddressDetail().city);
-        map.put("city","");
+        map.put("addr",reverseGeoCodeResult.getAddress());
+        map.put("city",reverseGeoCodeResult.getAddressDetail().city);
         map.put("district",reverseGeoCodeResult.getAddressDetail().district);
         map.put("province",reverseGeoCodeResult.getAddressDetail().province);
         map.put("street",reverseGeoCodeResult.getAddressDetail().street);
