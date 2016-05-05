@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -63,12 +64,21 @@ public class UserMainFragment extends WebViewBaseFragment{
         super.onViewCreated(view, savedInstanceState);
     }
 
-    @OnClick({R.id.rl_center})
+    @OnClick({R.id.rl_center,R.id.position,R.id.btn_arrow_down})
     public void onClick(View v){
         switch (v.getId()){
             case R.id.rl_center:
                 Intent intent = new Intent(getContext(), MapActivity.class);
                 startActivityForResult(intent,REQUEST_MAP_CODE);
+                break;
+            case R.id.position:
+                ((MainActivity)getActivity()).getBottomNavigationBar().selectTab(2);
+                break;
+            case R.id.btn_arrow_down:
+                String url = "resources.html";
+                HashMap<String,String> map = new HashMap<String, String>();
+                map.put("params","{\"title\":\"全网房源\",\"hasBackButton\":true}");
+                ((MainActivity)getActivity()).openLinkInNewActivity(url,map);
                 break;
         }
     }
