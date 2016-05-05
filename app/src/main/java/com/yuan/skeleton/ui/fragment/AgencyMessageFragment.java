@@ -7,9 +7,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.yuan.skeleton.R;
+import com.yuan.skeleton.activities.MainActivity;
 import com.yuan.skeleton.application.Injector;
 
+import java.util.HashMap;
+
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by KevinLee on 2016/4/24.
@@ -41,4 +45,17 @@ public class AgencyMessageFragment extends WebViewBaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
     }
+
+    @OnClick({R.id.book})
+    public void onClick(View v){
+        switch (v.getId()){
+            case R.id.book:
+                String url = "agency_contacts.html";
+                HashMap<String,String> map = new HashMap<String, String>();
+                map.put("params","{\"title\":\"通讯录\",\"hasBackButton\":true}");
+                ((MainActivity)getActivity()).openLinkInNewActivity(url,map);
+                break;
+        }
+    }
+
 }
