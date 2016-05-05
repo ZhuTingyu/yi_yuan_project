@@ -3,6 +3,7 @@ package com.yuan.skeleton.activities;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -548,7 +549,7 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
             }
         });
 
-        /*bridge.registerHandler("setRightItem", new WebViewJavascriptBridge.WVJBHandler() {
+        bridge.registerHandler("setRightItem", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("setRightItem got:" + data);
@@ -569,7 +570,7 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                     setRightItem(resourceId, new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            callback.callback("onRightItemClick");
+                            bridge.callHandler("onRightItemClick");
                         }
                     });
                 } else {
@@ -578,15 +579,11 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                         @Override
                         public void onClick(View view) {
                             bridge.callHandler("onRightItemClick", content, null);
-                            if (null != callback) {
-                                bridge.callHandler("onRightItemClick", content, null);
-                                callback.callback("right text button clicked");
-                            }
                         }
                     });
                 }
             }
-        });*/
+        });
 
         bridge.registerHandler("getAOSPVersion", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
