@@ -1,141 +1,150 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <RelativeLayout
-        android:id="@+id/topbar"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/topbar_height"
-        android:background="@drawable/background_title">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:layout_marginLeft="15dp"
-            android:gravity="center_vertical"
-            android:visibility="gone">
-
-            <ImageView
-                android:id="@+id/book"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/btn_addressbook"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/rl_center"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_centerInParent="true"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:gravity="center_vertical">
-
-            <Button
-                android:id="@+id/proposal"
-                style="@style/top_proposal"
-                android:text="@string/tabbar_item_txt_proposal"/>
-            <Button
-                android:id="@+id/complaint"
-                style="@style/top_complaint"
-                android:text="@string/tabbar_item_txt_complaint"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="15dp"
-            android:gravity="center_vertical"
-            android:visibility="gone">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="按房源"
-                android:textSize="14dp"
-                android:textColor="@color/white"/>
-
-            <ImageView
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:src="@drawable/btn_arrow_down"/>
-
-        </LinearLayout>
-    </RelativeLayout>
-
-    <EditText
-        android:id="@+id/et_info"
-        android:layout_width="match_parent"
-        android:layout_height="135dp"
-        android:background="#FFFFFF"
-        android:maxLength="1000"
-        android:textSize="14dp"
-        android:padding="10dp"
-        android:gravity="top"
-        android:hint="  在这里说说你的看法或建议"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="#BABABA"/>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbars="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:background="#F0F0F0">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <ImageView
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@drawable/btn_keybord_switchover"
-            android:layout_marginLeft="10dp"
-            android:scaleType="fitXY"/>
+        <RelativeLayout
+            android:id="@+id/topbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/topbar_height"
+            android:background="@drawable/background_title">
 
-        <com.yuan.skeleton.ui.view.AudioRecorderButton
-            android:id="@+id/btn_recorder"
-            android:layout_margin="10dp"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="按下说话"
-            android:textColor="#C4C4C4"
-            android:background="@drawable/proposal_send_background"/>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="15dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
 
-        <ImageView
-            android:id="@+id/btn_other"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@drawable/btn_other"
-            android:scaleType="fitXY"/>
+                <ImageView
+                    android:id="@+id/book"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/btn_addressbook" />
 
-        <ImageView
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@drawable/btn_question"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:scaleType="fitXY"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/rl_center"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/proposal"
+                    style="@style/top_proposal"
+                    android:text="@string/tabbar_item_txt_proposal" />
+
+                <Button
+                    android:id="@+id/complaint"
+                    style="@style/top_complaint"
+                    android:text="@string/tabbar_item_txt_complaint" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="15dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="按房源"
+                    android:textColor="@color/white"
+                    android:textSize="14dp" />
+
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@drawable/btn_arrow_down" />
+
+            </LinearLayout>
+        </RelativeLayout>
+
+        <EditText
+            android:id="@+id/et_info"
+            android:layout_width="match_parent"
+            android:layout_height="135dp"
+            android:background="#FFFFFF"
+            android:gravity="top"
+            android:hint="  在这里说说你的看法或建议"
+            android:maxLength="1000"
+            android:padding="10dp"
+            android:textSize="14dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="#BABABA" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="#F0F0F0"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="10dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/btn_keybord_switchover" />
+
+            <com.yuan.skeleton.ui.view.AudioRecorderButton
+                android:id="@+id/btn_recorder"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/proposal_send_background"
+                android:text="按下说话"
+                android:textColor="#C4C4C4" />
+
+            <ImageView
+                android:id="@+id/btn_other"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/btn_other" />
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/btn_question" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="#BABABA" />
+
+        <WebView
+            android:id="@+id/webview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/topbar" />
 
     </LinearLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="#BABABA"/>
-
-    <WebView
-        android:id="@+id/webview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/topbar"/>
-
-</LinearLayout>
+</ScrollView>
