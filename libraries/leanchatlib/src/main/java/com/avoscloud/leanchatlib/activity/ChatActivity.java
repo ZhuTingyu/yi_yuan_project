@@ -311,7 +311,7 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
             public void onAudioLongClick(AVIMAudioMessage audioMessage) {
                 //弹出编辑文本(语音附加消息)，确认后上传。
                 final EditText inputServer = new EditText(ChatActivity.this);
-                AlertDialog.Builder builder = new AlertDialog.Builder(ChatActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(ChatActivity.this,R.style.AlertDialogCustom);
                 builder.setTitle("附加消息").setIcon(android.R.drawable.ic_dialog_info).setView(inputServer)
                         .setNegativeButton("取消", null);
                 builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {

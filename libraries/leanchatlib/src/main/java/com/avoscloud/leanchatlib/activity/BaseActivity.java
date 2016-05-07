@@ -83,6 +83,7 @@ public class BaseActivity extends FragmentActivity {
     }
     actionBar.setDisplayUseLogoEnabled(false);
     actionBar.setDisplayHomeAsUpEnabled(true);
+    actionBar.hide();
   }
 
   protected void initActionBar(int id) {

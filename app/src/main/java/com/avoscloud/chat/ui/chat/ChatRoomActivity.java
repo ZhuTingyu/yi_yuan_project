@@ -54,6 +54,7 @@ public class ChatRoomActivity extends ChatActivity {
     public WebViewJavascriptBridge bridge;
     private WebView webView;
     private String value;
+    private LinearLayout back;
 
     public static void chatByConversation(Context from, AVIMConversation conv) {
         CacheService.registerConv(conv);
@@ -82,8 +83,15 @@ public class ChatRoomActivity extends ChatActivity {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         chatroom = (RelativeLayout) findViewById(R.id.rl_chatroom);
         bottomLayout = (LinearLayout) findViewById(R.id.bottomLayout);
+        back = (LinearLayout) findViewById(R.id.back);
         initLocation();
         initWebView();
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     private void initWebView(){
