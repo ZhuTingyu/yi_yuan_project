@@ -975,6 +975,7 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                 }
 
                 String objectId = params.get("user_id");
+                prefs.edit().putString("target_id",objectId).commit();
 
                 ChatRoomActivity.chatByUserId(WebViewBasedActivity.this, objectId);
 
