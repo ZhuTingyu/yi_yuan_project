@@ -71,6 +71,7 @@
         <activity android:name=".activities.SignInActivity" android:screenOrientation="portrait" />
         <activity android:name=".activities.MapActivity" android:screenOrientation="portrait" />
         <activity android:name=".activities.ImagePagerActivity" android:screenOrientation="portrait" />
+        <activity android:name="com.avoscloud.chat.ui.chat.HouseInfosActivity" android:screenOrientation="portrait" />
 
         <activity
             android:name="com.avoscloud.chat.ui.chat.ChatRoomActivity"

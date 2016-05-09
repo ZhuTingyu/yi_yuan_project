@@ -12,6 +12,7 @@ public class Constants {
     public static String kWebServiceFileUpload = kWebServiceAPIEndpoint + "/file-upload/feedback";
     public static String kWebServiceUploadCommon = kWebServiceAPIEndpoint + "/file-upload/common";
     public static String kWebServiceSendFeedback = kWebServiceAPIEndpoint + "/feedback";
+    public static String kWebServiceSwitchable = kWebServiceAPIEndpoint + "/house/switchable/";
 
     // Production Server
     public static String kPrefsFirstLaunch = "kPrefsFirstLaunch";

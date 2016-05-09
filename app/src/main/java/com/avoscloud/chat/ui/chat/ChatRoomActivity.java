@@ -231,6 +231,12 @@ public class ChatRoomActivity extends ChatActivity {
     }*/
 
     @Override
+    protected void openHouseInfo() {
+        Intent intent = new Intent(this,HouseInfosActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
     protected void onResume() {
         CacheService.setCurConv(conversation);
         super.onResume();

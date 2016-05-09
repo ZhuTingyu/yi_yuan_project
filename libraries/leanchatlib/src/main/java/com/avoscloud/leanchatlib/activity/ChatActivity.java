@@ -371,7 +371,12 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
             selectImageFromCamera();
         } else if (v.getId() == R.id.addChangeHouseBtn){
             //房源
+            openHouseInfo();
         }
+    }
+
+    protected void openHouseInfo(){
+
     }
 
     private void hideBottomLayoutAndScrollToLast() {
