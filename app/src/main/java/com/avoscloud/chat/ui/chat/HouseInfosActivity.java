@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -43,6 +44,7 @@ public class HouseInfosActivity extends FragmentActivity {
     private Context mContext;
     private ListView listView;
     private SharedPreferences prefs;
+    private LinearLayout back;
     private List<Map<String,Object>> houseInfos;
 
     @Override
@@ -50,6 +52,7 @@ public class HouseInfosActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chat_house_info_layout);
         mContext = this;
+        back = (LinearLayout) findViewById(R.id.back);
         listView = (ListView) findViewById(R.id.listview);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String json = prefs.getString("userLogin",null);
@@ -94,6 +97,12 @@ public class HouseInfosActivity extends FragmentActivity {
 
                     }
                 });
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     private String getToken(String json){
