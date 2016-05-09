@@ -56,8 +56,10 @@ import com.nostra13.universalimageloader.core.listener.PauseOnScrollListener;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import de.greenrobot.event.EventBus;
@@ -83,7 +85,7 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
     protected ChatMessageAdapter adapter;
     protected RoomsTable roomsTable;
     protected View chatTextLayout, chatAudioLayout, chatAddLayout, chatEmotionLayout;
-    protected View turnToTextBtn, turnToAudioBtn, sendBtn, addImageBtn, showAddBtn, addLocationBtn, showEmotionBtn;
+    protected View turnToTextBtn, turnToAudioBtn, sendBtn, addImageBtn, showAddBtn, addFileBtn, showEmotionBtn,addChangeHouseBtn;
     protected ViewPager emotionPager;
     protected EmotionEditText contentEdit;
     protected XListView xListView;
@@ -133,25 +135,27 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
         recordBtn = (RecordButton) findViewById(R.id.recordBtn);
         chatTextLayout = findViewById(R.id.chatTextLayout);
         chatAddLayout = findViewById(R.id.chatAddLayout);
-        addLocationBtn = findViewById(R.id.addLocationBtn);
+        addFileBtn = findViewById(R.id.addFileBtn);
         chatEmotionLayout = findViewById(R.id.chatEmotionLayout);
         showAddBtn = findViewById(R.id.showAddBtn);
         showEmotionBtn = findViewById(R.id.showEmotionBtn);
         sendBtn = findViewById(R.id.sendBtn);
         emotionPager = (ViewPager) findViewById(R.id.emotionPager);
         addCameraBtn = findViewById(R.id.addCameraBtn);
+        addChangeHouseBtn = findViewById(R.id.addChangeHouseBtn);
 
         sendBtn.setOnClickListener(this);
         contentEdit.setOnClickListener(this);
         addImageBtn.setOnClickListener(this);
-        addLocationBtn.setOnClickListener(this);
+        addFileBtn.setOnClickListener(this);
         turnToAudioBtn.setOnClickListener(this);
         turnToTextBtn.setOnClickListener(this);
         showAddBtn.setOnClickListener(this);
         showEmotionBtn.setOnClickListener(this);
         addCameraBtn.setOnClickListener(this);
+        addChangeHouseBtn.setOnClickListener(this);
 
-        addLocationBtn.setVisibility(View.GONE);
+//        addLocationBtn.setVisibility(View.GONE);
     }
 
     private void initByIntent(Intent intent) {
@@ -308,7 +312,7 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
             }
 
             @Override
-            public void onAudioLongClick(AVIMAudioMessage audioMessage) {
+            public void onAudioLongClick(final AVIMAudioMessage audioMessage) {
                 //弹出编辑文本(语音附加消息)，确认后上传。
                 final EditText inputServer = new EditText(ChatActivity.this);
                 AlertDialog.Builder builder = new AlertDialog.Builder(ChatActivity.this,R.style.AlertDialogCustom);
@@ -317,7 +321,8 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
                 builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
 
                     public void onClick(DialogInterface dialog, int which) {
-                        inputServer.getText().toString();
+                        //封装成MAP对象后转换为json
+
                     }
                 });
                 builder.show();
@@ -358,15 +363,20 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
             toggleBottomAddLayout();
         } else if (v.getId() == R.id.showEmotionBtn) {
             toggleEmotionLayout();
-        } else if (v.getId() == R.id.addLocationBtn) {
-            if (locationHandler != null) {
-                locationHandler.onAddLocationButtonClicked(this);
-            }
+        } else if (v.getId() == R.id.addFileBtn) {
+            //文件
         } else if (v.getId() == R.id.textEdit) {
             hideBottomLayoutAndScrollToLast();
         } else if (v.getId() == R.id.addCameraBtn) {
             selectImageFromCamera();
+        } else if (v.getId() == R.id.addChangeHouseBtn){
+            //房源
+            openHouseInfo();
         }
+    }
+
+    protected void openHouseInfo(){
+
     }
 
     private void hideBottomLayoutAndScrollToLast() {

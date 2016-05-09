@@ -29,7 +29,8 @@
     <string name="chat_cannotFindResult">抱歉，未能找到结果</string>
     <string name="chat_bottom_picture">照片</string>
     <string name="chat_bottom_camera">拍摄</string>
-    <string name="chat_bottom_location">位置</string>
+    <string name="chat_bottom_file">文件</string>
+    <string name="chat_bottom_change">房源</string>
 
     <string name="chat_emotion">表情</string>
     <string name="chat_pleaseCheckNetwork">请检查网络</string>

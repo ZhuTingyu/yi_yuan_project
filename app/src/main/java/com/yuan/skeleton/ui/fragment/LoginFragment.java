@@ -77,7 +77,10 @@ public class LoginFragment extends WebViewBaseFragment {
                     if("userLogin".equals(key)){
                         params = StringUtil.JSONString2HashMap(data);
                         params = StringUtil.JSONString2HashMap(params.get("value"));
-                        params = StringUtil.JSONString2HashMap(params.get("user_info"));
+                        if(params.get("user_info") != null)
+                            params = StringUtil.JSONString2HashMap(params.get("user_info"));
+                        else
+                            params = StringUtil.JSONString2HashMap(params.get("agency_info"));
                         String userName = params.get("lean_user");
                         String passwd = params.get("lean_passwd");
                         avUserLogin(userName,passwd);
