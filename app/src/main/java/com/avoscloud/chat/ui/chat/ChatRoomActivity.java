@@ -84,7 +84,7 @@ public class ChatRoomActivity extends ChatActivity {
         chatroom = (RelativeLayout) findViewById(R.id.rl_chatroom);
         bottomLayout = (LinearLayout) findViewById(R.id.bottomLayout);
         back = (LinearLayout) findViewById(R.id.back);
-        initLocation();
+//        initLocation();
         initWebView();
         back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -213,6 +213,7 @@ public class ChatRoomActivity extends ChatActivity {
         }
     }
 
+    /*
     private void initLocation() {
         addLocationBtn.setVisibility(View.VISIBLE);
         setLocationHandler(new LocationHandler() {
@@ -227,7 +228,7 @@ public class ChatRoomActivity extends ChatActivity {
                         locationMessage.getLocation().getLongitude());
             }
         });
-    }
+    }*/
 
     @Override
     protected void onResume() {
