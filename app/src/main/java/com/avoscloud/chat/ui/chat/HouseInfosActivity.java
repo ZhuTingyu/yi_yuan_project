@@ -1,6 +1,7 @@
 package com.avoscloud.chat.ui.chat;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -19,6 +21,7 @@ import android.widget.TextView;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.avoscloud.chat.ui.entry.SerializableMap;
 import com.dimo.utils.StringUtil;
 import com.squareup.picasso.Picasso;
 import com.yuan.skeleton.R;
@@ -94,6 +97,17 @@ public class HouseInfosActivity extends FragmentActivity {
                         }
                         Log.i("houseInfos",houseInfos.toString());
                         listView.setAdapter(new HouseInfoAdapter());
+                        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                Intent intent = new Intent();
+                                final SerializableMap myMap=new SerializableMap();
+                                myMap.setMap(houseInfos.get(position));
+                                intent.putExtra("data",myMap);
+                                setResult(RESULT_OK,intent);
+                                finish();
+                            }
+                        });
 
                     }
                 });

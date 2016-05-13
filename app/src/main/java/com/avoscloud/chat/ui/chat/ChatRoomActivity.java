@@ -22,9 +22,11 @@ import com.avos.avoscloud.im.v2.callback.AVIMConversationCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
 import com.avos.avoscloud.im.v2.messages.AVIMLocationMessage;
 import com.avoscloud.chat.entity.AVIMUserInfoMessage;
+import com.avoscloud.chat.model.AVIMHouseInfoMessage;
 import com.avoscloud.chat.service.CacheService;
 import com.avoscloud.chat.service.ConversationChangeEvent;
 import com.avoscloud.chat.service.event.FinishEvent;
+import com.avoscloud.chat.ui.entry.SerializableMap;
 import com.avoscloud.chat.util.Utils;
 import com.avoscloud.leanchatlib.activity.ChatActivity;
 import com.avoscloud.leanchatlib.activity.LocationHandler;
@@ -48,6 +50,7 @@ import timber.log.Timber;
  */
 public class ChatRoomActivity extends ChatActivity {
     public static final int LOCATION_REQUEST = 100;
+    public static final int REQUEST_CODE_HOUSE = 101;
     private RelativeLayout chatroom;
     private LinearLayout bottomLayout;
     private SharedPreferences prefs;
@@ -233,7 +236,7 @@ public class ChatRoomActivity extends ChatActivity {
     @Override
     protected void openHouseInfo() {
         Intent intent = new Intent(this,HouseInfosActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent,REQUEST_CODE_HOUSE);
     }
 
     @Override
@@ -307,6 +310,20 @@ public class ChatRoomActivity extends ChatActivity {
                         toast(R.string.chat_cannotGetYourAddressInfo);
                     }
                     hideBottomLayout();
+                    break;
+                case REQUEST_CODE_HOUSE:
+                    SerializableMap serializableMap = (SerializableMap) data.getSerializableExtra("data");
+                    Map<String, Object> map = serializableMap.getMap();
+                    AVIMHouseInfoMessage message = new AVIMHouseInfoMessage();
+                    message.setAttrs(map);
+                    conversation.sendMessage(message, new AVIMConversationCallback() {
+                        @Override
+                        public void done(AVException e) {
+                            if (e != null) {
+                                Logger.d(e.getMessage());
+                            }
+                        }
+                    });
                     break;
             }
         }
