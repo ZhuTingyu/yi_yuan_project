@@ -81,6 +81,7 @@ public class DMApplication extends Application {
 
     private String htmlExtractedFolder;
     private String rootDataFolder;
+    private String rootPagesFolder;
 
     /**
      * Create main application
@@ -267,6 +268,7 @@ public class DMApplication extends Application {
             FileUtil.copyAssetFolder(getAssets(), "html", htmlExtractedFolder);
             prefs.edit().putBoolean(Constants.kWebPackageExtracted, true).commit();
         }*/
+        rootPagesFolder = htmlExtractedFolder + "/pages";
         Timber.v("Copy HTML asset to folder : " + htmlExtractedFolder);
         FileUtil.copyAssetFolder(getAssets(), "html", htmlExtractedFolder);
         prefs.edit().putBoolean(Constants.kWebPackageExtracted, true).commit();
@@ -430,5 +432,17 @@ public class DMApplication extends Application {
         ZipUtil.unzip(destUri, targetFolder);
 
         prefs.edit().putString(Constants.kApplicationPackageVersion, mLatestVersion).commit();
+    }
+
+    public void setHtmlExtractedFolder(String htmlExtractedFolder) {
+        this.htmlExtractedFolder = htmlExtractedFolder;
+    }
+
+    public void setRootPagesFolder(String rootPagesFolder) {
+        this.rootPagesFolder = rootPagesFolder;
+    }
+
+    public String getRootPagesFolder() {
+        return rootPagesFolder;
     }
 }

@@ -2,6 +2,7 @@ package com.yuan.skeleton.application;
 
 
 
+import com.yuan.skeleton.activities.IPSettingActivity;
 import com.yuan.skeleton.activities.MainActivity;
 import com.yuan.skeleton.activities.MapActivity;
 import com.yuan.skeleton.activities.SignInActivity;
@@ -32,7 +33,7 @@ import dagger.Module;
 
                 injects = {
                         DMApplication.class,
-
+                        IPSettingActivity.class,
                         SplashActivity.class,
                         TutorialActivity.class,
                         MainActivity.class,

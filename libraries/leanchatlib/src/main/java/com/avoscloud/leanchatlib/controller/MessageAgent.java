@@ -90,6 +90,10 @@ public class MessageAgent {
     sendMsg(textMsg, null, sendCallback);
   }
 
+  public void sendHouse(AVIMTypedMessage msg) {
+    sendMsg(msg, null, sendCallback);
+  }
+
   public void sendImage(String imagePath) {
     final String newPath = com.avoscloud.leanchatlib.utils.PathUtils.getChatFilePath(Utils.uuid());
     PhotoUtils.compressImage(imagePath, newPath);

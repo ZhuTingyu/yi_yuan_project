@@ -112,11 +112,11 @@ public class WebViewBaseFragment extends Fragment {
 
         String htmlExtractedFolder = DMApplication.getInstance().getHtmlExtractedFolder();
 
-        mUrl = htmlExtractedFolder + "/pages/" + url;
+        mUrl = htmlExtractedFolder + "/" + url;
 
         Timber.i("URL - " + mUrl);
 
-        if (StringUtil.isValidHTTPUrl(url)) {
+        if (StringUtil.isValidHTTPUrl(mUrl)) {
             // url is web link
             if (additionalHttpHeaders != null) {
                 webView.loadUrl(mUrl, additionalHttpHeaders);

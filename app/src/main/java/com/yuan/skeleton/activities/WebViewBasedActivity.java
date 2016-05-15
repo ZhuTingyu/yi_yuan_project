@@ -974,8 +974,9 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                     e.printStackTrace();
                 }
 
-                String objectId = params.get("user_id");
-                prefs.edit().putString("target_id",objectId).commit();
+                String objectId = params.get("lean_id");
+                String userId = params.get("user_id");
+                prefs.edit().putString("target_id",userId).commit();
 
                 ChatRoomActivity.chatByUserId(WebViewBasedActivity.this, objectId);
 

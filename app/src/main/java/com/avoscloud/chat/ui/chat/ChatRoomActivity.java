@@ -20,23 +20,22 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
-import com.avos.avoscloud.im.v2.messages.AVIMLocationMessage;
 import com.avoscloud.chat.entity.AVIMUserInfoMessage;
-import com.avoscloud.chat.model.AVIMHouseInfoMessage;
 import com.avoscloud.chat.service.CacheService;
 import com.avoscloud.chat.service.ConversationChangeEvent;
 import com.avoscloud.chat.service.event.FinishEvent;
 import com.avoscloud.chat.ui.entry.SerializableMap;
 import com.avoscloud.chat.util.Utils;
 import com.avoscloud.leanchatlib.activity.ChatActivity;
-import com.avoscloud.leanchatlib.activity.LocationHandler;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.ConversationHelper;
+import com.avoscloud.leanchatlib.model.AVIMHouseInfoMessage;
 import com.avoscloud.leanchatlib.utils.Logger;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.yuan.skeleton.R;
 import com.yuan.skeleton.application.DMApplication;
+import com.yuan.skeleton.utils.JsonParse;
 
 import org.json.JSONException;
 
@@ -106,7 +105,14 @@ public class ChatRoomActivity extends ChatActivity {
         this.webView.setVerticalScrollBarEnabled(false);
         this.bridge = new WebViewJavascriptBridge(this, webView, null);
         registerBridge();
-        redirectToLoadUrl("agency_bbs.html");
+        try {
+            if(JsonParse.getInstance().judgeUserType())
+                redirectToLoadUrl("user_bbs.html");
+            else
+                redirectToLoadUrl("agency_bbs.html");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -207,9 +213,9 @@ public class ChatRoomActivity extends ChatActivity {
             return;
         }
         String htmlExtractedFolder = DMApplication.getInstance().getHtmlExtractedFolder();
-        mUrl = htmlExtractedFolder + "/pages/" + url;
+        mUrl = htmlExtractedFolder + "/" + url;
         Timber.i("URL - " + mUrl);
-        if (StringUtil.isValidHTTPUrl(url)) {
+        if (StringUtil.isValidHTTPUrl(mUrl)) {
             webView.loadUrl(mUrl);
         } else {
             webView.loadUrl("file:///" + mUrl);
@@ -316,14 +322,9 @@ public class ChatRoomActivity extends ChatActivity {
                     Map<String, Object> map = serializableMap.getMap();
                     AVIMHouseInfoMessage message = new AVIMHouseInfoMessage();
                     message.setAttrs(map);
-                    conversation.sendMessage(message, new AVIMConversationCallback() {
-                        @Override
-                        public void done(AVException e) {
-                            if (e != null) {
-                                Logger.d(e.getMessage());
-                            }
-                        }
-                    });
+
+                    messageAgent.sendHouse(message);
+
                     break;
             }
         }
