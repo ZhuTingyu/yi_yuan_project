@@ -69,6 +69,8 @@ import java.util.Set;
 
 import de.greenrobot.event.EventBus;
 import okhttp3.Call;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 
 public class ChatActivity extends BaseActivity implements OnClickListener,
         XListView.IXListViewListener {
@@ -364,11 +366,13 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
         stringBuffer.insert(stringBuffer.indexOf(":-3") + 3,",\\\"_lctext\\\":" + "\\\"" + text + "\\\"");
         Log.i("new json " , stringBuffer.toString());
 
-        // TODO: 16/5/18  代码已完成，但服务器返回结果有问题。暂无解决方案。
+        Map<String,String> headers = new HashMap<>();
+        headers.put("X-LC-Id","IwzlUusBdjf4bEGlypaqNRIx-gzGzoHsz");
+        headers.put("X-LC-Key","4iGQy4Mg1Q8o3AyvtUTGiFQl,master");
+
         OkHttpUtils.put().url("https://leancloud.cn/1.1/rtm/messages/logs")
-                .addHeader("X-LC-Id","IwzlUusBdjf4bEGlypaqNRIx-gzGzoHsz")
-                .addHeader("X-LC-Key","4iGQy4Mg1Q8o3AyvtUTGiFQl,master")
-                .requestBody(stringBuffer.toString())
+                .headers(headers)
+                .requestBody(RequestBody.create(MediaType.parse("application/json"),stringBuffer.toString()))
                 .build()
                 .execute(new StringCallback() {
                     @Override

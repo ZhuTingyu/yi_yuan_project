@@ -64,6 +64,7 @@ import com.yuan.skeleton.payment.AliPay;
 import com.yuan.skeleton.ui.fragment.WebViewBaseFragment;
 import com.yuan.skeleton.ui.fragment.WebViewFragment;
 import com.victor.loading.rotate.RotateLoading;
+import com.yuan.skeleton.ui.view.PickerPopWindow;
 import com.yuan.skeleton.utils.JsonParse;
 import com.yuan.skeleton.utils.OkHttpClientManager;
 import com.yuan.skeleton.utils.ToastUtil;
@@ -82,6 +83,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -1241,6 +1243,29 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                 Intent intent = new Intent(mContext, SignInActivity.class);
                 startActivity(intent);
                 finish();
+            }
+        });
+
+        bridge.registerHandler("showPickerView",new WebViewJavascriptBridge.WVJBHandler() {
+
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                Log.i("showPickerView",data);
+
+                ArrayList<String> item1 = new ArrayList<String>();
+                item1.add("a");
+                item1.add("b");
+                item1.add("c");
+                item1.add("d");
+                PickerPopWindow pickPopWin = new PickerPopWindow(mContext, item1, null, null, new PickerPopWindow.OnPickCompletedListener() {
+                    @Override
+                    public void onAddressPickCompleted(String item1, String item2, String item3) {
+
+                    }
+                });
+
+                pickPopWin.showPopWin(WebViewBasedActivity.this);
+
             }
         });
     }
