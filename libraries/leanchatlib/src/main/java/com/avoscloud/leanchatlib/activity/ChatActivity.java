@@ -17,6 +17,7 @@ import android.text.Selection;
 import android.text.Spannable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -25,6 +26,8 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.AVIMReservedMessageType;
 import com.avos.avoscloud.im.v2.AVIMTypedMessage;
@@ -53,6 +56,8 @@ import com.avoscloud.leanchatlib.view.RecordButton;
 import com.avoscloud.leanchatlib.view.xlist.XListView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.PauseOnScrollListener;
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.StringCallback;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -63,6 +68,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.greenrobot.event.EventBus;
+import okhttp3.Call;
 
 public class ChatActivity extends BaseActivity implements OnClickListener,
         XListView.IXListViewListener {
@@ -322,6 +328,28 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
 
                     public void onClick(DialogInterface dialog, int which) {
                         //封装成MAP对象后转换为json
+                        OkHttpUtils.get().url("https://leancloud.cn/1.1/rtm/messages/logs?convid=" + audioMessage.getConversationId())
+                                .addHeader("X-LC-Id","IwzlUusBdjf4bEGlypaqNRIx-gzGzoHsz")
+                                .addHeader("X-LC-Key","4iGQy4Mg1Q8o3AyvtUTGiFQl,master")
+                                .build()
+                                .execute(new StringCallback() {
+                                    @Override
+                                    public void onError(Call call, Exception e) {
+
+                                    }
+
+                                    @Override
+                                    public void onResponse(String response) {
+                                        Log.i("云端返回的JSON",response);
+                                        JSONArray jsonArray = JSONArray.parseArray(response);
+                                        for (int i = 0; i < jsonArray.size(); i++){
+                                            if(jsonArray.getJSONObject(i).get("msg-id").toString().equals(audioMessage.getMessageId())){
+                                                putJson2LeanChat(jsonArray.get(i).toString(),inputServer.getText().toString());
+                                                return;
+                                            }
+                                        }
+                                    }
+                                });
 
                     }
                 });
@@ -329,6 +357,30 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
             }
         });
         xListView.setAdapter(adapter);
+    }
+
+    private void putJson2LeanChat(String json,String text){
+        StringBuffer stringBuffer = new StringBuffer(json);
+        stringBuffer.insert(stringBuffer.indexOf(":-3") + 3,",\\\"_lctext\\\":" + "\\\"" + text + "\\\"");
+        Log.i("new json " , stringBuffer.toString());
+
+        // TODO: 16/5/18  代码已完成，但服务器返回结果有问题。暂无解决方案。
+        OkHttpUtils.put().url("https://leancloud.cn/1.1/rtm/messages/logs")
+                .addHeader("X-LC-Id","IwzlUusBdjf4bEGlypaqNRIx-gzGzoHsz")
+                .addHeader("X-LC-Key","4iGQy4Mg1Q8o3AyvtUTGiFQl,master")
+                .requestBody(stringBuffer.toString())
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onResponse(String response) {
+                        Log.i("修改聊天记录 : ",response);
+                    }
+                });
     }
 
     public void refreshMsgsFromDB() {

@@ -213,7 +213,7 @@ public class ChatRoomActivity extends ChatActivity {
             return;
         }
         String htmlExtractedFolder = DMApplication.getInstance().getHtmlExtractedFolder();
-        mUrl = htmlExtractedFolder + "/" + url;
+        mUrl = htmlExtractedFolder + "/pages/" + url;
         Timber.i("URL - " + mUrl);
         if (StringUtil.isValidHTTPUrl(mUrl)) {
             webView.loadUrl(mUrl);
