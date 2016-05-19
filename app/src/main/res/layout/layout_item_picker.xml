@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#33000000">
@@ -24,9 +23,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:background="@null"
-                tools:text="cancel"
-                android:textColor="@color/btn_cancel_color"
-                android:textSize="@dimen/btn_text_size" />
+                android:text="cancel"
+                android:textColor="@color/blue"
+                android:textSize="16px" />
 
             <Button
                 android:id="@+id/btn_confirm"
@@ -34,9 +33,9 @@
                 android:layout_height="30dp"
                 android:layout_alignParentRight="true"
                 android:background="@null"
-                tools:text="confirm"
-                android:textColor="@color/btn_confirm_color"
-                android:textSize="@dimen/btn_text_size"/>
+                android:text="confirm"
+                android:textColor="@color/blue"
+                android:textSize="16px"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -47,22 +46,23 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" >
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
 
-                <com.yuan.skeleton.ui.view.PickerView
+                <com.wx.wheelview.widget.WheelView
                     android:id="@+id/picker_year"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1" />
 
-                <com.yuan.skeleton.ui.view.PickerView
+                <com.wx.wheelview.widget.WheelView
                     android:id="@+id/picker_month"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginLeft="1dp"
                     android:layout_weight="1" />
 
-                <com.yuan.skeleton.ui.view.PickerView
+                <com.wx.wheelview.widget.WheelView
                     android:id="@+id/picker_day"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"

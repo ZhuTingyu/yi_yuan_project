@@ -1253,14 +1253,27 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                 Log.i("showPickerView",data);
 
                 ArrayList<String> item1 = new ArrayList<String>();
+                ArrayList<String> item2 = new ArrayList<String>();
+                ArrayList<String> item3 = new ArrayList<String>();
                 item1.add("a");
                 item1.add("b");
                 item1.add("c");
                 item1.add("d");
-                PickerPopWindow pickPopWin = new PickerPopWindow(mContext, item1, null, null, new PickerPopWindow.OnPickCompletedListener() {
+                item2.add("1");
+                item2.add("2");
+                item2.add("3");
+                item3.add("d");
+                item3.add("e");
+                item3.add("f");
+                item3.add("g");
+                PickerPopWindow pickPopWin = new PickerPopWindow(mContext, item1, item2, item3, new PickerPopWindow.OnPickCompletedListener() {
                     @Override
                     public void onAddressPickCompleted(String item1, String item2, String item3) {
-
+                        StringBuffer sb = new StringBuffer();
+                        sb.append(item1);
+                        sb.append(item2);
+                        sb.append(item3);
+                        Log.i("result",sb.toString());
                     }
                 });
 

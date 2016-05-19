@@ -2,6 +2,7 @@ package com.yuan.skeleton.ui.view;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -13,7 +14,11 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 
+import com.wx.wheelview.adapter.ArrayWheelAdapter;
+import com.wx.wheelview.adapter.BaseWheelAdapter;
+import com.wx.wheelview.widget.WheelView;
 import com.yuan.skeleton.R;
 
 import java.util.ArrayList;
@@ -33,7 +38,10 @@ public class PickerPopWindow extends PopupWindow implements View.OnClickListener
     private Button cancelBtn;
     private Button confirmBtn;
 
-    private PickerView item1PickerV,item2PickerV,item3PickerV;
+    private WheelView item1PickerV,item2PickerV,item3PickerV;
+    private String item1,item2,item3 = "";
+
+
     /**
      * g构造函数
      * @param cxt
@@ -54,19 +62,16 @@ public class PickerPopWindow extends PopupWindow implements View.OnClickListener
         contentView = LayoutInflater.from(mContext).inflate(R.layout.layout_item_picker, null);
         cancelBtn = (Button) contentView.findViewById(R.id.btn_cancel);
         confirmBtn = (Button) contentView.findViewById(R.id.btn_confirm);
-        item1PickerV = (PickerView) contentView.findViewById(R.id.picker_year);
-        item2PickerV = (PickerView) contentView.findViewById(R.id.picker_month);
-        item3PickerV = (PickerView) contentView.findViewById(R.id.picker_day);
+        item1PickerV = (WheelView) contentView.findViewById(R.id.picker_year);
+        item2PickerV = (WheelView) contentView.findViewById(R.id.picker_month);
+        item3PickerV = (WheelView) contentView.findViewById(R.id.picker_day);
         pickerContainerV = contentView.findViewById(R.id.container_picker);
-        contentView.findViewById(R.id.picker_day).setVisibility(View.GONE);
 
         initPickerViews();
 
         cancelBtn.setOnClickListener(this);
         confirmBtn.setOnClickListener(this);
         contentView.setOnClickListener(this);
-        item1PickerV.setOnPickedListener(this);
-        item2PickerV.setOnPickedListener(this);
 
         setTouchable(true);
         setFocusable(true);
@@ -78,12 +83,46 @@ public class PickerPopWindow extends PopupWindow implements View.OnClickListener
         setHeight(ViewGroup.LayoutParams.MATCH_PARENT);
     }
 
-    /**
-     * 初始化选择器试图
-     */
-    private void initPickerViews() {
-        item1PickerV.setData(item1List);
+    private void initPickerViews(){
+        WheelView.WheelViewStyle style = new WheelView.WheelViewStyle();
+        style.backgroundColor = Color.parseColor("#f2f7fa");
+        item1PickerV.setWheelAdapter(new ItemArrayWheel(mContext));
+        item1PickerV.setWheelData(item1List);
+        item1PickerV.setSkin(WheelView.Skin.Holo);
+        item1PickerV.setStyle(style);
+        item2PickerV.setWheelAdapter(new ItemArrayWheel(mContext));
+        item2PickerV.setWheelData(item2List);
+        item2PickerV.setStyle(style);
+        item2PickerV.setSkin(WheelView.Skin.Holo);
+        item3PickerV.setWheelAdapter(new ItemArrayWheel(mContext));
+        item3PickerV.setWheelData(item3List);
+        item3PickerV.setSkin(WheelView.Skin.Holo);
+        item3PickerV.setStyle(style);
+
+        item1PickerV.setOnWheelItemSelectedListener(new WheelView.OnWheelItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(int position, Object o) {
+                item1 = item1List.get(position);
+            }
+        });
+
+        item2PickerV.setOnWheelItemSelectedListener(new WheelView.OnWheelItemSelectedListener() {
+            @Override
+            public void onItemSelected(int position, Object o) {
+                item2 = item2List.get(position);
+            }
+        });
+
+        item3PickerV.setOnWheelItemSelectedListener(new WheelView.OnWheelItemSelectedListener() {
+            @Override
+            public void onItemSelected(int position, Object o) {
+                item3 = item3List.get(position);
+            }
+        });
     }
+
+
 
     /**
      * 显示地址选择器弹层
@@ -103,6 +142,40 @@ public class PickerPopWindow extends PopupWindow implements View.OnClickListener
 
             pickerContainerV.startAnimation(trans);
         }
+    }
+
+    private class ItemArrayWheel extends BaseWheelAdapter<String> {
+
+        private Context mContext;
+
+        public ItemArrayWheel(Context context) {
+            this.mContext = context;
+        }
+
+        @Override
+        public View bindView(int position, View convertView, ViewGroup parent) {
+
+            ViewHolder holder = null;
+
+            if(convertView == null){
+                holder = new ViewHolder();
+                convertView = LayoutInflater.from(mContext).inflate(R.layout.item_list_adapter,null);
+                holder.info = (TextView) convertView.findViewById(R.id.info);
+                convertView.setTag(holder);
+            }else{
+                holder = (ViewHolder) convertView.getTag();
+            }
+
+            holder.info.setText(mList.get(position));
+
+
+            return convertView;
+        }
+
+        class ViewHolder{
+            TextView info;
+        }
+
     }
 
     /**
@@ -142,7 +215,7 @@ public class PickerPopWindow extends PopupWindow implements View.OnClickListener
         } else if (v == confirmBtn) {
 
             if (null != mListener)
-//                mListener.onAddressPickCompleted(mProvince, mProvinceId, mCity, mCityId);
+                mListener.onAddressPickCompleted(item1, item2, item3);
 
             dismissPopWin();
         }
