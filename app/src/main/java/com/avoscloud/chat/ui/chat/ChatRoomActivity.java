@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -31,6 +32,7 @@ import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.ConversationHelper;
 import com.avoscloud.leanchatlib.model.AVIMHouseInfoMessage;
 import com.avoscloud.leanchatlib.utils.Logger;
+import com.bugtags.library.Bugtags;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.yuan.skeleton.R;
@@ -249,12 +251,14 @@ public class ChatRoomActivity extends ChatActivity {
     protected void onResume() {
         CacheService.setCurConv(conversation);
         super.onResume();
+        Bugtags.onResume(this);
     }
 
     @Override
     protected void onDestroy() {
         CacheService.setCurConv(null);
         super.onDestroy();
+        Bugtags.onPause(this);
     }
 
     private void testSendCustomMessage() {
@@ -329,5 +333,12 @@ public class ChatRoomActivity extends ChatActivity {
             }
         }
 
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        //注：回调 3
+        Bugtags.onDispatchTouchEvent(this, event);
+        return super.dispatchTouchEvent(event);
     }
 }

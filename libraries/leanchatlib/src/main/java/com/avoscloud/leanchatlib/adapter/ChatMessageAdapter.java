@@ -37,10 +37,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+
 public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     private static PrettyTime prettyTime = new PrettyTime();
     private ConversationType conversationType;
-    private int msgViewTypes = 8;
+    private int msgViewTypes = 9;
     private ClickListener clickListener;
 
     public ChatMessageAdapter(Context context, ConversationType conversationType) {
@@ -75,7 +76,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         AVIMTypedMessage msg = datas.get(position);
         boolean comeMsg = isComeMsg(msg);
 
-        MsgViewType viewType;
+        MsgViewType viewType = null;
         AVIMReservedMessageType msgType = AVIMReservedMessageType.getAVIMReservedMessageType(msg.getMessageType());
         switch (msgType) {
             case TextMessageType:
@@ -91,7 +92,9 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 viewType = comeMsg ? MsgViewType.ComeLocation : MsgViewType.ToLocation;
                 break;
             default:
-                throw new IllegalStateException();
+                if(msg.getMessageType() == 2){
+                    viewType = comeMsg ? MsgViewType.ChangeHouse : MsgViewType.ChangeHouse;
+                }
         }
         return viewType.getValue();
     }
@@ -386,7 +389,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     }
 
     private enum MsgViewType {
-        ComeText(0), ToText(1), ComeImage(2), ToImage(3), ComeAudio(4), ToAudio(5), ComeLocation(6), ToLocation(7);
+        ComeText(0), ToText(1), ComeImage(2), ToImage(3), ComeAudio(4), ToAudio(5), ComeLocation(6), ToLocation(7),ChangeHouse(8);
         int value;
 
         MsgViewType(int value) {

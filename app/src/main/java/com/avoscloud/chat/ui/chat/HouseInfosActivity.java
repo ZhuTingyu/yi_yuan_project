@@ -189,9 +189,10 @@ public class HouseInfosActivity extends FragmentActivity {
                 holder = (ViewHolder) convertView.getTag();
             }
 
-            List<String> images = JSON.parseObject(houseInfos.get(position).get("images").toString(),List.class);
-
-            Picasso.with(mContext).load(images.get(0)).into(holder.img);
+            if(houseInfos.get(position).get("images") != null) {
+                List<String> images = JSON.parseObject(houseInfos.get(position).get("images").toString(), List.class);
+                Picasso.with(mContext).load(images.get(0)).into(holder.img);
+            }
             holder.title.setText(houseInfos.get(position).get("estate_name").toString());
             holder.area.setText(houseInfos.get(position).get("acreage").toString() + "㎡");
             StringBuffer sb = new StringBuffer();
