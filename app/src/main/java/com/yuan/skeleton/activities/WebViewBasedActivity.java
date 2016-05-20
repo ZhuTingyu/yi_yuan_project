@@ -46,6 +46,9 @@ import com.fourmob.datetimepicker.date.DatePickerDialog;
 import com.gitonway.lee.niftymodaldialogeffects.lib.Effectstype;
 import com.gitonway.lee.niftymodaldialogeffects.lib.NiftyDialogBuilder;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -1252,20 +1255,28 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 Log.i("showPickerView",data);
 
-                ArrayList<String> item1 = new ArrayList<String>();
-                ArrayList<String> item2 = new ArrayList<String>();
-                ArrayList<String> item3 = new ArrayList<String>();
-                item1.add("a");
-                item1.add("b");
-                item1.add("c");
-                item1.add("d");
-                item2.add("1");
-                item2.add("2");
-                item2.add("3");
-                item3.add("d");
-                item3.add("e");
-                item3.add("f");
-                item3.add("g");
+                ArrayList item1 = new ArrayList();
+                ArrayList item2 = new ArrayList();
+                ArrayList item3 = new ArrayList();
+                try {
+                    JSONArray jsonArray = new JSONArray(data);
+                    for (int i = 0; i < jsonArray.length(); i++){
+                        JSONObject jsonObject = (JSONObject) jsonArray.opt(i);
+                        JSONArray jsonRows = (JSONArray) jsonObject.get("rows");
+                        for (int j = 0; j < jsonRows.length(); j++){
+                            if(i == 0)
+                                item1.add(jsonRows.opt(j).toString());
+                            else if (i ==1)
+                                item2.add(jsonRows.opt(j).toString());
+                            else
+                                item3.add(jsonRows.opt(j).toString());
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
                 PickerPopWindow pickPopWin = new PickerPopWindow(mContext, item1, item2, item3, new PickerPopWindow.OnPickCompletedListener() {
                     @Override
                     public void onAddressPickCompleted(String item1, String item2, String item3) {

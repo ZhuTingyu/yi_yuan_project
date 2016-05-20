@@ -64,7 +64,11 @@ public class PickerPopWindow extends PopupWindow implements View.OnClickListener
         confirmBtn = (Button) contentView.findViewById(R.id.btn_confirm);
         item1PickerV = (WheelView) contentView.findViewById(R.id.picker_year);
         item2PickerV = (WheelView) contentView.findViewById(R.id.picker_month);
+        if(item2List.size() == 0)
+            item2PickerV.setVisibility(View.GONE);
         item3PickerV = (WheelView) contentView.findViewById(R.id.picker_day);
+        if(item3List.size() == 0)
+            item3PickerV.setVisibility(View.GONE);
         pickerContainerV = contentView.findViewById(R.id.container_picker);
 
         initPickerViews();
