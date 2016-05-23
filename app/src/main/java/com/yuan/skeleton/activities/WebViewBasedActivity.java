@@ -982,6 +982,8 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                 String objectId = params.get("lean_id");
                 String userId = params.get("user_id");
                 String houseId = params.get("house_id");
+                if(params.get("audit_type") != null)
+                    prefs.edit().putString("auditType",params.get("audit_type")).commit();
                 prefs.edit().putString("houseId",houseId).commit();
                 prefs.edit().putString("target_id",userId).commit();
 

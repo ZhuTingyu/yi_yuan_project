@@ -75,8 +75,15 @@ public class ChatRoomActivity extends ChatActivity {
         if(prefs == null)
             prefs = PreferenceManager.getDefaultSharedPreferences(from);
         String houseId = prefs.getString("houseId",null);
-        StringBuffer sb = new StringBuffer(houseId);
-        sb.append(userId);
+        String auditType = prefs.getString("auditType",null);
+        StringBuffer sb = new StringBuffer();
+        if(auditType == null) {
+            sb.append(houseId);
+            sb.append(userId);
+        }else{
+            sb.append(auditType);
+            sb.append(userId);
+        }
         ChatManager.getInstance().fetchConversationWithUserId(sb.toString(),userId, new AVIMConversationCreatedCallback() {
             @Override
             public void done(AVIMConversation conversation, AVException e) {
