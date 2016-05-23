@@ -17,6 +17,36 @@ public class AVIMHouseInfoMessage extends AVIMTypedMessage {
 
     @AVIMMessageField(name = "_lcattrs")
     Map<String, Object> attrs;
+    @AVIMMessageField(name = "_lctext")
+    private String houseName;
+    @AVIMMessageField(name = "_lctext")
+    private String houseAddress;
+    @AVIMMessageField(name = "_lctext")
+    private String houseImage;
+
+    public String getHouseName() {
+        return houseName;
+    }
+
+    public void setHouseName(String houseName) {
+        this.houseName = houseName;
+    }
+
+    public String getHouseAddress() {
+        return houseAddress;
+    }
+
+    public void setHouseAddress(String houseAddress) {
+        this.houseAddress = houseAddress;
+    }
+
+    public String getHouseImage() {
+        return houseImage;
+    }
+
+    public void setHouseImage(String houseImage) {
+        this.houseImage = houseImage;
+    }
 
     public AVIMHouseInfoMessage(){
         AVIMMessageManager.registerAVIMMessageType(this.getClass());

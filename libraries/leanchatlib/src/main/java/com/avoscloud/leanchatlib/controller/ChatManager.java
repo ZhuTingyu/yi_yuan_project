@@ -66,7 +66,7 @@ public class ChatManager extends AVIMClientEventHandler {
   }
 
   // fetchConversation
-  public void fetchConversationWithUserId(String userId, final AVIMConversationCreatedCallback callback) {
+  public void fetchConversationWithUserId(final String param,String userId, final AVIMConversationCreatedCallback callback) {
     final List<String> members = new ArrayList<>();
     members.add(userId);
     members.add(selfId);
@@ -85,6 +85,7 @@ public class ChatManager extends AVIMClientEventHandler {
           } else {
             Map<String, Object> attrs = new HashMap<>();
             attrs.put(ConversationType.TYPE_KEY, ConversationType.Single.getValue());
+            members.add(param);
             imClient.createConversation(members, attrs, callback);
           }
         }

@@ -17,6 +17,7 @@ import android.webkit.WebView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.alibaba.fastjson.JSON;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCallback;
@@ -42,6 +43,7 @@ import com.yuan.skeleton.utils.JsonParse;
 import org.json.JSONException;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import timber.log.Timber;
@@ -54,7 +56,7 @@ public class ChatRoomActivity extends ChatActivity {
     public static final int REQUEST_CODE_HOUSE = 101;
     private RelativeLayout chatroom;
     private LinearLayout bottomLayout;
-    private SharedPreferences prefs;
+    private static SharedPreferences prefs;
     public WebViewJavascriptBridge bridge;
     private WebView webView;
     private String value;
@@ -70,7 +72,12 @@ public class ChatRoomActivity extends ChatActivity {
 
     public static void chatByUserId(final Activity from, String userId) {
         final ProgressDialog dialog = Utils.showSpinnerDialog(from);
-        ChatManager.getInstance().fetchConversationWithUserId(userId, new AVIMConversationCreatedCallback() {
+        if(prefs == null)
+            prefs = PreferenceManager.getDefaultSharedPreferences(from);
+        String houseId = prefs.getString("houseId",null);
+        StringBuffer sb = new StringBuffer(houseId);
+        sb.append(userId);
+        ChatManager.getInstance().fetchConversationWithUserId(sb.toString(),userId, new AVIMConversationCreatedCallback() {
             @Override
             public void done(AVIMConversation conversation, AVException e) {
                 dialog.dismiss();
@@ -324,7 +331,12 @@ public class ChatRoomActivity extends ChatActivity {
                 case REQUEST_CODE_HOUSE:
                     SerializableMap serializableMap = (SerializableMap) data.getSerializableExtra("data");
                     Map<String, Object> map = serializableMap.getMap();
+                    List<String> images = JSON.parseObject(map.get("images").toString(),List.class);
+
                     AVIMHouseInfoMessage message = new AVIMHouseInfoMessage();
+                    message.setHouseName(map.get("estate_name"));
+                    message.setHouseAddress(map.get("location_text"));
+                    message.setHouseImage(images.get(0).toString());
                     message.setAttrs(map);
 
                     messageAgent.sendHouse(message);
