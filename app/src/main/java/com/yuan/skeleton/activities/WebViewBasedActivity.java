@@ -49,6 +49,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.lfy.dao.MessageDao;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -58,6 +59,7 @@ import com.sleepbot.datetimepicker.time.TimePickerDialog;
 import com.squareup.okhttp.Request;
 import com.yuan.cp.activity.ClipPictureActivity;
 import com.yuan.skeleton.R;
+import com.yuan.skeleton.application.DMApplication;
 import com.yuan.skeleton.application.Injector;
 import com.yuan.skeleton.base.BaseFragmentActivity;
 import com.yuan.skeleton.bean.PayInfo;
@@ -1294,6 +1296,17 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
 
                 pickPopWin.showPopWin(WebViewBasedActivity.this);
 
+            }
+        });
+
+        bridge.registerHandler("getLastMessageByHouse",new WebViewJavascriptBridge.WVJBHandler(){
+
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                MessageDao messageDao = DMApplication.getInstance().getMessageDao();
+                List<com.lfy.bean.Message> list = messageDao.queryBuilder().build().list();
+                String json = com.alibaba.fastjson.JSONArray.toJSONString(list);
+                jsCallback.callback(json);
             }
         });
     }

@@ -118,6 +118,7 @@ android {
 
 dependencies {
     compile project(':libraries:leanchatlib')
+    compile project(':libraries:chatexamplegenerator')
     compile project(':libraries:ShareCode')
     compile project(':libraries:Loading')
     compile project(':libraries:MultiImageSelector')

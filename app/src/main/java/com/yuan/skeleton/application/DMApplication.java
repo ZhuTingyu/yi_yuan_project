@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.StrictMode;
 import android.support.v4.BuildConfig;
@@ -35,6 +36,9 @@ import com.dimo.utils.FileUtil;
 import com.dimo.utils.StringUtil;
 import com.dimo.utils.ZipUtil;
 import com.github.kevinsawicki.http.HttpRequest;
+import com.lfy.dao.DaoMaster;
+import com.lfy.dao.DaoSession;
+import com.lfy.dao.MessageDao;
 import com.loopj.android.http.FileAsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -68,6 +72,7 @@ public class DMApplication extends Application {
     private static DMApplication instance;
 
     private ThinDownloadManager downloadManager;
+    private DaoSession daoSession;
 
     private static final int DOWNLOAD_THREAD_POOL_SIZE = 2;
 
@@ -121,6 +126,7 @@ public class DMApplication extends Application {
 
         // Perform injection
         Injector.init(getRootModule(), this);
+        initAnerdaDatabase();
 
         Utils.fixAsyncTaskBug();
 
@@ -272,6 +278,19 @@ public class DMApplication extends Application {
         Timber.v("Copy HTML asset to folder : " + htmlExtractedFolder);
         FileUtil.copyAssetFolder(getAssets(), "html", htmlExtractedFolder);
         prefs.edit().putBoolean(Constants.kWebPackageExtracted, true).commit();
+    }
+
+    private void initAnerdaDatabase() {
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "chat-db", null);
+        SQLiteDatabase db = helper.getWritableDatabase();
+        // 注意：该数据库连接属于 DaoMaster，所以多个 Session 指的是相同的数据库连接。
+
+        DaoMaster daoMaster = new DaoMaster(db);
+        daoSession = daoMaster.newSession();
+    }
+
+    public MessageDao getMessageDao(){
+        return daoSession.getMessageDao();
     }
 
     public void openStrictMode() {

@@ -1,6 +1,7 @@
 package com.avoscloud.leanchatlib.adapter;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,9 @@ import com.avoscloud.leanchatlib.model.ConversationType;
 import com.avoscloud.leanchatlib.utils.PhotoUtils;
 import com.avoscloud.leanchatlib.view.PlayButton;
 import com.avoscloud.leanchatlib.view.ViewHolder;
+import com.lfy.bean.Message;
+import com.lfy.dao.DaoMaster;
+import com.lfy.dao.DaoSession;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.squareup.picasso.Picasso;
 
@@ -43,9 +47,11 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     private ConversationType conversationType;
     private int msgViewTypes = 9;
     private ClickListener clickListener;
+    private Context context;
 
     public ChatMessageAdapter(Context context, ConversationType conversationType) {
         super(context);
+        this.context = context;
         this.conversationType = conversationType;
     }
 
@@ -111,17 +117,29 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     public View getView(int position, View conView, ViewGroup parent) {
         AVIMMessage msg = datas.get(position);
         if (conView == null) {
+
+            DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context,"chat-db",null);
+            SQLiteDatabase db = helper.getWritableDatabase();
+            DaoMaster master = new DaoMaster(db);
+            DaoSession daoSession = master.newSession();
+            Message bean = new Message();
+            bean.setConv_id(msg.getConversationId());
+            bean.setMessage_id(msg.getMessageId());
             if (msg instanceof AVIMHouseInfoMessage) {
                 AVIMHouseInfoMessage houseInfoMessage = (AVIMHouseInfoMessage) msg;
                 boolean isComMsg = isComeMsg(houseInfoMessage);
                 conView = createViewByType(houseInfoMessage.getMessageType(), isComMsg);
                 initHouseMessageView(conView,houseInfoMessage,isComMsg);
+                bean.setMessage_text("[房源信息]");
             } else if (msg instanceof AVIMTypedMessage){
                 AVIMTypedMessage typedMessage = (AVIMTypedMessage) msg;
                 boolean isComMsg = isComeMsg(typedMessage);
                 conView = createViewByType(AVIMReservedMessageType.getAVIMReservedMessageType(typedMessage.getMessageType()), isComMsg);
-                initReservedMessageView(conView,position,typedMessage,isComMsg);
+                initReservedMessageView(conView,position,typedMessage,isComMsg,bean);
             }
+
+            daoSession.getMessageDao().insertOrReplace(bean);
+
         }
 
         return conView;
@@ -178,7 +196,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     }
 
     //初始化AVIMReservedMessageType的视图
-    private void initReservedMessageView(View conView,int position,AVIMTypedMessage msg,boolean isComMsg){
+    private void initReservedMessageView(View conView,int position,AVIMTypedMessage msg,boolean isComMsg,Message message){
         TextView sendTimeView = ViewHolder.findViewById(conView, R.id.sendTimeView);
         TextView contentView = ViewHolder.findViewById(conView, R.id.textContent);
         View contentLayout = ViewHolder.findViewById(conView, R.id.contentLayout);
@@ -224,19 +242,23 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 AVIMTextMessage textMsg = (AVIMTextMessage) msg;
                 contentView.setText(EmotionHelper.replace(ChatManager.getContext(), textMsg.getText()));
                 contentLayout.requestLayout();
+                message.setMessage_text(textMsg.getText());
                 break;
             case ImageMessageType:
                 AVIMImageMessage imageMsg = (AVIMImageMessage) msg;
                 PhotoUtils.displayImageCacheElseNetwork(imageView, MessageHelper.getFilePath(imageMsg),
                         imageMsg.getFileUrl());
                 setImageOnClickListener(imageView, imageMsg);
+                message.setMessage_text(imageMsg.getText());
                 break;
             case AudioMessageType:
                 AVIMAudioMessage audioMessage = (AVIMAudioMessage) msg;
                 initPlayBtn(msg, playBtn, audioMessage);
+                message.setMessage_text(audioMessage.getText());
                 break;
             case LocationMessageType:
                 setLocationView(msg, locationView);
+                message.setMessage_text(locationView.getText().toString());
                 break;
             default:
                 break;

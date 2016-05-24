@@ -341,8 +341,8 @@ public class ChatRoomActivity extends ChatActivity {
                     List<String> images = JSON.parseObject(map.get("images").toString(),List.class);
 
                     AVIMHouseInfoMessage message = new AVIMHouseInfoMessage();
-                    message.setHouseName(map.get("estate_name"));
-                    message.setHouseAddress(map.get("location_text"));
+                    message.setHouseName(map.get("estate_name").toString());
+                    message.setHouseAddress(map.get("location_text").toString());
                     message.setHouseImage(images.get(0).toString());
                     message.setAttrs(map);
 
