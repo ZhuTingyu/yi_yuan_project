@@ -85,7 +85,7 @@ public class ChatManager extends AVIMClientEventHandler {
           } else {
             Map<String, Object> attrs = new HashMap<>();
             attrs.put(ConversationType.TYPE_KEY, ConversationType.Single.getValue());
-            members.add(param);
+            attrs.put("houseId",param);
             imClient.createConversation(members, attrs, callback);
           }
         }

@@ -988,6 +988,8 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                     prefs.edit().putString("auditType",params.get("audit_type")).commit();
                 prefs.edit().putString("houseId",houseId).commit();
                 prefs.edit().putString("target_id",userId).commit();
+                prefs.edit().putString("leanId",objectId).commit();
+                prefs.edit().putString("userId",userId).commit();
 
                 ChatRoomActivity.chatByUserId(WebViewBasedActivity.this, objectId);
 
@@ -1305,8 +1307,25 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 MessageDao messageDao = DMApplication.getInstance().getMessageDao();
                 List<com.lfy.bean.Message> list = messageDao.queryBuilder().build().list();
-                String json = com.alibaba.fastjson.JSONArray.toJSONString(list);
-                jsCallback.callback(json);
+                StringBuffer sb = new StringBuffer();
+                for (int i = 0; i < list.size(); i++){
+                    com.lfy.bean.Message message = list.get(i);
+                    sb.append("{");
+                    sb.append(prefs.getString("userId",null) + ":");
+                    sb.append("{");
+                    sb.append(message.getHouseId() + ":");
+                    sb.append("{");
+                    sb.append(message.getAuditType() + ":");
+                    sb.append("{");
+                    sb.append(message.getLeanId() +":");
+                    sb.append("{\"message\" : "+ message.getDate() +", \"is_read\" : "+message.getIs_read()+"}");
+                    sb.append("}");
+                    sb.append("}");
+                    sb.append("}");
+                    sb.append("}");
+                    if(list.size() - 1 != i)
+                        sb.append(",");
+                }
             }
         });
     }

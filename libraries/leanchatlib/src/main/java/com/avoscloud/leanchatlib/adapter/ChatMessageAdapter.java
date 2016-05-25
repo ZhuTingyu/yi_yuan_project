@@ -1,8 +1,10 @@
 package com.avoscloud.leanchatlib.adapter;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -48,11 +50,12 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     private int msgViewTypes = 9;
     private ClickListener clickListener;
     private Context context;
-
+    private SharedPreferences prefs;
     public ChatMessageAdapter(Context context, ConversationType conversationType) {
         super(context);
         this.context = context;
         this.conversationType = conversationType;
+        this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     // time
@@ -123,7 +126,10 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
             DaoSession daoSession = master.newSession();
             Message bean = new Message();
             bean.setDate(String.valueOf(msg.getTimestamp()));
-            
+            bean.setLeanId(prefs.getString("leanId","0"));
+            bean.setAuditType(prefs.getString("auditType","0"));
+            bean.setHouseId(prefs.getString("houseId","0"));
+            bean.setIs_read("1");
             if (msg instanceof AVIMHouseInfoMessage) {
                 AVIMHouseInfoMessage houseInfoMessage = (AVIMHouseInfoMessage) msg;
                 boolean isComMsg = isComeMsg(houseInfoMessage);

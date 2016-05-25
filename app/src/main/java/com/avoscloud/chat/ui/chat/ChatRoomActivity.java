@@ -10,14 +10,17 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCallback;
@@ -38,14 +41,20 @@ import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.yuan.skeleton.R;
 import com.yuan.skeleton.application.DMApplication;
+import com.yuan.skeleton.common.Constants;
 import com.yuan.skeleton.utils.JsonParse;
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.StringCallback;
 
 import org.json.JSONException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.Call;
+import okhttp3.Request;
 import timber.log.Timber;
 
 /**
@@ -57,10 +66,11 @@ public class ChatRoomActivity extends ChatActivity {
     private RelativeLayout chatroom;
     private LinearLayout bottomLayout;
     private static SharedPreferences prefs;
-    public WebViewJavascriptBridge bridge;
+
     private WebView webView;
     private String value;
     private LinearLayout back;
+    private List<Map<String,Object>> houseInfos;
 
     public static void chatByConversation(Context from, AVIMConversation conv) {
         CacheService.registerConv(conv);
@@ -104,6 +114,7 @@ public class ChatRoomActivity extends ChatActivity {
         back = (LinearLayout) findViewById(R.id.back);
 //        initLocation();
         initWebView();
+        initHouseInfos();
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -221,6 +232,32 @@ public class ChatRoomActivity extends ChatActivity {
                 bottomLayout.setVisibility(View.INVISIBLE);
             }
         });
+
+        bridge.registerHandler("webChangeHouse",new WebViewJavascriptBridge.WVJBHandler(){
+
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                Map<String, Object> map = null;
+                for (int i = 0; i < houseInfos.size(); i++){
+                    map = houseInfos.get(i);
+                    String houseId = map.get("houseId").toString();
+                    if(houseId.equals(data))
+                        return;
+                }
+                if(map == null)
+                    return;
+                List<String> images = JSON.parseObject(map.get("images").toString(),List.class);
+
+                AVIMHouseInfoMessage message = new AVIMHouseInfoMessage();
+                message.setHouseName(map.get("estate_name").toString());
+                message.setHouseAddress(map.get("location_text").toString());
+                message.setHouseImage(images.get(0).toString());
+                message.setAttrs(map);
+
+                messageAgent.sendHouse(message);
+
+            }
+        });
     }
 
     public void redirectToLoadUrl(String url) {
@@ -254,6 +291,88 @@ public class ChatRoomActivity extends ChatActivity {
             }
         });
     }*/
+
+    private void initHouseInfos(){
+        String json = prefs.getString("userLogin",null);
+        Log.i("json",json);
+        String userId = getUserId(json);
+        String token = getToken(json);
+        String url = null;
+        if(isUserLogin(json))
+            url = Constants.kWebServiceSwitchable + userId + "/" + prefs.getString("target_id",null);
+        else
+            url = Constants.kWebServiceSwitchable + prefs.getString("target_id",null) + "/" + userId;
+
+        OkHttpUtils.get().url(url)
+                .addHeader("Content-Type","application/json")
+                .addHeader("token",token)
+                .build()
+                .execute(new StringCallback() {
+
+                    @Override
+                    public void onBefore(Request request) {
+                        super.onBefore(request);
+                        Log.i("onBefore","==================================================");
+                    }
+
+                    @Override
+                    public void onError(Call call, Exception e) {
+                        Log.i("onError",e.getMessage());
+                    }
+
+                    @Override
+                    public void onResponse(String response) {
+                        Log.i("onResponse",response);
+                        List<Map<String,Object>> list = JSON.parseObject(response,new TypeReference<List<Map<String, Object>>>(){});
+                        houseInfos = new ArrayList<>();
+                        for (int i = 0; i < list.size(); i++) {
+                            Map<String, Object> objectMap = list.get(i);
+                            Map<String,Object> houseMap = JSON.parseObject(objectMap.get("house_info").toString(),new TypeReference<Map<String, Object>>(){});
+                            houseInfos.add(houseMap);
+                        }
+                        Log.i("houseInfos",houseInfos.toString());
+
+                    }
+                });
+    }
+
+    private boolean isUserLogin(String json){
+        HashMap<String, String> params = null;
+        try {
+            params = StringUtil.JSONString2HashMap(json);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if(params.get("user_info") != null)
+            return true;
+        else
+            return false;
+    }
+
+    private String getToken(String json){
+        try {
+            HashMap<String, String> params = StringUtil.JSONString2HashMap(json);
+            return params.get("token");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private String getUserId(String json){
+        try {
+            HashMap<String, String> params = StringUtil.JSONString2HashMap(json);
+            if(params.get("user_info") != null)
+                params = StringUtil.JSONString2HashMap(params.get("user_info"));
+            else
+                params = StringUtil.JSONString2HashMap(params.get("agency_info"));
+
+            return params.get("user_id");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     @Override
     protected void openHouseInfo() {
@@ -347,6 +466,8 @@ public class ChatRoomActivity extends ChatActivity {
                     message.setAttrs(map);
 
                     messageAgent.sendHouse(message);
+
+                    bridge.callHandler("nativeChangeHouse",map.get("houseId"));
 
                     break;
             }

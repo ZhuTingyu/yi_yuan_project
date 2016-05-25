@@ -54,6 +54,7 @@ import com.avoscloud.leanchatlib.utils.ProviderPathUtils;
 import com.avoscloud.leanchatlib.view.EmotionEditText;
 import com.avoscloud.leanchatlib.view.RecordButton;
 import com.avoscloud.leanchatlib.view.xlist.XListView;
+import com.dimo.web.WebViewJavascriptBridge;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.PauseOnScrollListener;
 import com.zhy.http.okhttp.OkHttpUtils;
@@ -101,6 +102,7 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
     protected String localCameraPath = PathUtils.getTmpPath();
     protected View addCameraBtn;
     private LocationHandler locationHandler;
+    protected WebViewJavascriptBridge bridge;
 
     public static ChatActivity getChatInstance() {
         return chatInstance;
