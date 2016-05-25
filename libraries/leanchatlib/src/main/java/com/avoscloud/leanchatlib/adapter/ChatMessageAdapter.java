@@ -51,11 +51,15 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     private ClickListener clickListener;
     private Context context;
     private SharedPreferences prefs;
+    private DaoMaster master;
     public ChatMessageAdapter(Context context, ConversationType conversationType) {
         super(context);
         this.context = context;
         this.conversationType = conversationType;
         this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context,"chat-db",null);
+        SQLiteDatabase db = helper.getWritableDatabase();
+        this.master = new DaoMaster(db);
     }
 
     // time
@@ -120,9 +124,6 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     public View getView(int position, View conView, ViewGroup parent) {
         AVIMMessage msg = datas.get(position);
         if (conView == null) {
-            DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context,"chat-db",null);
-            SQLiteDatabase db = helper.getWritableDatabase();
-            DaoMaster master = new DaoMaster(db);
             DaoSession daoSession = master.newSession();
             Message bean = new Message();
             bean.setDate(String.valueOf(msg.getTimestamp()));
@@ -143,7 +144,8 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 initReservedMessageView(conView,position,typedMessage,isComMsg,bean);
             }
 
-            daoSession.getMessageDao().insertOrReplace(bean);
+            if(position == datas.size() - 1)
+                daoSession.getMessageDao().insertOrReplace(bean);
 
         }
 
