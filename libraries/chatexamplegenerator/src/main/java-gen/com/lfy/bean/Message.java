@@ -6,45 +6,75 @@ package com.lfy.bean;
  */
 public class Message {
 
-    private String conv_id;
-    private String message_id;
-    private String message_text;
+    private String houseId;
+    private String leanId;
+    private String message;
+    private String date;
+    private String is_read;
+    private String auditType;
 
     public Message() {
     }
 
-    public Message(String conv_id) {
-        this.conv_id = conv_id;
+    public Message(String houseId) {
+        this.houseId = houseId;
     }
 
-    public Message(String conv_id, String message_id, String message_text) {
-        this.conv_id = conv_id;
-        this.message_id = message_id;
-        this.message_text = message_text;
+    public Message(String houseId, String leanId, String message, String date, String is_read, String auditType) {
+        this.houseId = houseId;
+        this.leanId = leanId;
+        this.message = message;
+        this.date = date;
+        this.is_read = is_read;
+        this.auditType = auditType;
     }
 
-    public String getConv_id() {
-        return conv_id;
+    public String getHouseId() {
+        return houseId;
     }
 
-    public void setConv_id(String conv_id) {
-        this.conv_id = conv_id;
+    public void setHouseId(String houseId) {
+        this.houseId = houseId;
     }
 
-    public String getMessage_id() {
-        return message_id;
+    public String getLeanId() {
+        return leanId;
     }
 
-    public void setMessage_id(String message_id) {
-        this.message_id = message_id;
+    public void setLeanId(String leanId) {
+        this.leanId = leanId;
     }
 
-    public String getMessage_text() {
-        return message_text;
+    public String getMessage() {
+        return message;
     }
 
-    public void setMessage_text(String message_text) {
-        this.message_text = message_text;
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getIs_read() {
+        return is_read;
+    }
+
+    public void setIs_read(String is_read) {
+        this.is_read = is_read;
+    }
+
+    public String getAuditType() {
+        return auditType;
+    }
+
+    public void setAuditType(String auditType) {
+        this.auditType = auditType;
     }
 
 }

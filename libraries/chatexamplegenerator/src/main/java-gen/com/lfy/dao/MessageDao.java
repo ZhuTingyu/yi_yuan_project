@@ -23,9 +23,12 @@ public class MessageDao extends AbstractDao<Message, String> {
      * Can be used for QueryBuilder and for referencing column names.
     */
     public static class Properties {
-        public final static Property Conv_id = new Property(0, String.class, "conv_id", true, "CONV_ID");
-        public final static Property Message_id = new Property(1, String.class, "message_id", false, "MESSAGE_ID");
-        public final static Property Message_text = new Property(2, String.class, "message_text", false, "MESSAGE_TEXT");
+        public final static Property HouseId = new Property(0, String.class, "houseId", true, "HOUSE_ID");
+        public final static Property LeanId = new Property(1, String.class, "leanId", false, "LEAN_ID");
+        public final static Property Message = new Property(2, String.class, "message", false, "MESSAGE");
+        public final static Property Date = new Property(3, String.class, "date", false, "DATE");
+        public final static Property Is_read = new Property(4, String.class, "is_read", false, "IS_READ");
+        public final static Property AuditType = new Property(5, String.class, "auditType", false, "AUDIT_TYPE");
     };
 
 
@@ -41,9 +44,12 @@ public class MessageDao extends AbstractDao<Message, String> {
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "'MESSAGE' (" + //
-                "'CONV_ID' TEXT PRIMARY KEY NOT NULL ," + // 0: conv_id
-                "'MESSAGE_ID' TEXT," + // 1: message_id
-                "'MESSAGE_TEXT' TEXT);"); // 2: message_text
+                "'HOUSE_ID' TEXT PRIMARY KEY NOT NULL ," + // 0: houseId
+                "'LEAN_ID' TEXT," + // 1: leanId
+                "'MESSAGE' TEXT," + // 2: message
+                "'DATE' TEXT," + // 3: date
+                "'IS_READ' TEXT," + // 4: is_read
+                "'AUDIT_TYPE' TEXT);"); // 5: auditType
     }
 
     /** Drops the underlying database table. */
@@ -57,19 +63,34 @@ public class MessageDao extends AbstractDao<Message, String> {
     protected void bindValues(SQLiteStatement stmt, Message entity) {
         stmt.clearBindings();
  
-        String conv_id = entity.getConv_id();
-        if (conv_id != null) {
-            stmt.bindString(1, conv_id);
+        String houseId = entity.getHouseId();
+        if (houseId != null) {
+            stmt.bindString(1, houseId);
         }
  
-        String message_id = entity.getMessage_id();
-        if (message_id != null) {
-            stmt.bindString(2, message_id);
+        String leanId = entity.getLeanId();
+        if (leanId != null) {
+            stmt.bindString(2, leanId);
         }
  
-        String message_text = entity.getMessage_text();
-        if (message_text != null) {
-            stmt.bindString(3, message_text);
+        String message = entity.getMessage();
+        if (message != null) {
+            stmt.bindString(3, message);
+        }
+ 
+        String date = entity.getDate();
+        if (date != null) {
+            stmt.bindString(4, date);
+        }
+ 
+        String is_read = entity.getIs_read();
+        if (is_read != null) {
+            stmt.bindString(5, is_read);
+        }
+ 
+        String auditType = entity.getAuditType();
+        if (auditType != null) {
+            stmt.bindString(6, auditType);
         }
     }
 
@@ -83,9 +104,12 @@ public class MessageDao extends AbstractDao<Message, String> {
     @Override
     public Message readEntity(Cursor cursor, int offset) {
         Message entity = new Message( //
-            cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0), // conv_id
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // message_id
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2) // message_text
+            cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0), // houseId
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // leanId
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // message
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // date
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // is_read
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5) // auditType
         );
         return entity;
     }
@@ -93,22 +117,25 @@ public class MessageDao extends AbstractDao<Message, String> {
     /** @inheritdoc */
     @Override
     public void readEntity(Cursor cursor, Message entity, int offset) {
-        entity.setConv_id(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
-        entity.setMessage_id(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setMessage_text(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setHouseId(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
+        entity.setLeanId(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setMessage(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setDate(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setIs_read(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setAuditType(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
      }
     
     /** @inheritdoc */
     @Override
     protected String updateKeyAfterInsert(Message entity, long rowId) {
-        return entity.getConv_id();
+        return entity.getHouseId();
     }
     
     /** @inheritdoc */
     @Override
     public String getKey(Message entity) {
         if(entity != null) {
-            return entity.getConv_id();
+            return entity.getHouseId();
         } else {
             return null;
         }

@@ -7,7 +7,7 @@ import de.greenrobot.daogenerator.Schema;
 public class ExampleDaoGenerator {
 
     public static void main(String[] args) throws Exception {
-        Schema schema = new Schema(1,"com.lfy.bean");
+        Schema schema = new Schema(2,"com.lfy.bean");
         schema.setDefaultJavaPackageDao("com.lfy.dao");
         addChatMessage(schema);
         DaoGenerator generator = new DaoGenerator();
@@ -20,12 +20,12 @@ public class ExampleDaoGenerator {
      */
     private static void addChatMessage(Schema schema){
         Entity message = schema.addEntity("Message");
-        //conv_id
-        message.addStringProperty("conv_id").primaryKey();
-        //msg_id
-        message.addStringProperty("message_id");
-        //message_text
-        message.addStringProperty("message_text");
+        message.addStringProperty("houseId").primaryKey();
+        message.addStringProperty("leanId");
+        message.addStringProperty("message");
+        message.addStringProperty("date");
+        message.addStringProperty("is_read");
+        message.addStringProperty("auditType");
     }
 
 

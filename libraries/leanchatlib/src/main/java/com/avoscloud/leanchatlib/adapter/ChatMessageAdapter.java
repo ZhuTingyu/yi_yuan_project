@@ -117,20 +117,19 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     public View getView(int position, View conView, ViewGroup parent) {
         AVIMMessage msg = datas.get(position);
         if (conView == null) {
-
             DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context,"chat-db",null);
             SQLiteDatabase db = helper.getWritableDatabase();
             DaoMaster master = new DaoMaster(db);
             DaoSession daoSession = master.newSession();
             Message bean = new Message();
-            bean.setConv_id(msg.getConversationId());
-            bean.setMessage_id(msg.getMessageId());
+            bean.setDate(String.valueOf(msg.getTimestamp()));
+            
             if (msg instanceof AVIMHouseInfoMessage) {
                 AVIMHouseInfoMessage houseInfoMessage = (AVIMHouseInfoMessage) msg;
                 boolean isComMsg = isComeMsg(houseInfoMessage);
                 conView = createViewByType(houseInfoMessage.getMessageType(), isComMsg);
                 initHouseMessageView(conView,houseInfoMessage,isComMsg);
-                bean.setMessage_text("[房源信息]");
+                bean.setMessage("[房源信息]");
             } else if (msg instanceof AVIMTypedMessage){
                 AVIMTypedMessage typedMessage = (AVIMTypedMessage) msg;
                 boolean isComMsg = isComeMsg(typedMessage);
@@ -242,23 +241,23 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 AVIMTextMessage textMsg = (AVIMTextMessage) msg;
                 contentView.setText(EmotionHelper.replace(ChatManager.getContext(), textMsg.getText()));
                 contentLayout.requestLayout();
-                message.setMessage_text(textMsg.getText());
+                message.setMessage(textMsg.getText());
                 break;
             case ImageMessageType:
                 AVIMImageMessage imageMsg = (AVIMImageMessage) msg;
                 PhotoUtils.displayImageCacheElseNetwork(imageView, MessageHelper.getFilePath(imageMsg),
                         imageMsg.getFileUrl());
                 setImageOnClickListener(imageView, imageMsg);
-                message.setMessage_text(imageMsg.getText());
+                message.setMessage("[图片]");
                 break;
             case AudioMessageType:
                 AVIMAudioMessage audioMessage = (AVIMAudioMessage) msg;
                 initPlayBtn(msg, playBtn, audioMessage);
-                message.setMessage_text(audioMessage.getText());
+                message.setMessage("[语音]");
                 break;
             case LocationMessageType:
                 setLocationView(msg, locationView);
-                message.setMessage_text(locationView.getText().toString());
+                message.setMessage("[位置]");
                 break;
             default:
                 break;

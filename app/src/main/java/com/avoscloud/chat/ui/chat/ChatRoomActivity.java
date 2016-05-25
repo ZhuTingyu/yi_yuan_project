@@ -79,10 +79,10 @@ public class ChatRoomActivity extends ChatActivity {
         StringBuffer sb = new StringBuffer();
         if(auditType == null) {
             sb.append(houseId);
-            sb.append(userId);
         }else{
+            sb.append("000");
             sb.append(auditType);
-            sb.append(userId);
+            sb.append(houseId);
         }
         ChatManager.getInstance().fetchConversationWithUserId(sb.toString(),userId, new AVIMConversationCreatedCallback() {
             @Override
