@@ -210,6 +210,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         ImageView imageView = ViewHolder.findViewById(conView, R.id.imageView);
         ImageView avatarView = ViewHolder.findViewById(conView, R.id.avatar);
         PlayButton playBtn = ViewHolder.findViewById(conView, R.id.playBtn);
+        TextView timeAudio = ViewHolder.findViewById(conView,R.id.time);
         TextView locationView = ViewHolder.findViewById(conView, R.id.locationView);
         TextView usernameView = ViewHolder.findViewById(conView, R.id.username);
 
@@ -260,7 +261,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 break;
             case AudioMessageType:
                 AVIMAudioMessage audioMessage = (AVIMAudioMessage) msg;
-                initPlayBtn(msg, playBtn, audioMessage);
+                initPlayBtn(msg, playBtn, audioMessage,timeAudio);
                 message.setMessage("[语音]");
                 break;
             case LocationMessageType:
@@ -322,11 +323,12 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         });
     }
 
-    private void initPlayBtn(AVIMTypedMessage msg, PlayButton playBtn, AVIMAudioMessage audioMessage) {
+    private void initPlayBtn(AVIMTypedMessage msg, PlayButton playBtn, AVIMAudioMessage audioMessage, TextView timeAudio) {
         playBtn.setLeftSide(isComeMsg(msg));
         AudioHelper audioHelper = AudioHelper.getInstance();
         playBtn.setAudioHelper(audioHelper);
         playBtn.setPath(MessageHelper.getFilePath(msg));
+        timeAudio.setText((int)audioMessage.getDuration());
         setItemOnLongClickListener(playBtn, audioMessage);
     }
 
