@@ -1328,6 +1328,33 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                 }
             }
         });
+
+        bridge.registerHandler("showSearchBar", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                setTitleSearch();
+            }
+        });
+
+        bridge.registerHandler("selectImageFromNative", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                Log.i("selectImageFromNative",data);
+                try {
+                    HashMap<String, String> map = StringUtil.JSONString2HashMap(data);
+                    String type = map.get("type");
+                    if("rectangle".equals(type)){
+                        //长方形
+                    }else if("square".equals(type)){
+                        //正方形
+                    }else{
+                        //不裁剪
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     protected String getUserToken() throws JSONException {

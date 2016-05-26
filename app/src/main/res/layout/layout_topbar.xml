@@ -14,6 +14,7 @@
         android:layout_marginTop="5dp">
 
         <RelativeLayout
+            android:id="@+id/rl_left"
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
 
@@ -37,6 +38,9 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/rl_center"
+            android:layout_toRightOf="@id/rl_left"
+            android:layout_toLeftOf="@id/rl_right"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
@@ -48,22 +52,35 @@
                 android:textColor="@color/white"
                 android:textSize="@dimen/text_size_large"
                 android:background="@android:color/transparent"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="visible"/>
 
             <TextView
                 android:id="@+id/topbar_title_item"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/app_name"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:visibility="gone"
                 />
+
+            <EditText
+                android:id="@+id/et_search"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:hint="搜索"
+                android:textSize="12dp"
+                android:drawableLeft="@drawable/img_search"
+                android:background="@drawable/search_editsharp"
+                android:visibility="gone"/>
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/rl_right"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"

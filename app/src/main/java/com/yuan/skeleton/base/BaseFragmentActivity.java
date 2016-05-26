@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -271,6 +272,16 @@ public class BaseFragmentActivity extends FragmentActivity {
         textView.setText(getString(resId));
 
         mTopBar.findViewById(R.id.topbar_title_button).setVisibility(View.GONE);
+    }
+
+    public void setTitleSearch(){
+        EditText search = (EditText) mTopBar.findViewById(R.id.et_search);
+        if(mTopBar.findViewById(R.id.topbar_title_item).getVisibility() == View.VISIBLE)
+            mTopBar.findViewById(R.id.topbar_title_item).setVisibility(View.GONE);
+        if(mTopBar.findViewById(R.id.topbar_title_button).getVisibility() == View.VISIBLE)
+            mTopBar.findViewById(R.id.topbar_title_button).setVisibility(View.GONE);
+
+        search.setVisibility(View.VISIBLE);
     }
 
     /**
