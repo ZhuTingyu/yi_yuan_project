@@ -112,7 +112,7 @@ public class WebViewBaseFragment extends Fragment {
 
         String htmlExtractedFolder = DMApplication.getInstance().getHtmlExtractedFolder();
 
-        mUrl = htmlExtractedFolder + "/pages/" + url;
+        mUrl = htmlExtractedFolder + "/" + url;
 
         Timber.i("URL - " + mUrl);
 

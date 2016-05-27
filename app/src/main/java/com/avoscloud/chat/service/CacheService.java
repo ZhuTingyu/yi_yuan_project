@@ -3,12 +3,15 @@ package com.avoscloud.chat.service;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVQuery;
 import com.avos.avoscloud.AVUser;
+import com.avos.avoscloud.FindCallback;
 import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationQueryCallback;
 import com.avoscloud.chat.base.C;
 
 import java.util.*;
+
+import timber.log.Timber;
 
 /**
  * Created by lzw on 14/12/19.
@@ -98,8 +101,15 @@ public class CacheService {
     }
     AVQuery<AVUser> q = AVUser.getQuery(AVUser.class);
     q.whereContainedIn(C.OBJECT_ID, userIds);
-    q.setCachePolicy(AVQuery.CachePolicy.NETWORK_ELSE_CACHE);
-    return q.find();
+    q.setCachePolicy(AVQuery.CachePolicy.NETWORK_ONLY);
+    q.findInBackground(new FindCallback<AVUser>() {
+      @Override
+      public void done(List<AVUser> list, AVException e) {
+        Timber.e(e,"");
+      }
+    });
+    return new ArrayList<>();
+//    return q.find();
   }
 
   public static void cacheConvs(List<String> ids, final AVIMConversationCallback callback) throws AVException {

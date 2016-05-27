@@ -37,6 +37,7 @@ import com.avoscloud.leanchatlib.controller.ConversationHelper;
 import com.avoscloud.leanchatlib.model.AVIMHouseInfoMessage;
 import com.avoscloud.leanchatlib.utils.Logger;
 import com.bugtags.library.Bugtags;
+import com.dimo.http.RestClient;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.yuan.skeleton.R;
@@ -47,6 +48,7 @@ import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -122,7 +124,8 @@ public class ChatRoomActivity extends ChatActivity {
             }
         });
     }
-
+    private float y1 = 0;
+    private float y2 = 0;
     private void initWebView(){
         this.webView = (WebView) findViewById(R.id.webview);
         this.webView.getSettings().setJavaScriptEnabled(true);
@@ -130,6 +133,16 @@ public class ChatRoomActivity extends ChatActivity {
         this.webView.setWebChromeClient(new WebChromeClient());
         this.webView.setHorizontalScrollBarEnabled(false);
         this.webView.setVerticalScrollBarEnabled(false);
+        this.webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        this.webView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_MOVE) {
+                    return true;
+                }
+                return false;
+            }
+        });
         this.bridge = new WebViewJavascriptBridge(this, webView, null);
         registerBridge();
         try {
@@ -167,7 +180,7 @@ public class ChatRoomActivity extends ChatActivity {
                     RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) webView.getLayoutParams();
                     params = StringUtil.JSONString2HashMap(value);
 //                    layoutParams.height = Integer.parseInt(params.get("height_s"));
-                    layoutParams.height = 110;
+                    layoutParams.height = 130;
 
 //                    DisplayMetrics dm = new DisplayMetrics();//获取当前显示的界面大小
 //                    getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -176,6 +189,27 @@ public class ChatRoomActivity extends ChatActivity {
                     webView.setLayoutParams(layoutParams);
                 } catch (JSONException e) {
                     e.printStackTrace();
+                }
+            }
+        });
+
+        bridge.registerHandler("getData", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
+                Timber.v("getData got:" + data);
+
+                HashMap<String, String> params = null;
+                try {
+                    params = StringUtil.JSONString2HashMap(data);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                String key = params.get("key");
+                String value = prefs.getString(key, null);
+
+                if (null != callback) {
+                    callback.callback(value);
                 }
             }
         });
@@ -192,7 +226,7 @@ public class ChatRoomActivity extends ChatActivity {
                     e.printStackTrace();
                 }
 //                layoutParams.height = Integer.parseInt(params.get("height_s"));
-                layoutParams.height = 110;
+                layoutParams.height = 130;
                 webView.setLayoutParams(layoutParams);
             }
         });
@@ -258,6 +292,86 @@ public class ChatRoomActivity extends ChatActivity {
 
             }
         });
+
+        bridge.registerHandler("rest_get", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
+                Timber.v("get got:" + data);
+                JSONObject params = null;
+                try {
+                    params = new JSONObject(data);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                RestClient.getInstance().bridgeRequest(params, RestClient.METHOD_GET, callback);
+
+//                try {
+//                    JSONObject jo = new JSONObject(data);
+//                    JSONObject object = jo.getJSONObject("headers");
+//                    if (object == null || object.length() == 0) {
+//                        return;
+//                    } else {
+////                        String token = object.getString("authtoken");
+//
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                JSONObject params = null;
+//                try {
+//                    params = new JSONObject(data);
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//                RestClient.getInstance().bridgeRequest(params, RestClient.METHOD_GET, callback);
+            }
+        });
+
+        bridge.registerHandler("rest_post", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
+                Timber.v("post got:" + data);
+
+                JSONObject params = null;
+                try {
+                    params = new JSONObject(data);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                RestClient.getInstance().bridgeRequest(params, RestClient.METHOD_POST, callback);
+            }
+        });
+
+        bridge.registerHandler("rest_put", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
+                Timber.v("put got:" + data);
+
+                JSONObject params = null;
+                try {
+                    params = new JSONObject(data);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                RestClient.getInstance().bridgeRequest(params, RestClient.METHOD_PUT, callback);
+            }
+        });
+
+        bridge.registerHandler("rest_delete", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
+                Timber.v("delete got:" + data);
+
+                JSONObject params = null;
+                try {
+                    params = new JSONObject(data);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                RestClient.getInstance().bridgeRequest(params, RestClient.MEHOTD_DELETE, callback);
+            }
+        });
     }
 
     public void redirectToLoadUrl(String url) {
@@ -266,7 +380,7 @@ public class ChatRoomActivity extends ChatActivity {
             return;
         }
         String htmlExtractedFolder = DMApplication.getInstance().getHtmlExtractedFolder();
-        mUrl = htmlExtractedFolder + "/pages/" + url;
+        mUrl = htmlExtractedFolder + "/" + url;
         Timber.i("URL - " + mUrl);
         if (StringUtil.isValidHTTPUrl(mUrl)) {
             webView.loadUrl(mUrl);

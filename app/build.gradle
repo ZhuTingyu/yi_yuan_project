@@ -183,7 +183,6 @@ dependencies {
     compile 'com.bugtags.library:bugtags-lib:latest.integration'
     compile project(':libraries:clippicture')
     compile files('libs/alipaySDK-20150818.jar')
-    compile files('libs/fastjson.jar')
 }
 
 android.applicationVariants.all { variant ->
