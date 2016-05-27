@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebChromeClient;
@@ -73,6 +74,7 @@ public class ChatRoomActivity extends ChatActivity {
     private String value;
     private LinearLayout back;
     private List<Map<String,Object>> houseInfos;
+    private GestureDetector gestureDetector;
 
     public static void chatByConversation(Context from, AVIMConversation conv) {
         CacheService.registerConv(conv);
@@ -117,6 +119,7 @@ public class ChatRoomActivity extends ChatActivity {
 //        initLocation();
         initWebView();
         initHouseInfos();
+        gestureDetector = new GestureDetector(this,onGestureListener);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -124,8 +127,8 @@ public class ChatRoomActivity extends ChatActivity {
             }
         });
     }
-    private float y1 = 0;
-    private float y2 = 0;
+
+    private int mLastY = 0;
     private void initWebView(){
         this.webView = (WebView) findViewById(R.id.webview);
         this.webView.getSettings().setJavaScriptEnabled(true);
@@ -137,9 +140,16 @@ public class ChatRoomActivity extends ChatActivity {
         this.webView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_MOVE) {
-                    return true;
+                if(event.getAction() == MotionEvent.ACTION_MOVE){
+                    final int  y = (int) event.getY();
+                    if(y < mLastY)
+                        return true;
+                    mLastY = y;
                 }
+
+                if(event.getAction() == MotionEvent.ACTION_UP)
+                    mLastY = 0;
+
                 return false;
             }
         });
@@ -155,6 +165,23 @@ public class ChatRoomActivity extends ChatActivity {
         }
 
     }
+
+    private GestureDetector.OnGestureListener onGestureListener =
+            new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+                                       float velocityY) {
+                    float x = e2.getX() - e1.getX();
+                    float y = e2.getY() - e1.getY();
+
+                    if (x > 0) {
+                        return true;
+                    } else if (x < 0) {
+                        return true;
+                    }
+                   return false;
+                }
+            };
 
     private void registerBridge(){
         bridge.registerHandler("setData", new WebViewJavascriptBridge.WVJBHandler() {
@@ -581,7 +608,7 @@ public class ChatRoomActivity extends ChatActivity {
 
                     messageAgent.sendHouse(message);
 
-                    bridge.callHandler("nativeChangeHouse",map.get("houseId"));
+                    bridge.callHandler("nativeChangeHouse",map.get("id"));
 
                     break;
             }

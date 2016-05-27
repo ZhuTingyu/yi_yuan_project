@@ -328,7 +328,8 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         AudioHelper audioHelper = AudioHelper.getInstance();
         playBtn.setAudioHelper(audioHelper);
         playBtn.setPath(MessageHelper.getFilePath(msg));
-        timeAudio.setText((int)audioMessage.getDuration());
+        Object obj = audioMessage.getFileMetaData().get("duration");
+        timeAudio.setText(String.valueOf((int)Double.parseDouble(obj.toString())));
         setItemOnLongClickListener(playBtn, audioMessage);
     }
 
@@ -383,7 +384,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         contentView.removeAllViews();
         View content = inflater.inflate(contentId, null, false);
         if (type == AVIMReservedMessageType.AudioMessageType) {
-            PlayButton btn = (PlayButton) content;
+            PlayButton btn = (PlayButton) content.findViewById(R.id.playBtn);
             btn.setLeftSide(comeMsg);
         } else if (type == AVIMReservedMessageType.TextMessageType) {
             TextView textView = (TextView) content;

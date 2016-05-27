@@ -1326,6 +1326,8 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                     if(list.size() - 1 != i)
                         sb.append(",");
                 }
+
+                jsCallback.callback(sb.toString());
             }
         });
 

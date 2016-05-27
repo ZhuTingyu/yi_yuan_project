@@ -207,6 +207,9 @@ public class RecordButton extends Button {
       thread = null;
     }
     if (recorder != null) {
+      recorder.setOnErrorListener(null);
+      recorder.setPreviewDisplay(null);
+
       recorder.stop();
       recorder.release();
       recorder = null;
