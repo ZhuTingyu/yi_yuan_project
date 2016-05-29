@@ -82,6 +82,7 @@ public class ChatRoomActivity extends ChatActivity {
         Intent intent = new Intent(from, ChatRoomActivity.class);
         intent.putExtra(CONVID, conv.getConversationId());
         from.startActivity(intent);
+
     }
 
     public static void chatByUserId(final Activity from, String userId) {
@@ -407,7 +408,7 @@ public class ChatRoomActivity extends ChatActivity {
             return;
         }
         String htmlExtractedFolder = DMApplication.getInstance().getHtmlExtractedFolder();
-        mUrl = htmlExtractedFolder + "/" + url;
+        mUrl = htmlExtractedFolder + "/pages/" + url;
         Timber.i("URL - " + mUrl);
         if (StringUtil.isValidHTTPUrl(mUrl)) {
             webView.loadUrl(mUrl);

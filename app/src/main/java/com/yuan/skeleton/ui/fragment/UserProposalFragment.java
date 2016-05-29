@@ -47,6 +47,8 @@ import com.yuan.skeleton.utils.ImageUtil;
 import com.yuan.skeleton.utils.JsonParse;
 import com.yuan.skeleton.utils.OkHttpClientManager;
 import com.yuan.skeleton.utils.ToastUtil;
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.StringCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -63,6 +65,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import de.greenrobot.event.EventBus;
+import okhttp3.Call;
 
 /**
  * 用户端和中介端合并在一个Fragment里
@@ -175,13 +178,32 @@ public class UserProposalFragment extends WebViewBaseFragment {
                     params.put("duration",duration);
                     //触发软键盘回车事件，上传服务器;
                     try {
-                        OkHttpClientManager.postJson(Constants.kWebServiceSendFeedback,
-                                com.alibaba.fastjson.JSONObject.toJSONString(params),
-                                getUserToken(),
-                                new SendFeedBackCallBack());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (JSONException e) {
+                        OkHttpUtils.postString().url(Constants.kWebServiceSendFeedback)
+                                .addHeader("Content-Type","application/json")
+                                .addHeader("token",getUserToken())
+                                .content(com.alibaba.fastjson.JSONObject.toJSONString(params))
+                                .mediaType(okhttp3.MediaType.parse("application/json"))
+                                .build()
+                                .execute(new StringCallback() {
+
+                                    @Override
+                                    public void onError(Call call, Exception e) {
+
+                                    }
+
+                                    @Override
+                                    public void onResponse(String response) {
+                                        try {
+                                            new JSONObject(response);
+                                            ToastUtil.showShort(getContext(),"提交成功");
+                                        } catch (JSONException e) {
+                                            ToastUtil.showShort(getContext(),"提交失败");
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                });
+
+                    }  catch (JSONException e) {
                         e.printStackTrace();
                     }
                     return true;
@@ -222,14 +244,40 @@ public class UserProposalFragment extends WebViewBaseFragment {
         try {
             if(msg_type == 2)
                 this.duration = MediaPlayer.create(getActivity(), Uri.parse(filePath)).getDuration();
+
+            File file = new File(filePath);
+            OkHttpUtils.post().url(Constants.kWebServiceFileUpload)
+                    .addHeader("token",token)
+                    .addHeader("Content-Type","multipart/form-data")
+                    .addFile("file[]",file.getName(),file)
+                    .build()
+                    .execute(new StringCallback() {
+                        @Override
+                        public void onError(Call call, Exception e) {
+
+                        }
+
+                        @Override
+                        public void onResponse(String response) {
+                            try {
+                                new JSONObject(response);
+                                ToastUtil.showShort(getContext(),"提交成功");
+                            } catch (JSONException e) {
+                                ToastUtil.showShort(getContext(),"提交失败");
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+
+            /*
             OkHttpClientManager.postAsyn(Constants.kWebServiceFileUpload,
                     new UploadResultCallBack(),
                     new File[]{new File(filePath)},
                     new String[]{"file[]"},
                     new OkHttpClientManager.Param[]{
                             new OkHttpClientManager.Param("token", token),
-                            new OkHttpClientManager.Param("Content-Type", "multipart/form-data")});
-        } catch (IOException e) {
+                            new OkHttpClientManager.Param("Content-Type", "multipart/form-data")});*/
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
