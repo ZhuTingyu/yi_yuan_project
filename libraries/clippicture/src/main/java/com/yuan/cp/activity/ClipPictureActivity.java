@@ -77,8 +77,8 @@ public class ClipPictureActivity extends Activity implements View.OnTouchListene
 
         String imagePath = getIntent().getStringExtra("imageFilePath");
         String type = getIntent().getStringExtra("type");
-        resultWidth = getIntent().getStringExtra("clipWidth");
-        resultHeight = getIntent().getStringExtra("clipHeight");
+//        resultWidth = getIntent().getStringExtra("clipWidth");
+//        resultHeight = getIntent().getStringExtra("clipHeight");
 
 
         clipRatio = getIntent().getDoubleExtra("clipRatio",0.00f);
@@ -166,7 +166,8 @@ public class ClipPictureActivity extends Activity implements View.OnTouchListene
     @Override
     public void onClick(View v) {
         if(v.getId() == R.id.sure){
-            Bitmap bitmap = resizeImage(getBitmap(),Integer.valueOf(resultWidth),Integer.valueOf(resultHeight));
+//            Bitmap bitmap = resizeImage(getBitmap(),Integer.valueOf(resultWidth),Integer.valueOf(resultHeight));
+            Bitmap bitmap = getBitmap();
 
             SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSSS");
             String name = formatter.format(System.currentTimeMillis()) + ".jpg";

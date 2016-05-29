@@ -120,8 +120,8 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
 
     private String capturePath;
     private Double clipRatio;
-    private String clipHeight;
-    private String clipWidth;
+    private String clipHeight = "0";
+    private String clipWidth = "0";
 
     public WebViewJavascriptBridge bridge;
     protected FragmentManager mFragmentManager;
@@ -145,11 +145,12 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
         public void handleMessage(Message msg) {
             if (pay_type.equals("alipay")) {
                 aliPay.AlipayResultProcess(msg);
-            }
-            else if (pay_type.equals("wechatpay")) {
+            } else if (pay_type.equals("wechatpay")) {
 //                WechatpayResultProcess(msg);
             }
-        };
+        }
+
+        ;
     };
 
     @Override
@@ -245,16 +246,16 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
         bridge.registerHandler("purchase", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                Log.i("reponse.data",data);
-                Map<String,Object> params = null;
-                Map<String,Object> orderMap = null;
-                Map<String,Object> orderPackagesMap = null;
+                Log.i("reponse.data", data);
+                Map<String, Object> params = null;
+                Map<String, Object> orderMap = null;
+                Map<String, Object> orderPackagesMap = null;
                 try {
 //                    params = (Map<String, Object>) JsonUtils.newInstance().readJson2List(data);
 //                    orderMap = (Map<String, Object>) params.get("order");
 //                    List<Object> orderPackagesList = (List<Object>) orderMap.get("order_packages");
 //                    orderPackagesMap = (Map<String, Object>) orderPackagesList.get(0);
-                }  catch (Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
@@ -324,7 +325,7 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
         bridge.registerHandler("showToast", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
-                ToastUtil.showShort(mContext,data);
+                ToastUtil.showShort(mContext, data);
             }
         });
 
@@ -572,8 +573,8 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                 final String content = params.get("content").toString();
                 if (!TextUtils.isEmpty(text) && text.equals("icon")) {
                     Resources resources = getResources();
-                    String icon = content.substring(0,params.get("content").indexOf("."));
-                    int resourceId = resources.getIdentifier(icon,"drawable",getPackageName());
+                    String icon = content.substring(0, params.get("content").indexOf("."));
+                    int resourceId = resources.getIdentifier(icon, "drawable", getPackageName());
                     setRightItem(resourceId, new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -984,12 +985,12 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                 String objectId = params.get("lean_id");
                 String userId = params.get("user_id");
                 String houseId = params.get("house_id");
-                if(params.get("audit_type") != null)
-                    prefs.edit().putString("auditType",params.get("audit_type")).commit();
-                prefs.edit().putString("houseId",houseId).commit();
-                prefs.edit().putString("target_id",userId).commit();
-                prefs.edit().putString("leanId",objectId).commit();
-                prefs.edit().putString("userId",userId).commit();
+                if (params.get("audit_type") != null)
+                    prefs.edit().putString("auditType", params.get("audit_type")).commit();
+                prefs.edit().putString("houseId", houseId).commit();
+                prefs.edit().putString("target_id", userId).commit();
+                prefs.edit().putString("leanId", objectId).commit();
+                prefs.edit().putString("userId", userId).commit();
 
                 ChatRoomActivity.chatByUserId(WebViewBasedActivity.this, objectId);
 
@@ -1042,11 +1043,11 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                                     item.put("chat_user_id", user.getObjectId());
                                     ret.put(item);
                                 }
-                            }catch (Exception e1) {
+                            } catch (Exception e1) {
                                 ret = null;
                             }
-                            if(callback!=null) {
-                                callback.callback(ret==null?"[]":ret.toString());
+                            if (callback != null) {
+                                callback.callback(ret == null ? "[]" : ret.toString());
                             }
                         }
                     });
@@ -1111,10 +1112,10 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                             obj.put("lng", location.getLongitude());
                             obj.put("lat", location.getLatitude());
                             obj.put("addr", location.getAddrStr());
-                            obj.put("city",location.getCity());
-                            obj.put("district",location.getDistrict());
-                            obj.put("province",location.getProvince());
-                            obj.put("street",location.getStreet());
+                            obj.put("city", location.getCity());
+                            obj.put("district", location.getDistrict());
+                            obj.put("province", location.getProvince());
+                            obj.put("street", location.getStreet());
                             obj.put("success", true);
                         } catch (Exception e) {
                             obj = null;
@@ -1179,7 +1180,7 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
         });
 
         //TODO 代码已完善，待测试。
-        bridge.registerHandler("uploadFiles",new WebViewJavascriptBridge.WVJBHandler() {
+        bridge.registerHandler("uploadFiles", new WebViewJavascriptBridge.WVJBHandler() {
 
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
@@ -1188,8 +1189,8 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                 try {
                     JSONArray jsonArray = new JSONArray(data);
                     File[] files = new File[jsonArray.length()];
-                    String [] fileKeys = new String[jsonArray.length()];
-                    for (int i = 0; i < jsonArray.length(); i++){
+                    String[] fileKeys = new String[jsonArray.length()];
+                    for (int i = 0; i < jsonArray.length(); i++) {
                         String fileUrl = (String) jsonArray.get(i);
                         files[i] = new File(fileUrl);
                         fileKeys[i] = "file[]";
@@ -1210,30 +1211,30 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
             }
         });
 
-        bridge.registerHandler("reviewImages",new WebViewJavascriptBridge.WVJBHandler() {
+        bridge.registerHandler("reviewImages", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                Log.i("图片预览",data);
+                Log.i("图片预览", data);
                 Intent intent = new Intent(mContext, ImagePagerActivity.class);
-                intent.putExtra("json",data);
+                intent.putExtra("json", data);
                 startActivity(intent);
             }
         });
 
-        bridge.registerHandler("showDateTimePicker",new WebViewJavascriptBridge.WVJBHandler(){
+        bridge.registerHandler("showDateTimePicker", new WebViewJavascriptBridge.WVJBHandler() {
 
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                Log.i("showDateTimePicker",data);
+                Log.i("showDateTimePicker", data);
                 mCallback = jsCallback;
                 try {
                     HashMap<String, String> map = StringUtil.JSONString2HashMap(data);
                     String date = map.get("pick_date");
                     calendar = Calendar.getInstance();
-                    if(date.equals("true")){
+                    if (date.equals("true")) {
                         //选择日期
                         DatePickerDialog.newInstance(new DataPickerOnClickListener(), calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show(mFragmentManager, "datePicker");
-                    }else{
+                    } else {
                         //选择时间
                         TimePickerDialog.newInstance(new TimePickerOnClickListener(), calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show(mFragmentManager, "timePicker");
                     }
@@ -1257,24 +1258,24 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
             }
         });
 
-        bridge.registerHandler("showPickerView",new WebViewJavascriptBridge.WVJBHandler() {
+        bridge.registerHandler("showPickerView", new WebViewJavascriptBridge.WVJBHandler() {
 
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                Log.i("showPickerView",data);
+                Log.i("showPickerView", data);
 
                 ArrayList item1 = new ArrayList();
                 ArrayList item2 = new ArrayList();
                 ArrayList item3 = new ArrayList();
                 try {
                     JSONArray jsonArray = new JSONArray(data);
-                    for (int i = 0; i < jsonArray.length(); i++){
+                    for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jsonObject = (JSONObject) jsonArray.opt(i);
                         JSONArray jsonRows = (JSONArray) jsonObject.get("rows");
-                        for (int j = 0; j < jsonRows.length(); j++){
-                            if(i == 0)
+                        for (int j = 0; j < jsonRows.length(); j++) {
+                            if (i == 0)
                                 item1.add(jsonRows.opt(j).toString());
-                            else if (i ==1)
+                            else if (i == 1)
                                 item2.add(jsonRows.opt(j).toString());
                             else
                                 item3.add(jsonRows.opt(j).toString());
@@ -1292,7 +1293,7 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
                         sb.append(item1);
                         sb.append(item2);
                         sb.append(item3);
-                        Log.i("result",sb.toString());
+                        Log.i("result", sb.toString());
                     }
                 });
 
@@ -1301,29 +1302,29 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
             }
         });
 
-        bridge.registerHandler("getLastMessageByHouse",new WebViewJavascriptBridge.WVJBHandler(){
+        bridge.registerHandler("getLastMessageByHouse", new WebViewJavascriptBridge.WVJBHandler() {
 
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 MessageDao messageDao = DMApplication.getInstance().getMessageDao();
                 List<com.lfy.bean.Message> list = messageDao.queryBuilder().build().list();
                 StringBuffer sb = new StringBuffer();
-                for (int i = 0; i < list.size(); i++){
+                for (int i = 0; i < list.size(); i++) {
                     com.lfy.bean.Message message = list.get(i);
                     sb.append("{");
-                    sb.append(prefs.getString("userId",null) + ":");
+                    sb.append(prefs.getString("userId", null) + ":");
                     sb.append("{");
                     sb.append(message.getHouseId() + ":");
                     sb.append("{");
                     sb.append(message.getAuditType() + ":");
                     sb.append("{");
-                    sb.append(message.getLeanId() +":");
-                    sb.append("{\"message\" : "+ message.getDate() +", \"is_read\" : "+message.getIs_read()+"}");
+                    sb.append(message.getLeanId() + ":");
+                    sb.append("{\"message\" : " + message.getDate() + ", \"is_read\" : " + message.getIs_read() + "}");
                     sb.append("}");
                     sb.append("}");
                     sb.append("}");
                     sb.append("}");
-                    if(list.size() - 1 != i)
+                    if (list.size() - 1 != i)
                         sb.append(",");
                 }
 
@@ -1341,17 +1342,34 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
         bridge.registerHandler("selectImageFromNative", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                Log.i("selectImageFromNative",data);
+                Log.i("selectImageFromNative", data);
                 try {
                     HashMap<String, String> map = StringUtil.JSONString2HashMap(data);
                     String type = map.get("type");
-                    if("rectangle".equals(type)){
-                        //长方形
-                    }else if("square".equals(type)){
-                        //正方形
-                    }else{
-                        //不裁剪
-                    }
+                    if ("rectangle".equals(type))//长方形
+                        clipRatio = 0.75;
+                    else if ("square".equals(type))//正方形
+                        clipRatio = 1.0;
+                    else //不裁剪
+                        clipRatio = 0.0;
+
+                    //1.弹出选择图片功能
+                    new AlertDialog.Builder(mContext).setTitle(R.string.dialog_title)
+                            .setPositiveButton(R.string.dialog_camera, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    //进入相机
+                                    systemCamera();
+                                    dialog.dismiss();
+                                }
+                            }).setNegativeButton(R.string.dialog_photo, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            //进入相册
+                            systemPhoto();
+                            dialog.dismiss();
+                        }
+                    }).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -1365,7 +1383,7 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
         return params.get("token");
     }
 
-    private class UploadResultCallBack extends OkHttpClientManager.ResultCallback<String>{
+    private class UploadResultCallBack extends OkHttpClientManager.ResultCallback<String> {
 
         @Override
         public void onError(Request request, Exception e) {
@@ -1374,7 +1392,7 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
 
         @Override
         public void onResponse(String response) {
-            Log.i("response",response);
+            Log.i("response", response);
             mCallback.callback(response);
         }
     }
@@ -1559,8 +1577,8 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
     }
 
     //TODO: 接收Web端触发的Event事件
-    public void onEvent(WebBroadcastEvent event){
-        Toast.makeText(mContext,event.result,Toast.LENGTH_SHORT).show();
+    public void onEvent(WebBroadcastEvent event) {
+        Toast.makeText(mContext, event.result, Toast.LENGTH_SHORT).show();
     }
 
     public void uploadImage(InputStream is, JSONArray imgResizeCfg) {
@@ -1672,9 +1690,9 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
 
     }
 
-    protected void systemCamera(){
+    protected void systemCamera() {
         String sdStatus = Environment.getExternalStorageState();
-		/* 检测sd是否可用 */
+        /* 检测sd是否可用 */
         if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) {
             Toast.makeText(this, "SD卡不可用！", Toast.LENGTH_SHORT).show();
             return;
@@ -1693,18 +1711,18 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Intent intent = new Intent(mContext, ClipPictureActivity.class);
-        intent.putExtra("clipRatio",clipRatio);
-        intent.putExtra("clipHeight",clipHeight);
-        intent.putExtra("clipWidth",clipWidth);
-        if(requestCode == CAMERA_INTENT_REQUEST && resultCode == RESULT_OK){
-            intent.putExtra("type","camera");
-            intent.putExtra("imageFilePath",capturePath);
-            startActivityForResult(intent,FILE_INTENT_REQUEST);
-        } else if (requestCode == SYS_INTENT_REQUEST && resultCode == RESULT_OK && data != null){
+        intent.putExtra("clipRatio", clipRatio);
+        intent.putExtra("clipHeight", clipHeight);
+        intent.putExtra("clipWidth", clipWidth);
+        if (requestCode == CAMERA_INTENT_REQUEST && resultCode == RESULT_OK) {
+            intent.putExtra("type", "camera");
+            intent.putExtra("imageFilePath", capturePath);
+            startActivityForResult(intent, FILE_INTENT_REQUEST);
+        } else if (requestCode == SYS_INTENT_REQUEST && resultCode == RESULT_OK && data != null) {
             Uri uri = data.getData();
-            intent.putExtra("type","photo");
-            intent.putExtra("imageFilePath",uri.toString());
-            startActivityForResult(intent,FILE_INTENT_REQUEST);
+            intent.putExtra("type", "photo");
+            intent.putExtra("imageFilePath", uri.toString());
+            startActivityForResult(intent, FILE_INTENT_REQUEST);
         } else if (requestCode == FILE_INTENT_REQUEST
                 && resultCode == RESULT_OK) {
             String filePath = data.getStringExtra("filePath");
@@ -1741,7 +1759,7 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
         return true;
     }
 
-    private class DataPickerOnClickListener implements DatePickerDialog.OnDateSetListener{
+    private class DataPickerOnClickListener implements DatePickerDialog.OnDateSetListener {
 
         @Override
         public void onDateSet(DatePickerDialog datePickerDialog, int year, int month, int day) {
@@ -1755,7 +1773,7 @@ public class WebViewBasedActivity extends BaseFragmentActivity implements WebVie
         }
     }
 
-    private class TimePickerOnClickListener implements TimePickerDialog.OnTimeSetListener{
+    private class TimePickerOnClickListener implements TimePickerDialog.OnTimeSetListener {
 
         @Override
         public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute) {
