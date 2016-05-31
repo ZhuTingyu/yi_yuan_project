@@ -2,12 +2,9 @@ package com.yuan.skeleton.activities;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
@@ -19,15 +16,13 @@ import com.avos.avoscloud.PushService;
 import com.avoscloud.chat.service.CacheService;
 import com.avoscloud.chat.service.PreferenceMap;
 import com.avoscloud.chat.service.UserService;
-import com.avoscloud.chat.ui.chat.ChatRoomActivity;
-import com.avoscloud.chat.ui.contact.ContactFragment;
-import com.avoscloud.chat.ui.conversation.ConversationRecentFragment;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.dimo.web.WebViewJavascriptBridge;
+import com.umeng.update.UmengUpdateAgent;
 import com.yuan.skeleton.R;
 import com.yuan.skeleton.application.DMApplication;
 import com.yuan.skeleton.application.Injector;
@@ -41,7 +36,6 @@ import com.yuan.skeleton.ui.fragment.UserMessageFragment;
 import com.yuan.skeleton.ui.fragment.UserProposalFragment;
 import com.yuan.skeleton.ui.fragment.WebViewBaseFragment;
 import com.yuan.skeleton.ui.fragment.WebViewFragment;
-import com.umeng.update.UmengUpdateAgent;
 
 import butterknife.ButterKnife;
 import de.greenrobot.event.EventBus;
@@ -99,23 +93,18 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         initBaiduLocClient();
 
         // configure chat service
-        if(AVUser.getCurrentUser()!=null) {
+        if (AVUser.getCurrentUser() != null) {
             ChatManager chatManager = ChatManager.getInstance();
             chatManager.setupDatabaseWithSelfId(AVUser.getCurrentUser().getObjectId());
             chatManager.openClientWithSelfId(AVUser.getCurrentUser().getObjectId(), null);
             CacheService.registerUser(AVUser.getCurrentUser());
         }
 
-// FIXME: crash here
-//        UpdateService updateService = UpdateService.getInstance(this);
-//        updateService.checkUpdate();
-//        CacheService.registerUser(AVUser.getCurrentUser());
-
-//        ButterKnife.findById(getTabBar(), R.id.tabbar_btn_1).performClick();
-        if(prefs.getBoolean("isLogin",false))
+        if (prefs.getBoolean("isLogin", false)) {
             switchToFragment(Constants.kFragmentTagNearby);
-        else
+        } else {
             switchToFragment(Constants.kFragmentTagLogin);
+        }
 
     }
 
@@ -126,7 +115,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         if (!TextUtils.isEmpty(cachedNotificationPayload)) {
             callbackWhenGetNotification(cachedNotificationPayload);
         }
-
     }
 
 
@@ -170,19 +158,20 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         }
 
         if (tag.equals(Constants.kFragmentTagNearby)) {
-            if(isUserType())
+            if (isUserType())
                 f = UserMainFragment.newInstance();
             else
                 f = AgencyMainFragment.newInstance();
-        } else if(tag.equals(Constants.kFragmentTagMessage)){
-            if(isUserType())
+        } else if (tag.equals(Constants.kFragmentTagMessage)) {
+            if (isUserType()) {
                 f = UserMessageFragment.newInstance();
-            else
+            } else {
                 f = AgencyMessageFragment.newInstance();
-        } else if(tag.equals(Constants.kFragmentTagLogin)){
+            }
+        } else if (tag.equals(Constants.kFragmentTagLogin)) {
             f = LoginFragment.newInstance();
-        } else if(tag.equals(Constants.kFragmentTagProposal)){
-            f= UserProposalFragment.newInstance();
+        } else if (tag.equals(Constants.kFragmentTagProposal)) {
+            f = UserProposalFragment.newInstance();
         } else {
             f = WebViewFragment.newInstance();
         }
@@ -207,33 +196,32 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         locClient.start();
     }
 
-    public BottomNavigationBar getBottomNavigationBar(){
+    public BottomNavigationBar getBottomNavigationBar() {
         return bottomNavigationBar;
     }
 
     // FIXME: ugly implementation, need dynamic adapt the tab bar items.
     public void setupTabbarClickListener() {
-        this.bottomNavigationBar = ButterKnife.findById(getTabBar(),R.id.bottom_navigation_bar);
+        this.bottomNavigationBar = ButterKnife.findById(getTabBar(), R.id.bottom_navigation_bar);
         bottomNavigationBar
-                .addItem(new BottomNavigationItem(R.drawable.ic_home,"房源")).setActiveColor(R.color.primary_color_scheme)
-                .addItem(new BottomNavigationItem(R.drawable.ic_chat,"消息")).setActiveColor(R.color.primary_color_scheme)
-                .addItem(new BottomNavigationItem(R.drawable.ic_suggest,"建议")).setActiveColor(R.color.primary_color_scheme)
+                .addItem(new BottomNavigationItem(R.drawable.ic_home, "房源")).setActiveColor(R.color.primary_color_scheme)
+                .addItem(new BottomNavigationItem(R.drawable.ic_chat, "消息")).setActiveColor(R.color.primary_color_scheme)
+                .addItem(new BottomNavigationItem(R.drawable.ic_suggest, "建议")).setActiveColor(R.color.primary_color_scheme)
                 .setFirstSelectedPosition(0)
                 .initialise();
 
-        if(!prefs.getBoolean("isLogin",false))
+        if (!prefs.getBoolean("isLogin", false))
             return;
 
-        bottomNavigationBar.setTabSelectedListener(new BottomNavigationBar.OnTabSelectedListener(){
-
+        bottomNavigationBar.setTabSelectedListener(new BottomNavigationBar.OnTabSelectedListener() {
             @Override
             public void onTabSelected(int position) {
 
-                switch (position){
+                switch (position) {
                     case 0:
                         switchToFragment(Constants.kFragmentTagNearby);
                         break;
-                    case 1 :
+                    case 1:
                         switchToFragment(Constants.kFragmentTagMessage);
                         break;
                     case 2:

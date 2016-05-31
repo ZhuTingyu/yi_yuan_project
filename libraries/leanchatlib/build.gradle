@@ -24,6 +24,9 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
+    compile project(':libraries:chatexamplegenerator')
+    compile project(':libraries:ShareCode')
+
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.android.support:support-v4:23.0.1'
 
@@ -36,6 +39,4 @@ dependencies {
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.3'
     compile 'com.zhy:okhttputils:2.4.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
-    compile project(':libraries:chatexamplegenerator')
-    compile project(':libraries:ShareCode')
 }

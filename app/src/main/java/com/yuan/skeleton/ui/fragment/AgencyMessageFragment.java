@@ -38,6 +38,7 @@ public class AgencyMessageFragment extends WebViewBaseFragment {
         ButterKnife.inject(this, view);
 
         redirectToLoadUrl("agency_message.html");
+
         return view;
     }
 
