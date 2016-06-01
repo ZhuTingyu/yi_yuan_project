@@ -18,6 +18,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/hint_warning"
         android:layout_margin="50dp"
+        android:gravity="center"
+        android:text="@string/dummy_ip"
         android:hint="@string/dummy_ip_setting"/>
 
     <Button

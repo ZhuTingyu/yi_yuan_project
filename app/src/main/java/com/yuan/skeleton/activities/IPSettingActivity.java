@@ -33,15 +33,11 @@ public class IPSettingActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.ip_setting);
 
         Injector.inject(this);
         ButterKnife.inject(this);
-
-        ip = preferences.getString("ip_settings", "");
-        if (!TextUtils.isEmpty(ip)) {
-            editText.setText(ip);
-        }
     }
 
     @OnClick(R.id.btn_dummy_ip_setting)
@@ -51,13 +47,13 @@ public class IPSettingActivity extends Activity {
 
         if (TextUtils.isEmpty(inputRaw)) {
             if (!TextUtils.isEmpty(ip)) {
-                DMApplication.getInstance().setHtmlExtractedFolder(ip + "/pages");
+                DMApplication.getInstance().setHtmlExtractedFolder(ip);
                 DMApplication.getInstance().setRootPagesFolder(ip + "/pages");
             }
         } else {
             input = "http://" + inputRaw;
-            DMApplication.getInstance().setHtmlExtractedFolder(input + "/html/pages");
-            DMApplication.getInstance().setRootPagesFolder(input + "/html/pages");
+            DMApplication.getInstance().setHtmlExtractedFolder(input);
+            DMApplication.getInstance().setRootPagesFolder(input + "/pages");
             preferences.edit().putString("ip_settings", inputRaw).commit();
         }
 
