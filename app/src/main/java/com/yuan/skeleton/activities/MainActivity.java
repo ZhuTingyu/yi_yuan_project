@@ -120,6 +120,24 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
     }
 
     @Override
+    protected void registerHandle() {
+        super.registerHandle();
+        bridge.registerHandler("dropToMessage", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                bottomNavigationBar.selectTab(1);
+            }
+        });
+
+        bridge.registerHandler("updateFriendRelationship", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                bottomNavigationBar.selectTab(0);
+            }
+        });
+    }
+
+    @Override
     public void onFragmentInteraction(WebViewBaseFragment fragment) {
         super.onFragmentInteraction(fragment);
 
