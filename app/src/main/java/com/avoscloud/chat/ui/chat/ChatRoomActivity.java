@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
@@ -24,8 +25,14 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.im.v2.AVIMConversation;
+import com.avos.avoscloud.im.v2.AVIMReservedMessageType;
+import com.avos.avoscloud.im.v2.AVIMTypedMessage;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
+import com.avos.avoscloud.im.v2.messages.AVIMAudioMessage;
+import com.avos.avoscloud.im.v2.messages.AVIMImageMessage;
+import com.avos.avoscloud.im.v2.messages.AVIMLocationMessage;
+import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
 import com.avoscloud.chat.entity.AVIMUserInfoMessage;
 import com.avoscloud.chat.service.CacheService;
 import com.avoscloud.chat.service.ConversationChangeEvent;
@@ -35,8 +42,11 @@ import com.avoscloud.chat.util.Utils;
 import com.avoscloud.leanchatlib.activity.ChatActivity;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.ConversationHelper;
+import com.avoscloud.leanchatlib.controller.EmotionHelper;
+import com.avoscloud.leanchatlib.controller.MessageHelper;
 import com.avoscloud.leanchatlib.model.AVIMHouseInfoMessage;
 import com.avoscloud.leanchatlib.utils.Logger;
+import com.avoscloud.leanchatlib.utils.PhotoUtils;
 import com.bugtags.library.Bugtags;
 import com.dimo.http.RestClient;
 import com.dimo.utils.StringUtil;
@@ -45,6 +55,7 @@ import com.yuan.skeleton.R;
 import com.yuan.skeleton.application.DMApplication;
 import com.yuan.skeleton.common.Constants;
 import com.yuan.skeleton.utils.JsonParse;
+import com.yuan.skeleton.utils.ToastUtil;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -85,7 +96,9 @@ public class ChatRoomActivity extends ChatActivity {
 
     }
 
+    private static String leanId = "";
     public static void chatByUserId(final Activity from, String userId) {
+        leanId = userId;
         final ProgressDialog dialog = Utils.showSpinnerDialog(from);
         if(prefs == null)
             prefs = PreferenceManager.getDefaultSharedPreferences(from);
@@ -399,6 +412,60 @@ public class ChatRoomActivity extends ChatActivity {
                 }
                 RestClient.getInstance().bridgeRequest(params, RestClient.MEHOTD_DELETE, callback);
             }
+        });
+
+        adapter.registerDataSetObserver(new DataSetObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+
+                if(adapter.getDatas().size() == 0)
+                    return;
+
+                AVIMTypedMessage msg = adapter.getDatas().get(adapter.getDatas().size() - 1);
+                AVIMReservedMessageType type = AVIMReservedMessageType.getAVIMReservedMessageType(msg.getMessageType());
+
+                String resultMessage = "";
+                long date = 0;
+                switch (type) {
+                    case TextMessageType:
+                        AVIMTextMessage textMsg = (AVIMTextMessage) msg;
+                        ToastUtil.showShort(getApplicationContext(),textMsg.getText());
+                        date = msg.getTimestamp();
+                        resultMessage = textMsg.getText();
+                        break;
+                    case ImageMessageType:
+                        AVIMImageMessage imageMsg = (AVIMImageMessage) msg;
+                        date = imageMsg.getTimestamp();
+                        resultMessage = "[图片]";
+                        break;
+                    case AudioMessageType:
+                        AVIMAudioMessage audioMessage = (AVIMAudioMessage) msg;
+                        date = audioMessage.getTimestamp();
+                        resultMessage = "[语音]";
+                        break;
+                    case LocationMessageType:
+                        AVIMLocationMessage locMsg = (AVIMLocationMessage) msg;
+                        date = locMsg.getTimestamp();
+                        resultMessage = "[位置]";
+                        break;
+                    default:
+                        break;
+                }
+
+                Map<String,Object> params = new HashMap<String, Object>();
+                params.put("date",date);
+                params.put("message",resultMessage);
+                params.put("houseId",prefs.getString("houseId",null));
+                params.put("leanId",leanId);
+                params.put("is_read",1);
+                params.put("auditType",prefs.getString("auditType",null));
+
+                String json = com.alibaba.fastjson.JSONObject.toJSONString(params);
+                bridge.callHandler("onLastMessageChangeByHouse",json);
+
+            }
+
         });
     }
 
