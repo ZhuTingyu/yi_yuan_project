@@ -83,6 +83,8 @@ public class WebViewBaseFragment extends Fragment {
             webView.setInitialScale(getResources().getDisplayMetrics().widthPixels * 100 / 360);
 
             webView.getSettings().setJavaScriptEnabled(true);
+            webView.getSettings().setDomStorageEnabled(true);
+
             webView.getSettings().setAllowFileAccess(true);
             webView.setWebChromeClient(new WebChromeClient());
             webView.setHorizontalScrollBarEnabled(false);
@@ -110,9 +112,13 @@ public class WebViewBaseFragment extends Fragment {
             return;
         }
 
-        String htmlExtractedFolder = DMApplication.getInstance().getHtmlExtractedFolder();
+        String rootPagesFolder = DMApplication.getInstance().getRootPagesFolder();
 
-        mUrl = htmlExtractedFolder + "/pages/" + url;
+        if (StringUtil.isValidHTTPUrl(url)) {
+            mUrl = url;
+        } else {
+            mUrl = rootPagesFolder + "/" + url;
+        }
 
         Timber.i("URL - " + mUrl);
 

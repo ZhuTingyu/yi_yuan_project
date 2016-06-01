@@ -265,19 +265,19 @@ public class DMApplication extends Application {
             Logger.level = Logger.NONE;
         }
 
+        // 使用 assets 目录中的文件
         rootDataFolder = FileUtil.getDataDirectory(getApplicationContext());
         htmlExtractedFolder = String.format("%s/%s", FileUtil.getDataDirectory(getApplicationContext()), "html");
 
-        /*if (!prefs.getBoolean(Constants.kWebPackageExtracted, false)) {
-            Timber.v("Copy HTML asset to folder : " + htmlExtractedFolder);
-
-            FileUtil.copyAssetFolder(getAssets(), "html", htmlExtractedFolder);
-            prefs.edit().putBoolean(Constants.kWebPackageExtracted, true).commit();
-        }*/
         rootPagesFolder = htmlExtractedFolder + "/pages";
+
+//        if (!prefs.getBoolean(Constants.kWebPackageExtracted, false)) {
         Timber.v("Copy HTML asset to folder : " + htmlExtractedFolder);
+
         FileUtil.copyAssetFolder(getAssets(), "html", htmlExtractedFolder);
         prefs.edit().putBoolean(Constants.kWebPackageExtracted, true).commit();
+//        }
+
     }
 
     private void initAnerdaDatabase() {
