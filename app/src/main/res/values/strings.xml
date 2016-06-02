@@ -137,5 +137,6 @@
     <string name="hint_warning">本界面只是为了调测方便,在输入框中输入页面的地址,即可使用本地的页面包;如果要使用开发服务器上的包,请直接点击确定</string>
     <string name="dummy_ip_setting">在此输入你的页面包服务器地址</string>
     <string name="btn_dummy_ip_setting">确定</string>
+    <!--<string name="dummy_ip">192.168.1.247:8000</string>-->
     <string name="dummy_ip">192.168.31.230:8000</string>
 </resources>
