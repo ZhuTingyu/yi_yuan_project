@@ -15,12 +15,10 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.dimo.utils.StringUtil;
-import com.yuan.skeleton.R;
 import com.yuan.house.activities.MainActivity;
 import com.yuan.house.activities.MapActivity;
-import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
-import com.yuan.house.utils.ToastUtil;
+import com.yuan.skeleton.R;
 
 import org.json.JSONException;
 
@@ -34,16 +32,15 @@ import timber.log.Timber;
 /**
  * Created by KevinLee on 2016/4/21.
  */
-public class UserMainFragment extends WebViewBaseFragment{
+public class UserMainFragment extends WebViewBaseFragment {
 
+    private static final int REQUEST_MAP_CODE = 0XFF01;
+    public LocationClient locClient;
+    public TCLocationListener locationListener;
     @InjectView(R.id.rl_center)
     LinearLayout center;
     @InjectView(R.id.address)
     TextView address;
-    public LocationClient locClient;
-    public TCLocationListener locationListener;
-
-    private static final int REQUEST_MAP_CODE = 0XFF01;
 
     public static UserMainFragment newInstance() {
         UserMainFragment fragment = new UserMainFragment();
@@ -74,21 +71,21 @@ public class UserMainFragment extends WebViewBaseFragment{
         super.onViewCreated(view, savedInstanceState);
     }
 
-    @OnClick({R.id.rl_center,R.id.position,R.id.btn_arrow_down})
-    public void onClick(View v){
-        switch (v.getId()){
+    @OnClick({R.id.rl_center, R.id.position, R.id.btn_arrow_down})
+    public void onClick(View v) {
+        switch (v.getId()) {
             case R.id.rl_center:
                 Intent intent = new Intent(getContext(), MapActivity.class);
-                startActivityForResult(intent,REQUEST_MAP_CODE);
+                startActivityForResult(intent, REQUEST_MAP_CODE);
                 break;
             case R.id.position:
-                ((MainActivity)getActivity()).getBottomNavigationBar().selectTab(2);
+                ((MainActivity) getActivity()).getBottomNavigationBar().selectTab(2);
                 break;
             case R.id.btn_arrow_down:
                 String url = "resources.html";
-                HashMap<String,String> map = new HashMap<String, String>();
-                map.put("params","{\"title\":\"全网房源\",\"hasBackButton\":true}");
-                ((MainActivity)getActivity()).openLinkInNewActivity(url,map);
+                HashMap<String, String> map = new HashMap<String, String>();
+                map.put("params", "{\"title\":\"全网房源\",\"hasBackButton\":true}");
+                ((MainActivity) getActivity()).openLinkInNewActivity(url, map);
                 break;
         }
     }
@@ -96,7 +93,7 @@ public class UserMainFragment extends WebViewBaseFragment{
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == REQUEST_MAP_CODE && resultCode == Activity.RESULT_OK){
+        if (requestCode == REQUEST_MAP_CODE && resultCode == Activity.RESULT_OK) {
             //获取地图返回的地理位置
             String mapJson = data.getStringExtra("mapJson");
             try {
@@ -132,7 +129,11 @@ public class UserMainFragment extends WebViewBaseFragment{
 
             Timber.v("onReceiveLocation latitude=" + latitude + " longitude=" + longitude
                     + " locType=" + locType + " address=" + location.getAddrStr());
-            address.setText(location.getStreet());
+
+            if (address != null) {
+                address.setText(location.getStreet());
+            }
+
             locClient.stop();
         }
     }
