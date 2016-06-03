@@ -107,7 +107,7 @@
                 android:scaleType="fitXY"
                 android:src="@drawable/btn_keybord_switchover" />
 
-            <com.yuan.skeleton.ui.view.AudioRecorderButton
+            <com.yuan.house.ui.view.AudioRecorderButton
                 android:id="@+id/btn_recorder"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

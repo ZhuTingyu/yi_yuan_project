@@ -4,7 +4,7 @@ apply plugin: 'android-apt'
 apt {
     arguments {
         androidManifestFile variant.outputs[0].processResources.manifestFile
-        resourcePackageName 'com.yuan.skeleton'
+        resourcePackageName 'com.yuan.house'
     }
 }
 
@@ -26,8 +26,9 @@ bugtags {
 }
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    compileSdkVersion Integer.parseInt(project.ANDROID_COMPILE_SDK_VERSION)
+    buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
+
     useLibrary 'org.apache.http.legacy'
 
     def versionPropsFile = file('version.properties')
@@ -43,13 +44,13 @@ android {
         versionProps.store(versionPropsFile.newWriter(), null)
 
         defaultConfig {
-            applicationId "com.yuan.skeleton"
+            applicationId "com.yuan.house"
 
             versionCode code
-            versionName "1.1." + code
+            versionName "0.1." + code
 
-            minSdkVersion 15
-            targetSdkVersion 14
+            minSdkVersion Integer.parseInt(project.ANDROID_MIN_SDK)
+            targetSdkVersion Integer.parseInt(project.ANDROID_TARGET_SDK_VERSION)
 
             multiDexEnabled true
         }

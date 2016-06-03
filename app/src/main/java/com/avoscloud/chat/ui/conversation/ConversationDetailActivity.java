@@ -34,7 +34,7 @@ import com.avoscloud.leanchatlib.db.RoomsTable;
 import com.avoscloud.leanchatlib.model.ConversationType;
 import com.avoscloud.leanchatlib.view.ViewHolder;
 import com.yuan.skeleton.R;
-import com.yuan.skeleton.application.DMApplication;
+import com.yuan.house.application.DMApplication;
 
 import java.util.ArrayList;
 import java.util.Arrays;

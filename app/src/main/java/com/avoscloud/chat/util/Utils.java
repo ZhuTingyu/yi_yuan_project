@@ -31,7 +31,7 @@ import com.avos.avoscloud.AVUser;
 import com.avoscloud.leanchatlib.utils.DownloadUtils;
 import com.avoscloud.leanchatlib.utils.Logger;
 import com.yuan.skeleton.R;
-import com.yuan.skeleton.application.DMApplication;
+import com.yuan.house.application.DMApplication;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;

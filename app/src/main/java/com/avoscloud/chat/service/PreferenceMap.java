@@ -9,7 +9,7 @@ import com.avos.avoscloud.AVUser;
 import com.avoscloud.chat.entity.avobject.User;
 import com.avoscloud.leanchatlib.utils.Logger;
 import com.yuan.skeleton.R;
-import com.yuan.skeleton.application.DMApplication;
+import com.yuan.house.application.DMApplication;
 
 /**
  * Created by lzw on 14-6-19.

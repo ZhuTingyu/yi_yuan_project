@@ -10,7 +10,7 @@ import com.avoscloud.chat.util.SimpleNetTask;
 import com.avoscloud.chat.util.Utils;
 
 import com.yuan.skeleton.R;
-import com.yuan.skeleton.application.DMApplication;
+import com.yuan.house.application.DMApplication;
 
 import java.util.List;
 

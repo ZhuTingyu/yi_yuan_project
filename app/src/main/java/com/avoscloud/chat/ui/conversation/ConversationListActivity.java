@@ -20,7 +20,7 @@ import com.avoscloud.leanchatlib.adapter.BaseListAdapter;
 import com.avoscloud.leanchatlib.controller.ConversationHelper;
 import com.avoscloud.leanchatlib.view.ViewHolder;
 import com.yuan.skeleton.R;
-import com.yuan.skeleton.application.DMApplication;
+import com.yuan.house.application.DMApplication;
 
 import java.util.ArrayList;
 import java.util.List;

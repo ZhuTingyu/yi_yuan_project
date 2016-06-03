@@ -41,9 +41,9 @@ import com.dimo.http.RestClient;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.yuan.skeleton.R;
-import com.yuan.skeleton.application.DMApplication;
-import com.yuan.skeleton.common.Constants;
-import com.yuan.skeleton.utils.JsonParse;
+import com.yuan.house.application.DMApplication;
+import com.yuan.house.common.Constants;
+import com.yuan.house.utils.JsonParse;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
