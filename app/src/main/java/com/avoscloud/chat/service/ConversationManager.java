@@ -1,7 +1,13 @@
 package com.avoscloud.chat.service;
 
 import com.avos.avoscloud.AVException;
-import com.avos.avoscloud.im.v2.*;
+import com.avos.avoscloud.im.v2.AVIMClient;
+import com.avos.avoscloud.im.v2.AVIMConversation;
+import com.avos.avoscloud.im.v2.AVIMConversationEventHandler;
+import com.avos.avoscloud.im.v2.AVIMConversationQuery;
+import com.avos.avoscloud.im.v2.AVIMException;
+import com.avos.avoscloud.im.v2.AVIMMessage;
+import com.avos.avoscloud.im.v2.AVIMTypedMessage;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationQueryCallback;
@@ -13,10 +19,15 @@ import com.avoscloud.leanchatlib.controller.ConversationHelper;
 import com.avoscloud.leanchatlib.controller.MessageHelper;
 import com.avoscloud.leanchatlib.model.ConversationType;
 import com.avoscloud.leanchatlib.model.Room;
-import de.greenrobot.event.EventBus;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Created by lzw on 15/2/11.
@@ -78,7 +89,7 @@ public class ConversationManager {
     final AVException[] es = new AVException[1];
     CacheService.cacheConvs(convids, new AVIMConversationCallback() {
       @Override
-      public void done(AVException e) {
+      public void done(AVIMException e) {
         es[0] = e;
         latch.countDown();
       }
@@ -102,7 +113,7 @@ public class ConversationManager {
     conv.setName(newName);
     conv.updateInfoInBackground(new AVIMConversationCallback() {
       @Override
-      public void done(AVException e) {
+      public void done(AVIMException e) {
         if (e != null) {
           callback.done(e);
         } else {
@@ -156,7 +167,7 @@ public class ConversationManager {
     final CountDownLatch latch = new CountDownLatch(1);
     conv.queryMessages(msgId, time, limit, new AVIMMessagesQueryCallback() {
       @Override
-      public void done(List<AVIMMessage> avimMessages, AVException e) {
+      public void done(List<AVIMMessage> avimMessages, AVIMException e) {
         if (e != null) {
           es[0] = e;
         } else {

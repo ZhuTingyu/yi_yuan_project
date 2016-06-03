@@ -11,14 +11,15 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVQuery;
 import com.avos.avoscloud.AVUser;
 import com.avos.avoscloud.FindCallback;
 import com.avos.avoscloud.im.v2.AVIMConversation;
+import com.avos.avoscloud.im.v2.AVIMException;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
-
 import com.avoscloud.chat.entity.avobject.User;
 import com.avoscloud.chat.service.CacheService;
 import com.avoscloud.chat.service.ConversationManager;
@@ -32,10 +33,10 @@ import com.avoscloud.leanchatlib.model.ConversationType;
 import com.avoscloud.leanchatlib.view.ViewHolder;
 import com.yuan.skeleton.R;
 
-import de.greenrobot.event.EventBus;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Created by lzw on 14-10-11.
@@ -104,7 +105,7 @@ public class ConversationAddMembersActivity extends ConversationBaseActivity {
         members.addAll(conv().getMembers());
         conversationManager.createGroupConversation(members, new AVIMConversationCreatedCallback() {
           @Override
-          public void done(final AVIMConversation conversation, AVException e) {
+          public void done(final AVIMConversation conversation, AVIMException e) {
             if (filterException(e)) {
               EventBus eventBus = EventBus.getDefault();
               FinishEvent finishEvent = new FinishEvent();
@@ -116,7 +117,7 @@ public class ConversationAddMembersActivity extends ConversationBaseActivity {
       } else {
         conv().addMembers(checkedUsers, new AVIMConversationCallback() {
           @Override
-          public void done(AVException e) {
+          public void done(AVIMException e) {
             dialog.dismiss();
             if (filterException(e)) {
               Utils.toast(R.string.conversation_inviteSucceed);
