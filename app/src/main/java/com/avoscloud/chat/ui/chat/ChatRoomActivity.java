@@ -16,14 +16,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
-import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.im.v2.AVIMConversation;
+import com.avos.avoscloud.im.v2.AVIMException;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
 import com.avoscloud.chat.entity.AVIMUserInfoMessage;
@@ -42,9 +41,9 @@ import com.dimo.http.RestClient;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.yuan.skeleton.R;
-import com.yuan.skeleton.application.DMApplication;
-import com.yuan.skeleton.common.Constants;
-import com.yuan.skeleton.utils.JsonParse;
+import com.yuan.house.application.DMApplication;
+import com.yuan.house.common.Constants;
+import com.yuan.house.utils.JsonParse;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -66,15 +65,31 @@ import timber.log.Timber;
 public class ChatRoomActivity extends ChatActivity {
     public static final int LOCATION_REQUEST = 100;
     public static final int REQUEST_CODE_HOUSE = 101;
+    private static SharedPreferences prefs;
     private RelativeLayout chatroom;
     private LinearLayout bottomLayout;
-    private static SharedPreferences prefs;
-
     private WebView webView;
     private String value;
     private LinearLayout back;
-    private List<Map<String,Object>> houseInfos;
+    private List<Map<String, Object>> houseInfos;
     private GestureDetector gestureDetector;
+    private int mLastY = 0;
+    private GestureDetector.OnGestureListener onGestureListener =
+            new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+                                       float velocityY) {
+                    float x = e2.getX() - e1.getX();
+                    float y = e2.getY() - e1.getY();
+
+                    if (x > 0) {
+                        return true;
+                    } else if (x < 0) {
+                        return true;
+                    }
+                    return false;
+                }
+            };
 
     public static void chatByConversation(Context from, AVIMConversation conv) {
         CacheService.registerConv(conv);
@@ -87,21 +102,21 @@ public class ChatRoomActivity extends ChatActivity {
 
     public static void chatByUserId(final Activity from, String userId) {
         final ProgressDialog dialog = Utils.showSpinnerDialog(from);
-        if(prefs == null)
+        if (prefs == null)
             prefs = PreferenceManager.getDefaultSharedPreferences(from);
-        String houseId = prefs.getString("houseId",null);
-        String auditType = prefs.getString("auditType",null);
+        String houseId = prefs.getString("houseId", null);
+        String auditType = prefs.getString("auditType", null);
         StringBuffer sb = new StringBuffer();
-        if(auditType == null) {
+        if (auditType == null) {
             sb.append(houseId);
-        }else{
+        } else {
             sb.append("000");
             sb.append(auditType);
             sb.append(houseId);
         }
-        ChatManager.getInstance().fetchConversationWithUserId(sb.toString(),userId, new AVIMConversationCreatedCallback() {
+        ChatManager.getInstance().fetchConversationWithUserId(sb.toString(), userId, new AVIMConversationCreatedCallback() {
             @Override
-            public void done(AVIMConversation conversation, AVException e) {
+            public void done(AVIMConversation conversation, AVIMException e) {
                 dialog.dismiss();
                 if (Utils.filterException(e)) {
                     chatByConversation(from, conversation);
@@ -120,7 +135,7 @@ public class ChatRoomActivity extends ChatActivity {
 //        initLocation();
         initWebView();
         initHouseInfos();
-        gestureDetector = new GestureDetector(this,onGestureListener);
+        gestureDetector = new GestureDetector(this, onGestureListener);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -129,8 +144,7 @@ public class ChatRoomActivity extends ChatActivity {
         });
     }
 
-    private int mLastY = 0;
-    private void initWebView(){
+    private void initWebView() {
         this.webView = (WebView) findViewById(R.id.webview);
         this.webView.getSettings().setJavaScriptEnabled(true);
         this.webView.getSettings().setAllowFileAccess(true);
@@ -141,14 +155,14 @@ public class ChatRoomActivity extends ChatActivity {
         this.webView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_MOVE){
-                    final int  y = (int) event.getY();
-                    if(y < mLastY)
+                if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                    final int y = (int) event.getY();
+                    if (y < mLastY)
                         return true;
                     mLastY = y;
                 }
 
-                if(event.getAction() == MotionEvent.ACTION_UP)
+                if (event.getAction() == MotionEvent.ACTION_UP)
                     mLastY = 0;
 
                 return false;
@@ -157,7 +171,7 @@ public class ChatRoomActivity extends ChatActivity {
         this.bridge = new WebViewJavascriptBridge(this, webView, null);
         registerBridge();
         try {
-            if(JsonParse.getInstance().judgeUserType())
+            if (JsonParse.getInstance().judgeUserType())
                 redirectToLoadUrl("user_bbs.html");
             else
                 redirectToLoadUrl("agency_bbs.html");
@@ -167,24 +181,7 @@ public class ChatRoomActivity extends ChatActivity {
 
     }
 
-    private GestureDetector.OnGestureListener onGestureListener =
-            new GestureDetector.SimpleOnGestureListener() {
-                @Override
-                public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-                                       float velocityY) {
-                    float x = e2.getX() - e1.getX();
-                    float y = e2.getY() - e1.getY();
-
-                    if (x > 0) {
-                        return true;
-                    } else if (x < 0) {
-                        return true;
-                    }
-                   return false;
-                }
-            };
-
-    private void registerBridge(){
+    private void registerBridge() {
         bridge.registerHandler("setData", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
@@ -242,7 +239,7 @@ public class ChatRoomActivity extends ChatActivity {
             }
         });
 
-        bridge.registerHandler("showSampleMessageBoard",new WebViewJavascriptBridge.WVJBHandler() {
+        bridge.registerHandler("showSampleMessageBoard", new WebViewJavascriptBridge.WVJBHandler() {
 
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
@@ -253,13 +250,12 @@ public class ChatRoomActivity extends ChatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-//                layoutParams.height = Integer.parseInt(params.get("height_s"));
                 layoutParams.height = 130;
                 webView.setLayoutParams(layoutParams);
             }
         });
 
-        bridge.registerHandler("showHalfMessageBoard",new WebViewJavascriptBridge.WVJBHandler() {
+        bridge.registerHandler("showHalfMessageBoard", new WebViewJavascriptBridge.WVJBHandler() {
 
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
@@ -271,14 +267,13 @@ public class ChatRoomActivity extends ChatActivity {
                     e.printStackTrace();
                 }
                 int height = Integer.parseInt(params.get("height_m"));
-                layoutParams.height = ((int)((height+10) * getResources().getDisplayMetrics().density));
-//                    layoutParams.height = 350;
+                layoutParams.height = ((int) ((height + 10) * getResources().getDisplayMetrics().density));
                 webView.setLayoutParams(layoutParams);
                 bottomLayout.setVisibility(View.VISIBLE);
             }
         });
 
-        bridge.registerHandler("showFullMessageBoard",new WebViewJavascriptBridge.WVJBHandler() {
+        bridge.registerHandler("showFullMessageBoard", new WebViewJavascriptBridge.WVJBHandler() {
 
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
@@ -289,26 +284,30 @@ public class ChatRoomActivity extends ChatActivity {
 
                 layoutParams.height = dm.heightPixels;
 
-//                    layoutParams.height = 200;
                 webView.setLayoutParams(layoutParams);
                 bottomLayout.setVisibility(View.INVISIBLE);
             }
         });
 
-        bridge.registerHandler("webChangeHouse",new WebViewJavascriptBridge.WVJBHandler(){
+        bridge.registerHandler("webChangeHouse", new WebViewJavascriptBridge.WVJBHandler() {
 
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 Map<String, Object> map = null;
-                for (int i = 0; i < houseInfos.size(); i++){
+                for (int i = 0; i < houseInfos.size(); i++) {
                     map = houseInfos.get(i);
-                    String houseId = map.get("houseId").toString();
-                    if(houseId.equals(data))
-                        return;
+
+                    String houseId = null;
+                    if (map.get("houseId") != null) {
+                        houseId = map.get("houseId").toString();
+                    }
+
+                    if (data.equals(houseId)) return;
                 }
-                if(map == null)
-                    return;
-                List<String> images = JSON.parseObject(map.get("images").toString(),List.class);
+
+                if (map == null) return;
+
+                List<String> images = JSON.parseObject(map.get("images").toString(), List.class);
 
                 AVIMHouseInfoMessage message = new AVIMHouseInfoMessage();
                 message.setHouseName(map.get("estate_name").toString());
@@ -434,64 +433,66 @@ public class ChatRoomActivity extends ChatActivity {
         });
     }*/
 
-    private void initHouseInfos(){
-        String json = prefs.getString("userLogin",null);
-        Log.i("json",json);
+    private void initHouseInfos() {
+        String json = prefs.getString("userLogin", null);
+        Log.i("json", json);
         String userId = getUserId(json);
         String token = getToken(json);
         String url = null;
-        if(isUserLogin(json))
-            url = Constants.kWebServiceSwitchable + userId + "/" + prefs.getString("target_id",null);
+        if (isUserLogin(json))
+            url = Constants.kWebServiceSwitchable + userId + "/" + prefs.getString("target_id", null);
         else
-            url = Constants.kWebServiceSwitchable + prefs.getString("target_id",null) + "/" + userId;
+            url = Constants.kWebServiceSwitchable + prefs.getString("target_id", null) + "/" + userId;
 
         OkHttpUtils.get().url(url)
-                .addHeader("Content-Type","application/json")
-                .addHeader("token",token)
+                .addHeader("Content-Type", "application/json")
+                .addHeader("token", token)
                 .build()
                 .execute(new StringCallback() {
 
                     @Override
                     public void onBefore(Request request) {
                         super.onBefore(request);
-                        Log.i("onBefore","==================================================");
+                        Log.i("onBefore", "==================================================");
                     }
 
                     @Override
                     public void onError(Call call, Exception e) {
-                        Log.i("onError",e.getMessage());
+                        Log.i("onError", e.getMessage());
                     }
 
                     @Override
                     public void onResponse(String response) {
-                        Log.i("onResponse",response);
-                        List<Map<String,Object>> list = JSON.parseObject(response,new TypeReference<List<Map<String, Object>>>(){});
+                        Log.i("onResponse", response);
+                        List<Map<String, Object>> list = JSON.parseObject(response, new TypeReference<List<Map<String, Object>>>() {
+                        });
                         houseInfos = new ArrayList<>();
                         for (int i = 0; i < list.size(); i++) {
                             Map<String, Object> objectMap = list.get(i);
-                            Map<String,Object> houseMap = JSON.parseObject(objectMap.get("house_info").toString(),new TypeReference<Map<String, Object>>(){});
+                            Map<String, Object> houseMap = JSON.parseObject(objectMap.get("house_info").toString(), new TypeReference<Map<String, Object>>() {
+                            });
                             houseInfos.add(houseMap);
                         }
-                        Log.i("houseInfos",houseInfos.toString());
+                        Log.i("houseInfos", houseInfos.toString());
 
                     }
                 });
     }
 
-    private boolean isUserLogin(String json){
+    private boolean isUserLogin(String json) {
         HashMap<String, String> params = null;
         try {
             params = StringUtil.JSONString2HashMap(json);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        if(params.get("user_info") != null)
+        if (params.get("user_info") != null)
             return true;
         else
             return false;
     }
 
-    private String getToken(String json){
+    private String getToken(String json) {
         try {
             HashMap<String, String> params = StringUtil.JSONString2HashMap(json);
             return params.get("token");
@@ -501,10 +502,10 @@ public class ChatRoomActivity extends ChatActivity {
         return null;
     }
 
-    private String getUserId(String json){
+    private String getUserId(String json) {
         try {
             HashMap<String, String> params = StringUtil.JSONString2HashMap(json);
-            if(params.get("user_info") != null)
+            if (params.get("user_info") != null)
                 params = StringUtil.JSONString2HashMap(params.get("user_info"));
             else
                 params = StringUtil.JSONString2HashMap(params.get("agency_info"));
@@ -518,8 +519,8 @@ public class ChatRoomActivity extends ChatActivity {
 
     @Override
     protected void openHouseInfo() {
-        Intent intent = new Intent(this,HouseInfosActivity.class);
-        startActivityForResult(intent,REQUEST_CODE_HOUSE);
+        Intent intent = new Intent(this, HouseInfosActivity.class);
+        startActivityForResult(intent, REQUEST_CODE_HOUSE);
     }
 
     @Override
@@ -543,7 +544,7 @@ public class ChatRoomActivity extends ChatActivity {
         userInfoMessage.setAttrs(map);
         conversation.sendMessage(userInfoMessage, new AVIMConversationCallback() {
             @Override
-            public void done(AVException e) {
+            public void done(AVIMException e) {
                 if (e != null) {
                     Logger.d(e.getMessage());
                 }
@@ -599,7 +600,7 @@ public class ChatRoomActivity extends ChatActivity {
                 case REQUEST_CODE_HOUSE:
                     SerializableMap serializableMap = (SerializableMap) data.getSerializableExtra("data");
                     Map<String, Object> map = serializableMap.getMap();
-                    List<String> images = JSON.parseObject(map.get("images").toString(),List.class);
+                    List<String> images = JSON.parseObject(map.get("images").toString(), List.class);
 
                     AVIMHouseInfoMessage message = new AVIMHouseInfoMessage();
                     message.setHouseName(map.get("estate_name").toString());
@@ -609,7 +610,7 @@ public class ChatRoomActivity extends ChatActivity {
 
                     messageAgent.sendHouse(message);
 
-                    bridge.callHandler("nativeChangeHouse",map.get("id"));
+                    bridge.callHandler("nativeChangeHouse", map.get("id"));
 
                     break;
             }

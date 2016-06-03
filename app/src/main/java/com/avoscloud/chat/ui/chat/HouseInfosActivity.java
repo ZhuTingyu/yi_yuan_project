@@ -19,14 +19,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.avoscloud.chat.ui.entry.SerializableMap;
 import com.dimo.utils.StringUtil;
 import com.squareup.picasso.Picasso;
 import com.yuan.skeleton.R;
-import com.yuan.skeleton.common.Constants;
-import com.yuan.skeleton.utils.OkHttpClientManager;
+import com.yuan.house.common.Constants;
+import com.yuan.house.utils.OkHttpClientManager;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 

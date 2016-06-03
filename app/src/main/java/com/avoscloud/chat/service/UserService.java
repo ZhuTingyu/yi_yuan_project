@@ -9,7 +9,7 @@ import com.avoscloud.chat.entity.avobject.User;
 import com.avoscloud.chat.util.Utils;
 import com.avoscloud.leanchatlib.utils.Logger;
 
-import com.yuan.skeleton.application.DMApplication;
+import com.yuan.house.application.DMApplication;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.IOException;
