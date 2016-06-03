@@ -1,7 +1,6 @@
 package com.yuan.house.application;
 
 
-import android.app.Application;
 import android.app.Instrumentation;
 import android.app.Notification;
 import android.content.Context;
@@ -43,14 +42,14 @@ import com.lfy.dao.MessageDao;
 import com.loopj.android.http.FileAsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.yuan.house.activities.SplashActivity;
-import com.yuan.house.common.Constants;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.thin.downloadmanager.DownloadRequest;
 import com.thin.downloadmanager.DownloadStatusListener;
 import com.thin.downloadmanager.ThinDownloadManager;
+import com.yuan.house.activities.SplashActivity;
+import com.yuan.house.common.Constants;
 
 import org.apache.http.Header;
 import org.json.JSONException;
@@ -127,7 +126,7 @@ public class DMApplication extends MultiDexApplication {
 
         // Perform injection
         Injector.init(getRootModule(), this);
-//        initAnerdaDatabase();
+        initAnerdaDatabase();
 
         Utils.fixAsyncTaskBug();
 
