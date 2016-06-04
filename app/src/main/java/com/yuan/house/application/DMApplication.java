@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.StrictMode;
+import android.support.multidex.MultiDexApplication;
 import android.support.v4.BuildConfig;
 
 import com.avos.avoscloud.AVAnalytics;
@@ -66,7 +67,7 @@ import timber.log.Timber;
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.FROYO;
 
-public class DMApplication extends Application {
+public class DMApplication extends MultiDexApplication {
     public static boolean debug = true;
 
     private static DMApplication instance;
@@ -126,7 +127,7 @@ public class DMApplication extends Application {
 
         // Perform injection
         Injector.init(getRootModule(), this);
-        initAnerdaDatabase();
+//        initAnerdaDatabase();
 
         Utils.fixAsyncTaskBug();
 
