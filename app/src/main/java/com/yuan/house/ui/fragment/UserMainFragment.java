@@ -10,10 +10,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.baidu.location.BDLocation;
-import com.baidu.location.BDLocationListener;
-import com.baidu.location.LocationClient;
-import com.baidu.location.LocationClientOption;
 import com.dimo.utils.StringUtil;
 import com.yuan.house.activities.MainActivity;
 import com.yuan.house.activities.MapActivity;
@@ -27,7 +23,6 @@ import java.util.HashMap;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
-import timber.log.Timber;
 
 /**
  * Created by KevinLee on 2016/4/21.
@@ -35,8 +30,7 @@ import timber.log.Timber;
 public class UserMainFragment extends WebViewBaseFragment {
 
     private static final int REQUEST_MAP_CODE = 0XFF01;
-    public LocationClient locClient;
-    public TCLocationListener locationListener;
+
     @InjectView(R.id.rl_center)
     LinearLayout center;
     @InjectView(R.id.address)
@@ -60,8 +54,6 @@ public class UserMainFragment extends WebViewBaseFragment {
         ButterKnife.inject(this, view);
 
         redirectToLoadUrl("user_index.html");
-
-        initBaiduLocClient();
 
         return view;
     }
@@ -102,39 +94,6 @@ public class UserMainFragment extends WebViewBaseFragment {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    private void initBaiduLocClient() {
-        locClient = new LocationClient(getContext());
-        locClient.setDebug(true);
-        LocationClientOption option = new LocationClientOption();
-        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
-        option.setScanSpan(5000);
-        option.setCoorType("bd09ll");
-        option.setIsNeedAddress(true);
-        locClient.setLocOption(option);
-
-        locationListener = new TCLocationListener();
-        locClient.registerLocationListener(locationListener);
-        locClient.start();
-    }
-
-    public class TCLocationListener implements BDLocationListener {
-        @Override
-        public void onReceiveLocation(BDLocation location) {
-            double latitude = location.getLatitude();
-            double longitude = location.getLongitude();
-            int locType = location.getLocType();
-
-            Timber.v("onReceiveLocation latitude=" + latitude + " longitude=" + longitude
-                    + " locType=" + locType + " address=" + location.getAddrStr());
-
-            if (address != null) {
-                address.setText(location.getStreet());
-            }
-
-            locClient.stop();
         }
     }
 }

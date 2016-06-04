@@ -470,10 +470,19 @@ public class ChatRoomActivity extends ChatActivity {
         if (webView == null) {
             return;
         }
-        String htmlExtractedFolder = DMApplication.getInstance().getHtmlExtractedFolder();
-        mUrl = htmlExtractedFolder + "/pages/" + url;
+
+        String rootPagesFolder = DMApplication.getInstance().getRootPagesFolder();
+
+        if (StringUtil.isValidHTTPUrl(url)) {
+            mUrl = url;
+        } else {
+            mUrl = rootPagesFolder + "/" + url;
+        }
+
         Timber.i("URL - " + mUrl);
+
         if (StringUtil.isValidHTTPUrl(mUrl)) {
+            // url is web link
             webView.loadUrl(mUrl);
         } else {
             webView.loadUrl("file:///" + mUrl);

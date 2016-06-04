@@ -48,12 +48,12 @@ public class IPSettingActivity extends Activity {
         if (TextUtils.isEmpty(inputRaw)) {
             if (!TextUtils.isEmpty(ip)) {
                 DMApplication.getInstance().setHtmlExtractedFolder(ip);
-                DMApplication.getInstance().setRootPagesFolder(ip + "/pages");
+                DMApplication.getInstance().setRootPagesFolder(ip + "/html/pages");
             }
         } else {
             input = "http://" + inputRaw;
             DMApplication.getInstance().setHtmlExtractedFolder(input);
-            DMApplication.getInstance().setRootPagesFolder(input + "/pages");
+            DMApplication.getInstance().setRootPagesFolder(input + "/html/pages");
             preferences.edit().putString("ip_settings", inputRaw).commit();
         }
 
