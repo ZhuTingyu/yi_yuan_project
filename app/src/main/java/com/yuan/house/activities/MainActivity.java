@@ -1,5 +1,6 @@
 package com.yuan.house.activities;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -15,18 +16,15 @@ import com.avos.avoscloud.AVInstallation;
 import com.avos.avoscloud.AVUser;
 import com.avos.avoscloud.LogInCallback;
 import com.avos.avoscloud.PushService;
-import com.avoscloud.chat.entity.avobject.User;
 import com.avoscloud.chat.service.CacheService;
 import com.avoscloud.chat.service.PreferenceMap;
 import com.avoscloud.chat.service.UserService;
 import com.avoscloud.leanchatlib.controller.ChatManager;
-import com.avoscloud.leanchatlib.utils.NetAsyncTask;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
-import com.dimo.http.RestClient;
-import com.dimo.web.WebViewJavascriptBridge;
+import com.dimo.utils.StringUtil;
 import com.umeng.update.UmengUpdateAgent;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
@@ -40,10 +38,12 @@ import com.yuan.house.ui.fragment.UserMessageFragment;
 import com.yuan.house.ui.fragment.UserProposalFragment;
 import com.yuan.house.ui.fragment.WebViewBaseFragment;
 import com.yuan.house.ui.fragment.WebViewFragment;
+import com.yuan.house.utils.ToastUtil;
 import com.yuan.skeleton.R;
 
 import org.json.JSONException;
-import org.json.JSONObject;
+
+import java.util.HashMap;
 
 import butterknife.ButterKnife;
 import de.greenrobot.event.EventBus;
@@ -275,88 +275,69 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         bottomNavigationBar.selectTab(1);
     }
 
-    public void onBridgeSignIn (final String data){
+    public void onBridgeSignIn(final String data) {
+        HashMap<String, String> params = null;
         try {
-            final JSONObject userLogin = new JSONObject(data);
-            final String chat_service_id = userLogin.has("chat_service_id") ? userLogin.getString("chat_service_id") : null;
-            final String chat_service_passwd = userLogin.has("chat_service_passwd") ? userLogin.getString("chat_service_passwd") : null;
-            if (TextUtils.isEmpty(chat_service_id)) {
-                Timber.e("Empty");
-            } else {
+            params = StringUtil.JSONString2HashMap(data);
 
+            String key = params.get("key");
+            String value = params.get("value");
+
+            SharedPreferences.Editor editor = prefs.edit();
+            if (value == null || value.equals("null")) {
+                editor.remove(key);
+            } else {
+                editor.putString(key, value);
             }
+            editor.apply();
 
-            if(userLogin.isNull("chat_user_id") || TextUtils.isEmpty(userLogin.getString("chat_user_id"))) {
-                NetAsyncTask task = new NetAsyncTask(MainActivity.this) {
-                    @Override
-                    protected void doInBack() throws Exception {
-                        AVUser user = UserService.signUp(chat_service_id, chat_service_passwd);
-                        User.setGender(user, userLogin.getInt("gender")==1? User.Gender.Male:User.Gender.Female);
-                        user.setFetchWhenSave(true);
-                        user.save();
-                    }
+            if (Constants.kWebDataKeyUserLogin.equals(key)) {
+                params = StringUtil.JSONString2HashMap(data);
+                params = StringUtil.JSONString2HashMap(params.get("value"));
+                if (params.get("user_info") != null) {
+                    params = StringUtil.JSONString2HashMap(params.get("user_info"));
+                } else {
+                    params = StringUtil.JSONString2HashMap(params.get("agency_info"));
+                }
 
-                    @Override
-                    protected void onPost(Exception e) {
-                        if (e != null) {
-                            Timber.e(e, "failed on register av user");
-                        } else {
-                            UserService.updateUserLocation();
-                        }
-                        final AVUser avUser = AVUser.getCurrentUser();
-                        try {
-                            JSONObject request = new JSONObject();
-                            request.put("url", "/user/"+userLogin.getInt("id"));
-                            request.put("headers", new JSONObject("{\"access-key\":\"" + userLogin.getString("access_key") + "\"}"));
-                            request.put("data", new JSONObject("{\"chat_user_id\":\"" + avUser.getObjectId() + "\"}"));
-                            RestClient.getInstance().bridgeRequest(request, RestClient.METHOD_PUT, new WebViewJavascriptBridge.WVJBResponseCallback() {
-                                @Override
-                                public void callback(Object data) {
-                                    try {
-                                        JSONObject response = new JSONObject(data.toString());
-                                        if(response.getInt("status")==200) {
-                                            userLogin.put("chat_user_id", avUser.getObjectId());
-                                            prefs.edit().putString(Constants.kLeanChatCurrentUserObjectId, avUser.getObjectId()).commit();
-                                            prefs.edit().putString("avUserLogin", userLogin.toString()).commit();
-//                                            startActivity(new Intent(SignInActivity.this, MainActivity.class));
-//                                            finish();
-                                        }
-                                    } catch (JSONException e1) {
-                                        e1.printStackTrace();
-                                    }
-                                    Timber.i("upload chat_user_id response:" + data);
-                                }
-                            });
-                        } catch (Exception e1) {
-                            Timber.e(e1, "error on upload chat_user_id");
-                        }
-                    }
-                };
+                String userName = params.get("lean_user");
+                String passwd = params.get("lean_passwd");
 
-                task.execute();
-            } else {
-                //TODO: handler after login to own server success
-                AVUser.logInInBackground(chat_service_id,
-                        chat_service_passwd,
-                        new LogInCallback<AVUser>() {
-                            @Override
-                            public void done(AVUser avUser, AVException e) {
-                                if (avUser != null) {
-                                    String chatUserId = avUser.getObjectId();
-                                    prefs.edit().putString("avUserLogin", data).apply();
-                                    prefs.edit().putString(Constants.kLeanChatCurrentUserObjectId, chatUserId).commit();
-                                    UserService.updateUserLocation();
-                                }
-
-//                                startActivity(new Intent(SignInActivity.this, MainActivity.class));
-//                                finish();
-                            }
-                        });
+                avUserLogin(userName, passwd);
             }
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private void avUserLogin(final String userName, String userPass) {
+        //TODO: handler after login to own server success
+        AVUser.logInInBackground(userName, userPass,
+                new LogInCallback<AVUser>() {
+                    @Override
+                    public void done(AVUser avUser, AVException e) {
+                        if (avUser != null) {
+                            String chatUserId = avUser.getObjectId();
+                            prefs.edit().putString("avUserLogin", userName)
+                                    .putString(Constants.kLeanChatCurrentUserObjectId, chatUserId)
+                                    .apply();
+                            UserService.updateUserLocation();
+                            ChatManager chatManager = ChatManager.getInstance();
+                            chatManager.setupDatabaseWithSelfId(AVUser.getCurrentUser().getObjectId());
+                            chatManager.openClientWithSelfId(AVUser.getCurrentUser().getObjectId(), null);
+                            CacheService.registerUser(AVUser.getCurrentUser());
+
+                            prefs.edit().putBoolean("isLogin", true).commit();
+
+                            switchToFragment(Constants.kFragmentTagNearby);
+                            getBottomNavigationBar().clearAll();
+                            setupTabbarClickListener();
+                        } else {
+                            ToastUtil.showShort(mContext, "leancould登陆失败");
+                        }
+                    }
+                });
     }
 
     public class TCLocationListener implements BDLocationListener {
@@ -372,6 +353,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
             AVUser user = AVUser.getCurrentUser();
             if (user != null) {
                 PreferenceMap preferenceMap = new PreferenceMap(DMApplication.getInstance(), user.getObjectId());
+
                 AVGeoPoint avGeoPoint = preferenceMap.getLocation();
                 if (avGeoPoint != null && avGeoPoint.getLatitude() == location.getLatitude()
                         && avGeoPoint.getLongitude() == location.getLongitude()) {
