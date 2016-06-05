@@ -12,20 +12,13 @@ import com.avos.avoscloud.LogInCallback;
 import com.avoscloud.chat.service.CacheService;
 import com.avoscloud.chat.service.UserService;
 import com.avoscloud.leanchatlib.controller.ChatManager;
-import com.dimo.utils.StringUtil;
-import com.dimo.web.WebViewJavascriptBridge;
-import com.yuan.skeleton.R;
 import com.yuan.house.activities.MainActivity;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
 import com.yuan.house.utils.ToastUtil;
-
-import org.json.JSONException;
-
-import java.util.HashMap;
+import com.yuan.skeleton.R;
 
 import butterknife.ButterKnife;
-import timber.log.Timber;
 
 /**
  * Created by KevinLee on 2016/4/22.
@@ -57,40 +50,40 @@ public class LoginFragment extends WebViewBaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        ((MainActivity)getActivity()).bridge.registerHandler("setData", new WebViewJavascriptBridge.WVJBHandler() {
-
-            @Override
-            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                Timber.v("setData got:" + data);
-                HashMap<String, String> params = null;
-                try {
-                    params = StringUtil.JSONString2HashMap(data);
-
-                    String key = params.get("key");
-                    String value = params.get("value");
-
-                    if (value == null || value.equals("null"))
-                        ((MainActivity)getActivity()).prefs.edit().remove(key).commit();
-                    else
-                        ((MainActivity)getActivity()).prefs.edit().putString(key, value).commit();
-
-                    if("userLogin".equals(key)){
-                        params = StringUtil.JSONString2HashMap(data);
-                        params = StringUtil.JSONString2HashMap(params.get("value"));
-                        if(params.get("user_info") != null)
-                            params = StringUtil.JSONString2HashMap(params.get("user_info"));
-                        else
-                            params = StringUtil.JSONString2HashMap(params.get("agency_info"));
-                        String userName = params.get("lean_user");
-                        String passwd = params.get("lean_passwd");
-                        avUserLogin(userName,passwd);
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+//        ((MainActivity)getActivity()).bridge.registerHandler("setData", new WebViewJavascriptBridge.WVJBHandler() {
+//
+//            @Override
+//            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+//                Timber.v("setData got:" + data);
+//                HashMap<String, String> params = null;
+//                try {
+//                    params = StringUtil.JSONString2HashMap(data);
+//
+//                    String key = params.get("key");
+//                    String value = params.get("value");
+//
+//                    if (value == null || value.equals("null"))
+//                        ((MainActivity)getActivity()).prefs.edit().remove(key).commit();
+//                    else
+//                        ((MainActivity)getActivity()).prefs.edit().putString(key, value).commit();
+//
+//                    if("userLogin".equals(key)){
+//                        params = StringUtil.JSONString2HashMap(data);
+//                        params = StringUtil.JSONString2HashMap(params.get("value"));
+//                        if(params.get("user_info") != null)
+//                            params = StringUtil.JSONString2HashMap(params.get("user_info"));
+//                        else
+//                            params = StringUtil.JSONString2HashMap(params.get("agency_info"));
+//                        String userName = params.get("lean_user");
+//                        String passwd = params.get("lean_passwd");
+//                        avUserLogin(userName,passwd);
+//                    }
+//
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
 
     }
 

@@ -382,7 +382,7 @@ public class UserProposalFragment extends WebViewBaseFragment {
                 category = 0;
                 break;
             case R.id.btn_other:
-                mPopupWindow.showAtLocation(webView, Gravity.BOTTOM, 0, 0);
+                mPopupWindow.showAtLocation(mWebView, Gravity.BOTTOM, 0, 0);
                 mPopupWindow.setAnimationStyle(R.style.app_pop);
                 mPopupWindow.setOutsideTouchable(true);
                 mPopupWindow.setFocusable(true);

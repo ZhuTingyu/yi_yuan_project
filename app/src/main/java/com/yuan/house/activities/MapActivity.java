@@ -29,8 +29,8 @@ import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.yuan.skeleton.R;
 import com.yuan.house.application.Injector;
+import com.yuan.skeleton.R;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -188,11 +188,11 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
 
         city = reverseGeoCodeResult.getAddressDetail().city;
 
-        Log.i("Address",reverseGeoCodeResult.getAddress());
-        Log.i("city",reverseGeoCodeResult.getAddressDetail().city);
-        Log.i("district",reverseGeoCodeResult.getAddressDetail().district);
-        Log.i("province",reverseGeoCodeResult.getAddressDetail().province);
-        Log.i("street",reverseGeoCodeResult.getAddressDetail().street);
+//        Log.i("Address",reverseGeoCodeResult.getAddress());
+//        Log.i("city",reverseGeoCodeResult.getAddressDetail().city);
+//        Log.i("district",reverseGeoCodeResult.getAddressDetail().district);
+//        Log.i("province",reverseGeoCodeResult.getAddressDetail().province);
+//        Log.i("street",reverseGeoCodeResult.getAddressDetail().street);
 
         Map<String,String> map = new HashMap<>();
         map.put("addr",reverseGeoCodeResult.getAddress());
@@ -202,6 +202,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         map.put("street",reverseGeoCodeResult.getAddressDetail().street);
         map.put("lat",String.valueOf(latitude));
         map.put("lng",String.valueOf(longitude));
+
         Gson gson = new GsonBuilder().enableComplexMapKeySerialization()
                 .create();
         json = gson.toJson(map);
@@ -246,6 +247,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
     @Override
     protected void onResume() {
         super.onResume();
+
         mMapView.onResume();
         locClient.start();
     }
@@ -253,6 +255,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
     @Override
     protected void onPause() {
         super.onPause();
+
         //在activity执行onPause时执行mMapView. onPause ()，实现地图生命周期管理
         mMapView.onPause();
         locClient.stop();

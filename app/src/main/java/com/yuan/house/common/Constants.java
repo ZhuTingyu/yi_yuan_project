@@ -25,6 +25,7 @@ public class Constants {
 
 //TODO: not working with query parameters..
     public static String kWebPageEntry = "nearby.html";
+    public static String kWebPageLogin = "login.html";
 
     // Web package version
     public static String kWebPackageVersionCached = "kWebPackageVersionCached";
@@ -68,4 +69,9 @@ public class Constants {
     public static String kBugTagsKey = "8b503a091aab6e57b03e1df7d01c1b85";
 
     public static String kLeanChatCurrentUserObjectId = "kLeanChatCurrentUserObjectId";
+
+    public static String kWebDataKeyUserLogin = "userLogin";
+    public static String kWebDataKeyLoginType = "LoginType";
+    public static String kWebDataKeyTags = "Tags";
+
 }

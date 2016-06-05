@@ -9,21 +9,25 @@ import android.view.MenuItem;
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.avos.avoscloud.AVAnalytics;
+import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVGeoPoint;
 import com.avos.avoscloud.AVInstallation;
 import com.avos.avoscloud.AVUser;
+import com.avos.avoscloud.LogInCallback;
 import com.avos.avoscloud.PushService;
+import com.avoscloud.chat.entity.avobject.User;
 import com.avoscloud.chat.service.CacheService;
 import com.avoscloud.chat.service.PreferenceMap;
 import com.avoscloud.chat.service.UserService;
 import com.avoscloud.leanchatlib.controller.ChatManager;
+import com.avoscloud.leanchatlib.utils.NetAsyncTask;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
+import com.dimo.http.RestClient;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.umeng.update.UmengUpdateAgent;
-import com.yuan.skeleton.R;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
@@ -36,6 +40,10 @@ import com.yuan.house.ui.fragment.UserMessageFragment;
 import com.yuan.house.ui.fragment.UserProposalFragment;
 import com.yuan.house.ui.fragment.WebViewBaseFragment;
 import com.yuan.house.ui.fragment.WebViewFragment;
+import com.yuan.skeleton.R;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import butterknife.ButterKnife;
 import de.greenrobot.event.EventBus;
@@ -105,25 +113,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         } else {
             switchToFragment(Constants.kFragmentTagLogin);
         }
-
-    }
-
-    @Override
-    protected void registerHandle() {
-        super.registerHandle();
-        bridge.registerHandler("dropToMessage", new WebViewJavascriptBridge.WVJBHandler() {
-            @Override
-            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                bottomNavigationBar.selectTab(1);
-            }
-        });
-
-        bridge.registerHandler("updateFriendRelationship", new WebViewJavascriptBridge.WVJBHandler() {
-            @Override
-            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                bottomNavigationBar.selectTab(0);
-            }
-        });
     }
 
     @Override
@@ -147,12 +136,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
      * @param notif notification body
      */
     private void callbackWhenGetNotification(String notif) {
-        bridge.callHandler("callbackWhenGetNotification", notif, new WebViewJavascriptBridge.WVJBResponseCallback() {
-            @Override
-            public void callback(Object data) {
-                Timber.v("Transfer notification to JS successed");
-            }
-        });
     }
 
     @Override
@@ -282,6 +265,98 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         mFragmentTransaction = mFragmentManager.beginTransaction();
         mFragmentTransaction.replace(R.id.content_frame, getFragment(tag), tag);
         mFragmentTransaction.commit();
+    }
+
+    public void onBridgeUpdateFriendRelationship() {
+        bottomNavigationBar.selectTab(0);
+    }
+
+    public void onBridgeDropToMessage() {
+        bottomNavigationBar.selectTab(1);
+    }
+
+    public void onBridgeSignIn (final String data){
+        try {
+            final JSONObject userLogin = new JSONObject(data);
+            final String chat_service_id = userLogin.has("chat_service_id") ? userLogin.getString("chat_service_id") : null;
+            final String chat_service_passwd = userLogin.has("chat_service_passwd") ? userLogin.getString("chat_service_passwd") : null;
+            if (TextUtils.isEmpty(chat_service_id)) {
+                Timber.e("Empty");
+            } else {
+
+            }
+
+            if(userLogin.isNull("chat_user_id") || TextUtils.isEmpty(userLogin.getString("chat_user_id"))) {
+                NetAsyncTask task = new NetAsyncTask(MainActivity.this) {
+                    @Override
+                    protected void doInBack() throws Exception {
+                        AVUser user = UserService.signUp(chat_service_id, chat_service_passwd);
+                        User.setGender(user, userLogin.getInt("gender")==1? User.Gender.Male:User.Gender.Female);
+                        user.setFetchWhenSave(true);
+                        user.save();
+                    }
+
+                    @Override
+                    protected void onPost(Exception e) {
+                        if (e != null) {
+                            Timber.e(e, "failed on register av user");
+                        } else {
+                            UserService.updateUserLocation();
+                        }
+                        final AVUser avUser = AVUser.getCurrentUser();
+                        try {
+                            JSONObject request = new JSONObject();
+                            request.put("url", "/user/"+userLogin.getInt("id"));
+                            request.put("headers", new JSONObject("{\"access-key\":\"" + userLogin.getString("access_key") + "\"}"));
+                            request.put("data", new JSONObject("{\"chat_user_id\":\"" + avUser.getObjectId() + "\"}"));
+                            RestClient.getInstance().bridgeRequest(request, RestClient.METHOD_PUT, new WebViewJavascriptBridge.WVJBResponseCallback() {
+                                @Override
+                                public void callback(Object data) {
+                                    try {
+                                        JSONObject response = new JSONObject(data.toString());
+                                        if(response.getInt("status")==200) {
+                                            userLogin.put("chat_user_id", avUser.getObjectId());
+                                            prefs.edit().putString(Constants.kLeanChatCurrentUserObjectId, avUser.getObjectId()).commit();
+                                            prefs.edit().putString("avUserLogin", userLogin.toString()).commit();
+//                                            startActivity(new Intent(SignInActivity.this, MainActivity.class));
+//                                            finish();
+                                        }
+                                    } catch (JSONException e1) {
+                                        e1.printStackTrace();
+                                    }
+                                    Timber.i("upload chat_user_id response:" + data);
+                                }
+                            });
+                        } catch (Exception e1) {
+                            Timber.e(e1, "error on upload chat_user_id");
+                        }
+                    }
+                };
+
+                task.execute();
+            } else {
+                //TODO: handler after login to own server success
+                AVUser.logInInBackground(chat_service_id,
+                        chat_service_passwd,
+                        new LogInCallback<AVUser>() {
+                            @Override
+                            public void done(AVUser avUser, AVException e) {
+                                if (avUser != null) {
+                                    String chatUserId = avUser.getObjectId();
+                                    prefs.edit().putString("avUserLogin", data).apply();
+                                    prefs.edit().putString(Constants.kLeanChatCurrentUserObjectId, chatUserId).commit();
+                                    UserService.updateUserLocation();
+                                }
+
+//                                startActivity(new Intent(SignInActivity.this, MainActivity.class));
+//                                finish();
+                            }
+                        });
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public class TCLocationListener implements BDLocationListener {

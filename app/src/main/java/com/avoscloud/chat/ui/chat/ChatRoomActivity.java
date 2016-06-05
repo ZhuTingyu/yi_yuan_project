@@ -683,7 +683,7 @@ public class ChatRoomActivity extends ChatActivity {
 
                     messageAgent.sendHouse(message);
 
-                    bridge.callHandler("nativeChangeHouse", map.get("id"));
+//                    bridge.callHandler("nativeChangeHouse", map.get("id"));
 
                     break;
             }

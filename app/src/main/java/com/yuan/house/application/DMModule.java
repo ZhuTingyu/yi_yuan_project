@@ -5,7 +5,6 @@ package com.yuan.house.application;
 import com.yuan.house.activities.IPSettingActivity;
 import com.yuan.house.activities.MainActivity;
 import com.yuan.house.activities.MapActivity;
-import com.yuan.house.activities.SignInActivity;
 import com.yuan.house.activities.SplashActivity;
 import com.yuan.house.activities.TutorialActivity;
 import com.yuan.house.activities.WebViewActivity;
@@ -39,7 +38,7 @@ import dagger.Module;
                         MainActivity.class,
                         WebViewBasedActivity.class,
                         WebViewActivity.class,
-                        SignInActivity.class,
+
                         MapActivity.class,
 
                         WebViewBaseFragment.class,

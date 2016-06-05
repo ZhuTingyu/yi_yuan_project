@@ -72,8 +72,8 @@ public class WebViewJavascriptBridge implements Serializable {
             webView.loadUrl("javascript:" + script);
         }
     }
-;
-    public static String convertStreamToString(java.io.InputStream is) {
+    ;
+    public static String convertStreamToString(InputStream is) {
         String s = "";
         try {
             Scanner scanner = new Scanner(is, "UTF-8").useDelimiter("\\A");
@@ -91,8 +91,6 @@ public class WebViewJavascriptBridge implements Serializable {
             Timber.v("Web View onPageFinished");
 
             loadWebViewJavascriptBridgeJs(webView);
-
-//            EventBus.getDefault().post(new PageEvent(PageEvent.PageEventEnum.FINISHED, webView.getTitle()));
         }
     }
 
@@ -148,6 +146,7 @@ public class WebViewJavascriptBridge implements Serializable {
         message.put("responseData", data);
         _dispatchMessage(message);
     }
+
     @JavascriptInterface
     public void _handleMessageFromJs(final String data, String responseId,
                                      String responseData, String callbackId, String handlerName) {
@@ -192,20 +191,6 @@ public class WebViewJavascriptBridge implements Serializable {
         _sendData(data, responseCallback, null);
     }
 
-    private void _sendData(Object data, WVJBResponseCallback responseCallback, String handlerName) {
-        Map<String, Object> message = new HashMap<>();
-        message.put("data", data);
-        if (null != responseCallback) {
-            String callbackId = "java_cb_" + (++_uniqueId);
-            _responseCallbacks.put(callbackId, responseCallback);
-            message.put("callbackId", callbackId);
-        }
-        if (null != handlerName) {
-            message.put("handlerName", handlerName);
-        }
-        _dispatchMessage(message);
-    }
-
     private void _sendData(String data, WVJBResponseCallback responseCallback, String handlerName) {
         Map<String, Object> message = new HashMap<>();
         message.put("data", data);
@@ -240,14 +225,6 @@ public class WebViewJavascriptBridge implements Serializable {
 
     public void callHandler(String handlerName, String data) {
         callHandler(handlerName, data, null);
-    }
-
-    public void callHandler(String handlerName, Object data) {
-        callHandler(handlerName, data, null);
-    }
-
-    public void callHandler(String handlerName, Object data, WVJBResponseCallback responseCallback) {
-        _sendData(data, responseCallback, handlerName);
     }
 
     public void callHandler(String handlerName, String data, WVJBResponseCallback responseCallback) {

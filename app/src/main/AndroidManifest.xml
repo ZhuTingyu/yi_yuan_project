@@ -76,7 +76,6 @@
         <activity android:name="com.yuan.house.activities.WebViewActivity"
             android:screenOrientation="portrait" />
 
-        <activity android:name="com.yuan.house.activities.SignInActivity" android:screenOrientation="portrait" />
         <activity android:name="com.yuan.house.activities.MapActivity" android:screenOrientation="portrait" />
         <activity android:name="com.yuan.house.activities.ImagePagerActivity" android:screenOrientation="portrait" />
         <activity android:name="com.avoscloud.chat.ui.chat.HouseInfosActivity" android:screenOrientation="portrait" />

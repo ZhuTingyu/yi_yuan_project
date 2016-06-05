@@ -214,7 +214,7 @@ public class DMApplication extends MultiDexApplication {
 
         initImageLoader(instance);
         // FIXME: Crash here
-        initBaidu();
+//        initBaidu();
 
 //        if (debug) {
 //            openStrictMode();
