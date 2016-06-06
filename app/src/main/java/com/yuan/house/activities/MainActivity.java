@@ -29,6 +29,7 @@ import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
 import com.yuan.house.event.AuthEvent;
+import com.yuan.house.event.LocationEvent;
 import com.yuan.house.event.PageEvent;
 import com.yuan.house.ui.fragment.AgencyMainFragment;
 import com.yuan.house.ui.fragment.AgencyMessageFragment;
@@ -56,7 +57,7 @@ import timber.log.Timber;
 public class MainActivity extends WebViewBasedActivity implements WebViewFragment.OnFragmentInteractionListener {
     public static MainActivity instance;
     public LocationClient locClient;
-    public TCLocationListener locationListener;
+    public HouseLocationListener locationListener;
 
     String cachedNotificationPayload;
     private BottomNavigationBar bottomNavigationBar;
@@ -318,7 +319,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
     }
 
     private void initBaiduLocClient() {
-        locClient = new LocationClient(this.getApplicationContext());
+        locClient = new LocationClient(mContext);
         locClient.setDebug(true);
         LocationClientOption option = new LocationClientOption();
         option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
@@ -327,12 +328,12 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         option.setIsNeedAddress(true);
         locClient.setLocOption(option);
 
-        locationListener = new TCLocationListener();
+        locationListener = new HouseLocationListener();
         locClient.registerLocationListener(locationListener);
         locClient.start();
     }
 
-    public class TCLocationListener implements BDLocationListener {
+    public class HouseLocationListener implements BDLocationListener {
         @Override
         public void onReceiveLocation(BDLocation location) {
             double latitude = location.getLatitude();
@@ -340,10 +341,15 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
             int locType = location.getLocType();
 
-            Timber.v("onReceiveLocation latitude=" + latitude + " longitude=" + longitude
-                    + " locType=" + locType + " address=" + location.getAddrStr());
+            Timber.v("onReceiveLocation latitude=" + latitude +
+                    " longitude=" + longitude +
+                    " locType=" + locType +
+                    " address=" + location.getAddrStr());
 
             DMApplication.getInstance().setLastActivatedLocation(location);
+
+            // tell subscriber to update location
+            EventBus.getDefault().post(new LocationEvent(LocationEvent.LocationEventEnum.UPDATED, location));
 
             AVUser user = AVUser.getCurrentUser();
             if (user != null) {

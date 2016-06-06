@@ -121,12 +121,11 @@
         </activity>
 
         <!--baidu location service-->
-        <!--<meta-data-->
-            <!--android:name="com.baidu.lbsapi.API_KEY"-->
-            <!--android:value="0IDGYMrRuOOuMrSERGgbFwzq" />&lt;!&ndash; key for yang's mac &ndash;&gt;-->
+        <!--http://lbsyun.baidu.com/apiconsole/key/update?app-id=8228474-->
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="EAsWQelCGVqigficOcu92fOmrWec1Eh5" /><!-- key for yang's home -->
+            android:value="q3WKKSo5y2OmcZUGULswSVbP9mreqdT3" />
+
         <service android:name="com.baidu.location.f" android:enabled="true" android:process=":remote">
         </service>
 

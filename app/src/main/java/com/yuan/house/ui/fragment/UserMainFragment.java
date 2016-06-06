@@ -4,17 +4,21 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.baidu.location.BDLocation;
 import com.dimo.utils.StringUtil;
 import com.yuan.house.activities.MainActivity;
 import com.yuan.house.activities.MapActivity;
+import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
+import com.yuan.house.event.LocationEvent;
 import com.yuan.skeleton.R;
 
 import org.json.JSONException;
@@ -24,6 +28,7 @@ import java.util.HashMap;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import de.greenrobot.event.EventBus;
 
 /**
  * Created by KevinLee on 2016/4/21.
@@ -62,6 +67,25 @@ public class UserMainFragment extends WebViewBaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        BDLocation location = DMApplication.getInstance().getLastActivatedLocation();
+        if (location != null) {
+            address.setText(location.getStreet());
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        EventBus.getDefault().unregister(this);
     }
 
     @OnClick({R.id.rl_center, R.id.position, R.id.btn_arrow_down})
@@ -95,6 +119,19 @@ public class UserMainFragment extends WebViewBaseFragment {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public void onEvent(LocationEvent event) {
+        if (event.getEventType() == LocationEvent.LocationEventEnum.UPDATED) {
+            BDLocation location = event.getHolder();
+
+            String street = location.getStreet();
+            if (TextUtils.isEmpty(street)) {
+                street = getString(R.string.get_location);
+            }
+
+            address.setText(street);
         }
     }
 }
