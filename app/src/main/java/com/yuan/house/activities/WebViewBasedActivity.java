@@ -15,6 +15,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import com.avos.avoscloud.AVInstallation;
 import com.avoscloud.chat.service.CacheService;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -29,6 +30,7 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.sleepbot.datetimepicker.time.RadialPickerLayout;
 import com.sleepbot.datetimepicker.time.TimePickerDialog;
 import com.victor.loading.rotate.RotateLoading;
+import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.base.BaseFragmentActivity;
 import com.yuan.house.bean.PayInfo;
@@ -131,9 +133,6 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         }
 
         ButterKnife.inject(this);
-
-        // Register event bus to receive events
-//        EventBus.getDefault().register(this);
 
         if (mFragmentTransaction == null) {
             mFragmentTransaction = mFragmentManager.beginTransaction();
@@ -286,7 +285,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     public void onBridgeLogout() {
-
+        DMApplication.getInstance().logout();
     }
 
     public void onBridgeShowProgressDialog() {

@@ -19,6 +19,9 @@ import com.avos.avoscloud.AVOSCloud;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVUser;
 import com.avos.avoscloud.PushService;
+import com.avos.avoscloud.im.v2.AVIMClient;
+import com.avos.avoscloud.im.v2.AVIMException;
+import com.avos.avoscloud.im.v2.callback.AVIMClientCallback;
 import com.avoscloud.chat.entity.avobject.AddRequest;
 import com.avoscloud.chat.entity.avobject.UpdateInfo;
 import com.avoscloud.chat.service.CacheService;
@@ -51,6 +54,7 @@ import com.thin.downloadmanager.DownloadStatusListener;
 import com.thin.downloadmanager.ThinDownloadManager;
 import com.yuan.house.activities.SplashActivity;
 import com.yuan.house.common.Constants;
+import com.yuan.house.event.AuthEvent;
 
 import org.apache.http.Header;
 import org.json.JSONException;
@@ -62,42 +66,28 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import de.greenrobot.event.EventBus;
 import timber.log.Timber;
 
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.FROYO;
 
 public class DMApplication extends MultiDexApplication {
-    public static boolean debug = true;
-
-    private static DMApplication instance;
-
-    private ThinDownloadManager downloadManager;
-    private DaoSession daoSession;
-
     private static final int DOWNLOAD_THREAD_POOL_SIZE = 2;
-
+    public static boolean debug = true;
+    private static DMApplication instance;
     @Inject
     SharedPreferences prefs;
-
     @Inject
     Context mContext;
-
     String mLatestVersion;
-
+    private ThinDownloadManager downloadManager;
+    private DaoSession daoSession;
     private String htmlExtractedFolder;
     private String rootDataFolder;
     private String rootPagesFolder;
 
     private BDLocation lastActivatedLocation;
-
-    public BDLocation getLastActivatedLocation() {
-        return lastActivatedLocation;
-    }
-
-    public void setLastActivatedLocation(BDLocation lastActivatedLocation) {
-        this.lastActivatedLocation = lastActivatedLocation;
-    }
 
     /**
      * Create main application
@@ -118,15 +108,37 @@ public class DMApplication extends MultiDexApplication {
         attachBaseContext(context);
     }
 
+    /**
+     * Create main application
+     *
+     * @param instrumentation
+     */
+    public DMApplication(final Instrumentation instrumentation) {
+        this();
+        attachBaseContext(instrumentation.getTargetContext());
+    }
+
     public static void initImageLoader(Context context) {
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
                 context)
                 .threadPoolSize(3).threadPriority(Thread.NORM_PRIORITY - 2)
-                        //.memoryCache(new WeakMemoryCache())
+                //.memoryCache(new WeakMemoryCache())
                 .denyCacheImageMultipleSizesInMemory()
                 .tasksProcessingOrder(QueueProcessingType.LIFO)
                 .build();
         ImageLoader.getInstance().init(config);
+    }
+
+    public static DMApplication getInstance() {
+        return instance;
+    }
+
+    public BDLocation getLastActivatedLocation() {
+        return lastActivatedLocation;
+    }
+
+    public void setLastActivatedLocation(BDLocation lastActivatedLocation) {
+        this.lastActivatedLocation = lastActivatedLocation;
     }
 
     @Override
@@ -137,7 +149,7 @@ public class DMApplication extends MultiDexApplication {
 
         // Perform injection
         Injector.init(getRootModule(), this);
-        initAnerdaDatabase();
+        initDatabase();
 
         Utils.fixAsyncTaskBug();
 
@@ -190,6 +202,8 @@ public class DMApplication extends MultiDexApplication {
 //        determineWebUpdate(Constants.kWebPackageVersionCached, Constants.kCheckTypeHtml);
 //        determineWebUpdate(Constants.kWebLaunchImageVersionCached, Constants.kCheckTypeLaunchImage);
 
+        RestClient.getInstance().setHostname(Constants.kWebServiceAPIEndpoint);
+
         // https://leancloud.cn/app.html?appid=9hk99pr7gknwj83tdmfbbccqar1x2myge00ulspafnpcbab8#/key
         AVOSCloud.initialize(this, Constants.kAVApplicationId, Constants.kAVClientKey);
 
@@ -201,24 +215,11 @@ public class DMApplication extends MultiDexApplication {
         AVObject.registerSubclass(UpdateInfo.class);
 
         AVInstallation.getCurrentInstallation().saveInBackground();
+        Timber.v("Installation id: " + AVInstallation.getCurrentInstallation().getInstallationId());
 
         String avInstallId = AVInstallation.getCurrentInstallation().getInstallationId();
-        prefs.edit().putString("AVInstallationId", avInstallId).commit();
-        RestClient.getInstance().setHostname(Constants.kWebServiceAPIEndpoint);
+        prefs.edit().putString("AVInstallationId", avInstallId).apply();
 
-//        AVInstallation.getCurrentInstallation().saveInBackground(new SaveCallback() {
-//            @Override
-//            public void done(AVException e) {
-//                if (e == null) {
-//                    String installationId = AVInstallation.getCurrentInstallation().getInstallationId();
-//                    // 关联  installationId 到用户表等操作……
-//                    // connect installation id with user
-//                    AVInstallation.getCurrentInstallation().addUnique("userid", null);
-//                } else {
-//                    // 保存失败，输出错误信息
-//                }
-//            }
-//        });
         PushService.setDefaultPushCallback(instance, SplashActivity.class);
         AVOSCloud.setDebugLogEnabled(debug);
         AVAnalytics.enableCrashReport(this, !debug);
@@ -227,11 +228,34 @@ public class DMApplication extends MultiDexApplication {
         // FIXME: Crash here
 //        initBaidu();
 
-//        if (debug) {
-//            openStrictMode();
-//        }
+        if (debug) {
+            openStrictMode();
+        }
 
-        // setup chat related environment
+        setupChatManager();
+
+        if (debug) {
+            Logger.level = Logger.VERBOSE;
+        } else {
+            Logger.level = Logger.NONE;
+        }
+
+        // 使用 assets 目录中的文件
+        rootDataFolder = FileUtil.getDataDirectory(getApplicationContext());
+        htmlExtractedFolder = String.format("%s/%s", FileUtil.getDataDirectory(getApplicationContext()), "html");
+
+        rootPagesFolder = htmlExtractedFolder + "/pages";
+
+//        if (!prefs.getBoolean(Constants.kWebPackageExtracted, false)) {
+        Timber.v("Copy HTML asset to folder : " + htmlExtractedFolder);
+
+        FileUtil.copyAssetFolder(getAssets(), "html", htmlExtractedFolder);
+        prefs.edit().putBoolean(Constants.kWebPackageExtracted, true).commit();
+//        }
+    }
+
+    // setup chat related environment
+    private void setupChatManager() {
         final ChatManager chatManager = ChatManager.getInstance();
         chatManager.init(this);
         if (AVUser.getCurrentUser() != null) {
@@ -269,29 +293,39 @@ public class DMApplication extends MultiDexApplication {
                 }
             }
         });
-
-        if (debug) {
-            Logger.level = Logger.VERBOSE;
-        } else {
-            Logger.level = Logger.NONE;
-        }
-
-        // 使用 assets 目录中的文件
-        rootDataFolder = FileUtil.getDataDirectory(getApplicationContext());
-        htmlExtractedFolder = String.format("%s/%s", FileUtil.getDataDirectory(getApplicationContext()), "html");
-
-        rootPagesFolder = htmlExtractedFolder + "/pages";
-
-//        if (!prefs.getBoolean(Constants.kWebPackageExtracted, false)) {
-        Timber.v("Copy HTML asset to folder : " + htmlExtractedFolder);
-
-        FileUtil.copyAssetFolder(getAssets(), "html", htmlExtractedFolder);
-        prefs.edit().putBoolean(Constants.kWebPackageExtracted, true).commit();
-//        }
-
     }
 
-    private void initAnerdaDatabase() {
+    /**
+     * 关闭聊天相关服务
+     */
+    private void pruneChatManager() {
+        AVInstallation installation = AVInstallation.getCurrentInstallation();
+        installation.put("user_id", null);
+        installation.put("agency_id", null);
+        installation.saveInBackground();
+
+        final ChatManager chatManager = ChatManager.getInstance();
+        chatManager.closeWithCallback(new AVIMClientCallback() {
+            @Override
+            public void done(AVIMClient avimClient, AVIMException e) {
+                EventBus.getDefault().post(new AuthEvent(AuthEvent.AuthEventEnum.LOGOUT, null));
+            }
+        });
+    }
+
+    /**
+     * 注销当前登录用户
+     */
+    public void logout() {
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(Constants.kWebDataKeyLoginType, null);
+        editor.putString(Constants.kWebDataKeyUserLogin, null);
+        editor.apply();
+
+        pruneChatManager();
+    }
+
+    private void initDatabase() {
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "chat-db", null);
         SQLiteDatabase db = helper.getWritableDatabase();
         // 注意：该数据库连接属于 DaoMaster，所以多个 Session 指的是相同的数据库连接。
@@ -300,7 +334,7 @@ public class DMApplication extends MultiDexApplication {
         daoSession = daoMaster.newSession();
     }
 
-    public MessageDao getMessageDao(){
+    public MessageDao getMessageDao() {
         return daoSession.getMessageDao();
     }
 
@@ -314,7 +348,7 @@ public class DMApplication extends MultiDexApplication {
         StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
                 .detectLeakedSqlLiteObjects()
                 .penaltyLog()
-                        //.penaltyDeath()
+                //.penaltyDeath()
                 .build());
     }
 
@@ -326,26 +360,18 @@ public class DMApplication extends MultiDexApplication {
         return new RootModule();
     }
 
-    /**
-     * Create main application
-     *
-     * @param instrumentation
-     */
-    public DMApplication(final Instrumentation instrumentation) {
-        this();
-        attachBaseContext(instrumentation.getTargetContext());
-    }
-
-    public static DMApplication getInstance() {
-        return instance;
-    }
     public String getHtmlExtractedFolder() {
         return htmlExtractedFolder;
+    }
+
+    public void setHtmlExtractedFolder(String htmlExtractedFolder) {
+        this.htmlExtractedFolder = htmlExtractedFolder;
     }
 
     public String getRootDataFolder() {
         return rootDataFolder;
     }
+
     /**
      * Check if there has new web content available to download
      */
@@ -416,7 +442,6 @@ public class DMApplication extends MultiDexApplication {
         });
     }
 
-
     /**
      * Download the web package / launch picture zip from site and save to external cache dir
      * <p/>
@@ -464,15 +489,11 @@ public class DMApplication extends MultiDexApplication {
         prefs.edit().putString(Constants.kApplicationPackageVersion, mLatestVersion).commit();
     }
 
-    public void setHtmlExtractedFolder(String htmlExtractedFolder) {
-        this.htmlExtractedFolder = htmlExtractedFolder;
+    public String getRootPagesFolder() {
+        return rootPagesFolder;
     }
 
     public void setRootPagesFolder(String rootPagesFolder) {
         this.rootPagesFolder = rootPagesFolder;
-    }
-
-    public String getRootPagesFolder() {
-        return rootPagesFolder;
     }
 }

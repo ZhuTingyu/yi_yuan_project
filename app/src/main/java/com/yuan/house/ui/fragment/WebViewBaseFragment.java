@@ -935,15 +935,6 @@ public class WebViewBaseFragment extends Fragment {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 mBridgeListener.onBridgeLogout();
-
-//                prefs.edit().putBoolean("isLogin", false).commit();
-//
-//                if (WebViewActivity.instance != null) WebViewActivity.instance.finish();
-//                if (MainActivity.instance != null) MainActivity.instance.finish();
-//
-//                Intent intent = new Intent(mContext, SignInActivity.class);
-//                startActivity(intent);
-//                finish();
             }
         });
 

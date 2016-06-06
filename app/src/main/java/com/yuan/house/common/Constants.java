@@ -60,7 +60,7 @@ public class Constants {
 
     public static String kServiceHost = "http://3c.ieyuan.com";
     public static String kServiceUploadImage = "/upload-image";
-    public static String kFragmentTagNearby = "kFragmentTagNearby";
+    public static String kFragmentTagMain = "kFragmentTagMain";
     public static String kFragmentTagLogin = "kFragmentTagLogin";
     public static String kFragmentTagProposal = "kFragmentTagProposal";
     public static String kFragmentTagMessage = "kFragmentTagMessage";

@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 
 import com.yuan.house.application.Injector;
+import com.yuan.house.common.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,7 +46,7 @@ public class JsonParse {
     //TODO 获取登录类型
     public boolean judgeUserType() throws JSONException {
 //        initLoginJson();
-        if("user".equals(sp.getString("LoginType",null)))
+        if("user".equals(sp.getString(Constants.kWebDataKeyLoginType,null)))
             return true;
         else
             return false;

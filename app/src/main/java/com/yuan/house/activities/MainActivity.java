@@ -1,11 +1,10 @@
 package com.yuan.house.activities;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-import android.view.Menu;
-import android.view.MenuItem;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
@@ -29,6 +28,7 @@ import com.umeng.update.UmengUpdateAgent;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
+import com.yuan.house.event.AuthEvent;
 import com.yuan.house.event.PageEvent;
 import com.yuan.house.ui.fragment.AgencyMainFragment;
 import com.yuan.house.ui.fragment.AgencyMessageFragment;
@@ -73,6 +73,9 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
         instance = this;
 
+        // Register event bus to receive events
+        EventBus.getDefault().register(this);
+
         UmengUpdateAgent.update(this);
 
         setContentView(R.layout.activity_main, false, true);
@@ -91,11 +94,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         PushService.subscribe(this, "private", MainActivity.class);
         PushService.subscribe(this, "protected", MainActivity.class);
 
-        // Register event bus to receive events
-        EventBus.getDefault().register(this);
-
-        Timber.v("Installation id: " + AVInstallation.getCurrentInstallation().getInstallationId());
-
         AVAnalytics.trackAppOpened(getIntent());
 
         initBaiduLocClient();
@@ -108,8 +106,8 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
             CacheService.registerUser(AVUser.getCurrentUser());
         }
 
-        if (prefs.getBoolean("isLogin", false)) {
-            switchToFragment(Constants.kFragmentTagNearby);
+        if (prefs.getString(Constants.kWebDataKeyUserLogin, null) != null) {
+            switchToFragment(Constants.kFragmentTagMain);
         } else {
             switchToFragment(Constants.kFragmentTagLogin);
         }
@@ -127,6 +125,16 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
     public void onEvent(PageEvent event) {
         if (event.getEventType() == PageEvent.PageEventEnum.FINISHED) {
+        }
+    }
+
+    public void onEvent(AuthEvent event) {
+        if (event.getEventType() == AuthEvent.AuthEventEnum.LOGOUT) {
+            // 注销已完成, 重新显示登录界面
+//            switchToFragment(Constants.kFragmentTagLogin);
+            Intent intent = new Intent(mContext, MainActivity.class);
+            startActivity(intent);
+            finish();
         }
     }
 
@@ -158,11 +166,12 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
             return f;
         }
 
-        if (tag.equals(Constants.kFragmentTagNearby)) {
-            if (isUserType())
+        if (tag.equals(Constants.kFragmentTagMain)) {
+            if (isUserType()) {
                 f = UserMainFragment.newInstance();
-            else
+            } else {
                 f = AgencyMainFragment.newInstance();
+            }
         } else if (tag.equals(Constants.kFragmentTagMessage)) {
             if (isUserType()) {
                 f = UserMessageFragment.newInstance();
@@ -205,7 +214,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
                 switch (position) {
                     case 0:
-                        switchToFragment(Constants.kFragmentTagNearby);
+                        switchToFragment(Constants.kFragmentTagMain);
                         break;
                     case 1:
                         switchToFragment(Constants.kFragmentTagMessage);
@@ -226,23 +235,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
             }
         });
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     public void switchToFragment(String tag) {
@@ -315,7 +307,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
                             prefs.edit().putBoolean("isLogin", true).commit();
 
-                            switchToFragment(Constants.kFragmentTagNearby);
+                            switchToFragment(Constants.kFragmentTagMain);
                             getBottomNavigationBar().clearAll();
                             setupTabbarClickListener();
                         } else {

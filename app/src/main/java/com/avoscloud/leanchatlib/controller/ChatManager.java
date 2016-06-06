@@ -256,6 +256,8 @@ public class ChatManager extends AVIMClientEventHandler {
   }
 
   public void closeWithCallback(final AVIMClientCallback callback) {
+    if (imClient == null) return;
+
     imClient.close(new AVIMClientCallback() {
 
       @Override
