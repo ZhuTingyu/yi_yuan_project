@@ -29,6 +29,7 @@ import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.UserInfoFactory;
 import com.avoscloud.leanchatlib.model.UserInfo;
 import com.avoscloud.leanchatlib.utils.Logger;
+import com.baidu.location.BDLocation;
 import com.baidu.mapapi.SDKInitializer;
 import com.bugtags.library.Bugtags;
 import com.dimo.http.RestClient;
@@ -87,6 +88,16 @@ public class DMApplication extends MultiDexApplication {
     private String htmlExtractedFolder;
     private String rootDataFolder;
     private String rootPagesFolder;
+
+    private BDLocation lastActivatedLocation;
+
+    public BDLocation getLastActivatedLocation() {
+        return lastActivatedLocation;
+    }
+
+    public void setLastActivatedLocation(BDLocation lastActivatedLocation) {
+        this.lastActivatedLocation = lastActivatedLocation;
+    }
 
     /**
      * Create main application

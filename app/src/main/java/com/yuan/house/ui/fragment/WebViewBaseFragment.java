@@ -25,6 +25,7 @@ import com.avos.avoscloud.FindCallback;
 import com.avos.avoscloud.SaveCallback;
 import com.avoscloud.chat.service.UserService;
 import com.avoscloud.chat.ui.chat.ChatRoomActivity;
+import com.baidu.location.BDLocation;
 import com.dimo.http.RestClient;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
@@ -846,7 +847,27 @@ public class WebViewBaseFragment extends Fragment {
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("getGeoLocation" + data);
 
-                mBridgeListener.onBridgeRequestLocation(callback);
+                BDLocation location = DMApplication.getInstance().getLastActivatedLocation();
+                if (location != null) {
+                    JSONObject object = new JSONObject();
+                    try {
+                        object.put("addr", location.getAddrStr());
+                        object.put("city", location.getCity());
+                        object.put("district", location.getDistrict());
+                        object.put("lat", location.getLatitude());
+                        object.put("lng", location.getLongitude());
+                        object.put("province", location.getProvince());
+                        object.put("street", location.getStreet());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (callback != null) {
+                        callback.callback(object.toString());
+                    }
+                } else {
+                    mBridgeListener.onBridgeRequestLocation(callback);
+                }
             }
         });
 
@@ -1038,7 +1059,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("selectMapLocation",new WebViewJavascriptBridge.WVJBHandler(){
+        bridge.registerHandler("selectMapLocation", new WebViewJavascriptBridge.WVJBHandler() {
 
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {

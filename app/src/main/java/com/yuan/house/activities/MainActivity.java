@@ -182,21 +182,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         return f;
     }
 
-    private void initBaiduLocClient() {
-        locClient = new LocationClient(this.getApplicationContext());
-        locClient.setDebug(true);
-        LocationClientOption option = new LocationClientOption();
-        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
-        option.setScanSpan(5000);
-        option.setCoorType("bd09ll");
-        option.setIsNeedAddress(true);
-        locClient.setLocOption(option);
-
-        locationListener = new TCLocationListener();
-        locClient.registerLocationListener(locationListener);
-        locClient.start();
-    }
-
     public BottomNavigationBar getBottomNavigationBar() {
         return bottomNavigationBar;
     }
@@ -340,15 +325,33 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                 });
     }
 
+    private void initBaiduLocClient() {
+        locClient = new LocationClient(this.getApplicationContext());
+        locClient.setDebug(true);
+        LocationClientOption option = new LocationClientOption();
+        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
+        option.setScanSpan(5000);
+        option.setCoorType("bd09ll");
+        option.setIsNeedAddress(true);
+        locClient.setLocOption(option);
+
+        locationListener = new TCLocationListener();
+        locClient.registerLocationListener(locationListener);
+        locClient.start();
+    }
+
     public class TCLocationListener implements BDLocationListener {
         @Override
         public void onReceiveLocation(BDLocation location) {
             double latitude = location.getLatitude();
             double longitude = location.getLongitude();
+
             int locType = location.getLocType();
 
             Timber.v("onReceiveLocation latitude=" + latitude + " longitude=" + longitude
                     + " locType=" + locType + " address=" + location.getAddrStr());
+
+            DMApplication.getInstance().setLastActivatedLocation(location);
 
             AVUser user = AVUser.getCurrentUser();
             if (user != null) {
