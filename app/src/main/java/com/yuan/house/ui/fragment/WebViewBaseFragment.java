@@ -121,6 +121,8 @@ public class WebViewBaseFragment extends Fragment {
         Timber.v("onCreateView");
 
         if (mFragmentListener != null) {
+            bridge = new WebViewJavascriptBridge(getActivity(), mWebView, null);
+
             mFragmentListener.onFragmentInteraction(this);
 
             mWebView.setInitialScale(getResources().getDisplayMetrics().widthPixels * 100 / 360);
@@ -146,8 +148,6 @@ public class WebViewBaseFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        bridge = new WebViewJavascriptBridge(getActivity(), mWebView, null);
 
         // register all the web handlers at once
         registerHandle();
@@ -734,13 +734,20 @@ public class WebViewBaseFragment extends Fragment {
                 String objectId = params.get("lean_id");
                 String userId = params.get("user_id");
                 String houseId = params.get("house_id");
-                if (params.get("audit_type") != null)
-                    prefs.edit().putString("auditType", params.get("audit_type")).commit();
-                prefs.edit().putString("houseId", houseId).commit();
-                prefs.edit().putString("target_id", userId).commit();
-                prefs.edit().putString("leanId", objectId).commit();
-                prefs.edit().putString("userId", userId).commit();
 
+                SharedPreferences.Editor editor = prefs.edit();
+                if (params.get("audit_type") != null) {
+                    editor.putString("auditType", params.get("audit_type"));
+                }
+
+                editor.putString("houseId", houseId);
+                editor.putString("target_id", userId);
+                editor.putString("leanId", objectId);
+                editor.putString("userId", userId);
+
+                editor.apply();
+
+                /** Start Chat **/
                 ChatRoomActivity.chatByUserId(getActivity(), objectId);
 
                 if (null != callback) {

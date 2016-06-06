@@ -74,4 +74,9 @@ public class Constants {
     public static String kWebDataKeyLoginType = "LoginType";
     public static String kWebDataKeyTags = "Tags";
 
+    public static String kFragmentTagBBS = "kFragmentTagBBS";
+    public static String kFragmentTagChat = "kFragmentTagChat";
+    public static String kWebPageUserBBS = "user_bbs.html";
+    public static String kWebPageAgentBBS = "agency_bbs.html";
+    public static String kWebPageUserIndex = "user_index.html";
 }

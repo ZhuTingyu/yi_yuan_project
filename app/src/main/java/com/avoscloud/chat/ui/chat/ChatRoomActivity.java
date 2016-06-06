@@ -11,12 +11,11 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
@@ -26,35 +25,29 @@ import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.AVIMException;
 import com.avos.avoscloud.im.v2.AVIMReservedMessageType;
 import com.avos.avoscloud.im.v2.AVIMTypedMessage;
-import com.avos.avoscloud.im.v2.callback.AVIMConversationCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
 import com.avos.avoscloud.im.v2.messages.AVIMAudioMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMImageMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMLocationMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
-import com.avoscloud.chat.entity.AVIMUserInfoMessage;
 import com.avoscloud.chat.service.CacheService;
 import com.avoscloud.chat.service.ConversationChangeEvent;
-import com.avoscloud.chat.service.event.FinishEvent;
 import com.avoscloud.chat.ui.entry.SerializableMap;
 import com.avoscloud.chat.util.Utils;
 import com.avoscloud.leanchatlib.activity.ChatActivity;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.ConversationHelper;
 import com.avoscloud.leanchatlib.model.AVIMHouseInfoMessage;
-import com.avoscloud.leanchatlib.utils.Logger;
-import com.bugtags.library.Bugtags;
-import com.dimo.http.RestClient;
 import com.dimo.utils.StringUtil;
-import com.dimo.web.WebViewJavascriptBridge;
-import com.yuan.house.application.DMApplication;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yuan.house.common.Constants;
-import com.yuan.house.utils.JsonParse;
+import com.yuan.house.ui.fragment.FragmentBBS;
+import com.yuan.house.ui.fragment.WebViewBaseFragment;
 import com.yuan.house.utils.ToastUtil;
 import com.yuan.skeleton.R;
-import com.zhy.http.okhttp.OkHttpUtils;
-import com.zhy.http.okhttp.callback.StringCallback;
 
+import org.apache.http.Header;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -63,24 +56,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import okhttp3.Call;
-import okhttp3.Request;
-import timber.log.Timber;
-
 /**
  * Created by lzw on 15/4/24.
  */
-public class ChatRoomActivity extends ChatActivity {
+public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSInteractionListener {
     public static final int LOCATION_REQUEST = 100;
     public static final int REQUEST_CODE_HOUSE = 101;
     private static SharedPreferences prefs;
     private static String leanId = "";
+    private FragmentBBS mFragmentBBS;
     private RelativeLayout chatroom;
     private LinearLayout bottomLayout;
-    private WebView webView;
     private String value;
     private LinearLayout back;
-    private List<Map<String, Object>> houseInfos;
+    private List<JSONObject> houseInfos;
     private GestureDetector gestureDetector;
     private int mLastY = 0;
     private GestureDetector.OnGestureListener onGestureListener =
@@ -99,6 +88,7 @@ public class ChatRoomActivity extends ChatActivity {
                     return false;
                 }
             };
+    private WebView webView;
 
     public static void chatByConversation(Context from, AVIMConversation conv) {
         CacheService.registerConv(conv);
@@ -106,16 +96,16 @@ public class ChatRoomActivity extends ChatActivity {
         Intent intent = new Intent(from, ChatRoomActivity.class);
         intent.putExtra(CONVID, conv.getConversationId());
         from.startActivity(intent);
-
     }
 
     public static void chatByUserId(final Activity from, String userId) {
         leanId = userId;
         final ProgressDialog dialog = Utils.showSpinnerDialog(from);
-        if (prefs == null)
-            prefs = PreferenceManager.getDefaultSharedPreferences(from);
+        if (prefs == null) prefs = PreferenceManager.getDefaultSharedPreferences(from);
+
         String houseId = prefs.getString("houseId", null);
         String auditType = prefs.getString("auditType", null);
+
         StringBuffer sb = new StringBuffer();
         if (auditType == null) {
             sb.append(houseId);
@@ -124,6 +114,7 @@ public class ChatRoomActivity extends ChatActivity {
             sb.append(auditType);
             sb.append(houseId);
         }
+
         ChatManager.getInstance().fetchConversationWithUserId(sb.toString(), userId, new AVIMConversationCreatedCallback() {
             @Override
             public void done(AVIMConversation conversation, AVIMException e) {
@@ -138,13 +129,11 @@ public class ChatRoomActivity extends ChatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        chatroom = (RelativeLayout) findViewById(R.id.rl_chatroom);
-        bottomLayout = (LinearLayout) findViewById(R.id.bottomLayout);
+
         back = (LinearLayout) findViewById(R.id.back);
-//        initLocation();
-        initWebView();
-        initHouseInfos();
+
         gestureDetector = new GestureDetector(this, onGestureListener);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -152,264 +141,26 @@ public class ChatRoomActivity extends ChatActivity {
                 finish();
             }
         });
+
+        mFragmentBBS = FragmentBBS.newInstance();
+
+        mFragmentTransaction = mFragmentManager.beginTransaction();
+        mFragmentTransaction.add(R.id.fragmentBBS, mFragmentBBS, Constants.kFragmentTagBBS);
+        mFragmentTransaction.commit();
+
+        initHouseInfos();
     }
 
-    private void initWebView() {
-        this.webView = (WebView) findViewById(R.id.webview);
-        this.webView.getSettings().setJavaScriptEnabled(true);
-        this.webView.getSettings().setAllowFileAccess(true);
-        this.webView.setWebChromeClient(new WebChromeClient());
-        this.webView.setHorizontalScrollBarEnabled(false);
-        this.webView.setVerticalScrollBarEnabled(false);
-        this.webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        this.webView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                    final int y = (int) event.getY();
-                    if (y < mLastY)
-                        return true;
-                    mLastY = y;
-                }
+    @Override
+    public void onFragmentInteraction(WebViewBaseFragment fragment) {
+        super.onFragmentInteraction(fragment);
 
-                if (event.getAction() == MotionEvent.ACTION_UP)
-                    mLastY = 0;
-
-                return false;
-            }
-        });
-        this.bridge = new WebViewJavascriptBridge(this, webView, null);
-        registerBridge();
-        try {
-            if (JsonParse.getInstance().judgeUserType())
-                redirectToLoadUrl("user_bbs.html");
-            else
-                redirectToLoadUrl("agency_bbs.html");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
+        updateWebViewSettings();
+        doOtherStuff();
     }
 
-    private void registerBridge() {
-        bridge.registerHandler("setData", new WebViewJavascriptBridge.WVJBHandler() {
-            @Override
-            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
-                Timber.v("setData got:" + data);
-                HashMap<String, String> params = null;
-                try {
-                    params = StringUtil.JSONString2HashMap(data);
-
-                    String key = params.get("key");
-                    value = params.get("value");
-
-                    if (value == null || value.equals("null"))
-                        prefs.edit().remove(key).commit();
-                    else
-                        prefs.edit().putString(key, value).commit();
-
-                    if (null != callback) {
-                        callback.callback(null);
-                    }
-
-                    RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) webView.getLayoutParams();
-                    params = StringUtil.JSONString2HashMap(value);
-//                    layoutParams.height = Integer.parseInt(params.get("height_s"));
-                    layoutParams.height = 130;
-
-//                    DisplayMetrics dm = new DisplayMetrics();//获取当前显示的界面大小
-//                    getWindowManager().getDefaultDisplay().getMetrics(dm);
-//
-//                    layoutParams.height = dm.heightPixels;
-                    webView.setLayoutParams(layoutParams);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        bridge.registerHandler("getData", new WebViewJavascriptBridge.WVJBHandler() {
-            @Override
-            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
-                Timber.v("getData got:" + data);
-
-                HashMap<String, String> params = null;
-                try {
-                    params = StringUtil.JSONString2HashMap(data);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                String key = params.get("key");
-                String value = prefs.getString(key, null);
-
-                if (null != callback) {
-                    callback.callback(value);
-                }
-            }
-        });
-
-        bridge.registerHandler("showSampleMessageBoard", new WebViewJavascriptBridge.WVJBHandler() {
-
-            @Override
-            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) webView.getLayoutParams();
-                HashMap<String, String> params = null;
-                try {
-                    params = StringUtil.JSONString2HashMap(value);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                layoutParams.height = 130;
-                webView.setLayoutParams(layoutParams);
-            }
-        });
-
-        bridge.registerHandler("showHalfMessageBoard", new WebViewJavascriptBridge.WVJBHandler() {
-
-            @Override
-            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) webView.getLayoutParams();
-                HashMap<String, String> params = null;
-                try {
-                    params = StringUtil.JSONString2HashMap(value);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                int height = Integer.parseInt(params.get("height_m"));
-                layoutParams.height = ((int) ((height + 10) * getResources().getDisplayMetrics().density));
-                webView.setLayoutParams(layoutParams);
-                bottomLayout.setVisibility(View.VISIBLE);
-            }
-        });
-
-        bridge.registerHandler("showFullMessageBoard", new WebViewJavascriptBridge.WVJBHandler() {
-
-            @Override
-            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) webView.getLayoutParams();
-
-                DisplayMetrics dm = new DisplayMetrics();//获取当前显示的界面大小
-                getWindowManager().getDefaultDisplay().getMetrics(dm);
-
-                layoutParams.height = dm.heightPixels;
-
-                webView.setLayoutParams(layoutParams);
-                bottomLayout.setVisibility(View.INVISIBLE);
-            }
-        });
-
-        bridge.registerHandler("webChangeHouse", new WebViewJavascriptBridge.WVJBHandler() {
-
-            @Override
-            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                Map<String, Object> map = null;
-                for (int i = 0; i < houseInfos.size(); i++) {
-                    map = houseInfos.get(i);
-
-                    String houseId = null;
-                    if (map.get("houseId") != null) {
-                        houseId = map.get("houseId").toString();
-                    }
-
-                    if (data.equals(houseId)) return;
-                }
-
-                if (map == null) return;
-
-                List<String> images = JSON.parseObject(map.get("images").toString(), List.class);
-
-                AVIMHouseInfoMessage message = new AVIMHouseInfoMessage();
-                message.setHouseName(map.get("estate_name").toString());
-                message.setHouseAddress(map.get("location_text").toString());
-                message.setHouseImage(images.get(0).toString());
-                message.setAttrs(map);
-
-                messageAgent.sendHouse(message);
-
-            }
-        });
-
-        bridge.registerHandler("rest_get", new WebViewJavascriptBridge.WVJBHandler() {
-            @Override
-            public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
-                Timber.v("get got:" + data);
-                JSONObject params = null;
-                try {
-                    params = new JSONObject(data);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                RestClient.getInstance().bridgeRequest(params, RestClient.METHOD_GET, callback);
-
-//                try {
-//                    JSONObject jo = new JSONObject(data);
-//                    JSONObject object = jo.getJSONObject("headers");
-//                    if (object == null || object.length() == 0) {
-//                        return;
-//                    } else {
-////                        String token = object.getString("authtoken");
-//
-//                    }
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//
-//                JSONObject params = null;
-//                try {
-//                    params = new JSONObject(data);
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//                RestClient.getInstance().bridgeRequest(params, RestClient.METHOD_GET, callback);
-            }
-        });
-
-        bridge.registerHandler("rest_post", new WebViewJavascriptBridge.WVJBHandler() {
-            @Override
-            public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
-                Timber.v("post got:" + data);
-
-                JSONObject params = null;
-                try {
-                    params = new JSONObject(data);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                RestClient.getInstance().bridgeRequest(params, RestClient.METHOD_POST, callback);
-            }
-        });
-
-        bridge.registerHandler("rest_put", new WebViewJavascriptBridge.WVJBHandler() {
-            @Override
-            public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
-                Timber.v("put got:" + data);
-
-                JSONObject params = null;
-                try {
-                    params = new JSONObject(data);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                RestClient.getInstance().bridgeRequest(params, RestClient.METHOD_PUT, callback);
-            }
-        });
-
-        bridge.registerHandler("rest_delete", new WebViewJavascriptBridge.WVJBHandler() {
-            @Override
-            public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
-                Timber.v("delete got:" + data);
-
-                JSONObject params = null;
-                try {
-                    params = new JSONObject(data);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                RestClient.getInstance().bridgeRequest(params, RestClient.MEHOTD_DELETE, callback);
-            }
-        });
-
+    // TODO: 16/6/6 WTF ???
+    private void doOtherStuff() {
         adapter.registerDataSetObserver(new DataSetObserver() {
             @Override
             public void onChanged() {
@@ -449,7 +200,7 @@ public class ChatRoomActivity extends ChatActivity {
                         break;
                 }
 
-                Map<String, Object> params = new HashMap<String, Object>();
+                Map<String, Object> params = new HashMap<>();
                 params.put("date", date);
                 params.put("message", resultMessage);
                 params.put("houseId", prefs.getString("houseId", null));
@@ -458,171 +209,75 @@ public class ChatRoomActivity extends ChatActivity {
                 params.put("auditType", prefs.getString("auditType", null));
 
                 String json = com.alibaba.fastjson.JSONObject.toJSONString(params);
-                bridge.callHandler("onLastMessageChangeByHouse", json);
-
+                mFragmentBBS.getBridge().callHandler("onLastMessageChangeByHouse", json);
             }
-
         });
     }
 
-    public void redirectToLoadUrl(String url) {
-        String mUrl;
-        if (webView == null) {
-            return;
-        }
-
-        String rootPagesFolder = DMApplication.getInstance().getRootPagesFolder();
-
-        if (StringUtil.isValidHTTPUrl(url)) {
-            mUrl = url;
-        } else {
-            mUrl = rootPagesFolder + "/" + url;
-        }
-
-        Timber.i("URL - " + mUrl);
-
-        if (StringUtil.isValidHTTPUrl(mUrl)) {
-            // url is web link
-            webView.loadUrl(mUrl);
-        } else {
-            webView.loadUrl("file:///" + mUrl);
-        }
-    }
-
-    /*
-    private void initLocation() {
-        addLocationBtn.setVisibility(View.VISIBLE);
-        setLocationHandler(new LocationHandler() {
+    private void updateWebViewSettings() {
+        webView = mFragmentBBS.getWebView();
+        webView.setHorizontalScrollBarEnabled(false);
+        webView.setVerticalScrollBarEnabled(false);
+        webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        webView.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onAddLocationButtonClicked(Activity activity) {
-                LocationActivity.startToSelectLocationForResult(activity, LOCATION_REQUEST);
-            }
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                    final int y = (int) event.getY();
+                    if (y < mLastY)
+                        return true;
+                    mLastY = y;
+                }
 
-            @Override
-            public void onLocationMessageViewClicked(Activity activity, AVIMLocationMessage locationMessage) {
-                LocationActivity.startToSeeLocationDetail(activity, locationMessage.getLocation().getLatitude(),
-                        locationMessage.getLocation().getLongitude());
+                if (event.getAction() == MotionEvent.ACTION_UP)
+                    mLastY = 0;
+
+                return false;
             }
         });
-    }*/
+    }
 
     private void initHouseInfos() {
-        String json = prefs.getString("userLogin", null);
-        Log.i("json", json);
+        String json = prefs.getString(Constants.kWebDataKeyUserLogin, null);
         String userId = getUserId(json);
-        String token = getToken(json);
-        String url = null;
-        if (isUserLogin(json))
-            url = Constants.kWebServiceSwitchable + userId + "/" + prefs.getString("target_id", null);
-        else
-            url = Constants.kWebServiceSwitchable + prefs.getString("target_id", null) + "/" + userId;
+        String url = Constants.kWebServiceSwitchable;
 
-        OkHttpUtils.get().url(url)
-                .addHeader("Content-Type", "application/json")
-                .addHeader("token", token)
-                .build()
-                .execute(new StringCallback() {
-
-                    @Override
-                    public void onBefore(Request request) {
-                        super.onBefore(request);
-                        Log.i("onBefore", "==================================================");
-                    }
-
-                    @Override
-                    public void onError(Call call, Exception e) {
-                        Log.i("onError", e.getMessage());
-                    }
-
-                    @Override
-                    public void onResponse(String response) {
-                        Log.i("onResponse", response);
-                        List<Map<String, Object>> list = JSON.parseObject(response, new TypeReference<List<Map<String, Object>>>() {
-                        });
-                        houseInfos = new ArrayList<>();
-                        for (int i = 0; i < list.size(); i++) {
-                            Map<String, Object> objectMap = list.get(i);
-                            Map<String, Object> houseMap = JSON.parseObject(objectMap.get("house_info").toString(), new TypeReference<Map<String, Object>>() {
-                            });
-                            houseInfos.add(houseMap);
-                        }
-                        Log.i("houseInfos", houseInfos.toString());
-
-                    }
-                });
-    }
-
-    private boolean isUserLogin(String json) {
-        HashMap<String, String> params = null;
-        try {
-            params = StringUtil.JSONString2HashMap(json);
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if (userAlreadyLogin(json)) {
+            url += userId + "/" + prefs.getString("target_id", null);
+        } else {
+            url += prefs.getString("target_id", null) + "/" + userId;
         }
-        if (params.get("user_info") != null)
-            return true;
-        else
-            return false;
-    }
 
-    private String getToken(String json) {
-        try {
-            HashMap<String, String> params = StringUtil.JSONString2HashMap(json);
-            return params.get("token");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+        restGet(url, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                super.onSuccess(statusCode, headers, response);
 
-    private String getUserId(String json) {
-        try {
-            HashMap<String, String> params = StringUtil.JSONString2HashMap(json);
-            if (params.get("user_info") != null)
-                params = StringUtil.JSONString2HashMap(params.get("user_info"));
-            else
-                params = StringUtil.JSONString2HashMap(params.get("agency_info"));
+                houseInfos = new ArrayList<>();
+                for (int i = 0; i < response.length(); i++) {
+                    JSONObject object;
+                    JSONObject houseInfo;
+                    try {
+                        object = (JSONObject) response.get(0);
+                        houseInfo = object.getJSONObject("house_info");
+                        houseInfos.add(houseInfo);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
 
-            return params.get("user_id");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+            }
+        });
     }
 
     @Override
     protected void openHouseInfo() {
         Intent intent = new Intent(this, HouseInfosActivity.class);
         startActivityForResult(intent, REQUEST_CODE_HOUSE);
-    }
-
-    @Override
-    protected void onResume() {
-        CacheService.setCurConv(conversation);
-        super.onResume();
-        Bugtags.onResume(this);
-    }
-
-    @Override
-    protected void onDestroy() {
-        CacheService.setCurConv(null);
-        super.onDestroy();
-        Bugtags.onPause(this);
-    }
-
-    private void testSendCustomMessage() {
-        AVIMUserInfoMessage userInfoMessage = new AVIMUserInfoMessage();
-        Map<String, Object> map = new HashMap<>();
-        map.put("nickname", "lzwjava");
-        userInfoMessage.setAttrs(map);
-        conversation.sendMessage(userInfoMessage, new AVIMConversationCallback() {
-            @Override
-            public void done(AVIMException e) {
-                if (e != null) {
-                    Logger.d(e.getMessage());
-                }
-            }
-        });
     }
 
     public void onEvent(ConversationChangeEvent conversationChangeEvent) {
@@ -633,26 +288,6 @@ public class ChatRoomActivity extends ChatActivity {
             actionBar.setTitle(ConversationHelper.titleOfConv(this.conversation));
         }
     }
-
-    public void onEvent(FinishEvent finishEvent) {
-        this.finish();
-    }
-
-//  @Override
-//  public boolean onCreateOptionsMenu(Menu menu) {
-//    MenuInflater inflater = getMenuInflater();
-//    inflater.inflate(R.menu.chat_ativity_menu, menu);
-//    return super.onCreateOptionsMenu(menu);
-//  }
-//
-//  @Override
-//  public boolean onMenuItemSelected(int featureId, MenuItem item) {
-//    int menuId = item.getItemId();
-//    if (menuId == R.id.people) {
-//      Utils.goActivity(ctx, ConversationDetailActivity.class);
-//    }
-//    return super.onMenuItemSelected(featureId, item);
-//  }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -666,7 +301,7 @@ public class ChatRoomActivity extends ChatActivity {
                     if (!TextUtils.isEmpty(address)) {
                         messageAgent.sendLocation(latitude, longitude, address);
                     } else {
-                        toast(R.string.chat_cannotGetYourAddressInfo);
+                        ToastUtil.show(mContext, R.string.chat_cannotGetYourAddressInfo);
                     }
                     hideBottomLayout();
                     break;
@@ -692,9 +327,105 @@ public class ChatRoomActivity extends ChatActivity {
     }
 
     @Override
-    public boolean dispatchTouchEvent(MotionEvent event) {
-        //注：回调 3
-        Bugtags.onDispatchTouchEvent(this, event);
-        return super.dispatchTouchEvent(event);
+    protected void onResume() {
+        CacheService.setCurConv(conversation);
+        super.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        CacheService.setCurConv(null);
+        super.onDestroy();
+    }
+
+    @Override
+    public void onWebChangeHouse(String data) {
+        JSONObject object = null;
+        for (int i = 0; i < houseInfos.size(); i++) {
+            object = houseInfos.get(i);
+
+            String houseId = null;
+            if (object.optString("id") != null) {
+                houseId = object.optString("id");
+            }
+
+            if (data.equals(houseId)) return;
+        }
+
+        if (object == null) return;
+
+        Map<String, Object> houseInfo = JSON.parseObject(object.toString(), new TypeReference<Map<String, Object>>() {
+        });
+
+        JSONArray jsonImages = object.optJSONArray("images");
+        ArrayList<String> images = new ArrayList<>();
+
+        if (jsonImages != null) {
+            for (int i = 0; i < jsonImages.length(); i++) {
+                images.add(jsonImages.optString(i));
+            }
+
+            AVIMHouseInfoMessage message = new AVIMHouseInfoMessage();
+            message.setHouseName(object.optString("estate_name").toString());
+            message.setHouseAddress(object.optString("location_text").toString());
+            message.setHouseImage(images.get(0).toString());
+            message.setAttrs(houseInfo);
+
+            messageAgent.sendHouse(message);
+        }
+    }
+
+    @Override
+    public void onShowSampleMessageBoard() {
+        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) webView.getLayoutParams();
+        HashMap<String, String> params = null;
+        try {
+            params = StringUtil.JSONString2HashMap(value);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        layoutParams.height = 130;
+        webView.setLayoutParams(layoutParams);
+    }
+
+    @Override
+    public void onShowHalfMessageBoard() {
+        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) webView.getLayoutParams();
+        HashMap<String, String> params = null;
+        try {
+            params = StringUtil.JSONString2HashMap(value);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        int height = Integer.parseInt(params.get("height_m"));
+        layoutParams.height = ((int) ((height + 10) * getResources().getDisplayMetrics().density));
+        webView.setLayoutParams(layoutParams);
+        bottomLayout.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onShowFullMessageBoard() {
+        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) webView.getLayoutParams();
+
+        DisplayMetrics dm = new DisplayMetrics();//获取当前显示的界面大小
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+        layoutParams.height = dm.heightPixels;
+
+        webView.setLayoutParams(layoutParams);
+        bottomLayout.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void onConfigBBSHeight(int height) {
+        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) webView.getLayoutParams();
+
+        // 获取当前显示的界面大小
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+        layoutParams.height = (int) (height * dm.density);
+
+        webView.setLayoutParams(layoutParams);
     }
 }

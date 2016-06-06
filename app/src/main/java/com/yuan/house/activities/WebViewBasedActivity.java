@@ -9,16 +9,23 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import com.avoscloud.chat.service.CacheService;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
+import com.bugtags.library.Bugtags;
+import com.dimo.http.RestClient;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.fourmob.datetimepicker.date.DatePickerDialog;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.sleepbot.datetimepicker.time.RadialPickerLayout;
 import com.sleepbot.datetimepicker.time.TimePickerDialog;
 import com.victor.loading.rotate.RotateLoading;
@@ -31,6 +38,7 @@ import com.yuan.house.payment.AliPay;
 import com.yuan.house.ui.fragment.WebViewBaseFragment;
 import com.yuan.house.ui.fragment.WebViewFragment;
 import com.yuan.house.utils.JsonParse;
+import com.yuan.house.utils.ToastUtil;
 import com.yuan.skeleton.R;
 
 import org.apache.commons.lang3.NotImplementedException;
@@ -156,6 +164,22 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     @Override
     protected void onPause() {
         super.onPause();
+    }
+
+    protected void hideSoftInputView() {
+        if (getWindow().getAttributes().softInputMode !=
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN) {
+            InputMethodManager manager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            View currentFocus = getCurrentFocus();
+            if (currentFocus != null) {
+                manager.hideSoftInputFromWindow(currentFocus.getWindowToken(),
+                        InputMethodManager.HIDE_NOT_ALWAYS);
+            }
+        }
+    }
+
+    protected void setSoftInputMode() {
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
     protected String getUserToken() throws JSONException {
@@ -392,6 +416,16 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         throw new NotImplementedException("NOT IMPLEMENTED");
     }
 
+    protected boolean filterException(Exception e) {
+        if (e != null) {
+            ToastUtil.show(mContext, e.getMessage());
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+
     private class DataPickerOnClickListener implements DatePickerDialog.OnDateSetListener {
         @Override
         public void onDateSet(DatePickerDialog datePickerDialog, int year, int month, int day) {
@@ -411,4 +445,78 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
         }
     }
+
+    protected void restGet(String url, AsyncHttpResponseHandler responseHandler) {
+        RestClient.getInstance().get(url, authTokenJsonHeader(), responseHandler);
+    }
+
+    private String kHttpReqKeyContentType = "Content-Type";
+    private String kHttpReqKeyAuthToken = "token";
+
+    private String getToken(String json) {
+        try {
+            HashMap<String, String> params = StringUtil.JSONString2HashMap(json);
+            return params.get("token");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private HashMap<String, String> authTokenJsonHeader() {
+        String json = prefs.getString(Constants.kWebDataKeyUserLogin, null);
+        String token = getToken(json);
+
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put(kHttpReqKeyAuthToken, token);
+        hashMap.put(kHttpReqKeyContentType, "application/json");
+
+        return hashMap;
+    }
+
+    protected boolean userAlreadyLogin(String json) {
+        HashMap<String, String> params = null;
+        try {
+            params = StringUtil.JSONString2HashMap(json);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (params.get("user_info") != null) return true;
+        else return false;
+    }
+
+    protected String getUserId(String json) {
+        try {
+            HashMap<String, String> params = StringUtil.JSONString2HashMap(json);
+            if (params.get("user_info") != null)
+                params = StringUtil.JSONString2HashMap(params.get("user_info"));
+            else
+                params = StringUtil.JSONString2HashMap(params.get("agency_info"));
+
+            return params.get("user_id");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Bugtags.onResume(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Bugtags.onPause(this);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        Bugtags.onDispatchTouchEvent(this, event);
+        return super.dispatchTouchEvent(event);
+    }
+
+
 }

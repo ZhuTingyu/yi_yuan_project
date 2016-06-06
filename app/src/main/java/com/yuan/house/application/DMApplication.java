@@ -193,7 +193,7 @@ public class DMApplication extends MultiDexApplication {
 
         String avInstallId = AVInstallation.getCurrentInstallation().getInstallationId();
         prefs.edit().putString("AVInstallationId", avInstallId).commit();
-        RestClient.getInstance().setkHost(Constants.kWebServiceAPIEndpoint);
+        RestClient.getInstance().setHostname(Constants.kWebServiceAPIEndpoint);
 
 //        AVInstallation.getCurrentInstallation().saveInBackground(new SaveCallback() {
 //            @Override
@@ -345,7 +345,7 @@ public class DMApplication extends MultiDexApplication {
         requestParams.put("product", product);
         requestParams.put("version", cachedVersion);
 
-        RestClient.getInstance().get(Constants.kServiceCheckUpdate, requestParams, new JsonHttpResponseHandler() {
+        RestClient.getInstance().get(Constants.kServiceCheckUpdate, null, requestParams, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);

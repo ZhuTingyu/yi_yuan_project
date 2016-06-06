@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/rl_chatroom"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -15,14 +16,14 @@
             android:id="@+id/back"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
             android:layout_marginLeft="15dp"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/chat_common_base_header_back_btn"/>
+                android:src="@drawable/chat_common_base_header_back_btn" />
 
         </LinearLayout>
 
@@ -30,38 +31,45 @@
             android:id="@+id/rl_center"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
             android:layout_centerInParent="true"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="test"
-                android:textSize="16dp"
-                android:textColor="@color/chat_common_white"/>
+                android:textColor="@color/chat_common_white"
+                android:textSize="16dp" />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
             android:layout_alignParentRight="true"
             android:layout_marginRight="15dp"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="搜索"
-                android:textSize="14dp"
-                android:textColor="@color/chat_common_white"/>
+                android:textColor="@color/chat_common_white"
+                android:textSize="14dp" />
 
         </LinearLayout>
     </RelativeLayout>
+
+    <com.victor.loading.rotate.RotateLoading
+        android:id="@+id/rotateloading"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_centerInParent="true"
+        app:loading_width="5dp" />
 
     <com.avoscloud.leanchatlib.view.xlist.XListView
         android:id="@+id/listview"
@@ -75,12 +83,26 @@
         android:dividerHeight="5dp"
         android:scrollbarStyle="outsideOverlay"
         android:stackFromBottom="true" />
-    <WebView
-        android:id="@+id/webview"
-        android:layout_below="@+id/topbar"
+
+    <FrameLayout
+        android:id="@+id/fragmentBBS"
+        android:name="com.yuan.house.ui.fragment.BBSFragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="vertical"/>
+        android:layout_height="60dp" />
+
+    <!--<WebView-->
+    <!--android:id="@+id/webview"-->
+    <!--android:layout_below="@+id/topbar"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:scrollbars="vertical"/>-->
+
+    <FrameLayout
+        android:id="@+id/fr"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </FrameLayout>
 
     <LinearLayout
         android:id="@+id/bottomLayout"

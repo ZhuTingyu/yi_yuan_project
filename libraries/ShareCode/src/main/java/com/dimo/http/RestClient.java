@@ -1,11 +1,14 @@
 package com.dimo.http;
 
+import android.os.Looper;
+
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.SyncHttpClient;
 
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
@@ -13,7 +16,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import timber.log.Timber;
 
@@ -28,9 +33,29 @@ public class RestClient {
 
     private static RestClient mInstance = null;
 
-    private static AsyncHttpClient client = new AsyncHttpClient();
+    private static AsyncHttpClient mAsyncClient = new AsyncHttpClient();
+    private static SyncHttpClient mSyncClient = new SyncHttpClient();
 
-    private String kHost;
+    static {
+        mAsyncClient.setTimeout(20000);
+        mSyncClient.setTimeout(20000);
+    }
+
+    private String mHostname;
+
+    public RestClient() {
+        getClient().setTimeout(20 * 1000);
+    }
+
+    /**
+     * @return an async client when calling from the main thread, otherwise a sync client.
+     */
+    private static AsyncHttpClient getClient() {
+        // Return the synchronous HTTP client when the thread is not prepared
+        if (Looper.myLooper() == null)
+            return mSyncClient;
+        return mAsyncClient;
+    }
 
     public static RestClient getInstance() {
         if (mInstance == null) {
@@ -39,18 +64,40 @@ public class RestClient {
         return mInstance;
     }
 
-    public void setkHost(String kHost) {
-        this.kHost = kHost;
+    public RestClient setHostname(String mHost) {
+        this.mHostname = mHost;
+        return mInstance;
     }
 
-    public void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+    public void get(String url, HashMap<String, String> headers, AsyncHttpResponseHandler responseHandler) {
+        String rawUrl;
+        if (url.startsWith("http://") || url.startsWith("https://")) {
+            rawUrl = url;
+        } else {
+            rawUrl = getAbsoluteUrl(url);
+        }
+
+        if (headers != null && (headers instanceof HashMap)) {
+            Iterator it = headers.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                Timber.v(pair.getKey() + " = " + pair.getValue());
+                getClient().addHeader(pair.getKey().toString(), pair.getValue().toString());
+                it.remove(); // avoids a ConcurrentModificationException
+            }
+        }
+
+        getClient().get(rawUrl, null, responseHandler);
+    }
+
+    public void get(String url, HashMap<String, String> headers, RequestParams params, AsyncHttpResponseHandler responseHandler) {
         String rawUrl = null;
         if (url.startsWith("http://") || url.startsWith("https://")) {
             rawUrl = url;
         } else {
             rawUrl = getAbsoluteUrl(url);
         }
-        client.get(rawUrl, params, responseHandler);
+        getClient().get(rawUrl, params, responseHandler);
     }
 
     public void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
@@ -60,7 +107,7 @@ public class RestClient {
         } else {
             rawUrl = getAbsoluteUrl(url);
         }
-        client.post(rawUrl, params, responseHandler);
+        getClient().post(rawUrl, params, responseHandler);
     }
 
     public void bridgeRequest(JSONObject params, int requestMethod, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
@@ -199,20 +246,20 @@ public class RestClient {
             params.setUseJsonStreamer(true);
         switch (method) {
             case METHOD_GET:
-                client.get(null, rawUrl, headers, params, responseHandler);
+                getClient().get(null, rawUrl, headers, params, responseHandler);
                 break;
             case METHOD_POST:
-                client.post(null, rawUrl, headers, params, null, responseHandler);
+                getClient().post(null, rawUrl, headers, params, null, responseHandler);
                 break;
             case METHOD_PUT:
                 try {
-                    client.put(null, rawUrl, headers, params == null ? null : params.getEntity(null), null, responseHandler);
+                    getClient().put(null, rawUrl, headers, params == null ? null : params.getEntity(null), null, responseHandler);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 break;
             case MEHOTD_DELETE:
-                client.delete(null, rawUrl, headers, params, responseHandler);
+                getClient().delete(null, rawUrl, headers, params, responseHandler);
                 break;
             default:
                 throw new IllegalArgumentException("");
@@ -220,6 +267,6 @@ public class RestClient {
     }
 
     private String getAbsoluteUrl(String relativeUrl) {
-        return kHost + relativeUrl;
+        return mHostname + relativeUrl;
     }
 }

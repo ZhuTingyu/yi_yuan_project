@@ -1,6 +1,7 @@
 package com.avoscloud.leanchatlib.activity;
 
 import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,7 +12,6 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
-import android.test.suitebuilder.annotation.Suppress;
 import android.text.Editable;
 import android.text.Selection;
 import android.text.Spannable;
@@ -24,17 +24,14 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.AVIMReservedMessageType;
 import com.avos.avoscloud.im.v2.AVIMTypedMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMAudioMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMImageMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMLocationMessage;
-import com.yuan.skeleton.R;
 import com.avoscloud.leanchatlib.adapter.ChatEmotionGridAdapter;
 import com.avoscloud.leanchatlib.adapter.ChatEmotionPagerAdapter;
 import com.avoscloud.leanchatlib.adapter.ChatMessageAdapter;
@@ -57,6 +54,9 @@ import com.avoscloud.leanchatlib.view.xlist.XListView;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.PauseOnScrollListener;
+import com.yuan.house.activities.WebViewBasedActivity;
+import com.yuan.house.utils.ToastUtil;
+import com.yuan.skeleton.R;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -73,7 +73,7 @@ import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 
-public class ChatActivity extends BaseActivity implements OnClickListener,
+public class ChatActivity extends WebViewBasedActivity implements OnClickListener,
         XListView.IXListViewListener {
     public static final String CONVID = "convid";
     private static final int PAGE_SIZE = 20;
@@ -94,15 +94,15 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
     protected ChatMessageAdapter adapter;
     protected RoomsTable roomsTable;
     protected View chatTextLayout, chatAudioLayout, chatAddLayout, chatEmotionLayout;
-    protected View turnToTextBtn, turnToAudioBtn, sendBtn, addImageBtn, showAddBtn, addFileBtn, showEmotionBtn,addChangeHouseBtn;
+    protected View turnToTextBtn, turnToAudioBtn, sendBtn, addImageBtn, showAddBtn, addFileBtn, showEmotionBtn, addChangeHouseBtn;
     protected ViewPager emotionPager;
     protected EmotionEditText contentEdit;
     protected XListView xListView;
     protected RecordButton recordBtn;
     protected String localCameraPath = PathUtils.getTmpPath();
     protected View addCameraBtn;
-    private LocationHandler locationHandler;
     protected WebViewJavascriptBridge bridge;
+    private LocationHandler locationHandler;
 
     public static ChatActivity getChatInstance() {
         return chatInstance;
@@ -183,8 +183,7 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
         xListView.setPullRefreshEnable(true);
         xListView.setPullLoadEnable(false);
         xListView.setXListViewListener(this);
-        xListView.setOnScrollListener(
-                new PauseOnScrollListener(ImageLoader.getInstance(), true, true));
+        xListView.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(), true, true));
     }
 
     private void initEmotionPager() {
@@ -198,10 +197,10 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
     }
 
     private View getEmotionGridView(int pos) {
-        LayoutInflater inflater = LayoutInflater.from(ctx);
+        LayoutInflater inflater = LayoutInflater.from(mContext);
         View emotionView = inflater.inflate(R.layout.chat_emotion_gridview, null, false);
         GridView gridView = (GridView) emotionView.findViewById(R.id.gridview);
-        final ChatEmotionGridAdapter chatEmotionGridAdapter = new ChatEmotionGridAdapter(ctx);
+        final ChatEmotionGridAdapter chatEmotionGridAdapter = new ChatEmotionGridAdapter(mContext);
         List<String> pageEmotions = EmotionHelper.emojiGroups.get(pos);
         chatEmotionGridAdapter.setDatas(pageEmotions);
         gridView.setAdapter(chatEmotionGridAdapter);
@@ -275,7 +274,7 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
     }
 
     void commonInit() {
-        ctx = this;
+        mContext = this;
         chatInstance = this;
         msgsTable = MsgsTable.getCurrentUserInstance();
         roomsTable = RoomsTable.getCurrentUserInstance();
@@ -290,12 +289,27 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
             throw new NullPointerException("conv is null");
         }
         initActionBar(ConversationHelper.titleOfConv(conversation));
+
         messageAgent = new MessageAgent(conversation);
         messageAgent.setSendCallback(defaultSendCallback);
         roomsTable.insertRoom(convid);
         roomsTable.clearUnread(conversation.getConversationId());
         conversationType = ConversationHelper.typeOfConv(conversation);
+
         bindAdapterToListView(conversationType);
+    }
+
+    private void initActionBar(String title) {
+        ActionBar actionBar = getActionBar();
+        if (actionBar == null) {
+            throw new NullPointerException("action bar is null");
+        }
+        if (title != null) {
+            actionBar.setTitle(title);
+        }
+        actionBar.setDisplayUseLogoEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+//        actionBar.hide();
     }
 
     private void bindAdapterToListView(ConversationType conversationType) {
@@ -325,7 +339,7 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
             public void onAudioLongClick(final AVIMAudioMessage audioMessage) {
                 //弹出编辑文本(语音附加消息)，确认后上传。
                 final EditText inputServer = new EditText(ChatActivity.this);
-                AlertDialog.Builder builder = new AlertDialog.Builder(ChatActivity.this,R.style.AlertDialogCustom);
+                AlertDialog.Builder builder = new AlertDialog.Builder(ChatActivity.this, R.style.AlertDialogCustom);
                 builder.setTitle("附加消息").setIcon(android.R.drawable.ic_dialog_info).setView(inputServer)
                         .setNegativeButton("取消", null);
                 builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
@@ -333,8 +347,8 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
                     public void onClick(DialogInterface dialog, int which) {
                         //封装成MAP对象后转换为json
                         OkHttpUtils.get().url("https://leancloud.cn/1.1/rtm/messages/logs?convid=" + audioMessage.getConversationId())
-                                .addHeader("X-LC-Id","IwzlUusBdjf4bEGlypaqNRIx-gzGzoHsz")
-                                .addHeader("X-LC-Key","4iGQy4Mg1Q8o3AyvtUTGiFQl,master")
+                                .addHeader("X-LC-Id", "IwzlUusBdjf4bEGlypaqNRIx-gzGzoHsz")
+                                .addHeader("X-LC-Key", "4iGQy4Mg1Q8o3AyvtUTGiFQl,master")
                                 .build()
                                 .execute(new StringCallback() {
                                     @Override
@@ -344,11 +358,11 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
 
                                     @Override
                                     public void onResponse(String response) {
-                                        Log.i("云端返回的JSON",response);
+                                        Log.i("云端返回的JSON", response);
                                         JSONArray jsonArray = JSONArray.parseArray(response);
-                                        for (int i = 0; i < jsonArray.size(); i++){
-                                            if(jsonArray.getJSONObject(i).get("msg-id").toString().equals(audioMessage.getMessageId())){
-                                                putJson2LeanChat(jsonArray.get(i).toString(),inputServer.getText().toString());
+                                        for (int i = 0; i < jsonArray.size(); i++) {
+                                            if (jsonArray.getJSONObject(i).get("msg-id").toString().equals(audioMessage.getMessageId())) {
+                                                putJson2LeanChat(jsonArray.get(i).toString(), inputServer.getText().toString());
                                                 return;
                                             }
                                         }
@@ -363,18 +377,18 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
         xListView.setAdapter(adapter);
     }
 
-    private void putJson2LeanChat(String json,String text){
+    private void putJson2LeanChat(String json, String text) {
         StringBuffer stringBuffer = new StringBuffer(json);
-        stringBuffer.insert(stringBuffer.indexOf(":-3") + 3,",\\\"_lctext\\\":" + "\\\"" + text + "\\\"");
-        Log.i("new json " , stringBuffer.toString());
+        stringBuffer.insert(stringBuffer.indexOf(":-3") + 3, ",\\\"_lctext\\\":" + "\\\"" + text + "\\\"");
+        Log.i("new json ", stringBuffer.toString());
 
-        Map<String,String> headers = new HashMap<>();
-        headers.put("X-LC-Id","IwzlUusBdjf4bEGlypaqNRIx-gzGzoHsz");
-        headers.put("X-LC-Key","4iGQy4Mg1Q8o3AyvtUTGiFQl,master");
+        Map<String, String> headers = new HashMap<>();
+        headers.put("X-LC-Id", "IwzlUusBdjf4bEGlypaqNRIx-gzGzoHsz");
+        headers.put("X-LC-Key", "4iGQy4Mg1Q8o3AyvtUTGiFQl,master");
 
         OkHttpUtils.put().url("https://leancloud.cn/1.1/rtm/messages/logs")
                 .headers(headers)
-                .requestBody(RequestBody.create(MediaType.parse("application/json"),stringBuffer.toString()))
+                .requestBody(RequestBody.create(MediaType.parse("application/json"), stringBuffer.toString()))
                 .build()
                 .execute(new StringCallback() {
                     @Override
@@ -384,13 +398,13 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
 
                     @Override
                     public void onResponse(String response) {
-                        Log.i("修改聊天记录 : ",response);
+                        Log.i("修改聊天记录 : ", response);
                     }
                 });
     }
 
     public void refreshMsgsFromDB() {
-        new GetDataTask(ctx, false).execute();
+        new GetDataTask(mContext, false).execute();
     }
 
     @Override
@@ -398,7 +412,7 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                new GetDataTask(ctx, true).execute();
+                new GetDataTask(mContext, true).execute();
             }
         }, 1000);
     }
@@ -427,13 +441,13 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
             hideBottomLayoutAndScrollToLast();
         } else if (v.getId() == R.id.addCameraBtn) {
             selectImageFromCamera();
-        } else if (v.getId() == R.id.addChangeHouseBtn){
+        } else if (v.getId() == R.id.addChangeHouseBtn) {
             //房源
             openHouseInfo();
         }
     }
 
-    protected void openHouseInfo(){
+    protected void openHouseInfo() {
 
     }
 
@@ -528,7 +542,8 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
                 case GALLERY_REQUEST:
                 case GALLERY_KITKAT_REQUEST:
                     if (data == null) {
-                        toast("return data is null");
+                        ToastUtil.show(mContext, "return data is null");
+
                         return;
                     }
                     Uri uri;
@@ -542,7 +557,7 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
 
                         getContentResolver().takePersistableUriPermission(uri, takeFlags);
                     }
-                    String localSelectPath = ProviderPathUtils.getPath(ctx, uri);
+                    String localSelectPath = ProviderPathUtils.getPath(mContext, uri);
                     messageAgent.sendImage(localSelectPath);
                     hideBottomLayout();
                     break;
@@ -675,7 +690,7 @@ public class ChatActivity extends BaseActivity implements OnClickListener,
                     if (msgs.size() > 0) {
                         xListView.setSelection(msgs.size() - 1);
                     } else {
-                        toast(R.string.chat_activity_loadMessagesFinish);
+                        ToastUtil.show(mContext, R.string.chat_activity_loadMessagesFinish);
                     }
                 }
             }

@@ -14,6 +14,7 @@ import com.dimo.utils.StringUtil;
 import com.yuan.house.activities.MainActivity;
 import com.yuan.house.activities.MapActivity;
 import com.yuan.house.application.Injector;
+import com.yuan.house.common.Constants;
 import com.yuan.skeleton.R;
 
 import org.json.JSONException;
@@ -53,7 +54,7 @@ public class UserMainFragment extends WebViewBaseFragment {
         ButterKnife.reset(this);
         ButterKnife.inject(this, view);
 
-        redirectToLoadUrl("user_index.html");
+        redirectToLoadUrl(Constants.kWebPageUserIndex);
 
         return view;
     }

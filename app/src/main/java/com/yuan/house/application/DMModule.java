@@ -1,7 +1,7 @@
 package com.yuan.house.application;
 
 
-
+import com.avoscloud.chat.ui.chat.ChatRoomActivity;
 import com.yuan.house.activities.IPSettingActivity;
 import com.yuan.house.activities.MainActivity;
 import com.yuan.house.activities.MapActivity;
@@ -12,6 +12,7 @@ import com.yuan.house.activities.WebViewBasedActivity;
 import com.yuan.house.ui.dialog.PopUpDialog;
 import com.yuan.house.ui.fragment.AgencyMainFragment;
 import com.yuan.house.ui.fragment.AgencyMessageFragment;
+import com.yuan.house.ui.fragment.FragmentBBS;
 import com.yuan.house.ui.fragment.LoginFragment;
 import com.yuan.house.ui.fragment.UserMainFragment;
 import com.yuan.house.ui.fragment.UserMessageFragment;
@@ -32,14 +33,6 @@ import dagger.Module;
 
                 injects = {
                         DMApplication.class,
-                        IPSettingActivity.class,
-                        SplashActivity.class,
-                        TutorialActivity.class,
-                        MainActivity.class,
-                        WebViewBasedActivity.class,
-                        WebViewActivity.class,
-
-                        MapActivity.class,
 
                         WebViewBaseFragment.class,
                         WebViewFragment.class,
@@ -49,6 +42,16 @@ import dagger.Module;
                         UserMessageFragment.class,
                         LoginFragment.class,
                         UserProposalFragment.class,
+                        FragmentBBS.class,
+
+                        IPSettingActivity.class,
+                        SplashActivity.class,
+                        TutorialActivity.class,
+                        MainActivity.class,
+                        WebViewBasedActivity.class,
+                        WebViewActivity.class,
+                        ChatRoomActivity.class,
+                        MapActivity.class,
 
                         PopUpDialog.class,
                         JsonParse.class
