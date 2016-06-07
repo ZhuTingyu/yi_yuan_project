@@ -68,7 +68,6 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
     private RelativeLayout chatroom;
     private LinearLayout bottomLayout;
     private String value;
-    private LinearLayout back;
     private List<JSONObject> houseInfos;
     private GestureDetector gestureDetector;
     private int mLastY = 0;
@@ -132,15 +131,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        back = (LinearLayout) findViewById(R.id.back);
-
         gestureDetector = new GestureDetector(this, onGestureListener);
-        back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
 
         mFragmentBBS = FragmentBBS.newInstance();
 

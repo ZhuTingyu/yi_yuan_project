@@ -124,7 +124,7 @@ public class UserProposalFragment extends WebViewBaseFragment {
         ButterKnife.inject(this, view);
 
         try {
-            //TODO 根据登陆账户加载不同的页面
+            // TODO: 根据登陆账户加载不同的页面
             if (JsonParse.getInstance().judgeUserType()) {
                 redirectToLoadUrl("user_center.html");
                 type = 1;

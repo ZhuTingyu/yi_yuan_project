@@ -82,12 +82,10 @@
 
         <activity
             android:name="com.avoscloud.chat.ui.chat.ChatRoomActivity"
-            android:launchMode="singleTask"
-            android:theme="@style/ChatMainTheme" />
+            android:launchMode="singleTask"/>
 
         <activity android:name="com.avoscloud.leanchatlib.activity.ImageBrowserActivity"
-            android:launchMode="singleTask"
-            android:theme="@style/ChatMainTheme"/>
+            android:launchMode="singleTask"/>
 
         <activity android:name="com.yuan.cp.activity.ClipPictureActivity"
             android:launchMode="singleTask"

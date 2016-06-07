@@ -122,15 +122,31 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.chat_layout);
+
+        setContentView(R.layout.chat_layout, true, false);
+
         commonInit();
+
+        initTitleView();
+
         findView();
+
         initEmotionPager();
         initRecordBtn();
         setEditTextChangeListener();
         initListView();
         setSoftInputMode();
         initByIntent(getIntent());
+    }
+
+    private void initTitleView() {
+        setTitleItem("13123");
+        setLeftItem(R.drawable.back, new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     private void findView() {
@@ -288,7 +304,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         if (conversation == null) {
             throw new NullPointerException("conv is null");
         }
-        initActionBar(ConversationHelper.titleOfConv(conversation));
+//        initActionBar(ConversationHelper.titleOfConv(conversation));
 
         messageAgent = new MessageAgent(conversation);
         messageAgent.setSendCallback(defaultSendCallback);
@@ -297,19 +313,6 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         conversationType = ConversationHelper.typeOfConv(conversation);
 
         bindAdapterToListView(conversationType);
-    }
-
-    private void initActionBar(String title) {
-        ActionBar actionBar = getActionBar();
-        if (actionBar == null) {
-            throw new NullPointerException("action bar is null");
-        }
-        if (title != null) {
-            actionBar.setTitle(title);
-        }
-        actionBar.setDisplayUseLogoEnabled(false);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-//        actionBar.hide();
     }
 
     private void bindAdapterToListView(ConversationType conversationType) {

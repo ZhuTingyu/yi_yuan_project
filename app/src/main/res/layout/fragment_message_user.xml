@@ -34,10 +34,9 @@
             android:layout_marginRight="20dp"
             android:gravity="center_vertical">
 
-            <TextView
+            <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/tabbar_item_txt_msg"
                 android:textSize="16dp"
                 android:textColor="@color/white"/>
 
@@ -54,7 +53,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="按房源"
+                android:text="@string/txt_msg_right_item_sort_by_agency"
                 android:textSize="14dp"
                 android:textColor="@color/white"/>
 
