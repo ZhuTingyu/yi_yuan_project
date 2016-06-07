@@ -62,7 +62,7 @@ public class FragmentBBS extends WebViewBaseFragment {
             if (JsonParse.getInstance().judgeUserType()) {
                 redirectToLoadUrl(Constants.kWebPageUserBBS);
             } else {
-                redirectToLoadUrl(Constants.kWebPageAgentBBS);
+                redirectToLoadUrl(Constants.kWebPageAgencyBBS);
             }
         } catch (JSONException e) {
             e.printStackTrace();
