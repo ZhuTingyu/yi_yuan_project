@@ -1,7 +1,6 @@
 package com.avoscloud.leanchatlib.activity;
 
 import android.annotation.TargetApi;
-import android.app.ActionBar;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;

@@ -110,6 +110,7 @@
     <string name="map_search_loc_button_text">搜索</string>
     <string name="map_no_location_found">没有找到相似的地址</string>
     <string name="hint_input_text">在这里输入你想说的话...</string>
+    <string name="hint_input_search">搜索 ...</string>
     <string name="save">保存</string>
     <string name="text_category">分类</string>
     <string name="use_camera">照相机</string>
