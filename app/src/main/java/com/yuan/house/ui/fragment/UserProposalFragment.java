@@ -124,12 +124,11 @@ public class UserProposalFragment extends WebViewBaseFragment {
         ButterKnife.inject(this, view);
 
         try {
-            // TODO: 根据登陆账户加载不同的页面
             if (JsonParse.getInstance().judgeUserType()) {
-                redirectToLoadUrl("user_center.html");
+                redirectToLoadUrl(Constants.kWebpageUserCenter);
                 type = 1;
             }else {
-                redirectToLoadUrl("agency_center.html");
+                redirectToLoadUrl(Constants.kWebpageAgencyCenter);
                 type = 2;
             }
         } catch (JSONException e) {
@@ -141,8 +140,11 @@ public class UserProposalFragment extends WebViewBaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         proposal.performClick();
+
         this.params = getActivity().getWindow().getAttributes();
+
         initPopupView();
         initPopupViewConfig();
         initOnClickListener();

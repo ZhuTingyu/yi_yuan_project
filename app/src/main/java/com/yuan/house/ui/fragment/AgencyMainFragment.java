@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.yuan.house.common.Constants;
 import com.yuan.skeleton.R;
 import com.yuan.house.application.Injector;
 
@@ -33,7 +34,7 @@ public class AgencyMainFragment extends WebViewBaseFragment {
         ButterKnife.reset(this);
         ButterKnife.inject(this, view);
 
-        redirectToLoadUrl("agency_index.html");
+        redirectToLoadUrl(Constants.kWebPageAgencyIndex);
         return view;
     }
 

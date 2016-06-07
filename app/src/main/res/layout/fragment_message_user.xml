@@ -10,7 +10,7 @@
         android:background="@drawable/background_title">
 
         <LinearLayout
-            android:id="@+id/book"
+            android:id="@+id/contacts"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="horizontal"
@@ -26,23 +26,29 @@
 
         <LinearLayout
             android:id="@+id/rl_center"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:layout_centerInParent="true"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="80dp"
+            android:layout_marginRight="80dp"
             android:gravity="center_vertical">
 
             <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:textSize="16dp"
+                android:drawableLeft="@drawable/img_search"
+                android:hint="@string/hint_input_search"
+                android:background="@drawable/bg_input_box"
                 android:textColor="@color/white"/>
 
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/sortBy"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="horizontal"
@@ -51,16 +57,11 @@
             android:gravity="center_vertical">
 
             <TextView
+                android:id="@+id/rightItem"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/txt_msg_right_item_sort_by_agency"
                 android:textSize="14dp"
                 android:textColor="@color/white"/>
-
-            <ImageView
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:src="@drawable/btn_arrow_down"/>
 
         </LinearLayout>
     </RelativeLayout>

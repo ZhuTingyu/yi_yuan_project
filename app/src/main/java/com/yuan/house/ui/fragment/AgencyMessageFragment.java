@@ -5,20 +5,28 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
-import com.yuan.skeleton.R;
-import com.yuan.house.activities.MainActivity;
+import com.dimo.web.WebViewJavascriptBridge;
 import com.yuan.house.application.Injector;
+import com.yuan.house.common.Constants;
+import com.yuan.skeleton.R;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 
 import butterknife.ButterKnife;
+import butterknife.InjectView;
 import butterknife.OnClick;
 
 /**
  * Created by KevinLee on 2016/4/24.
  */
 public class AgencyMessageFragment extends WebViewBaseFragment {
+    @InjectView(R.id.rightItem)
+    TextView tvRightItem;
 
     public static AgencyMessageFragment newInstance() {
         AgencyMessageFragment fragment = new AgencyMessageFragment();
@@ -37,7 +45,7 @@ public class AgencyMessageFragment extends WebViewBaseFragment {
         ButterKnife.reset(this);
         ButterKnife.inject(this, view);
 
-        redirectToLoadUrl("agency_message.html");
+        redirectToLoadUrl(Constants.kWebPageAgencyMessage);
 
         return view;
     }
@@ -45,18 +53,42 @@ public class AgencyMessageFragment extends WebViewBaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        registerHandle();
     }
 
-    @OnClick({R.id.book})
+    @Override
+    protected void registerHandle() {
+        super.registerHandle();
+
+        bridge.registerHandler("setRightItem", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                try {
+                    JSONObject object = new JSONObject(data);
+                    if ("text".equals(object.getString("type"))) {
+                        tvRightItem.setText(object.getString("content"));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    @OnClick({R.id.contacts, R.id.sortBy})
     public void onClick(View v){
         switch (v.getId()){
-            case R.id.book:
+            case R.id.contacts:
                 String url = "agency_contacts.html";
                 HashMap<String,String> map = new HashMap<String, String>();
                 map.put("params","{\"title\":\"通讯录\",\"hasBackButton\":true}");
-                ((MainActivity)getActivity()).openLinkInNewActivity(url,map);
+//                ((MainActivity)getActivity()).openLinkInNewActivity(url,map);
+                mBridgeListener.onBridgeOpenNewLink(url, map);
+                break;
+            case R.id.sortBy:
+                getBridge().callHandler(Constants.kJavascriptFnOnRightItemClick);
                 break;
         }
     }
-
 }
