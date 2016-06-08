@@ -15,8 +15,6 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
-import com.avos.avoscloud.AVInstallation;
-import com.avoscloud.chat.service.CacheService;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
@@ -39,7 +37,6 @@ import com.yuan.house.event.WebBroadcastEvent;
 import com.yuan.house.payment.AliPay;
 import com.yuan.house.ui.fragment.WebViewBaseFragment;
 import com.yuan.house.ui.fragment.WebViewFragment;
-import com.yuan.house.utils.JsonParse;
 import com.yuan.house.utils.ToastUtil;
 import com.yuan.skeleton.R;
 
@@ -47,27 +44,29 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import me.nereo.multi_image_selector.MultiImageSelector;
+import me.nereo.multi_image_selector.MultiImageSelectorActivity;
 import timber.log.Timber;
 
 /**
  * Created by Alsor Zhou on 8/12/15.
  */
 public abstract class WebViewBasedActivity extends BaseFragmentActivity implements WebViewFragment.OnFragmentInteractionListener, WebViewFragment.OnBridgeInteractionListener {
-    public static final int kActivityRequestCodeWebActivity = 3;
-
+    protected static final int kActivityRequestCodeWebActivity = 3;
+    protected final int kActivityRequestCodeImagePickOnly = 9;
     protected FragmentManager mFragmentManager;
     protected FragmentTransaction mFragmentTransaction;
     protected String mUrl;
-
     @InjectView(R.id.rotateloading)
     protected RotateLoading mLoadingDialog;
-
     WebViewBaseFragment webViewFragment;
-
+    private int kActivityRequestCodeImagePickThenCrop = 10;
     private AliPay aliPay;
     private String pay_type;
     private Handler mHandler = new Handler() {
@@ -79,6 +78,9 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             }
         }
     };
+    private String kHttpReqKeyContentType = "Content-Type";
+    private String kHttpReqKeyAuthToken = "token";
+    private WebViewJavascriptBridge.WVJBResponseCallback mBridgeCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,8 +168,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     protected void hideSoftInputView() {
-        if (getWindow().getAttributes().softInputMode !=
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN) {
+        if (getWindow().getAttributes().softInputMode != WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN) {
             InputMethodManager manager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             View currentFocus = getCurrentFocus();
             if (currentFocus != null) {
@@ -215,24 +216,48 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         webViewFragment = fragment;
     }
 
-    //TODO: 接收Web端触发的Event事件
+    //TODO: 接收 Web 端触发的 Event 事件
     public void onEvent(WebBroadcastEvent event) {
         Toast.makeText(mContext, event.result, Toast.LENGTH_SHORT).show();
     }
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-    }
+        if (requestCode == kActivityRequestCodeWebActivity || requestCode == kActivityRequestCodeImagePickOnly) {
+            String result = null;
+            ArrayList<String> imgUrls = null;
+            if (data != null) {
+                // handle the case if activity is terminated by JS code
+                Bundle res = data.getExtras();
+                if (requestCode == kActivityRequestCodeWebActivity)
+                    result = res.getString("param_result_after_activity_finished");
+                else {
+                    imgUrls = res.getStringArrayList("select_result");
+                    mBridgeCallback.callback(imgUrls);
+                }
+            }
 
-    protected boolean isUserType() {
-        try {
-            return JsonParse.getInstance().judgeUserType();
-        } catch (JSONException e) {
-            e.printStackTrace();
+            Timber.v("Got finished result:" + result);
+
+            // send back the result to original webview
+            getWebViewFragment().getBridge().callHandler("activityFinished", result);
+            return;
+        } else if (requestCode == kActivityRequestCodeImagePickOnly) {
+            if (resultCode == RESULT_OK) {
+                // TODO: 16/5/27 获取到选取照片的本地文件路径
+                // Get the result list of select image paths
+                List<String> path = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
+                // /storage/emulated/0/DCIM/IMG_-646584368.jpg
+
+                Timber.v("Finish pick images");
+
+                mBridgeCallback.callback(path);
+            }
+        } else {
+            // never reach
+            Timber.e("onActivityResult SHOULD NEVER REACH");
         }
-        return true;
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     public void onBridgeRequestPurchase(WebViewJavascriptBridge.WVJBResponseCallback callback) {
@@ -272,8 +297,27 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         }
     }
 
-    public void onBridgeSelectImageFromNative() {
+    public void onBridgeSelectImageFromNative(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
+        mBridgeCallback = callback;
 
+        int requestCode = kActivityRequestCodeImagePickOnly;
+        MultiImageSelector selector = MultiImageSelector.create(mContext)
+                .showCamera(true) // show camera or not. true by default
+                .count(9);// max select image size, 9 by default. used width #.multi()
+        try {
+            JSONObject object = new JSONObject(data);
+            String type = object.optString("type");
+            if ("rectangle".equals(type) || "square".equals(type)) {
+                selector = selector.single(); // single mode
+                requestCode = kActivityRequestCodeImagePickThenCrop;
+            } else if ("none".equals(type)) {
+                selector = selector.multi(); // single mode
+            }
+
+            selector.start(this, requestCode);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public void onBridgeOpenNewLink(String url, HashMap<String, String> params) {
@@ -424,33 +468,9 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         }
     }
 
-
-    private class DataPickerOnClickListener implements DatePickerDialog.OnDateSetListener {
-        @Override
-        public void onDateSet(DatePickerDialog datePickerDialog, int year, int month, int day) {
-            StringBuffer sb = new StringBuffer();
-            sb.append(year);
-            sb.append("-");
-            sb.append(month);
-            sb.append("-");
-            sb.append(day);
-//            mCallback.callback(sb.toString());
-        }
-    }
-
-    private class TimePickerOnClickListener implements TimePickerDialog.OnTimeSetListener {
-        @Override
-        public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute) {
-
-        }
-    }
-
     protected void restGet(String url, AsyncHttpResponseHandler responseHandler) {
         RestClient.getInstance().get(url, authTokenJsonHeader(), responseHandler);
     }
-
-    private String kHttpReqKeyContentType = "Content-Type";
-    private String kHttpReqKeyAuthToken = "token";
 
     private String getToken(String json) {
         try {
@@ -515,6 +535,26 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     public boolean dispatchTouchEvent(MotionEvent event) {
         Bugtags.onDispatchTouchEvent(this, event);
         return super.dispatchTouchEvent(event);
+    }
+
+    private class DataPickerOnClickListener implements DatePickerDialog.OnDateSetListener {
+        @Override
+        public void onDateSet(DatePickerDialog datePickerDialog, int year, int month, int day) {
+            StringBuffer sb = new StringBuffer();
+            sb.append(year);
+            sb.append("-");
+            sb.append(month);
+            sb.append("-");
+            sb.append(day);
+//            mCallback.callback(sb.toString());
+        }
+    }
+
+    private class TimePickerOnClickListener implements TimePickerDialog.OnTimeSetListener {
+        @Override
+        public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute) {
+
+        }
     }
 
 

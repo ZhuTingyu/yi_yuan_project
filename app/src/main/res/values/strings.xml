@@ -138,8 +138,8 @@
     <string name="hint_warning">本界面只是为了调测方便,在输入框中输入页面的地址,即可使用本地的页面包;如果要使用开发服务器上的包,请直接点击确定</string>
     <string name="dummy_ip_setting">在此输入你的页面包服务器地址</string>
     <string name="btn_dummy_ip_setting">确定</string>
-    <string name="dummy_ip">192.168.1.133:8000</string>
-    <!--<string name="dummy_ip">192.168.31.230:8000</string>-->
+    <!--<string name="dummy_ip">192.168.1.133:8000</string>-->
+    <string name="dummy_ip">192.168.31.230:8000</string>
 
 
     <string name="chat_base_list_view_listEmptyHint">无数据</string>
@@ -189,5 +189,6 @@
     <string name="get_location">定位中</string>
     <string name="txt_msg_right_item_sort_by_agency">按经纪人</string>
     <string name="txt_msg_right_item_sort_by_house">按房源</string>
+    <string name="app_name_real">房产</string>
 
 </resources>

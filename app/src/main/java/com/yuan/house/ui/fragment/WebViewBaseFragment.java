@@ -67,13 +67,13 @@ import timber.log.Timber;
  * Created by Alsor Zhou on 8/13/15.
  */
 public class WebViewBaseFragment extends Fragment {
-    public WebViewJavascriptBridge bridge;
+    protected WebViewJavascriptBridge bridge;
     protected OnFragmentInteractionListener mFragmentListener;
     protected OnBridgeInteractionListener mBridgeListener;
     protected String mUrl;
-    WebViewJavascriptBridge.WVJBResponseCallback mCallback;
     @Inject
-    SharedPreferences prefs;
+    protected SharedPreferences prefs;
+    WebViewJavascriptBridge.WVJBResponseCallback mCallback;
     @InjectView(R.id.webview)
     WebView mWebView;
     HashMap<String, String> additionalHttpHeaders;
@@ -656,13 +656,14 @@ public class WebViewBaseFragment extends Fragment {
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("setData got:" + data);
 
-                HashMap<String, String> params = null;
+                HashMap<String, String> params;
                 try {
                     params = StringUtil.JSONString2HashMap(data);
 
                     String key = params.get("key");
                     String value = params.get("value");
 
+                    SharedPreferences.Editor editor = prefs.edit();
                     // TODO: 16/6/5 如果是设置 userLogin,则为登陆
                     if (Constants.kWebDataKeyUserLogin.equals(key)) {
                         mBridgeListener.onBridgeSignIn(data);
@@ -671,10 +672,11 @@ public class WebViewBaseFragment extends Fragment {
                     }
 
                     if (value == null || value.equals("null")) {
-                        prefs.edit().remove(key).apply();
+                        editor.remove(key);
                     } else {
-                        prefs.edit().putString(key, value).apply();
+                        editor.putString(key, value);
                     }
+                    editor.apply();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -1025,7 +1027,7 @@ public class WebViewBaseFragment extends Fragment {
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 Log.i("selectImageFromNative", data);
 
-                mBridgeListener.onBridgeSelectImageFromNative();
+                mBridgeListener.onBridgeSelectImageFromNative(data, jsCallback);
             }
         });
 
@@ -1040,13 +1042,6 @@ public class WebViewBaseFragment extends Fragment {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 mBridgeListener.onBridgeUpdateFriendRelationship();
-            }
-        });
-
-        bridge.registerHandler("signin", new WebViewJavascriptBridge.WVJBHandler() {
-            @Override
-            public void handle(final String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
-                mBridgeListener.onBridgeSignIn(data);
             }
         });
 
@@ -1135,7 +1130,7 @@ public class WebViewBaseFragment extends Fragment {
     public interface OnBridgeInteractionListener {
         void onBridgeRequestPurchase(WebViewJavascriptBridge.WVJBResponseCallback callback);
 
-        void onBridgeSelectImageFromNative();
+        void onBridgeSelectImageFromNative(String data, WebViewJavascriptBridge.WVJBResponseCallback callback);
 
         void onBridgeOpenNewLink(String url, HashMap<String, String> params);
 

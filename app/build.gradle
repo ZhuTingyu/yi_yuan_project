@@ -38,7 +38,8 @@ android {
 
         versionProps.load(new FileInputStream(versionPropsFile))
 
-        def code = versionProps['VERSION_CODE'].toInteger() + 1
+//        def code = versionProps['VERSION_CODE'].toInteger() + 1
+        def code = 1
 
         versionProps['VERSION_CODE'] = code.toString()
         versionProps.store(versionPropsFile.newWriter(), null)
@@ -164,25 +165,27 @@ dependencies {
     compile 'com.github.kevinsawicki:http-request:6.0'
     compile 'com.loopj.android:android-async-http:1.4.6'
     compile 'com.mani:thindownloadmanager:1.0.0'
+    compile 'com.squareup.okhttp:okhttp:2.4.0'
+    compile 'com.zhy:okhttputils:2.4.1'
+
+
+    /** MISC .        */
+    compile 'com.bugtags.library:bugtags-lib:latest.integration'
 
     /** UI .        */
     compile 'com.github.johnpersano:supertoasts:1.3.4@aar'
     compile 'com.metrekare:contentloadingprogressdialog:0.1'
     compile 'com.github.johnkil.android-robototextview:robototextview:2.3.0'
     compile 'com.github.flavienlaurent.datetimepicker:library:0.0.2'
-
-    compile 'com.nineoldandroids:library:2.4.0'
-    compile 'com.github.sd6352051.niftydialogeffects:niftydialogeffects:1.0.0@aar'
     compile 'com.baoyz.actionsheet:library:1.1.1'
-    compile 'com.ashokvarma.android:bottom-navigation-bar:1.0.0'
-
-    compile 'com.bugtags.library:bugtags-lib:latest.integration'
-    compile 'com.squareup.okhttp:okhttp:2.4.0'
-    compile 'com.zhy:okhttputils:2.4.1'
     compile 'com.github.citux:datetimepicker:0.2.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.brucetoo.pickview:library:1.1.1'
     compile 'com.wx.wheelview:wheelview:1.3.3'
+    compile 'com.github.lovetuzitong:MultiImageSelector:1.1'
+    compile 'com.nineoldandroids:library:2.4.0'
+    compile 'com.github.sd6352051.niftydialogeffects:niftydialogeffects:1.0.0@aar'
+    compile 'com.ashokvarma.android:bottom-navigation-bar:1.0.0'
 }
 
 android.applicationVariants.all { variant ->

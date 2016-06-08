@@ -168,13 +168,13 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         }
 
         if (tag.equals(Constants.kFragmentTagMain)) {
-            if (isUserType()) {
+            if (DMApplication.getInstance().iAmUser()) {
                 f = UserMainFragment.newInstance();
             } else {
                 f = AgencyMainFragment.newInstance();
             }
         } else if (tag.equals(Constants.kFragmentTagMessage)) {
-            if (isUserType()) {
+            if (DMApplication.getInstance().iAmUser()) {
                 f = UserMessageFragment.newInstance();
             } else {
                 f = AgencyMessageFragment.newInstance();
@@ -196,7 +196,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         return bottomNavigationBar;
     }
 
-    // FIXME: ugly implementation, need dynamic adapt the tab bar items.
     public void setupTabbarClickListener() {
         this.bottomNavigationBar = ButterKnife.findById(getTabBar(), R.id.bottom_navigation_bar);
         bottomNavigationBar
@@ -206,13 +205,9 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                 .setFirstSelectedPosition(0)
                 .initialise();
 
-        if (!prefs.getBoolean("isLogin", false))
-            return;
-
         bottomNavigationBar.setTabSelectedListener(new BottomNavigationBar.OnTabSelectedListener() {
             @Override
             public void onTabSelected(int position) {
-
                 switch (position) {
                     case 0:
                         switchToFragment(Constants.kFragmentTagMain);
@@ -253,8 +248,13 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         bottomNavigationBar.selectTab(1);
     }
 
+    /**
+     * Callback when user has sign in
+     *
+     * @param data user credentials
+     */
     public void onBridgeSignIn(final String data) {
-        HashMap<String, String> params = null;
+        HashMap<String, String> params;
         try {
             params = StringUtil.JSONString2HashMap(data);
 
@@ -278,6 +278,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                     params = StringUtil.JSONString2HashMap(params.get("agency_info"));
                 }
 
+                // TODO: 16/6/8 edit user type
                 String userName = params.get("lean_user");
                 String passwd = params.get("lean_passwd");
 
@@ -305,8 +306,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                             chatManager.setupDatabaseWithSelfId(AVUser.getCurrentUser().getObjectId());
                             chatManager.openClientWithSelfId(AVUser.getCurrentUser().getObjectId(), null);
                             CacheService.registerUser(AVUser.getCurrentUser());
-
-                            prefs.edit().putBoolean("isLogin", true).commit();
 
                             switchToFragment(Constants.kFragmentTagMain);
                             getBottomNavigationBar().clearAll();

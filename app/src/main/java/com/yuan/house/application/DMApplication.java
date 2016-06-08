@@ -496,4 +496,8 @@ public class DMApplication extends MultiDexApplication {
     public void setRootPagesFolder(String rootPagesFolder) {
         this.rootPagesFolder = rootPagesFolder;
     }
+
+    public boolean iAmUser() {
+        return "user".equals(prefs.getString(Constants.kWebDataKeyLoginType, ""));
+    }
 }

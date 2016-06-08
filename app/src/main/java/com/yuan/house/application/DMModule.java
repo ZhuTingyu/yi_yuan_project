@@ -19,7 +19,6 @@ import com.yuan.house.ui.fragment.UserMessageFragment;
 import com.yuan.house.ui.fragment.UserProposalFragment;
 import com.yuan.house.ui.fragment.WebViewBaseFragment;
 import com.yuan.house.ui.fragment.WebViewFragment;
-import com.yuan.house.utils.JsonParse;
 
 import dagger.Module;
 
@@ -53,8 +52,7 @@ import dagger.Module;
                         ChatRoomActivity.class,
                         MapActivity.class,
 
-                        PopUpDialog.class,
-                        JsonParse.class
+                        PopUpDialog.class
                 }
 
         )

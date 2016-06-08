@@ -28,16 +28,16 @@ import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
-import com.yuan.skeleton.R;
 import com.yuan.house.activities.MainActivity;
+import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
 import com.yuan.house.ui.view.AudioRecorderButton;
 import com.yuan.house.utils.FileUtil;
 import com.yuan.house.utils.ImageUtil;
-import com.yuan.house.utils.JsonParse;
 import com.yuan.house.utils.OkHttpClientManager;
 import com.yuan.house.utils.ToastUtil;
+import com.yuan.skeleton.R;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -63,6 +63,10 @@ import okhttp3.Call;
  */
 public class UserProposalFragment extends WebViewBaseFragment {
 
+    private static final int SUCCESS = 1;
+    private static final int TIMEOUT = 0;
+    private final OkHttpClient client = new OkHttpClient();
+    private final int SYS_INTENT_REQUEST = 0XFF01;
     @InjectView(R.id.proposal)
     Button proposal;
     @InjectView(R.id.complaint)
@@ -71,40 +75,32 @@ public class UserProposalFragment extends WebViewBaseFragment {
     EditText info;
     @InjectView(R.id.btn_recorder)
     AudioRecorderButton recorderButton;
-
+    TextView app_upload_image, app_complaint, app_cancle;
     private int type = 0;       //1:用户发的，2：中介发的
     private int msg_type = 0;           //1:文本，2：语音，3：图片
     private int category = 1;           //0：投诉；1：建议；2：BUG
     private int duration = 0;       //录音时长
-
     private View mPopView;
     private PopupWindow mPopupWindow;
     private WindowManager.LayoutParams params;
-    TextView app_upload_image, app_complaint, app_cancle;
-
-    private static final int SUCCESS = 1;
-    private static final int TIMEOUT = 0;
-
-    private Handler handler = new Handler(){
+    private Handler handler = new Handler() {
 
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            switch (msg.what){
+            switch (msg.what) {
                 case TIMEOUT:
-                    ToastUtil.showShort(getContext(),"发送超时");
+                    ToastUtil.showShort(getContext(), "发送超时");
                     break;
                 case SUCCESS:
-                    if(msg.arg1 == 1)
-                        ToastUtil.showShort(getContext(),"发送成功");
+                    if (msg.arg1 == 1)
+                        ToastUtil.showShort(getContext(), "发送成功");
                     else
-                        ToastUtil.showShort(getContext(),"发送失败");
+                        ToastUtil.showShort(getContext(), "发送失败");
                     break;
             }
         }
     };
-
-    private final OkHttpClient client = new OkHttpClient();
 
     public static UserProposalFragment newInstance() {
         UserProposalFragment fragment = new UserProposalFragment();
@@ -116,23 +112,19 @@ public class UserProposalFragment extends WebViewBaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = createView(inflater, R.layout.fragment_proposal_user, container, savedInstanceState);
+        View view = createView(inflater, R.layout.fragment_proposal, container, savedInstanceState);
 
         Injector.inject(this);
 
         ButterKnife.reset(this);
         ButterKnife.inject(this, view);
 
-        try {
-            if (JsonParse.getInstance().judgeUserType()) {
-                redirectToLoadUrl(Constants.kWebpageUserCenter);
-                type = 1;
-            }else {
-                redirectToLoadUrl(Constants.kWebpageAgencyCenter);
-                type = 2;
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if (DMApplication.getInstance().iAmUser()) {
+            redirectToLoadUrl(Constants.kWebpageUserCenter);
+            type = 1;
+        } else {
+            redirectToLoadUrl(Constants.kWebpageAgencyCenter);
+            type = 2;
         }
         return view;
     }
@@ -156,23 +148,23 @@ public class UserProposalFragment extends WebViewBaseFragment {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEND
-                        ||  (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
+                        || (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
 
-                    if(TextUtils.isEmpty(info.getText()))
+                    if (TextUtils.isEmpty(info.getText()))
                         return false;
-                    Map<String,Object> params = new HashMap<>();
+                    Map<String, Object> params = new HashMap<>();
                     msg_type = 1;
-                    params.put("msg_type",msg_type);
-                    params.put("type",type);
-                    params.put("content",info.getText().toString());
-                    params.put("complain_agency_id",0);
-                    params.put("category",category);
-                    params.put("duration",duration);
+                    params.put("msg_type", msg_type);
+                    params.put("type", type);
+                    params.put("content", info.getText().toString());
+                    params.put("complain_agency_id", 0);
+                    params.put("category", category);
+                    params.put("duration", duration);
                     //触发软键盘回车事件，上传服务器;
                     try {
                         OkHttpUtils.postString().url(Constants.kWebServiceSendFeedback)
-                                .addHeader("Content-Type","application/json")
-                                .addHeader("token",getUserToken())
+                                .addHeader("Content-Type", "application/json")
+                                .addHeader("token", getUserToken())
                                 .content(com.alibaba.fastjson.JSONObject.toJSONString(params))
                                 .mediaType(okhttp3.MediaType.parse("application/json"))
                                 .build()
@@ -187,15 +179,15 @@ public class UserProposalFragment extends WebViewBaseFragment {
                                     public void onResponse(String response) {
                                         try {
                                             new JSONObject(response);
-                                            ToastUtil.showShort(getContext(),"提交成功");
+                                            ToastUtil.showShort(getContext(), "提交成功");
                                         } catch (JSONException e) {
-                                            ToastUtil.showShort(getContext(),"提交失败");
+                                            ToastUtil.showShort(getContext(), "提交失败");
                                             e.printStackTrace();
                                         }
                                     }
                                 });
 
-                    }  catch (JSONException e) {
+                    } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     return true;
@@ -234,14 +226,14 @@ public class UserProposalFragment extends WebViewBaseFragment {
     private void uploadFile(String filePath) throws JSONException {
         String token = getUserToken();
         try {
-            if(msg_type == 2)
+            if (msg_type == 2)
                 this.duration = MediaPlayer.create(getActivity(), Uri.parse(filePath)).getDuration();
 
             File file = new File(filePath);
             OkHttpUtils.post().url(Constants.kWebServiceFileUpload)
-                    .addHeader("token",token)
-                    .addHeader("Content-Type","multipart/form-data")
-                    .addFile("file[]",file.getName(),file)
+                    .addHeader("token", token)
+                    .addHeader("Content-Type", "multipart/form-data")
+                    .addFile("file[]", file.getName(), file)
                     .build()
                     .execute(new StringCallback() {
                         @Override
@@ -253,9 +245,9 @@ public class UserProposalFragment extends WebViewBaseFragment {
                         public void onResponse(String response) {
                             try {
                                 new JSONObject(response);
-                                ToastUtil.showShort(getContext(),"提交成功");
+                                ToastUtil.showShort(getContext(), "提交成功");
                             } catch (JSONException e) {
-                                ToastUtil.showShort(getContext(),"提交失败");
+                                ToastUtil.showShort(getContext(), "提交失败");
                                 e.printStackTrace();
                             }
                         }
@@ -273,61 +265,6 @@ public class UserProposalFragment extends WebViewBaseFragment {
             e.printStackTrace();
         }
 
-    }
-
-    private class UploadResultCallBack extends OkHttpClientManager.ResultCallback<String>{
-
-        @Override
-        public void onError(Request request, Exception e) {
-
-        }
-
-        @Override
-        public void onResponse(String response) {
-            Log.i("response",response);
-            try {
-                JSONArray jsonArray = new JSONArray(response);
-                JSONObject jsonObject = jsonArray.getJSONObject(0);
-//                Log.i("original",jsonObject.getJSONArray("original").getString(0));
-                String responseUrl = jsonObject.getJSONArray("original").getString(0);
-                Map<String,Object> params = new HashMap<>();
-                params.put("msg_type",msg_type);
-                params.put("type",type);
-                params.put("content",responseUrl);
-                params.put("complain_agency_id",0);
-                params.put("category",category);
-                params.put("duration",duration);
-                OkHttpClientManager.postJson(Constants.kWebServiceSendFeedback,
-                        com.alibaba.fastjson.JSONObject.toJSONString(params),
-                        getUserToken(),
-                        new SendFeedBackCallBack());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private class SendFeedBackCallBack implements Callback{
-
-        @Override
-        public void onFailure(Request request, IOException e) {
-            Message message = handler.obtainMessage();
-            message.what = TIMEOUT;
-            handler.sendMessage(message);
-        }
-
-        @Override
-        public void onResponse(Response response) throws IOException {
-            Message message = handler.obtainMessage();
-            message.what = SUCCESS;
-            if(response.isSuccessful())
-                message.arg1 = 1;
-            else
-                message.arg1 = 0;
-            handler.sendMessage(message);
-        }
     }
 
     private String getUserToken() throws JSONException {
@@ -366,8 +303,6 @@ public class UserProposalFragment extends WebViewBaseFragment {
                 closePopupWindow();
             }
         });
-
-
     }
 
     @OnClick({R.id.proposal, R.id.complaint, R.id.btn_other})
@@ -407,8 +342,6 @@ public class UserProposalFragment extends WebViewBaseFragment {
         getActivity().getWindow().setAttributes(params);
     }
 
-
-    private final int SYS_INTENT_REQUEST = 0XFF01;
     /**
      * 打开系统相册
      */
@@ -417,14 +350,13 @@ public class UserProposalFragment extends WebViewBaseFragment {
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(intent, SYS_INTENT_REQUEST);
-
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == SYS_INTENT_REQUEST && resultCode == getActivity().RESULT_OK && data != null){
+        if (requestCode == SYS_INTENT_REQUEST && resultCode == getActivity().RESULT_OK && data != null) {
             Uri uri = data.getData();
             try {
                 msg_type = 3;
@@ -432,7 +364,7 @@ public class UserProposalFragment extends WebViewBaseFragment {
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSSS");
                 String fileName = formatter.format(System.currentTimeMillis()) + ".jpg";
                 bitmap = ImageUtil.getInstance().compressImage(bitmap);
-                FileUtil.saveMyBitmap(FileUtil.getWaterPhotoPath(),fileName,bitmap);
+                FileUtil.saveMyBitmap(FileUtil.getWaterPhotoPath(), fileName, bitmap);
                 //上传至服务器
                 uploadFile(FileUtil.getWaterPhotoPath() + fileName);
             } catch (JSONException e) {
@@ -443,6 +375,58 @@ public class UserProposalFragment extends WebViewBaseFragment {
                 e.printStackTrace();
             }
         }
+    }
 
+    private class UploadResultCallBack extends OkHttpClientManager.ResultCallback<String> {
+        @Override
+        public void onError(Request request, Exception e) {
+
+        }
+
+        @Override
+        public void onResponse(String response) {
+            Log.i("response", response);
+            try {
+                JSONArray jsonArray = new JSONArray(response);
+                JSONObject jsonObject = jsonArray.getJSONObject(0);
+                String responseUrl = jsonObject.getJSONArray("original").getString(0);
+                Map<String, Object> params = new HashMap<>();
+                params.put("msg_type", msg_type);
+                params.put("type", type);
+                params.put("content", responseUrl);
+                params.put("complain_agency_id", 0);
+                params.put("category", category);
+                params.put("duration", duration);
+                OkHttpClientManager.postJson(Constants.kWebServiceSendFeedback,
+                        com.alibaba.fastjson.JSONObject.toJSONString(params),
+                        getUserToken(),
+                        new SendFeedBackCallBack());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private class SendFeedBackCallBack implements Callback {
+
+        @Override
+        public void onFailure(Request request, IOException e) {
+            Message message = handler.obtainMessage();
+            message.what = TIMEOUT;
+            handler.sendMessage(message);
+        }
+
+        @Override
+        public void onResponse(Response response) throws IOException {
+            Message message = handler.obtainMessage();
+            message.what = SUCCESS;
+            if (response.isSuccessful())
+                message.arg1 = 1;
+            else
+                message.arg1 = 0;
+            handler.sendMessage(message);
+        }
     }
 }

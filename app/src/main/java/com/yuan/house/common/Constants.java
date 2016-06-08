@@ -53,7 +53,11 @@ public class Constants {
     public static String kFragmentTagMessage = "kFragmentTagMessage";
     public static String kFragmentTagSocial = "kFragmentTagSocial";
     public static String kFragmentTagProfile = "kFragmentTagProfile";
-    public static String kBugTagsKey = "8b503a091aab6e57b03e1df7d01c1b85";
+
+    // dev
+    public static String kBugTagsKey = "c0a589a1390e94a20f24ce42885311b7";
+    // release
+//    public static String kBugTagsKey = "f5cfd36a5c5edcda25fab391dc947289";
 
     public static String kLeanChatCurrentUserObjectId = "kLeanChatCurrentUserObjectId";
 
