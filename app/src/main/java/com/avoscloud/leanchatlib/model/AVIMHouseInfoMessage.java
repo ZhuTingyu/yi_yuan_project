@@ -1,5 +1,6 @@
 package com.avoscloud.leanchatlib.model;
 
+import com.avos.avoscloud.im.v2.AVIMMessageCreator;
 import com.avos.avoscloud.im.v2.AVIMMessageField;
 import com.avos.avoscloud.im.v2.AVIMMessageManager;
 import com.avos.avoscloud.im.v2.AVIMMessageType;
@@ -47,6 +48,7 @@ public class AVIMHouseInfoMessage extends AVIMTypedMessage {
     public void setHouseImage(String houseImage) {
         this.houseImage = houseImage;
     }
+    public static final Creator<AVIMHouseInfoMessage> CREATOR = new AVIMMessageCreator(AVIMHouseInfoMessage.class);
 
     public AVIMHouseInfoMessage(){
         AVIMMessageManager.registerAVIMMessageType(this.getClass());

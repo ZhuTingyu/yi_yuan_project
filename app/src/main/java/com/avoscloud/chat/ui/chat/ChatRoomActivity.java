@@ -307,7 +307,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                     message.setHouseImage(images.get(0).toString());
                     message.setAttrs(map);
 
-                    messageAgent.sendHouse(message);
+                    messageAgent.sendEncapsulatedTypedMessage(message);
 
 //                    bridge.callHandler("nativeChangeHouse", map.get("id"));
 
@@ -362,7 +362,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
             message.setHouseImage(images.get(0).toString());
             message.setAttrs(houseInfo);
 
-            messageAgent.sendHouse(message);
+            messageAgent.sendEncapsulatedTypedMessage(message);
         }
     }
 

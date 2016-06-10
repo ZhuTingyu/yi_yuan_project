@@ -351,6 +351,45 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
     }
 
+    public void onBridgeSendNoticeMessage(final String data) {
+        boolean isAgency = false;
+        // TODO: 16/6/10 web传参数（house_id,lean_id(数组),text(消息文本)）,用于从web端发送消息给特定的用户
+        List<String> leanIdList = null;
+        String houseId = null;
+        try {
+            JSONObject object = new JSONObject(data);
+            houseId = object.optString("house_id");
+            String leanId = object.optString("lean_id");
+            String text = object.optString("text");
+
+            leanIdList = new ArrayList<>(Arrays.asList(leanId.split(",")));
+            if ("agency".equals(object.optString("type"))) {
+                isAgency = true;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        // TODO: 16/6/10 get last user id??? WTH?
+        String leanIdString = leanIdList.get(leanIdList.size() - 1);
+
+        // FIXME: 16/6/10 WTF!!! isAgency 的作用是什么? 中介不能发这种类型消息么?
+        // 创建相应对话, 并发送文本信息到该会话
+        final String finalHouseId = houseId;
+        ChatManager.getInstance().fetchConversationWithUserId(null, leanIdString, new AVIMConversationCreatedCallback() {
+            @Override
+            public void done(AVIMConversation avimConversation, AVIMException e) {
+                AVIMNoticeWithHouseIdMessage message = new AVIMNoticeWithHouseIdMessage();
+                message.setHouseId(finalHouseId);
+
+                MessageAgent messageAgent = new MessageAgent(avimConversation);
+                messageAgent.sendEncapsulatedTypedMessage(message);
+
+                // TODO: 16/6/10 发送成功之后需要缓存该条消息到本地
+            }
+        });
+    }
+
     public void onBridgeLogout() {
         DMApplication.getInstance().logout();
     }
