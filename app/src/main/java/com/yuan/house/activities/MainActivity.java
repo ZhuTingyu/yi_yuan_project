@@ -34,9 +34,9 @@ import com.yuan.house.event.PageEvent;
 import com.yuan.house.ui.fragment.AgencyMainFragment;
 import com.yuan.house.ui.fragment.AgencyMessageFragment;
 import com.yuan.house.ui.fragment.LoginFragment;
+import com.yuan.house.ui.fragment.ProposalFragment;
 import com.yuan.house.ui.fragment.UserMainFragment;
 import com.yuan.house.ui.fragment.UserMessageFragment;
-import com.yuan.house.ui.fragment.UserProposalFragment;
 import com.yuan.house.ui.fragment.WebViewBaseFragment;
 import com.yuan.house.ui.fragment.WebViewFragment;
 import com.yuan.house.utils.ToastUtil;
@@ -182,7 +182,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         } else if (tag.equals(Constants.kFragmentTagLogin)) {
             f = LoginFragment.newInstance();
         } else if (tag.equals(Constants.kFragmentTagProposal)) {
-            f = UserProposalFragment.newInstance();
+            f = ProposalFragment.newInstance();
         } else {
             f = WebViewFragment.newInstance();
         }

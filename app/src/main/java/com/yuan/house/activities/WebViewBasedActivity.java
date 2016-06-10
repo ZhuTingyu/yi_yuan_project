@@ -25,6 +25,8 @@ import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.fourmob.datetimepicker.date.DatePickerDialog;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 import com.sleepbot.datetimepicker.time.RadialPickerLayout;
 import com.sleepbot.datetimepicker.time.TimePickerDialog;
 import com.victor.loading.rotate.RotateLoading;
@@ -34,16 +36,28 @@ import com.yuan.house.base.BaseFragmentActivity;
 import com.yuan.house.bean.PayInfo;
 import com.yuan.house.common.Constants;
 import com.yuan.house.event.WebBroadcastEvent;
+import com.yuan.house.http.WebService;
 import com.yuan.house.payment.AliPay;
+import com.yuan.house.ui.fragment.ProposalFragment;
 import com.yuan.house.ui.fragment.WebViewBaseFragment;
 import com.yuan.house.ui.fragment.WebViewFragment;
 import com.yuan.house.utils.ToastUtil;
 import com.yuan.skeleton.R;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.FileBody;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,16 +71,17 @@ import timber.log.Timber;
 /**
  * Created by Alsor Zhou on 8/12/15.
  */
-public abstract class WebViewBasedActivity extends BaseFragmentActivity implements WebViewFragment.OnFragmentInteractionListener, WebViewFragment.OnBridgeInteractionListener {
-    protected static final int kActivityRequestCodeWebActivity = 3;
-    protected final int kActivityRequestCodeImagePickOnly = 9;
+public abstract class WebViewBasedActivity extends BaseFragmentActivity implements WebViewFragment.OnFragmentInteractionListener, WebViewFragment.OnBridgeInteractionListener, ProposalFragment.OnProposalInteractionListener {
+    private final int kActivityRequestCodeWebActivity = 3;
+    private final int kActivityRequestCodeImagePickOnly = 10;
+    private final int kActivityRequestCodeImagePickThenCrop = 11;
+    private final int kActivityRequestCodeImagePickThenUpload = 12;
     protected FragmentManager mFragmentManager;
     protected FragmentTransaction mFragmentTransaction;
-    protected String mUrl;
     @InjectView(R.id.rotateloading)
     protected RotateLoading mLoadingDialog;
+    String mUrl;
     WebViewBaseFragment webViewFragment;
-    private int kActivityRequestCodeImagePickThenCrop = 10;
     private AliPay aliPay;
     private String pay_type;
     private Handler mHandler = new Handler() {
@@ -223,18 +238,15 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == kActivityRequestCodeWebActivity || requestCode == kActivityRequestCodeImagePickOnly) {
+        if (requestCode == kActivityRequestCodeWebActivity) {
+            Timber.v("kActivityRequestCodeWebActivity");
+
             String result = null;
-            ArrayList<String> imgUrls = null;
             if (data != null) {
                 // handle the case if activity is terminated by JS code
                 Bundle res = data.getExtras();
                 if (requestCode == kActivityRequestCodeWebActivity)
                     result = res.getString("param_result_after_activity_finished");
-                else {
-                    imgUrls = res.getStringArrayList("select_result");
-                    mBridgeCallback.callback(imgUrls);
-                }
             }
 
             Timber.v("Got finished result:" + result);
@@ -243,16 +255,27 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             getWebViewFragment().getBridge().callHandler("activityFinished", result);
             return;
         } else if (requestCode == kActivityRequestCodeImagePickOnly) {
+            Timber.v("kActivityRequestCodeImagePickOnly");
             if (resultCode == RESULT_OK) {
-                // TODO: 16/5/27 获取到选取照片的本地文件路径
-                // Get the result list of select image paths
+                // 获取到选取照片的本地文件路径
                 List<String> path = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
                 // /storage/emulated/0/DCIM/IMG_-646584368.jpg
 
-                Timber.v("Finish pick images");
-
                 mBridgeCallback.callback(path);
             }
+        } else if (requestCode == kActivityRequestCodeImagePickThenUpload) {
+            // TODO: 16/6/9 upload files directly
+            Timber.v("kActivityRequestCodeImagePickThenUpload");
+            List<String> path = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
+
+            // TODO: 16/6/10 invoke upload process
+            uploadMultiPartFiles(path);
+        } else if (requestCode == kActivityRequestCodeImagePickThenCrop) {
+            // TODO: 16/6/9 upload files directly
+            Timber.v("kActivityRequestCodeImagePickThenUpload");
+            List<String> path = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
+
+            // TODO: 16/6/10 invoke crop process
         } else {
             // never reach
             Timber.e("onActivityResult SHOULD NEVER REACH");
@@ -457,6 +480,71 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     @Override
     public void onBridgeSignIn(String data) {
         throw new NotImplementedException("NOT IMPLEMENTED");
+    }
+
+    private HttpEntity constructMultiPartEntity(List<String> filePaths) {
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+
+        for (String path : filePaths) {
+            FileBody fileBody = new FileBody(new File(path));
+            builder.addPart("file[]", fileBody);
+        }
+
+        return builder.build();
+    }
+
+    private RequestParams constructMultiPartParams(List<String> filePaths) {
+        RequestParams params = new RequestParams();
+
+        for (String path : filePaths) {
+//            FileBody fileBody = new FileBody(new File(path));
+            try {
+                params.put("file[]", new File(path));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return params;
+    }
+
+    @Override
+    public void onUploadProposalAudio(String data) {
+//        if (msg_type == ProposalMediaType.AUDIO)
+//            this.duration = MediaPlayer.create(this, Uri.parse(data)).getDuration();
+        List<String> datum = new ArrayList<>();
+        datum.add(data);
+        uploadMultiPartFiles(datum);
+    }
+
+    private void uploadMultiPartFiles(List<String> datum) {
+//        HttpEntity entity = constructMultiPartEntity(datum);
+        RequestParams entity = constructMultiPartParams(datum);
+
+        WebService.getInstance().postMultiPartFormDataFile(entity, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                ToastUtil.showShort(mContext, "提交成功");
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                ToastUtil.showShort(mContext, "提交失败");
+            }
+        });
+    }
+
+    @Override
+    public void onSelectImageForProposal() {
+        int requestCode = kActivityRequestCodeImagePickThenUpload;
+        MultiImageSelector.create(mContext)
+                .showCamera(true) // show camera or not. true by default
+                .count(9) // max select image size, 9 by default. used width #.multi()
+                .multi()
+                .start(this, requestCode);
     }
 
     protected boolean filterException(Exception e) {

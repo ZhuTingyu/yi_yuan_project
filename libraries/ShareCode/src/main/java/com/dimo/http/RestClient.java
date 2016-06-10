@@ -11,6 +11,7 @@ import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.SyncHttpClient;
 
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.message.BasicHeader;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -108,6 +109,53 @@ public class RestClient {
             rawUrl = getAbsoluteUrl(url);
         }
         getClient().post(rawUrl, params, responseHandler);
+    }
+
+    public void post(String url, HashMap<String, String> headers, HttpEntity entity, AsyncHttpResponseHandler responseHandler) {
+        AsyncHttpClient httpClient = new AsyncHttpClient();
+        httpClient.setResponseTimeout(20000);
+
+        String rawUrl;
+        if (url.startsWith("http://") || url.startsWith("https://")) {
+            rawUrl = url;
+        } else {
+            rawUrl = getAbsoluteUrl(url);
+        }
+
+        if (headers != null && (headers instanceof HashMap)) {
+            Iterator it = headers.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                Timber.v(pair.getKey() + " = " + pair.getValue());
+                getClient().addHeader(pair.getKey().toString(), pair.getValue().toString());
+                it.remove(); // avoids a ConcurrentModificationException
+            }
+        }
+
+        getClient().post(null, rawUrl, entity, null, responseHandler);
+    }
+    public void post(String url, HashMap<String, String> headers, RequestParams requestParams, AsyncHttpResponseHandler responseHandler) {
+        AsyncHttpClient httpClient = new AsyncHttpClient();
+        httpClient.setResponseTimeout(20000);
+
+        String rawUrl;
+        if (url.startsWith("http://") || url.startsWith("https://")) {
+            rawUrl = url;
+        } else {
+            rawUrl = getAbsoluteUrl(url);
+        }
+
+        if (headers != null && (headers instanceof HashMap)) {
+            Iterator it = headers.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                Timber.v(pair.getKey() + " = " + pair.getValue());
+                httpClient.addHeader(pair.getKey().toString(), pair.getValue().toString());
+                it.remove(); // avoids a ConcurrentModificationException
+            }
+        }
+
+        httpClient.post(null, rawUrl, requestParams, responseHandler);
     }
 
     public void bridgeRequest(JSONObject params, int requestMethod, final WebViewJavascriptBridge.WVJBResponseCallback callback) {

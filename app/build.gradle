@@ -167,7 +167,15 @@ dependencies {
     compile 'com.mani:thindownloadmanager:1.0.0'
     compile 'com.squareup.okhttp:okhttp:2.4.0'
     compile 'com.zhy:okhttputils:2.4.1'
+    compile 'com.squareup.retrofit2:retrofit:2.0.2'
 
+    // http://stackoverflow.com/a/30725203/2619161
+    compile ('org.apache.httpcomponents:httpmime:4.3'){
+        exclude group: 'org.apache.httpcomponents', module: 'httpclient'
+    }
+    compile ('org.apache.httpcomponents:httpcore:4.4.1'){
+        exclude group: 'org.apache.httpcomponents', module: 'httpclient'
+    }
 
     /** MISC .        */
     compile 'com.bugtags.library:bugtags-lib:latest.integration'

@@ -9,14 +9,15 @@ import com.yuan.house.activities.SplashActivity;
 import com.yuan.house.activities.TutorialActivity;
 import com.yuan.house.activities.WebViewActivity;
 import com.yuan.house.activities.WebViewBasedActivity;
+import com.yuan.house.http.WebService;
 import com.yuan.house.ui.dialog.PopUpDialog;
 import com.yuan.house.ui.fragment.AgencyMainFragment;
 import com.yuan.house.ui.fragment.AgencyMessageFragment;
 import com.yuan.house.ui.fragment.FragmentBBS;
 import com.yuan.house.ui.fragment.LoginFragment;
+import com.yuan.house.ui.fragment.ProposalFragment;
 import com.yuan.house.ui.fragment.UserMainFragment;
 import com.yuan.house.ui.fragment.UserMessageFragment;
-import com.yuan.house.ui.fragment.UserProposalFragment;
 import com.yuan.house.ui.fragment.WebViewBaseFragment;
 import com.yuan.house.ui.fragment.WebViewFragment;
 
@@ -40,8 +41,10 @@ import dagger.Module;
                         AgencyMessageFragment.class,
                         UserMessageFragment.class,
                         LoginFragment.class,
-                        UserProposalFragment.class,
+                        ProposalFragment.class,
                         FragmentBBS.class,
+
+                        WebService.class,
 
                         IPSettingActivity.class,
                         SplashActivity.class,

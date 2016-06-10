@@ -7,17 +7,21 @@ package com.yuan.house.common;
 public class Constants {
     public static final String kServiceCheckUpdate = "checkupdate";
     public static final String kServiceLogin = "login";
-    public static String kApplicationId = "com.mowelltech.threec";
+
+    // Production Server
     public static String kWebServiceAPIEndpoint = "http://house.ieyuan.com/api";
+
+    /**
+     * Web Service Url
+     */
     public static String kWebServiceFileUpload = kWebServiceAPIEndpoint + "/file-upload/feedback";
     public static String kWebServiceUploadCommon = kWebServiceAPIEndpoint + "/file-upload/common";
     public static String kWebServiceSendFeedback = kWebServiceAPIEndpoint + "/feedback";
     public static String kWebServiceSwitchable = kWebServiceAPIEndpoint + "/house/switchable/";
-    // Production Server
+
     public static String kPrefsFirstLaunch = "kPrefsFirstLaunch";
     public static int kSplashTimeInterval = 20;
-    public static String kLocalWebHTMLFolder = "file:///android_asset/html";
-    public static String kLocalWebHTMLPageFolder = "file:///android_asset/3c_html";
+
     //TODO: not working with query parameters..
     public static String kWebPageEntry = "nearby.html";
     public static String kWebPageLogin = "login.html";

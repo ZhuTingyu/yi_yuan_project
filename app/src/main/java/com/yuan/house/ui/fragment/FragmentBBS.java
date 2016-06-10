@@ -91,7 +91,6 @@ public class FragmentBBS extends WebViewBaseFragment {
         super.registerHandle();
 
         bridge.registerHandler("showSampleMessageBoard", new WebViewJavascriptBridge.WVJBHandler() {
-
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 mBridgeListener.onShowSampleMessageBoard();

@@ -9,14 +9,11 @@ import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.widget.ImageView;
 
-import com.yuan.skeleton.R;
-import com.yuan.house.application.Injector;
-import com.yuan.house.common.Constants;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.umeng.update.UmengUpdateAgent;
-
-import org.json.JSONObject;
+import com.yuan.house.application.Injector;
+import com.yuan.skeleton.R;
 
 import javax.inject.Inject;
 
@@ -68,31 +65,17 @@ public class SplashActivity extends FragmentActivity implements Handler.Callback
     }
 
     private void enterMainScreen() {
-        mHandler = new Handler(SplashActivity.this);
-
-        JSONObject userLogin = null;
-        try {
-            userLogin = new JSONObject(prefs.getString("userLogin", null));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        final Class nextClass;
-//        if (userLogin == null) {
-//            nextClass = SignInActivity.class;
-//        } else {
-            nextClass = MainActivity.class;
-//        }
-
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Intent intent = new Intent(getApplicationContext(), nextClass);
+//        mHandler = new Handler(this);
+//
+//        mHandler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
 
-                SplashActivity.this.finish();
-            }
-        }, Constants.kSplashTimeInterval * 100);
+                finish();
+//            }
+//        }, Constants.kSplashTimeInterval * 100);
     }
 
     @Override

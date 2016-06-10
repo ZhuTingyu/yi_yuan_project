@@ -225,8 +225,8 @@ public class DMApplication extends MultiDexApplication {
         AVAnalytics.enableCrashReport(this, !debug);
 
         initImageLoader(instance);
-        // FIXME: Crash here
-//        initBaidu();
+
+        initBaiduMapSDK();
 
         if (debug) {
             openStrictMode();
@@ -352,7 +352,7 @@ public class DMApplication extends MultiDexApplication {
                 .build());
     }
 
-    private void initBaidu() {
+    private void initBaiduMapSDK() {
         SDKInitializer.initialize(getApplicationContext());
     }
 
