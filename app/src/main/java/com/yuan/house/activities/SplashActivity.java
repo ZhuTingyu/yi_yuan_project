@@ -13,7 +13,7 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.umeng.update.UmengUpdateAgent;
 import com.yuan.house.application.Injector;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 import javax.inject.Inject;
 

@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 /**
  * Created by lzw on 14-9-17.

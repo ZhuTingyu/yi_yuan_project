@@ -30,7 +30,7 @@ import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.yuan.house.application.Injector;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 import java.util.HashMap;
 import java.util.Map;

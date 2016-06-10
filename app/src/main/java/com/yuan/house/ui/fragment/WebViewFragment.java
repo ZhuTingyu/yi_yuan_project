@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 import com.yuan.house.activities.MainActivity;
 import com.yuan.house.application.Injector;
 

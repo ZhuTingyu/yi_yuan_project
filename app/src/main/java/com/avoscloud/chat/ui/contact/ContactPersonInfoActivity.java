@@ -15,7 +15,7 @@ import com.avoscloud.chat.service.CacheService;
 import com.avoscloud.chat.service.UserService;
 import com.avoscloud.chat.ui.chat.ChatRoomActivity;
 import com.avoscloud.leanchatlib.activity.BaseActivity;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 import java.util.List;
 

@@ -27,7 +27,7 @@ import com.avoscloud.chat.util.Refreshable;
 import com.avoscloud.leanchatlib.activity.BaseActivity;
 import com.avoscloud.leanchatlib.adapter.BaseListAdapter;
 import com.avoscloud.leanchatlib.view.ViewHolder;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 import java.util.ArrayList;
 import java.util.List;

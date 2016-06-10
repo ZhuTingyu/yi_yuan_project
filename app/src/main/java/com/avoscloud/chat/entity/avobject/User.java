@@ -3,7 +3,7 @@ package com.avoscloud.chat.entity.avobject;
 import com.avos.avoscloud.AVFile;
 import com.avos.avoscloud.AVInstallation;
 import com.avos.avoscloud.AVUser;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 public class User {
   public static final String USERNAME = "username";

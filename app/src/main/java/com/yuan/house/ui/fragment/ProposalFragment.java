@@ -22,7 +22,7 @@ import com.yuan.house.enumerate.ProposalMediaType;
 import com.yuan.house.enumerate.ProposalMessageCategory;
 import com.yuan.house.enumerate.ProposalSourceType;
 import com.yuan.house.ui.view.AudioRecorderButton;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;

@@ -19,7 +19,7 @@ import android.widget.TextView;
 
 import com.bugtags.library.Bugtags;
 
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 import com.yuan.house.application.Injector;
 
 import javax.inject.Inject;

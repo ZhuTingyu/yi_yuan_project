@@ -40,7 +40,7 @@ import com.yuan.house.ui.fragment.UserMessageFragment;
 import com.yuan.house.ui.fragment.WebViewBaseFragment;
 import com.yuan.house.ui.fragment.WebViewFragment;
 import com.yuan.house.utils.ToastUtil;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 import org.json.JSONException;
 

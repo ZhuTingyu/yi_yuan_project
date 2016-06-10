@@ -42,7 +42,7 @@ import com.yuan.house.common.Constants;
 import com.yuan.house.event.WebBroadcastEvent;
 import com.yuan.house.ui.view.PickerPopWindow;
 import com.yuan.house.utils.ToastUtil;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 import org.apache.http.Header;
 import org.json.JSONArray;

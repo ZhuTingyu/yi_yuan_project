@@ -18,7 +18,7 @@ import android.widget.TextView;
 
 import com.wx.wheelview.adapter.BaseWheelAdapter;
 import com.wx.wheelview.widget.WheelView;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 import java.util.ArrayList;
 import java.util.List;

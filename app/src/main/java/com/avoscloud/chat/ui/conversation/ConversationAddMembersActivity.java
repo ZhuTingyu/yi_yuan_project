@@ -31,7 +31,7 @@ import com.avoscloud.chat.util.Utils;
 import com.avoscloud.leanchatlib.controller.ConversationHelper;
 import com.avoscloud.leanchatlib.model.ConversationType;
 import com.avoscloud.leanchatlib.view.ViewHolder;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 import java.util.ArrayList;
 import java.util.List;

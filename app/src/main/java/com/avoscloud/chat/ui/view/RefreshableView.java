@@ -9,7 +9,7 @@ import android.view.ViewConfiguration;
 import android.view.animation.RotateAnimation;
 import android.widget.*;
 
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 /**
  * Created by lzw on 14-4-23.

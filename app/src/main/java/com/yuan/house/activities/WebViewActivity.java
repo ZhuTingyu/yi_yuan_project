@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.yuan.house.ui.fragment.WebViewFragment;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 /**
  * Created by yj on 2015/8/16.

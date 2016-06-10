@@ -9,7 +9,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.avoscloud.leanchatlib.activity.BaseActivity;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 /**
  * Created by lzw on 14-9-17.

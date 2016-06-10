@@ -9,7 +9,7 @@ import com.avoscloud.chat.util.SimpleNetTask;
 import com.avoscloud.chat.util.Utils;
 import com.avoscloud.leanchatlib.adapter.BaseListAdapter;
 import com.avoscloud.leanchatlib.view.xlist.XListView;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -14,7 +14,7 @@ import com.avoscloud.chat.entity.avobject.User;
 import com.avoscloud.chat.service.UserService;
 import com.avoscloud.leanchatlib.adapter.BaseListAdapter;
 import com.avoscloud.leanchatlib.view.ViewHolder;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 @SuppressLint("DefaultLocale")
 public class ContactFragmentAdapter extends BaseListAdapter<SortUser> implements SectionIndexer {

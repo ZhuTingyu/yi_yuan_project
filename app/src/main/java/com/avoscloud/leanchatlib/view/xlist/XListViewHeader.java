@@ -10,7 +10,7 @@ import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 public class XListViewHeader extends LinearLayout {
   public final static int STATE_NORMAL = 0;

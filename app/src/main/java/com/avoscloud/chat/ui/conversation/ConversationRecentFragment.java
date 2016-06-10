@@ -26,7 +26,7 @@ import com.avoscloud.leanchatlib.model.ConversationType;
 import com.avoscloud.leanchatlib.model.MessageEvent;
 import com.avoscloud.leanchatlib.model.Room;
 import com.avoscloud.leanchatlib.view.ViewHolder;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 import de.greenrobot.event.EventBus;
 

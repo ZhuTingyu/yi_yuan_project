@@ -26,27 +26,30 @@
 
         <LinearLayout
             android:id="@+id/rl_center"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:layout_centerInParent="true"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_toRightOf="@id/contacts"
+            android:layout_toLeftOf="@+id/sortBy"
             android:gravity="center_vertical">
 
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:textSize="16dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:hint="搜索"
+                android:textSize="12dp"
                 android:drawableLeft="@drawable/img_search"
-                android:hint="@string/hint_input_search"
-                android:background="@drawable/bg_input_box"
-                android:textColor="@color/white"/>
+                android:background="@drawable/search_editsharp"/>
 
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/sortBy"
+            android:id="@id/sortBy"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="horizontal"

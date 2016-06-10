@@ -2,7 +2,7 @@ package com.avoscloud.leanchatlib.utils;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 import java.util.Random;
 

@@ -41,10 +41,11 @@ import com.avoscloud.leanchatlib.model.AVIMHouseInfoMessage;
 import com.dimo.utils.StringUtil;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yuan.house.common.Constants;
+import com.yuan.house.helper.AuthHelper;
 import com.yuan.house.ui.fragment.FragmentBBS;
 import com.yuan.house.ui.fragment.WebViewBaseFragment;
 import com.yuan.house.utils.ToastUtil;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
@@ -229,14 +230,12 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
     }
 
     private void initHouseInfos() {
-        String json = prefs.getString(Constants.kWebDataKeyUserLogin, null);
-        String userId = getUserId(json);
         String url = Constants.kWebServiceSwitchable;
 
-        if (userAlreadyLogin(json)) {
-            url += userId + "/" + prefs.getString("target_id", null);
+        if (AuthHelper.userAlreadyLogin()) {
+            url += AuthHelper.userId() + "/" + AuthHelper.targetId();
         } else {
-            url += prefs.getString("target_id", null) + "/" + userId;
+            url += AuthHelper.targetId() + "/" + AuthHelper.userId();
         }
 
         restGet(url, new JsonHttpResponseHandler() {
@@ -267,7 +266,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
     @Override
     protected void openHouseInfo() {
-        Intent intent = new Intent(this, HouseInfosActivity.class);
+        Intent intent = new Intent(this, SwitchHouseActivity.class);
         startActivityForResult(intent, REQUEST_CODE_HOUSE);
     }
 

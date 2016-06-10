@@ -35,7 +35,7 @@ import com.avoscloud.chat.util.CharacterParser;
 import com.avoscloud.chat.util.PinyinComparator;
 import com.avoscloud.chat.util.Utils;
 import com.avoscloud.leanchatlib.utils.NetAsyncTask;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
 
 

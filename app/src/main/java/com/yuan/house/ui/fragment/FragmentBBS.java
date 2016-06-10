@@ -12,7 +12,7 @@ import com.dimo.web.WebViewJavascriptBridge;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;

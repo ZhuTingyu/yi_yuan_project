@@ -17,7 +17,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 import java.io.File;
 import java.io.IOException;

@@ -2,6 +2,7 @@ package com.yuan.house.application;
 
 
 import com.avoscloud.chat.ui.chat.ChatRoomActivity;
+import com.avoscloud.chat.ui.chat.SwitchHouseActivity;
 import com.yuan.house.activities.IPSettingActivity;
 import com.yuan.house.activities.MainActivity;
 import com.yuan.house.activities.MapActivity;
@@ -9,6 +10,7 @@ import com.yuan.house.activities.SplashActivity;
 import com.yuan.house.activities.TutorialActivity;
 import com.yuan.house.activities.WebViewActivity;
 import com.yuan.house.activities.WebViewBasedActivity;
+import com.yuan.house.helper.AuthHelper;
 import com.yuan.house.http.WebService;
 import com.yuan.house.ui.dialog.PopUpDialog;
 import com.yuan.house.ui.fragment.AgencyMainFragment;
@@ -54,8 +56,12 @@ import dagger.Module;
                         WebViewActivity.class,
                         ChatRoomActivity.class,
                         MapActivity.class,
+                        SwitchHouseActivity.class,
 
                         PopUpDialog.class
+                },
+                staticInjections = {
+                        AuthHelper.class
                 }
 
         )

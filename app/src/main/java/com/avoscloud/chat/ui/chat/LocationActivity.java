@@ -20,7 +20,7 @@ import com.baidu.mapapi.map.*;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.search.core.SearchResult;
 import com.baidu.mapapi.search.geocode.*;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 public class LocationActivity extends BaseActivity implements
     OnGetGeoCoderResultListener {

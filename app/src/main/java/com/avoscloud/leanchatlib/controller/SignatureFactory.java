@@ -4,7 +4,7 @@ import android.widget.Toast;
 import com.avos.avoscloud.AVCloud;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.Signature;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 import com.avoscloud.leanchatlib.utils.Logger;
 
 import java.util.ArrayList;

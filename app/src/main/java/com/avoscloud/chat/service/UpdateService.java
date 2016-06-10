@@ -17,7 +17,7 @@ import com.avoscloud.chat.entity.avobject.UpdateInfo;
 import com.avoscloud.chat.util.Utils;
 import com.avoscloud.leanchatlib.utils.Logger;
 import com.avoscloud.leanchatlib.utils.NetAsyncTask;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 import java.util.List;
 

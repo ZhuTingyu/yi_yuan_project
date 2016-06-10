@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
 
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 /**
  * Created by lzw on 14-9-17.

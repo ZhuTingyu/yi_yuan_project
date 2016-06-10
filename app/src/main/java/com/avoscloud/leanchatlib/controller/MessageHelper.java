@@ -4,7 +4,7 @@ import com.avos.avoscloud.im.v2.AVIMReservedMessageType;
 import com.avos.avoscloud.im.v2.AVIMTypedMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMLocationMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 import com.avoscloud.leanchatlib.model.UserInfo;
 
 import java.util.List;

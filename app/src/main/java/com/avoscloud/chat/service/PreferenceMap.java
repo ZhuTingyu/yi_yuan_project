@@ -8,7 +8,7 @@ import com.avos.avoscloud.AVUser;
 
 import com.avoscloud.chat.entity.avobject.User;
 import com.avoscloud.leanchatlib.utils.Logger;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
 
 /**

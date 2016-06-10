@@ -42,20 +42,17 @@ import com.yuan.house.base.BaseFragmentActivity;
 import com.yuan.house.bean.PayInfo;
 import com.yuan.house.common.Constants;
 import com.yuan.house.event.WebBroadcastEvent;
+import com.yuan.house.helper.AuthHelper;
 import com.yuan.house.http.WebService;
 import com.yuan.house.payment.AliPay;
 import com.yuan.house.ui.fragment.ProposalFragment;
 import com.yuan.house.ui.fragment.WebViewBaseFragment;
 import com.yuan.house.ui.fragment.WebViewFragment;
 import com.yuan.house.utils.ToastUtil;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.FileBody;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -98,8 +95,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             }
         }
     };
-    private String kHttpReqKeyContentType = "Content-Type";
-    private String kHttpReqKeyAuthToken = "token";
+
     private WebViewJavascriptBridge.WVJBResponseCallback mBridgeCallback;
 
     @Override
@@ -589,54 +585,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     protected void restGet(String url, AsyncHttpResponseHandler responseHandler) {
-        RestClient.getInstance().get(url, authTokenJsonHeader(), responseHandler);
-    }
-
-    private String getToken(String json) {
-        try {
-            HashMap<String, String> params = StringUtil.JSONString2HashMap(json);
-            return params.get("token");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private HashMap<String, String> authTokenJsonHeader() {
-        String json = prefs.getString(Constants.kWebDataKeyUserLogin, null);
-        String token = getToken(json);
-
-        HashMap<String, String> hashMap = new HashMap<>();
-        hashMap.put(kHttpReqKeyAuthToken, token);
-        hashMap.put(kHttpReqKeyContentType, "application/json");
-
-        return hashMap;
-    }
-
-    protected boolean userAlreadyLogin(String json) {
-        HashMap<String, String> params = null;
-        try {
-            params = StringUtil.JSONString2HashMap(json);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        if (params.get("user_info") != null) return true;
-        else return false;
-    }
-
-    protected String getUserId(String json) {
-        try {
-            HashMap<String, String> params = StringUtil.JSONString2HashMap(json);
-            if (params.get("user_info") != null)
-                params = StringUtil.JSONString2HashMap(params.get("user_info"));
-            else
-                params = StringUtil.JSONString2HashMap(params.get("agency_info"));
-
-            return params.get("user_id");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
+        RestClient.getInstance().get(url, AuthHelper.authTokenJsonHeader(), responseHandler);
     }
 
     @Override

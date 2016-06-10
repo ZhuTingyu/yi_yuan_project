@@ -7,7 +7,7 @@ import android.support.v4.app.Fragment;
 import android.widget.Toast;
 
 import com.avoscloud.chat.ui.view.HeaderLayout;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 public class BaseFragment extends Fragment {
   protected HeaderLayout headerLayout;

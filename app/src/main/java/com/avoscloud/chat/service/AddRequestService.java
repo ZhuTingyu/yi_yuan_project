@@ -9,7 +9,7 @@ import com.avoscloud.chat.entity.avobject.AddRequest;
 import com.avoscloud.chat.util.SimpleNetTask;
 import com.avoscloud.chat.util.Utils;
 
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
 
 import java.util.List;

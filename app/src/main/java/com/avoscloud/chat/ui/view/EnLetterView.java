@@ -12,7 +12,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.avoscloud.chat.util.PixelUtils;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 public class EnLetterView extends View {
   public static String[] letters = {"A", "B", "C", "D", "E", "F", "G", "H", "I",

@@ -5,7 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.Window;
 
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 import timber.log.Timber;
 

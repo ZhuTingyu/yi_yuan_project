@@ -9,7 +9,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 /**
  * Created by KevinLee on 2016/4/25.

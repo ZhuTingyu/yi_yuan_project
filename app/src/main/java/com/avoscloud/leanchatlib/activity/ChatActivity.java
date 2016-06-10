@@ -55,9 +55,11 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.PauseOnScrollListener;
 import com.yuan.house.activities.WebViewBasedActivity;
 import com.yuan.house.utils.ToastUtil;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
+
+import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -150,7 +152,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
 
     private void findView() {
         xListView = (XListView) findViewById(R.id.listview);
-        addImageBtn = findViewById(R.id.addImageBtn);
+        addImageBtn = findViewById(R.id.btnImageFromGallery);
 
         contentEdit = (EmotionEditText) findViewById(R.id.textEdit);
         chatTextLayout = findViewById(R.id.chatTextLayout);
@@ -166,8 +168,8 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         showEmotionBtn = findViewById(R.id.showEmotionBtn);
         sendBtn = findViewById(R.id.sendBtn);
         emotionPager = (ViewPager) findViewById(R.id.emotionPager);
-        addCameraBtn = findViewById(R.id.addCameraBtn);
-        addChangeHouseBtn = findViewById(R.id.addChangeHouseBtn);
+        addCameraBtn = findViewById(R.id.btnImageFromCamera);
+        addChangeHouseBtn = findViewById(R.id.btnSwitchHouse);
 
         sendBtn.setOnClickListener(this);
         contentEdit.setOnClickListener(this);
@@ -427,7 +429,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
     public void onClick(View v) {
         if (v.getId() == R.id.sendBtn) {
             sendText();
-        } else if (v.getId() == R.id.addImageBtn) {
+        } else if (v.getId() == R.id.btnImageFromGallery) {
             selectImageFromLocal();
         } else if (v.getId() == R.id.turnToAudioBtn) {
             showAudioLayout();
@@ -441,16 +443,16 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
             //文件
         } else if (v.getId() == R.id.textEdit) {
             hideBottomLayoutAndScrollToLast();
-        } else if (v.getId() == R.id.addCameraBtn) {
+        } else if (v.getId() == R.id.btnImageFromCamera) {
             selectImageFromCamera();
-        } else if (v.getId() == R.id.addChangeHouseBtn) {
+        } else if (v.getId() == R.id.btnSwitchHouse) {
             //房源
             openHouseInfo();
         }
     }
 
     protected void openHouseInfo() {
-
+        throw new NotImplementedException("NOT IMPLEMENTED");
     }
 
     private void hideBottomLayoutAndScrollToLast() {

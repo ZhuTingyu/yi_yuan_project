@@ -6,7 +6,7 @@ import android.graphics.drawable.AnimationDrawable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 import com.avoscloud.leanchatlib.controller.AudioHelper;
 
 /**

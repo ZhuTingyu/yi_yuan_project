@@ -13,7 +13,7 @@ import android.view.animation.CycleInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.EditText;
 
-import com.yuan.skeleton.R;
+import com.yuan.house.R;
 
 public class ClearEditText extends EditText implements
     OnFocusChangeListener, TextWatcher {
