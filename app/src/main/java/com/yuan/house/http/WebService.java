@@ -8,7 +8,6 @@ import com.loopj.android.http.RequestParams;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
 
-import org.apache.http.HttpEntity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -38,21 +37,13 @@ public class WebService {
         return ourInstance;
     }
 
-    public void postMultiPartFormDataFile(HttpEntity entity, AsyncHttpResponseHandler responseHandler) {
-        // file[]
-        // "multipart/form-data"
-        RestClient.getInstance().post(Constants.kWebServiceFileUpload, multiPartDataHeaderWithAuth(), entity, responseHandler);
-    }
-
     public void postMultiPartFormDataFile(RequestParams requestParams, AsyncHttpResponseHandler responseHandler) {
-        // file[]
-        // "multipart/form-data"
-        RestClient.getInstance().post(Constants.kWebServiceFileUpload, multiPartDataHeaderWithAuth(), requestParams, responseHandler);
+        RestClient.getInstance().post(Constants.kWebServiceFileUpload, authTokenHeader(), requestParams, responseHandler);
     }
 
     private String getAuthToken() {
         String token = null;
-        String json = prefs.getString("userLogin", "");
+        String json = prefs.getString(Constants.kWebDataKeyUserLogin, null);
         try {
             JSONObject object = new JSONObject(json);
             token = object.optString(kHttpReqKeyToken);
@@ -67,13 +58,6 @@ public class WebService {
         HashMap<String, String> hashMap = new HashMap<>();
 
         hashMap.put(kHttpReqKeyToken, getAuthToken());
-
-        return hashMap;
-    }
-
-    private HashMap<String, String> multiPartDataHeaderWithAuth() {
-        HashMap<String, String> hashMap = authTokenHeader();
-        hashMap.put(kHttpReqKeyContentType, "multipart/form-data");
 
         return hashMap;
     }

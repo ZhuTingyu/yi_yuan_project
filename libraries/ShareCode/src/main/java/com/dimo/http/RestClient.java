@@ -155,7 +155,7 @@ public class RestClient {
             }
         }
 
-        httpClient.post(null, rawUrl, requestParams, responseHandler);
+        httpClient.post(rawUrl, requestParams, responseHandler);
     }
 
     public void bridgeRequest(JSONObject params, int requestMethod, final WebViewJavascriptBridge.WVJBResponseCallback callback) {

@@ -15,6 +15,12 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import com.avos.avoscloud.im.v2.AVIMConversation;
+import com.avos.avoscloud.im.v2.AVIMException;
+import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
+import com.avoscloud.leanchatlib.controller.ChatManager;
+import com.avoscloud.leanchatlib.controller.MessageAgent;
+import com.avoscloud.leanchatlib.model.AVIMNoticeWithHouseIdMessage;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
@@ -50,15 +56,14 @@ import org.apache.http.HttpEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -521,23 +526,10 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         throw new NotImplementedException("NOT IMPLEMENTED");
     }
 
-    private HttpEntity constructMultiPartEntity(List<String> filePaths) {
-        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-
-        for (String path : filePaths) {
-            FileBody fileBody = new FileBody(new File(path));
-            builder.addPart("file[]", fileBody);
-        }
-
-        return builder.build();
-    }
-
     private RequestParams constructMultiPartParams(List<String> filePaths) {
         RequestParams params = new RequestParams();
 
         for (String path : filePaths) {
-//            FileBody fileBody = new FileBody(new File(path));
             try {
                 params.put("file[]", new File(path));
             } catch (FileNotFoundException e) {
@@ -558,19 +550,20 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     private void uploadMultiPartFiles(List<String> datum) {
-//        HttpEntity entity = constructMultiPartEntity(datum);
         RequestParams entity = constructMultiPartParams(datum);
 
         WebService.getInstance().postMultiPartFormDataFile(entity, new JsonHttpResponseHandler() {
             @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 super.onSuccess(statusCode, headers, response);
+
                 ToastUtil.showShort(mContext, "提交成功");
             }
 
             @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
+
                 ToastUtil.showShort(mContext, "提交失败");
             }
         });
