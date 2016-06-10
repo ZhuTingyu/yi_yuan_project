@@ -36,6 +36,7 @@ import com.loopj.android.http.RequestParams;
 import com.sleepbot.datetimepicker.time.RadialPickerLayout;
 import com.sleepbot.datetimepicker.time.TimePickerDialog;
 import com.victor.loading.rotate.RotateLoading;
+import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.base.BaseFragmentActivity;
@@ -48,9 +49,11 @@ import com.yuan.house.payment.AliPay;
 import com.yuan.house.ui.fragment.ProposalFragment;
 import com.yuan.house.ui.fragment.WebViewBaseFragment;
 import com.yuan.house.ui.fragment.WebViewFragment;
+import com.yuan.house.utils.FileUtil;
+import com.yuan.house.utils.ImageUtil;
 import com.yuan.house.utils.ToastUtil;
-import com.yuan.house.R;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.http.Header;
 import org.json.JSONArray;
@@ -59,6 +62,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -525,12 +529,24 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     private RequestParams constructMultiPartParams(List<String> filePaths) {
         RequestParams params = new RequestParams();
 
-        for (String path : filePaths) {
-            try {
-                params.put("file[]", new File(path));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
+        // loopj android async http support add byte[] as RequestParam item to submit multipart data
+        for (String file : filePaths) {
+            byte[] data = new byte[0];
+
+            String fileType = FileUtil.getFileExt(file);
+
+            if (!fileType.equals("amr")) {
+                // image
+                data = ImageUtil.compressToByteArray(file);
+            } else {
+                // audio
+                try {
+                    data = FileUtils.readFileToByteArray(new File(file));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+            params.put("file[]", data);
         }
 
         return params;
@@ -545,8 +561,13 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         uploadMultiPartFiles(datum);
     }
 
-    private void uploadMultiPartFiles(List<String> datum) {
-        RequestParams entity = constructMultiPartParams(datum);
+    /**
+     * 上传文件列表
+     *
+     * @param filenames
+     */
+    private void uploadMultiPartFiles(List<String> filenames) {
+        RequestParams entity = constructMultiPartParams(filenames);
 
         WebService.getInstance().postMultiPartFormDataFile(entity, new JsonHttpResponseHandler() {
             @Override
