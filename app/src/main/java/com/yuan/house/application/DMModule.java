@@ -2,7 +2,7 @@ package com.yuan.house.application;
 
 
 import com.avoscloud.chat.ui.chat.ChatRoomActivity;
-import com.avoscloud.chat.ui.chat.SwitchHouseActivity;
+import com.yuan.house.activities.SwitchHouseActivity;
 import com.yuan.house.activities.IPSettingActivity;
 import com.yuan.house.activities.MainActivity;
 import com.yuan.house.activities.MapActivity;

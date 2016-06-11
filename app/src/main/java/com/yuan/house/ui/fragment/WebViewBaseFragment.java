@@ -727,31 +727,17 @@ public class WebViewBaseFragment extends Fragment {
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("chatByUserId" + data);
 
-                HashMap<String, String> params = null;
+                JSONObject object = null;
                 try {
-                    params = StringUtil.JSONString2HashMap(data);
+                    object = new JSONObject(data);
+
+                    /** Start Chat **/
+                    ChatRoomActivity.chatByUserId(getActivity(), object);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
-                String objectId = params.get("lean_id");
-                String userId = params.get("user_id");
-                String houseId = params.get("house_id");
 
-                SharedPreferences.Editor editor = prefs.edit();
-                if (params.get("audit_type") != null) {
-                    editor.putString("auditType", params.get("audit_type"));
-                }
-
-                editor.putString("houseId", houseId);
-                editor.putString("target_id", userId);
-                editor.putString("leanId", objectId);
-                editor.putString("userId", userId);
-
-                editor.apply();
-
-                /** Start Chat **/
-                ChatRoomActivity.chatByUserId(getActivity(), objectId);
 
                 if (null != callback) {
                     callback.callback(null);

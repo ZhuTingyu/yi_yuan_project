@@ -17,7 +17,6 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
@@ -40,12 +39,13 @@ import com.avoscloud.leanchatlib.controller.ConversationHelper;
 import com.avoscloud.leanchatlib.model.AVIMHouseInfoMessage;
 import com.dimo.utils.StringUtil;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.yuan.house.R;
+import com.yuan.house.activities.SwitchHouseActivity;
 import com.yuan.house.common.Constants;
 import com.yuan.house.helper.AuthHelper;
 import com.yuan.house.ui.fragment.FragmentBBS;
 import com.yuan.house.ui.fragment.WebViewBaseFragment;
 import com.yuan.house.utils.ToastUtil;
-import com.yuan.house.R;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
@@ -62,14 +62,17 @@ import java.util.Map;
  */
 public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSInteractionListener {
     public static final int LOCATION_REQUEST = 100;
-    public static final int REQUEST_CODE_HOUSE = 101;
+    public static final int kRequestCodeSwitchHouse = 101;
+
     private static SharedPreferences prefs;
     private static String leanId = "";
     private FragmentBBS mFragmentBBS;
-    private RelativeLayout chatroom;
+
     private LinearLayout bottomLayout;
     private String value;
     private List<JSONObject> houseInfos;
+    private JSONObject jsonFormatParams;
+
     private GestureDetector gestureDetector;
     private int mLastY = 0;
     private GestureDetector.OnGestureListener onGestureListener =
@@ -89,6 +92,18 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                 }
             };
     private WebView webView;
+    private JSONArray jsonFormatSwitchParams;
+
+    public static void chatByConversation(Context from, AVIMConversation conv, JSONObject params) {
+        CacheService.registerConv(conv);
+
+        ChatManager.getInstance().registerConversation(conv);
+        Intent intent = new Intent(from, ChatRoomActivity.class);
+        intent.putExtra(CONVID, conv.getConversationId());
+        intent.putExtra(Constants.kHouseParamsForChatRoom, params.toString());
+
+        from.startActivity(intent);
+    }
 
     public static void chatByConversation(Context from, AVIMConversation conv) {
         CacheService.registerConv(conv);
@@ -126,9 +141,51 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         });
     }
 
+    public static void chatByUserId(final Activity from, final JSONObject params) {
+        String userId = params.optString("user_id");
+
+        leanId = params.optString("lean_id");
+
+        final ProgressDialog dialog = Utils.showSpinnerDialog(from);
+        if (prefs == null) prefs = PreferenceManager.getDefaultSharedPreferences(from);
+
+        String houseId = params.optString("house_id");
+        String auditType = params.optString("audit_type");
+
+        StringBuilder sb = new StringBuilder();
+        if (auditType == null) {
+            sb.append(houseId);
+        } else {
+            sb.append("000");
+            sb.append(auditType);
+            sb.append(houseId);
+        }
+
+        ChatManager.getInstance().fetchConversationWithUserId(sb.toString(), userId, new AVIMConversationCreatedCallback() {
+            @Override
+            public void done(AVIMConversation conversation, AVIMException e) {
+                dialog.dismiss();
+                if (Utils.filterException(e)) {
+                    chatByConversation(from, conversation, params);
+                }
+            }
+        });
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Bundle bundle = getIntent().getExtras();
+
+        if (bundle != null) {
+            String raw = bundle.getString(Constants.kHouseParamsForChatRoom);
+            try {
+                jsonFormatParams = new JSONObject(raw);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -140,7 +197,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         mFragmentTransaction.add(R.id.fragmentBBS, mFragmentBBS, Constants.kFragmentTagBBS);
         mFragmentTransaction.commit();
 
-        initHouseInfos();
+        initSuggestedHouseInfos();
     }
 
     @Override
@@ -216,26 +273,26 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_MOVE) {
                     final int y = (int) event.getY();
-                    if (y < mLastY)
-                        return true;
+
+                    if (y < mLastY) return true;
+
                     mLastY = y;
                 }
 
-                if (event.getAction() == MotionEvent.ACTION_UP)
-                    mLastY = 0;
+                if (event.getAction() == MotionEvent.ACTION_UP) mLastY = 0;
 
                 return false;
             }
         });
     }
 
-    private void initHouseInfos() {
+    private void initSuggestedHouseInfos() {
         String url = Constants.kWebServiceSwitchable;
 
         if (AuthHelper.userAlreadyLogin()) {
-            url += AuthHelper.userId() + "/" + AuthHelper.targetId();
+            url += AuthHelper.userId() + "/" + jsonFormatParams.optString("user_id");
         } else {
-            url += AuthHelper.targetId() + "/" + AuthHelper.userId();
+            url += jsonFormatParams.optString("user_id") + "/" + AuthHelper.userId();
         }
 
         restGet(url, new JsonHttpResponseHandler() {
@@ -243,6 +300,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 super.onSuccess(statusCode, headers, response);
 
+                jsonFormatSwitchParams = response;
                 houseInfos = new ArrayList<>();
                 for (int i = 0; i < response.length(); i++) {
                     JSONObject object;
@@ -265,15 +323,18 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
     }
 
     @Override
-    protected void openHouseInfo() {
+    protected void showSuggestedHouses() {
         Intent intent = new Intent(this, SwitchHouseActivity.class);
-        startActivityForResult(intent, REQUEST_CODE_HOUSE);
+        intent.putExtra(Constants.kHouseSwtichParamsForChatRoom, jsonFormatSwitchParams.toString());
+
+        startActivityForResult(intent, kRequestCodeSwitchHouse);
     }
 
     public void onEvent(ConversationChangeEvent conversationChangeEvent) {
-        if (conversation != null && conversation.getConversationId().
-                equals(conversationChangeEvent.getConv().getConversationId())) {
+        String convId = conversationChangeEvent.getConv().getConversationId();
+        if (conversation != null && conversation.getConversationId().equals(convId)) {
             this.conversation = conversationChangeEvent.getConv();
+
             ActionBar actionBar = getActionBar();
             actionBar.setTitle(ConversationHelper.titleOfConv(this.conversation));
         }
@@ -295,7 +356,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                     }
                     hideBottomLayout();
                     break;
-                case REQUEST_CODE_HOUSE:
+                case kRequestCodeSwitchHouse:
                     SerializableMap serializableMap = (SerializableMap) data.getSerializableExtra("data");
                     Map<String, Object> map = serializableMap.getMap();
                     List<String> images = JSON.parseObject(map.get("images").toString(), List.class);
@@ -330,6 +391,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
     @Override
     public void onWebChangeHouse(String data) {
+        // TODO: 16/6/10 这个接口干嘛用的?
         JSONObject object = null;
         for (int i = 0; i < houseInfos.size(); i++) {
             object = houseInfos.get(i);

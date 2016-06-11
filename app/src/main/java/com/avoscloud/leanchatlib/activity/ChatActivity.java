@@ -446,12 +446,12 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         } else if (v.getId() == R.id.btnImageFromCamera) {
             selectImageFromCamera();
         } else if (v.getId() == R.id.btnSwitchHouse) {
-            //房源
-            openHouseInfo();
+            // 显示推荐房源
+            showSuggestedHouses();
         }
     }
 
-    protected void openHouseInfo() {
+    protected void showSuggestedHouses() {
         throw new NotImplementedException("NOT IMPLEMENTED");
     }
 

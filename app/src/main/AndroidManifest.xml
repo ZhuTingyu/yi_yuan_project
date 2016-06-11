@@ -80,7 +80,7 @@
 
         <activity android:name=".activities.MapActivity" android:screenOrientation="portrait" />
         <activity android:name=".activities.ImagePagerActivity" android:screenOrientation="portrait" />
-        <activity android:name="com.avoscloud.chat.ui.chat.SwitchHouseActivity" android:screenOrientation="portrait" />
+        <activity android:name=".activities.SwitchHouseActivity" android:screenOrientation="portrait" />
 
         <activity
             android:name="com.avoscloud.chat.ui.chat.ChatRoomActivity"

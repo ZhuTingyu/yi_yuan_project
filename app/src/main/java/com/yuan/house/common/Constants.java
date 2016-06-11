@@ -88,4 +88,8 @@ public class Constants {
     public static String kWebpageUserMessage = "user_message.html";
     public static String kWebpageUserCenter = "user_center.html";
     public static String kWebpageAgencyCenter = "agency_center.html";
+
+    public static final String kHouseParamsForChatRoom = "kHouseParamsForChatRoom";
+    public static final String kHouseSwtichParamsForChatRoom = "kHouseSwtichParamsForChatRoom";
+
 }
