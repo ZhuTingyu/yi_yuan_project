@@ -42,6 +42,8 @@ public class ProposalFragment extends WebViewBaseFragment {
     Button proposal;
     @InjectView(R.id.complaint)
     Button complaint;
+    @InjectView(R.id.bug)
+    Button bug;
     @InjectView(R.id.et_info)
     EditText info;
     @InjectView(R.id.btn_recorder)
@@ -212,20 +214,31 @@ public class ProposalFragment extends WebViewBaseFragment {
         });
     }
 
-    @OnClick({R.id.proposal, R.id.complaint, R.id.btn_other})
+    @OnClick({R.id.proposal, R.id.complaint, R.id.bug, R.id.btn_more})
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.proposal:
-                proposal.setEnabled(false);
-                complaint.setEnabled(true);
-                category = ProposalMessageCategory.SUGGESTION;
-                break;
-            case R.id.complaint:
-                proposal.setEnabled(true);
-                complaint.setEnabled(false);
+            case R.id.complaint: {
+                complaint.setSelected(true);
+                proposal.setSelected(false);
+                bug.setSelected(false);
                 category = ProposalMessageCategory.COMPLAINT;
                 break;
-            case R.id.btn_other:
+            }
+            case R.id.proposal: {
+                complaint.setSelected(false);
+                proposal.setSelected(true);
+                bug.setSelected(false);
+                category = ProposalMessageCategory.SUGGESTION;
+                break;
+            }
+            case R.id.bug: {
+                complaint.setSelected(false);
+                proposal.setSelected(false);
+                bug.setSelected(true);
+                category = ProposalMessageCategory.BUG;
+                break;
+            }
+            case R.id.btn_more: {
                 mPopupWindow.showAtLocation(mWebView, Gravity.BOTTOM, 0, 0);
                 mPopupWindow.setAnimationStyle(R.style.app_pop);
                 mPopupWindow.setOutsideTouchable(true);
@@ -234,6 +247,7 @@ public class ProposalFragment extends WebViewBaseFragment {
                 params.alpha = 0.7f;
                 setWindowAttributes();
                 break;
+            }
         }
     }
 
