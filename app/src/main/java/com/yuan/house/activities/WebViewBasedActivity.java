@@ -202,19 +202,13 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
-    protected String getUserToken() throws JSONException {
-        String json = prefs.getString("userLogin", "");
-        HashMap<String, String> params = StringUtil.JSONString2HashMap(json);
-        return params.get("token");
-    }
-
     /**
      * Invoke from JS script interaction
      *
      * @param url    destination url
      * @param params params for page
      */
-    public void openLinkInNewActivity(String url, HashMap<String, String> params) {
+    public void openLinkInNewActivity(String url, HashMap<String, Object> params) {
         Bundle extras = new Bundle();
         extras.putSerializable("params", params);
 
@@ -348,7 +342,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         }
     }
 
-    public void onBridgeOpenNewLink(String url, HashMap<String, String> params) {
+    public void onBridgeOpenNewLink(String url, HashMap<String, Object> params) {
         openLinkInNewActivity(url, params);
     }
 
@@ -429,14 +423,14 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     public void onBridgeFinishActivity(String data) {
-        HashMap<String, String> params = null;
+        HashMap<String, Object> params = null;
         try {
             params = StringUtil.JSONString2HashMap(data);
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        String result = params.get("result");
+        String result = (String) params.get("result");
 
         Bundle conData = new Bundle();
         conData.putString("param_result_after_activity_finished", result);
@@ -492,14 +486,14 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     public void onBridgeOpenNewLinkWithExternalBrowser(String data) {
-        HashMap<String, String> params = null;
+        HashMap<String, Object> params = null;
         try {
             params = StringUtil.JSONString2HashMap(data);
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        String link = params.get("link");
+        String link = (String) params.get("link");
         if (!TextUtils.isEmpty(link)) {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
             startActivity(browserIntent);

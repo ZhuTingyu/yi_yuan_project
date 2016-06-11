@@ -94,7 +94,7 @@ public class SwitchHouseActivity extends FragmentActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent();
-                intent.putExtra("data", houseInfos.get(position).toString());
+                intent.putExtra(Constants.kBundleKeyAfterSwitchHouseSelected, houseInfos.get(position).toString());
                 setResult(RESULT_OK, intent);
                 finish();
             }

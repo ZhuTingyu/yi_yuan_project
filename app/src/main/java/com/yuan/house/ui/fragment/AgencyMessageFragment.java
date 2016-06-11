@@ -8,9 +8,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.dimo.web.WebViewJavascriptBridge;
+import com.yuan.house.R;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
-import com.yuan.house.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -77,13 +77,21 @@ public class AgencyMessageFragment extends WebViewBaseFragment {
     }
 
     @OnClick({R.id.contacts, R.id.sortBy})
-    public void onClick(View v){
-        switch (v.getId()){
+    public void onClick(View v) {
+        switch (v.getId()) {
             case R.id.contacts:
                 String url = "agency_contacts.html";
-                HashMap<String,String> map = new HashMap<String, String>();
-                map.put("params","{\"title\":\"通讯录\",\"hasBackButton\":true}");
-//                ((MainActivity)getActivity()).openLinkInNewActivity(url,map);
+                HashMap<String, Object> map = new HashMap<>();
+                JSONObject object = new JSONObject();
+                try {
+                    object.put("title", "通讯录");
+                    object.put("hasBackButton", true);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                map.put("params", object);
+
                 mBridgeListener.onBridgeOpenNewLink(url, map);
                 break;
             case R.id.sortBy:

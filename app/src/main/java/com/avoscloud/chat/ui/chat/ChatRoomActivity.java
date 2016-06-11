@@ -18,8 +18,6 @@ import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.AVIMException;
 import com.avos.avoscloud.im.v2.AVIMReservedMessageType;
@@ -31,7 +29,6 @@ import com.avos.avoscloud.im.v2.messages.AVIMLocationMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
 import com.avoscloud.chat.service.CacheService;
 import com.avoscloud.chat.service.ConversationChangeEvent;
-import com.avoscloud.chat.ui.entry.SerializableMap;
 import com.avoscloud.chat.util.Utils;
 import com.avoscloud.leanchatlib.activity.ChatActivity;
 import com.avoscloud.leanchatlib.controller.ChatManager;
@@ -345,8 +342,9 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
-                case LOCATION_REQUEST:
+                case LOCATION_REQUEST: {
                     final double latitude = data.getDoubleExtra(LocationActivity.LATITUDE, 0);
+
                     final double longitude = data.getDoubleExtra(LocationActivity.LONGITUDE, 0);
                     final String address = data.getStringExtra(LocationActivity.ADDRESS);
                     if (!TextUtils.isEmpty(address)) {
@@ -356,22 +354,29 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                     }
                     hideBottomLayout();
                     break;
-                case kRequestCodeSwitchHouse:
-                    SerializableMap serializableMap = (SerializableMap) data.getSerializableExtra("data");
-                    Map<String, Object> map = serializableMap.getMap();
-                    List<String> images = JSON.parseObject(map.get("images").toString(), List.class);
+                }
+                case kRequestCodeSwitchHouse: {
+                    String raw = data.getStringExtra(Constants.kBundleKeyAfterSwitchHouseSelected);
+                    JSONObject object;
+                    try {
+                        object = new JSONObject(raw);
 
-                    AVIMHouseInfoMessage message = new AVIMHouseInfoMessage();
-                    message.setHouseName(map.get("estate_name").toString());
-                    message.setHouseAddress(map.get("location_text").toString());
-                    message.setHouseImage(images.get(0).toString());
-                    message.setAttrs(map);
+                        JSONArray images = object.optJSONArray("images");
 
-                    messageAgent.sendEncapsulatedTypedMessage(message);
+                        AVIMHouseInfoMessage message = new AVIMHouseInfoMessage();
+                        message.setHouseName(object.optString("estate_name"));
+                        message.setHouseAddress(object.optString("location_text"));
+                        message.setHouseImage(images.optString(0));
+                        message.setAttrs(object);
 
+                        messageAgent.sendEncapsulatedTypedMessage(message);
 //                    bridge.callHandler("nativeChangeHouse", map.get("id"));
 
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     break;
+                }
             }
         }
 
@@ -380,18 +385,19 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
     @Override
     protected void onResume() {
         CacheService.setCurConv(conversation);
+
         super.onResume();
     }
 
     @Override
     protected void onDestroy() {
         CacheService.setCurConv(null);
+
         super.onDestroy();
     }
 
     @Override
     public void onWebChangeHouse(String data) {
-        // TODO: 16/6/10 这个接口干嘛用的?
         JSONObject object = null;
         for (int i = 0; i < houseInfos.size(); i++) {
             object = houseInfos.get(i);
@@ -406,31 +412,26 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
         if (object == null) return;
 
-        Map<String, Object> houseInfo = JSON.parseObject(object.toString(), new TypeReference<Map<String, Object>>() {
-        });
+        JSONArray images = object.optJSONArray("images");
 
-        JSONArray jsonImages = object.optJSONArray("images");
-        ArrayList<String> images = new ArrayList<>();
-
-        if (jsonImages != null) {
-            for (int i = 0; i < jsonImages.length(); i++) {
-                images.add(jsonImages.optString(i));
-            }
-
-            AVIMHouseInfoMessage message = new AVIMHouseInfoMessage();
-            message.setHouseName(object.optString("estate_name").toString());
-            message.setHouseAddress(object.optString("location_text").toString());
-            message.setHouseImage(images.get(0).toString());
-            message.setAttrs(houseInfo);
-
-            messageAgent.sendEncapsulatedTypedMessage(message);
+        AVIMHouseInfoMessage message = new AVIMHouseInfoMessage();
+        message.setHouseName(object.optString("estate_name"));
+        message.setHouseAddress(object.optString("location_text"));
+        message.setHouseImage(images.optString(0));
+        try {
+            message.setAttrs(object);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+
+        messageAgent.sendEncapsulatedTypedMessage(message);
+
     }
 
     @Override
     public void onShowSampleMessageBoard() {
         FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) webView.getLayoutParams();
-        HashMap<String, String> params = null;
+        HashMap<String, Object> params = null;
         try {
             params = StringUtil.JSONString2HashMap(value);
         } catch (JSONException e) {
@@ -443,13 +444,13 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
     @Override
     public void onShowHalfMessageBoard() {
         FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) webView.getLayoutParams();
-        HashMap<String, String> params = null;
+        HashMap<String, Object> params = null;
         try {
             params = StringUtil.JSONString2HashMap(value);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        int height = Integer.parseInt(params.get("height_m"));
+        int height = Integer.parseInt((String) params.get("height_m"));
         layoutParams.height = ((int) ((height + 10) * getResources().getDisplayMetrics().density));
         webView.setLayoutParams(layoutParams);
         bottomLayout.setVisibility(View.VISIBLE);

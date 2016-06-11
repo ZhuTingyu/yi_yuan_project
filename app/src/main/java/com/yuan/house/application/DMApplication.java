@@ -435,8 +435,6 @@ public class DMApplication extends Application {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-
-                // error connecting web page package server
             }
         });
     }

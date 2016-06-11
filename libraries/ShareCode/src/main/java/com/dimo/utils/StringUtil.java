@@ -110,8 +110,8 @@ public class StringUtil {
         }
     }
 
-    public static HashMap<String, String> JSONString2HashMap(String jsonString) throws JSONException {
-        HashMap<String, String> map;
+    public static HashMap<String, Object> JSONString2HashMap(String jsonString) throws JSONException {
+        HashMap<String, Object> map;
 
         JSONObject object = new JSONObject(jsonString);
         map = JSON2HashMap(object);
@@ -119,8 +119,8 @@ public class StringUtil {
         return map;
     }
 
-    private static HashMap<String, String> JSON2HashMap(JSONObject object) throws JSONException {
-        HashMap<String, String> map = new HashMap<>();
+    public static HashMap<String, Object> JSON2HashMap(JSONObject object) throws JSONException {
+        HashMap<String, Object> map = new HashMap<>();
 
         Iterator<?> keys = object.keys();
 

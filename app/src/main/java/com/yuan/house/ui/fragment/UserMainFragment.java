@@ -12,16 +12,16 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.baidu.location.BDLocation;
-import com.dimo.utils.StringUtil;
+import com.yuan.house.R;
 import com.yuan.house.activities.MainActivity;
 import com.yuan.house.activities.MapActivity;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
 import com.yuan.house.event.LocationEvent;
-import com.yuan.house.R;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 
@@ -100,10 +100,31 @@ public class UserMainFragment extends WebViewBaseFragment {
                 break;
             case R.id.btn_arrow_down:
                 String url = "resources.html";
-                HashMap<String, String> map = new HashMap<String, String>();
-                map.put("params", "{\"title\":\"全网房源\",\"hasBackButton\":true}");
-                ((MainActivity) getActivity()).openLinkInNewActivity(url, map);
+
+                HashMap<String, Object> map = new HashMap<>();
+                JSONObject object = new JSONObject();
+                try {
+                    object.put("title", "全网房源");
+                    object.put("hasBackButton", true);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                map.put("params", object);
+
+                mBridgeListener.onBridgeOpenNewLink(url, map);
                 break;
+        }
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mBridgeListener = (OnBridgeInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnFragmentInteractionListener");
         }
     }
 
@@ -112,10 +133,10 @@ public class UserMainFragment extends WebViewBaseFragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_MAP_CODE && resultCode == Activity.RESULT_OK) {
             //获取地图返回的地理位置
-            String mapJson = data.getStringExtra("mapJson");
+            String json = data.getStringExtra("mapJson");
             try {
-                HashMap<String, String> hashMap = StringUtil.JSONString2HashMap(mapJson);
-                address.setText(hashMap.get("street"));
+                JSONObject object = new JSONObject(json);
+                address.setText(object.optString("street"));
             } catch (JSONException e) {
                 e.printStackTrace();
             }

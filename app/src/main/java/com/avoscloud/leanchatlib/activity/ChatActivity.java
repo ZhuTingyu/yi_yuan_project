@@ -141,6 +141,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
     }
 
     private void initTitleView() {
+        // FIXME: 16/6/11 conversation title
         setTitleItem("13123");
         setLeftItem(R.drawable.back, new OnClickListener() {
             @Override

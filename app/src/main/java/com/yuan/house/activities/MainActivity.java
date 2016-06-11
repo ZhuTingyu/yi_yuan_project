@@ -23,8 +23,8 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
-import com.dimo.utils.StringUtil;
 import com.umeng.update.UmengUpdateAgent;
+import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
@@ -40,11 +40,9 @@ import com.yuan.house.ui.fragment.UserMessageFragment;
 import com.yuan.house.ui.fragment.WebViewBaseFragment;
 import com.yuan.house.ui.fragment.WebViewFragment;
 import com.yuan.house.utils.ToastUtil;
-import com.yuan.house.R;
 
 import org.json.JSONException;
-
-import java.util.HashMap;
+import org.json.JSONObject;
 
 import butterknife.ButterKnife;
 import de.greenrobot.event.EventBus;
@@ -254,60 +252,64 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
      * @param data user credentials
      */
     public void onBridgeSignIn(final String data) {
-        HashMap<String, String> params;
+        JSONObject object = null;
         try {
-            params = StringUtil.JSONString2HashMap(data);
-
-            String key = params.get("key");
-            String value = params.get("value");
-
-            SharedPreferences.Editor editor = prefs.edit();
-            if (value == null || value.equals("null")) {
-                editor.remove(key);
-            } else {
-                editor.putString(key, value);
-            }
-            editor.apply();
-
-            if (Constants.kWebDataKeyUserLogin.equals(key)) {
-                params = StringUtil.JSONString2HashMap(data);
-                params = StringUtil.JSONString2HashMap(params.get("value"));
-                if (params.get("user_info") != null) {
-                    params = StringUtil.JSONString2HashMap(params.get("user_info"));
-                } else {
-                    params = StringUtil.JSONString2HashMap(params.get("agency_info"));
-                }
-
-                // TODO: 16/6/8 edit user type
-                String userName = params.get("lean_user");
-                String passwd = params.get("lean_passwd");
-
-                avUserLogin(userName, passwd);
-            }
-
+            object = new JSONObject(data);
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        String key = object.optString("key");
+        String value = object.optString("value");
+
+        SharedPreferences.Editor editor = prefs.edit();
+        if (value == null || value.equals("null")) {
+            editor.remove(key);
+        } else {
+            editor.putString(key, value);
+        }
+        editor.apply();
+
+        if (Constants.kWebDataKeyUserLogin.equals(key)) {
+            try {
+                JSONObject holder = new JSONObject(value);
+                JSONObject user;
+                user = holder.optJSONObject("user_info");
+                if (user == null) {
+                    user = holder.optJSONObject("agency_info");
+                }
+
+                String userName = user.optString("lean_user");
+                String passwd = user.optString("lean_passwd");
+
+                avUserLogin(userName, passwd);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    private void avUserLogin(final String userName, String userPass) {
-        //TODO: handler after login to own server success
-        AVUser.logInInBackground(userName, userPass,
+    private void avUserLogin(final String username, String password) {
+        AVUser.logInInBackground(username, password,
                 new LogInCallback<AVUser>() {
                     @Override
                     public void done(AVUser avUser, AVException e) {
                         if (avUser != null) {
                             String chatUserId = avUser.getObjectId();
-                            prefs.edit().putString("avUserLogin", userName)
+                            prefs.edit().putString("avUserLogin", username)
                                     .putString(Constants.kLeanChatCurrentUserObjectId, chatUserId)
                                     .apply();
+
                             UserService.updateUserLocation();
+
                             ChatManager chatManager = ChatManager.getInstance();
                             chatManager.setupDatabaseWithSelfId(AVUser.getCurrentUser().getObjectId());
                             chatManager.openClientWithSelfId(AVUser.getCurrentUser().getObjectId(), null);
+
                             CacheService.registerUser(AVUser.getCurrentUser());
 
                             switchToFragment(Constants.kFragmentTagMain);
+
                             getBottomNavigationBar().clearAll();
                             setupTabbarClickListener();
                         } else {

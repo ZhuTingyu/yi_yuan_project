@@ -81,9 +81,17 @@ public class UserMessageFragment extends WebViewBaseFragment {
         switch (v.getId()) {
             case R.id.contacts:
                 String url = "user_contacts.html";
-                HashMap<String, String> map = new HashMap<String, String>();
-                map.put("params", "{\"title\":\"通讯录\",\"hasBackButton\":true}");
-//                ((MainActivity)getActivity()).openLinkInNewActivity(url,map);
+                HashMap<String, Object> map = new HashMap<>();
+                JSONObject object = new JSONObject();
+                try {
+                    object.put("title", "通讯录");
+                    object.put("hasBackButton", true);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                map.put("params", object);
+
                 mBridgeListener.onBridgeOpenNewLink(url, map);
                 break;
             case R.id.sortBy:
