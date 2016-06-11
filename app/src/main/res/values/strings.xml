@@ -190,5 +190,6 @@
     <string name="txt_msg_right_item_sort_by_agency">按经纪人</string>
     <string name="txt_msg_right_item_sort_by_house">按房源</string>
     <string name="app_name_real">房产</string>
+    <string name="tabbar_item_txt_bug">BUG</string>
 
 </resources>
