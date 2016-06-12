@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSON;
 import com.avos.avoscloud.im.v2.AVIMMessage;
 import com.avos.avoscloud.im.v2.AVIMReservedMessageType;
 import com.avos.avoscloud.im.v2.AVIMTypedMessage;
@@ -41,6 +42,7 @@ import org.ocpsoft.prettytime.PrettyTime;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 
 
 public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
@@ -57,7 +59,9 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         this.context = context;
         this.conversationType = conversationType;
         this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context, "chat-db", null);
+
         SQLiteDatabase db = helper.getWritableDatabase();
         this.master = new DaoMaster(db);
     }
@@ -162,7 +166,9 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
 
     private void initHouseMessageView(View conView, AVIMTypedMessage msg, boolean isMessageSentByMe) {
         AVIMHouseInfoMessage message = (AVIMHouseInfoMessage) msg;
-        JSONObject object = message.getAttrs();
+
+        Map<String, Object> map = message.getAttrs();
+        JSONObject object = (JSONObject) JSON.toJSON(map);
 
         if (object.length() == 0) return;
 

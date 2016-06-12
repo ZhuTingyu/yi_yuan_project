@@ -18,6 +18,8 @@ import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.AVIMException;
 import com.avos.avoscloud.im.v2.AVIMReservedMessageType;
@@ -127,7 +129,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
             sb.append(houseId);
         }
 
-        ChatManager.getInstance().fetchConversationWithUserId(sb.toString(), userId, new AVIMConversationCreatedCallback() {
+        ChatManager.getInstance().fetchConversationWithUserId(sb.toString(), leanId, new AVIMConversationCreatedCallback() {
             @Override
             public void done(AVIMConversation conversation, AVIMException e) {
                 dialog.dismiss();
@@ -158,7 +160,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
             sb.append(houseId);
         }
 
-        ChatManager.getInstance().fetchConversationWithUserId(sb.toString(), userId, new AVIMConversationCreatedCallback() {
+        ChatManager.getInstance().fetchConversationWithUserId(sb.toString(), leanId, new AVIMConversationCreatedCallback() {
             @Override
             public void done(AVIMConversation conversation, AVIMException e) {
                 dialog.dismiss();
@@ -320,6 +322,26 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
     }
 
     @Override
+    protected void sendText() {
+        String content = contentEdit.getText().toString();
+        if (!TextUtils.isEmpty(content)) {
+            AVIMTextMessage message = new AVIMTextMessage();
+
+            Map<String, Object> attrs = new HashMap<>();
+            attrs.put("houseId", jsonFormatParams.optString("house_id"));
+            attrs.put("username", "wo");
+
+            message.setAttrs(attrs);
+
+            message.setText(content);
+
+            messageAgent.sendEncapsulatedTypedMessage(message);
+
+            contentEdit.setText("");
+        }
+    }
+
+    @Override
     protected void showSuggestedHouses() {
         Intent intent = new Intent(this, SwitchHouseActivity.class);
         intent.putExtra(Constants.kHouseSwtichParamsForChatRoom, jsonFormatSwitchParams.toString());
@@ -367,7 +389,10 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                         message.setHouseName(object.optString("estate_name"));
                         message.setHouseAddress(object.optString("location_text"));
                         message.setHouseImage(images.optString(0));
-                        message.setAttrs(object);
+
+                        Map<String, Object> attrs = JSON.parseObject(raw, new TypeReference<Map<String, Object>>() {
+                        });
+                        message.setAttrs(attrs);
 
                         messageAgent.sendEncapsulatedTypedMessage(message);
 //                    bridge.callHandler("nativeChangeHouse", map.get("id"));
@@ -418,11 +443,10 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         message.setHouseName(object.optString("estate_name"));
         message.setHouseAddress(object.optString("location_text"));
         message.setHouseImage(images.optString(0));
-        try {
-            message.setAttrs(object);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+
+        Map<String, Object> attrs = JSON.parseObject(jsonFormatParams.toString(), new TypeReference<Map<String, Object>>() {
+        });
+        message.setAttrs(attrs);
 
         messageAgent.sendEncapsulatedTypedMessage(message);
 

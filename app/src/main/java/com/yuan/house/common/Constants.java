@@ -93,4 +93,5 @@ public class Constants {
     public static final String kHouseSwtichParamsForChatRoom = "kHouseSwtichParamsForChatRoom";
 
     public static String kBundleKeyAfterSwitchHouseSelected = "kBundleKeyAfterSwitchHouseSelected";
+    public static String kActivityParamFinishSelectLocationOnMap = "kActivityParamFinishSelectLocationOnMap";
 }

@@ -453,7 +453,11 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
     }
 
     protected void showSuggestedHouses() {
-        throw new NotImplementedException("NOT IMPLEMENTED");
+        throw new NotImplementedException("IMPLEMENT IN DERIEVED CLASS");
+    }
+
+    protected void sendText() {
+        throw new NotImplementedException("IMPLEMENT IN DERIEVED CLASS");
     }
 
     private void hideBottomLayoutAndScrollToLast() {
@@ -528,14 +532,6 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         openCameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
         startActivityForResult(openCameraIntent,
                 TAKE_CAMERA_REQUEST);
-    }
-
-    private void sendText() {
-        final String content = contentEdit.getText().toString();
-        if (!TextUtils.isEmpty(content)) {
-            messageAgent.sendText(content);
-            contentEdit.setText("");
-        }
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)

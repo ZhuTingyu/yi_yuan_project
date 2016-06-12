@@ -235,8 +235,11 @@ public class ChatManager extends AVIMClientEventHandler {
     msgsTable.insertMsg(message);
     roomsTable.insertRoom(message.getConversationId());
     roomsTable.increaseUnreadCount(message.getConversationId());
+
     MessageEvent messageEvent = new MessageEvent(message);
+
     eventBus.post(messageEvent);
+
     new NetAsyncTask(getContext(), false) {
       @Override
       protected void doInBack() throws Exception {
@@ -245,8 +248,8 @@ public class ChatManager extends AVIMClientEventHandler {
 
       @Override
       protected void onPost(Exception exception) {
-        if (selfId != null && ChatActivity.getCurrentChattingConvid() == null || !ChatActivity.getCurrentChattingConvid().equals(message
-            .getConversationId())) {
+        if (selfId != null && ChatActivity.getCurrentChattingConvid() == null
+                || !ChatActivity.getCurrentChattingConvid().equals(message.getConversationId())) {
           if (getUserInfoFactory().showNotificationWhenNewMessageCome(selfId)) {
             showMessageNotification(getContext(), conversation, message);
           }

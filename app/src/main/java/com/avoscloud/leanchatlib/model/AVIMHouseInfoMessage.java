@@ -6,8 +6,7 @@ import com.avos.avoscloud.im.v2.AVIMMessageManager;
 import com.avos.avoscloud.im.v2.AVIMMessageType;
 import com.avos.avoscloud.im.v2.AVIMTypedMessage;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.Map;
 
 /**
  * Created by KevinLee on 2016/5/10.
@@ -18,7 +17,8 @@ import org.json.JSONObject;
 public class AVIMHouseInfoMessage extends AVIMTypedMessage {
 
     @AVIMMessageField(name = "_lcattrs")
-    JSONObject attrs;
+    Map<String, Object> attrs;
+
     @AVIMMessageField(name = "_lctext")
     private String houseName;
     @AVIMMessageField(name = "_lctext")
@@ -55,19 +55,11 @@ public class AVIMHouseInfoMessage extends AVIMTypedMessage {
         AVIMMessageManager.registerAVIMMessageType(this.getClass());
     }
 
-//    public Map<String, Object> getAttrs() {
-//        return attrs;
-//    }
-//
-//    public void setAttrs(Map<String, Object> attrs) {
-//        this.attrs = attrs;
-//    }
-
-    public JSONObject getAttrs() {
+    public Map<String, Object> getAttrs() {
         return attrs;
     }
 
-    public void setAttrs(JSONObject attrs) throws JSONException {
+    public void setAttrs(Map<String, Object> attrs) {
         this.attrs = attrs;
     }
 }
