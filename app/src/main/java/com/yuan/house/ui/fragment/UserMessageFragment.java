@@ -8,14 +8,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.dimo.web.WebViewJavascriptBridge;
+import com.yuan.house.R;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
-import com.yuan.house.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.HashMap;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -81,18 +79,22 @@ public class UserMessageFragment extends WebViewBaseFragment {
         switch (v.getId()) {
             case R.id.contacts:
                 String url = "user_contacts.html";
-                HashMap<String, Object> map = new HashMap<>();
+
                 JSONObject object = new JSONObject();
+                JSONObject innerObject = new JSONObject();
                 try {
-                    object.put("title", "通讯录");
-                    object.put("hasBackButton", true);
+                    innerObject.put("title", "通讯录");
+                    innerObject.put("hasBackButton", true);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
-                map.put("params", object);
-
-                mBridgeListener.onBridgeOpenNewLink(url, map);
+                try {
+                    object.put("params", innerObject);
+                    mBridgeListener.onBridgeOpenNewLink(url, object);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 break;
             case R.id.sortBy:
                 getBridge().callHandler(Constants.kJavascriptFnOnRightItemClick);

@@ -23,8 +23,6 @@ import com.yuan.house.event.LocationEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
@@ -101,18 +99,21 @@ public class UserMainFragment extends WebViewBaseFragment {
             case R.id.btn_arrow_down:
                 String url = "resources.html";
 
-                HashMap<String, Object> map = new HashMap<>();
                 JSONObject object = new JSONObject();
+                JSONObject innerObject = new JSONObject();
                 try {
-                    object.put("title", "全网房源");
-                    object.put("hasBackButton", true);
+                    innerObject.put("title", "全网房源");
+                    innerObject.put("hasBackButton", true);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
-                map.put("params", object);
-
-                mBridgeListener.onBridgeOpenNewLink(url, map);
+                try {
+                    object.put("params", innerObject);
+                    mBridgeListener.onBridgeOpenNewLink(url, object);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 break;
         }
     }

@@ -61,7 +61,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -113,7 +112,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         // prepare the fragment for main framelayout
         mFragmentManager = getSupportFragmentManager();
 
-        HashMap<String, String> params = null;
+        JSONObject params = null;
         String url = Constants.kWebPageEntry;
 
         Bundle bundle = getIntent().getExtras();
@@ -125,12 +124,16 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         }
 
         if (bundle != null) {
-            params = (HashMap<String, String>) bundle.getSerializable("params");
+            try {
+                params = new JSONObject(bundle.getString("params"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             if (params != null) {
                 try {
                     mUrl = bundle.getString("url");
 
-                    JSONObject object = new JSONObject(params.get("params"));
+                    JSONObject object = new JSONObject(params.optString("params"));
 
                     if (!TextUtils.isEmpty(object.optString("title"))) {
                         setTitleItem(object.optString("title"));
@@ -208,12 +211,12 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
      * @param url    destination url
      * @param params params for page
      */
-    public void openLinkInNewActivity(String url, HashMap<String, Object> params) {
+    public void openLinkInNewActivity(String url, JSONObject params) {
         Bundle extras = new Bundle();
-        extras.putSerializable("params", params);
+        extras.putString("params", params.toString());
 
         Intent intent = new Intent(this, WebViewActivity.class);
-        intent.putExtra("params", params);
+        intent.putExtra("params", params.toString());
         intent.putExtra("url", url);
 
         startActivityForResult(intent, kActivityRequestCodeWebActivity);
@@ -342,7 +345,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         }
     }
 
-    public void onBridgeOpenNewLink(String url, HashMap<String, Object> params) {
+    public void onBridgeOpenNewLink(String url, JSONObject params) {
         openLinkInNewActivity(url, params);
     }
 

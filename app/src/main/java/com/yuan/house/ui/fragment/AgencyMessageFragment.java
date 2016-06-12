@@ -15,8 +15,6 @@ import com.yuan.house.common.Constants;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
@@ -81,18 +79,23 @@ public class AgencyMessageFragment extends WebViewBaseFragment {
         switch (v.getId()) {
             case R.id.contacts:
                 String url = "agency_contacts.html";
-                HashMap<String, Object> map = new HashMap<>();
+
                 JSONObject object = new JSONObject();
+                JSONObject innerObject = new JSONObject();
                 try {
-                    object.put("title", "通讯录");
-                    object.put("hasBackButton", true);
+                    innerObject.put("title", "通讯录");
+                    innerObject.put("hasBackButton", true);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
-                map.put("params", object);
+                try {
+                    object.put("params", innerObject);
+                    mBridgeListener.onBridgeOpenNewLink(url, object);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
-                mBridgeListener.onBridgeOpenNewLink(url, map);
                 break;
             case R.id.sortBy:
                 getBridge().callHandler(Constants.kJavascriptFnOnRightItemClick);

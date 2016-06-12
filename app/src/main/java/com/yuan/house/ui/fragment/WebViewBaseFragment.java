@@ -198,15 +198,15 @@ public class WebViewBaseFragment extends Fragment {
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("redirectPage got:" + data);
 
-                HashMap<String, Object> params = null;
+                JSONObject object = null;
                 try {
-                    params = StringUtil.JSONString2HashMap(data);
+                    object = new JSONObject(data);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
-                String url = (String) params.get("url");
-                mBridgeListener.onBridgeOpenNewLink(url, params);
+                String url = object.optString("url");
+                mBridgeListener.onBridgeOpenNewLink(url, object);
 
                 if (null != callback) {
                     callback.callback("redirectPage answer");
@@ -980,7 +980,7 @@ public class WebViewBaseFragment extends Fragment {
 
         void onBridgeSelectImageFromNative(String data, WebViewJavascriptBridge.WVJBResponseCallback callback);
 
-        void onBridgeOpenNewLink(String url, HashMap<String, Object> params);
+        void onBridgeOpenNewLink(String url, JSONObject params);
 
         void onBridgeShowSearchBar();
 
