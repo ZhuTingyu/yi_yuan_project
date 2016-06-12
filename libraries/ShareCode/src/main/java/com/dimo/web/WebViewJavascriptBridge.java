@@ -205,6 +205,20 @@ public class WebViewJavascriptBridge implements Serializable {
         _dispatchMessage(message);
     }
 
+    private void _sendData(JSONObject data, WVJBResponseCallback responseCallback, String handlerName) {
+        Map<String, Object> message = new HashMap<>();
+        message.put("data", data);
+        if (null != responseCallback) {
+            String callbackId = "java_cb_" + (++_uniqueId);
+            _responseCallbacks.put(callbackId, responseCallback);
+            message.put("callbackId", callbackId);
+        }
+        if (null != handlerName) {
+            message.put("handlerName", handlerName);
+        }
+        _dispatchMessage(message);
+    }
+
     private void _dispatchMessage(Map<String, Object> message) {
         String messageJSON = new JSONObject(message).toString();
         Timber.v("Web View sending:" + messageJSON);
@@ -220,14 +234,20 @@ public class WebViewJavascriptBridge implements Serializable {
 
 
     public void callHandler(String handlerName) {
-        callHandler(handlerName, null, null);
+        callHandler(handlerName, "", null);
     }
 
     public void callHandler(String handlerName, String data) {
         callHandler(handlerName, data, null);
     }
+    public void callHandler(String handlerName, JSONObject data) {
+        callHandler(handlerName, data, null);
+    }
 
     public void callHandler(String handlerName, String data, WVJBResponseCallback responseCallback) {
+        _sendData(data, responseCallback, handlerName);
+    }
+    public void callHandler(String handlerName, JSONObject data, WVJBResponseCallback responseCallback) {
         _sendData(data, responseCallback, handlerName);
     }
 
