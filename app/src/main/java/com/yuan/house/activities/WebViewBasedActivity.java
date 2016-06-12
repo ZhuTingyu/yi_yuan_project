@@ -123,7 +123,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             setContentView(R.layout.activity_webview);
         }
 
-        if (bundle != null) {
+        if (bundle != null && !TextUtils.isEmpty(bundle.getString("params"))) {
             try {
                 params = new JSONObject(bundle.getString("params"));
             } catch (JSONException e) {
@@ -153,7 +153,6 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
             }
         }
 
