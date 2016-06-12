@@ -65,7 +65,9 @@ public class AgencyMessageFragment extends WebViewBaseFragment {
                 try {
                     JSONObject object = new JSONObject(data);
                     if ("text".equals(object.getString("type"))) {
-                        tvRightItem.setText(object.getString("content"));
+                        if (tvRightItem != null) {
+                            tvRightItem.setText(object.getString("content"));
+                        }
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

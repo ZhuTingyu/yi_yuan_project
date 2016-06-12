@@ -129,21 +129,6 @@ public class UserMainFragment extends WebViewBaseFragment {
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_MAP_CODE && resultCode == Activity.RESULT_OK) {
-            //获取地图返回的地理位置
-            String json = data.getStringExtra("mapJson");
-            try {
-                JSONObject object = new JSONObject(json);
-                address.setText(object.optString("street"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     public void onEvent(LocationEvent event) {
         if (event.getEventType() == LocationEvent.LocationEventEnum.UPDATED) {
             BDLocation location = event.getHolder();

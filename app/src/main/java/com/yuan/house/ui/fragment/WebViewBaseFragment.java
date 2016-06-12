@@ -148,7 +148,7 @@ public class WebViewBaseFragment extends Fragment {
         // register all the web handlers at once
         registerHandle();
 
-        bridge.registerHandler("getParams", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("getParams", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("getParams got:" + data);
@@ -184,7 +184,7 @@ public class WebViewBaseFragment extends Fragment {
     }
 
     protected void registerHandle() {
-        bridge.registerHandler("purchase", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("purchase", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Log.i("reponse.data", data);
@@ -193,7 +193,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("redirectPage", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("redirectPage", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("redirectPage got:" + data);
@@ -215,8 +215,8 @@ public class WebViewBaseFragment extends Fragment {
         });
 
         // This will NOT working since the webview might be not ready!!!
-        // bridge.callHandler("testJavascriptHandler", "42");
-        bridge.registerHandler("replacePage", new WebViewJavascriptBridge.WVJBHandler() {
+        // getBridge().callHandler("testJavascriptHandler", "42");
+        getBridge().registerHandler("replacePage", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("replacePage got:" + data);
@@ -226,14 +226,14 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("showToast", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("showToast", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 ToastUtil.showShort(getActivity(), data);
             }
         });
 
-        bridge.registerHandler("showConfirmDialog", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("showConfirmDialog", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("showConfirmDialog got:" + data);
@@ -270,7 +270,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("showMsg", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("showMsg", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("showMsg got:" + data);
@@ -280,7 +280,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("showProgressDialog", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("showProgressDialog", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("showProgressDialog got:" + data);
@@ -289,7 +289,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("dismissProgressDialog", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("dismissProgressDialog", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("dismissProgressDialog got:" + data);
@@ -298,7 +298,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("updatePackage", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("updatePackage", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("updatePackage got:" + data);
@@ -308,7 +308,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("uploadFile", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("uploadFile", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("uploadFile got:" + data);
@@ -350,7 +350,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("getCurrentPackageVersion", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("getCurrentPackageVersion", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("getCurrentPackageVersion got:" + data);
@@ -361,7 +361,7 @@ public class WebViewBaseFragment extends Fragment {
                 }
             }
         });
-        bridge.registerHandler("setTitle", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("setTitle", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("setTitle got:" + data);
@@ -378,7 +378,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("setRightItem", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("setRightItem", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("setRightItem got:" + data);
@@ -398,7 +398,7 @@ public class WebViewBaseFragment extends Fragment {
                     mBridgeListener.onBridgeSetRightItem(resourceId, new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            bridge.callHandler("onRightItemClick");
+                            getBridge().callHandler("onRightItemClick");
                         }
                     });
                 } else {
@@ -406,14 +406,14 @@ public class WebViewBaseFragment extends Fragment {
                     mBridgeListener.onBridgeSetRightItem(content, new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            bridge.callHandler("onRightItemClick", content, null);
+                            getBridge().callHandler("onRightItemClick", content, null);
                         }
                     });
                 }
             }
         });
 
-        bridge.registerHandler("getAOSPVersion", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("getAOSPVersion", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("getAOSPVersion got:" + data);
@@ -423,7 +423,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("callNumber", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("callNumber", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("callNumber got:" + data);
@@ -450,34 +450,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-//        bridge.registerHandler("showTabbar", new WebViewJavascriptBridge.WVJBHandler() {
-//            @Override
-//            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
-//                Timber.v("showTabbar got:" + data);
-//
-//                HashMap<String, String> stringStringHashMap = null;
-//                try {
-//                    stringStringHashMap = StringUtil.JSONString2HashMap(data);
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//
-//                if (null != callback) {
-//                    View view = ButterKnife.findById(MainActivity.this, R.id.tabbar_layout);
-//                    if (view != null) {
-//                        String str = stringStringHashMap.get("visible");
-//                        if (str.equals("false")) {
-//                            view.setVisibility(View.GONE);
-//                        } else {
-//                            view.setVisibility(View.VISIBLE);
-//                        }
-//                    }
-//                    callback.callback(null);
-//                }
-//            }
-//        });
-
-        bridge.registerHandler("rest_get", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("rest_get", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("get got:" + data);
@@ -491,7 +464,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("rest_post", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("rest_post", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("post got:" + data);
@@ -506,7 +479,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("rest_put", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("rest_put", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("put got:" + data);
@@ -521,7 +494,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("rest_delete", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("rest_delete", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("delete got:" + data);
@@ -536,7 +509,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("login", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("login", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("login got:" + data);
@@ -570,7 +543,9 @@ public class WebViewBaseFragment extends Fragment {
                                     e.printStackTrace();
                                 }
                             }
-                            callback.callback(response.toString());
+                            if (callback != null) {
+                                callback.callback(response.toString());
+                            }
                         }
 
                         @Override
@@ -584,7 +559,9 @@ public class WebViewBaseFragment extends Fragment {
                                     e.printStackTrace();
                                 }
                             }
-                            callback.callback(errorResponse.toString());
+                            if (callback != null) {
+                                callback.callback(errorResponse.toString());
+                            }
                         }
                     });
                 }
@@ -593,7 +570,7 @@ public class WebViewBaseFragment extends Fragment {
 
         // Cache Data set/get - set key/value to data. !!!Do not save preferences
         // cached data will be REMOVED after app uninstalled.
-        bridge.registerHandler("setData", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("setData", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("setData got:" + data);
@@ -611,7 +588,9 @@ public class WebViewBaseFragment extends Fragment {
                 SharedPreferences.Editor editor = prefs.edit();
                 // 如果是设置 userLogin, 则为登陆
                 if (Constants.kWebDataKeyUserLogin.equals(key)) {
-                    mBridgeListener.onBridgeSignIn(data);
+                    if (mBridgeListener != null) {
+                        mBridgeListener.onBridgeSignIn(data);
+                    }
 
                     return;
                 }
@@ -624,7 +603,7 @@ public class WebViewBaseFragment extends Fragment {
                 editor.apply();
             }
         });
-        bridge.registerHandler("getData", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("getData", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("getData got:" + data);
@@ -646,25 +625,29 @@ public class WebViewBaseFragment extends Fragment {
         });
 
         // finish activity by JS code
-        bridge.registerHandler("finishActivity", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("finishActivity", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("finishActivity" + data);
 
-                mBridgeListener.onBridgeFinishActivity(data);
+                if (mBridgeListener != null) {
+                    mBridgeListener.onBridgeFinishActivity(data);
+                }
             }
         });
 
-        bridge.registerHandler("openLinkWithBrowser", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("openLinkWithBrowser", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("openLinkWithBrowser" + data);
 
-                mBridgeListener.onBridgeOpenNewLinkWithExternalBrowser(data);
+                if (mBridgeListener != null) {
+                    mBridgeListener.onBridgeOpenNewLinkWithExternalBrowser(data);
+                }
             }
         });
 
-        bridge.registerHandler("chatByUserId", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("chatByUserId", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("chatByUserId" + data);
@@ -688,7 +671,7 @@ public class WebViewBaseFragment extends Fragment {
         /**
          * get geo location
          */
-        bridge.registerHandler("getGeoLocation", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("getGeoLocation", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("getGeoLocation" + data);
@@ -712,21 +695,25 @@ public class WebViewBaseFragment extends Fragment {
                         callback.callback(object.toString());
                     }
                 } else {
-                    mBridgeListener.onBridgeRequestLocation(callback);
+                    if (mBridgeListener != null) {
+                        mBridgeListener.onBridgeRequestLocation(callback);
+                    }
                 }
             }
         });
 
-        bridge.registerHandler("cutImage", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("cutImage", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 mCallback = jsCallback;
 
-                mBridgeListener.onBridgeResizeOrCropImage();
+                if (mBridgeListener != null) {
+                    mBridgeListener.onBridgeResizeOrCropImage();
+                }
             }
         });
 
-        bridge.registerHandler("broadcast", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("broadcast", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(final String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 EventBus.getDefault().post(new WebBroadcastEvent(data, getActivity()));
@@ -734,17 +721,19 @@ public class WebViewBaseFragment extends Fragment {
         });
 
         //TODO 代码已完善，待测试。
-        bridge.registerHandler("uploadFiles", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("uploadFiles", new WebViewJavascriptBridge.WVJBHandler() {
 
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 mCallback = jsCallback;
 
-                mBridgeListener.onBridgeUploadFiles();
+                if (mBridgeListener != null) {
+                    mBridgeListener.onBridgeUploadFiles();
+                }
             }
         });
 
-        bridge.registerHandler("reviewImages", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("reviewImages", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 Log.i("图片预览", data);
@@ -754,7 +743,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("showDateTimePicker", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("showDateTimePicker", new WebViewJavascriptBridge.WVJBHandler() {
 
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
@@ -782,14 +771,16 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("logout", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("logout", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                mBridgeListener.onBridgeLogout();
+                if (mBridgeListener != null) {
+                    mBridgeListener.onBridgeLogout();
+                }
             }
         });
 
-        bridge.registerHandler("showPickerView", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("showPickerView", new WebViewJavascriptBridge.WVJBHandler() {
 
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
@@ -833,7 +824,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("getLastMessageByHouse", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("getLastMessageByHouse", new WebViewJavascriptBridge.WVJBHandler() {
 
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
@@ -863,41 +854,50 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("showSearchBar", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("showSearchBar", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                mBridgeListener.onBridgeShowSearchBar();
+                if (mBridgeListener != null) {
+                    mBridgeListener.onBridgeShowSearchBar();
+                }
             }
         });
 
-        bridge.registerHandler("selectImageFromNative", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("selectImageFromNative", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 Log.i("selectImageFromNative", data);
-
-                mBridgeListener.onBridgeSelectImageFromNative(data, jsCallback);
+                if (mBridgeListener != null) {
+                    mBridgeListener.onBridgeSelectImageFromNative(data, jsCallback);
+                }
             }
         });
 
-        bridge.registerHandler("dropToMessage", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("dropToMessage", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                mBridgeListener.onBridgeDropToMessage();
+                if (mBridgeListener != null) {
+                    mBridgeListener.onBridgeDropToMessage();
+                }
             }
         });
 
-        bridge.registerHandler("updateFriendRelationship", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("updateFriendRelationship", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                mBridgeListener.onBridgeUpdateFriendRelationship();
+                if (mBridgeListener != null) {
+                    mBridgeListener.onBridgeUpdateFriendRelationship();
+                }
             }
         });
 
-        bridge.registerHandler("selectMapLocation", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("selectMapLocation", new WebViewJavascriptBridge.WVJBHandler() {
 
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                mBridgeListener.onBridgeSelectMapLocation();
+                if (mBridgeListener != null) {
+                    mBridgeListener.onBridgeSelectMapLocation();
+                }
             }
         });
 
