@@ -274,10 +274,18 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
             try {
                 JSONObject holder = new JSONObject(value);
                 JSONObject user;
+
+                // save `user_id' or `agency_id' in AVInstallation
+                AVInstallation installation = AVInstallation.getCurrentInstallation();
                 user = holder.optJSONObject("user_info");
                 if (user == null) {
                     user = holder.optJSONObject("agency_info");
+                    installation.put("agency_id", user.optString("id"));
+                } else {
+                    installation.put("user_id", user.optString("id"));
                 }
+
+                installation.saveInBackground();
 
                 String userName = user.optString("lean_user");
                 String passwd = user.optString("lean_passwd");
