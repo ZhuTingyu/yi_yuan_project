@@ -81,6 +81,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     private final int kActivityRequestCodeImagePickOnly = 10;
     private final int kActivityRequestCodeImagePickThenCrop = 11;
     private final int kActivityRequestCodeImagePickThenUpload = 12;
+    private final int kActivityRequestCodeSelectMapLocation = 20;
     protected FragmentManager mFragmentManager;
     protected FragmentTransaction mFragmentTransaction;
     @InjectView(R.id.rotateloading)
@@ -98,7 +99,6 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             }
         }
     };
-
     private WebViewJavascriptBridge.WVJBResponseCallback mBridgeCallback;
 
     @Override
@@ -246,8 +246,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             if (data != null) {
                 // handle the case if activity is terminated by JS code
                 Bundle res = data.getExtras();
-                if (requestCode == kActivityRequestCodeWebActivity)
-                    result = res.getString("param_result_after_activity_finished");
+                result = res.getString("param_result_after_activity_finished");
             }
 
             Timber.v("Got finished result:" + result);
@@ -277,6 +276,21 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             List<String> path = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
 
             // TODO: 16/6/10 invoke crop process
+        } else if (requestCode == kActivityRequestCodeSelectMapLocation) {
+            Timber.v("kActivityRequestCodeSelectMapLocation");
+            // TODO: 16/6/12 revert callback the selected map location
+            String result = null;
+            if (data != null) {
+                // handle the case if activity is terminated by JS code
+                Bundle res = data.getExtras();
+                result = res.getString(Constants.kActivityParamFinishSelectLocationOnMap);
+                try {
+                    JSONObject object = new JSONObject(result);
+                    getWebViewFragment().getBridge().callHandler("selectedMapLocation", object);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         } else {
             // never reach
             Timber.e("onActivityResult SHOULD NEVER REACH");
@@ -503,8 +517,8 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     public void onBridgeSelectMapLocation() {
-//        Intent intent = new Intent(mContext, MapActivity.class);
-//        startActivityForResult(intent, REQUEST_MAP_CODE);
+        Intent intent = new Intent(mContext, MapActivity.class);
+        startActivityForResult(intent, kActivityRequestCodeSelectMapLocation);
     }
 
     @Override

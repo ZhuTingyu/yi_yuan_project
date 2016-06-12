@@ -31,6 +31,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.yuan.house.application.Injector;
 import com.yuan.house.R;
+import com.yuan.house.common.Constants;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -151,7 +152,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
             public void onClick(View v) {
                 if(!TextUtils.isEmpty(json)){
                     Intent intent = new Intent();
-                    intent.putExtra("mapJson", json);
+                    intent.putExtra(Constants.kActivityParamFinishSelectLocationOnMap, json);
                     setResult(RESULT_OK,intent);
                     finish();
                 }
