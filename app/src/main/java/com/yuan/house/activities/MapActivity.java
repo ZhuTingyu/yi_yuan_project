@@ -80,6 +80,13 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
 
         this.mContext = this;
 
+        setLeftItem(R.drawable.back, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
         setTitleItem("位置");
 
         this.mMapView = (MapView) findViewById(R.id.bmap);
