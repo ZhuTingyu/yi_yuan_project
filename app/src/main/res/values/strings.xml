@@ -112,7 +112,6 @@
     <string name="hint_input_text">在这里输入你想说的话...</string>
     <string name="hint_input_search">搜索 ...</string>
     <string name="save">保存</string>
-    <string name="text_category">分类</string>
     <string name="use_camera">照相机</string>
     <string name="use_gallery">图库</string>
     <string name="use_camera_or_gallery">选择从哪里获取图片</string>

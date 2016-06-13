@@ -668,13 +668,10 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        /**
-         * get geo location
-         */
-        getBridge().registerHandler("getGeoLocation", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("getRecentLocation", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
-                Timber.v("getGeoLocation" + data);
+                Timber.v("getRecentLocation" + data);
 
                 BDLocation location = DMApplication.getInstance().getLastActivatedLocation();
                 if (location != null) {
@@ -781,46 +778,48 @@ public class WebViewBaseFragment extends Fragment {
         });
 
         getBridge().registerHandler("showPickerView", new WebViewJavascriptBridge.WVJBHandler() {
-
             @Override
-            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                Log.i("showPickerView", data);
-
+            public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 ArrayList item1 = new ArrayList();
                 ArrayList item2 = new ArrayList();
                 ArrayList item3 = new ArrayList();
+
                 try {
                     JSONArray jsonArray = new JSONArray(data);
+
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jsonObject = (JSONObject) jsonArray.opt(i);
                         JSONArray jsonRows = (JSONArray) jsonObject.get("rows");
                         for (int j = 0; j < jsonRows.length(); j++) {
-                            if (i == 0)
-                                item1.add(jsonRows.opt(j).toString());
-                            else if (i == 1)
-                                item2.add(jsonRows.opt(j).toString());
-                            else
-                                item3.add(jsonRows.opt(j).toString());
+                            if ("undefined".equals(jsonRows.optString(j))) break;
+
+                            if (i == 0) {
+                                item1.add(jsonRows.optString(j));
+                            } else if (i == 1) {
+                                item2.add(jsonRows.optString(j));
+                            } else {
+                                item3.add(jsonRows.optString(j));
+                            }
                         }
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
-
                 PickerPopWindow pickPopWin = new PickerPopWindow(getActivity(), item1, item2, item3, new PickerPopWindow.OnPickCompletedListener() {
                     @Override
                     public void onAddressPickCompleted(String item1, String item2, String item3) {
-                        StringBuffer sb = new StringBuffer();
-                        sb.append(item1);
-                        sb.append(item2);
-                        sb.append(item3);
-                        Log.i("result", sb.toString());
+                        JSONArray jsonArray = new JSONArray();
+
+                        if (!TextUtils.isEmpty(item1)) jsonArray.put(item1);
+                        if (!TextUtils.isEmpty(item2)) jsonArray.put(item2);
+                        if (!TextUtils.isEmpty(item3)) jsonArray.put(item3);
+
+                        getBridge().callHandler("didSelectPickerView", jsonArray);
                     }
                 });
 
                 pickPopWin.showPopWin(getActivity());
-
             }
         });
 
