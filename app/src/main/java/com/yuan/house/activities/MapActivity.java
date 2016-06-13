@@ -45,7 +45,6 @@ import timber.log.Timber;
  * Created by KevinLee on 2016/5/2.
  */
 public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderResultListener {
-
     private GeoCoder mSearch;
     protected MapView mMapView;
     protected BaiduMap baiduMap;
@@ -80,9 +79,12 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         Injector.inject(this);
 
         this.mContext = this;
+
         setTitleItem("位置");
+
         this.mMapView = (MapView) findViewById(R.id.bmap);
         this.baiduMap = mMapView.getMap();
+
         initLocation();
         initMapConfig();
         initViewConfig();
@@ -188,12 +190,6 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         }
 
         city = reverseGeoCodeResult.getAddressDetail().city;
-
-//        Log.i("Address",reverseGeoCodeResult.getAddress());
-//        Log.i("city",reverseGeoCodeResult.getAddressDetail().city);
-//        Log.i("district",reverseGeoCodeResult.getAddressDetail().district);
-//        Log.i("province",reverseGeoCodeResult.getAddressDetail().province);
-//        Log.i("street",reverseGeoCodeResult.getAddressDetail().street);
 
         Map<String,String> map = new HashMap<>();
         map.put("addr",reverseGeoCodeResult.getAddress());

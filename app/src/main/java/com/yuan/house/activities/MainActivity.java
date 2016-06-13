@@ -124,6 +124,11 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
     public void onEvent(PageEvent event) {
         if (event.getEventType() == PageEvent.PageEventEnum.FINISHED) {
+
+        } else if (event.getEventType() == PageEvent.PageEventEnum.FRIENDSHIP_UPDATE) {
+            bottomNavigationBar.selectTab(0);
+        } else if (event.getEventType() == PageEvent.PageEventEnum.DROP_TO_MESSAGE) {
+            bottomNavigationBar.selectTab(1);
         }
     }
 
@@ -238,13 +243,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         mFragmentTransaction.commit();
     }
 
-    public void onBridgeUpdateFriendRelationship() {
-        bottomNavigationBar.selectTab(0);
-    }
-
-    public void onBridgeDropToMessage() {
-        bottomNavigationBar.selectTab(1);
-    }
 
     /**
      * Callback when user has sign in

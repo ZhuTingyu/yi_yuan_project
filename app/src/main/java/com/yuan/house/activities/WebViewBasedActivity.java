@@ -42,6 +42,7 @@ import com.yuan.house.application.Injector;
 import com.yuan.house.base.BaseFragmentActivity;
 import com.yuan.house.bean.PayInfo;
 import com.yuan.house.common.Constants;
+import com.yuan.house.event.PageEvent;
 import com.yuan.house.event.WebBroadcastEvent;
 import com.yuan.house.helper.AuthHelper;
 import com.yuan.house.http.WebService;
@@ -69,6 +70,7 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import de.greenrobot.event.EventBus;
 import me.nereo.multi_image_selector.MultiImageSelector;
 import me.nereo.multi_image_selector.MultiImageSelectorActivity;
 import timber.log.Timber;
@@ -521,14 +523,12 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         startActivityForResult(intent, kActivityRequestCodeSelectMapLocation);
     }
 
-    @Override
     public void onBridgeUpdateFriendRelationship() {
-        throw new NotImplementedException("NOT IMPLEMENTED");
+        EventBus.getDefault().post(new PageEvent(PageEvent.PageEventEnum.FRIENDSHIP_UPDATE, null));
     }
 
-    @Override
     public void onBridgeDropToMessage() {
-        throw new NotImplementedException("NOT IMPLEMENTED");
+        EventBus.getDefault().post(new PageEvent(PageEvent.PageEventEnum.DROP_TO_MESSAGE, null));
     }
 
     @Override
