@@ -329,7 +329,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
             Map<String, Object> attrs = new HashMap<>();
             attrs.put("houseId", jsonFormatParams.optString("house_id"));
-            attrs.put("username", "wo");
+            attrs.put("username", jsonFormatParams.optString("nickname"));
 
             message.setAttrs(attrs);
 
