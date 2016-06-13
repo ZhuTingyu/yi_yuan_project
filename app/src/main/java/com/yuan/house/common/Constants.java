@@ -90,7 +90,7 @@ public class Constants {
     public static String kWebpageAgencyCenter = "agency_center.html";
 
     public static final String kHouseParamsForChatRoom = "kHouseParamsForChatRoom";
-    public static final String kHouseSwtichParamsForChatRoom = "kHouseSwtichParamsForChatRoom";
+    public static final String kHouseSwitchParamsForChatRoom = "kHouseSwitchParamsForChatRoom";
 
     public static String kBundleKeyAfterSwitchHouseSelected = "kBundleKeyAfterSwitchHouseSelected";
     public static String kActivityParamFinishSelectLocationOnMap = "kActivityParamFinishSelectLocationOnMap";

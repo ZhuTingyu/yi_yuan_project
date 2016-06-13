@@ -53,7 +53,7 @@ public class SwitchHouseActivity extends FragmentActivity {
         Bundle bundle = getIntent().getExtras();
 
         if (bundle != null) {
-            String raw = bundle.getString(Constants.kHouseParamsForChatRoom);
+            String raw = bundle.getString(Constants.kHouseSwitchParamsForChatRoom);
             try {
                 jsonFormatDatum = new JSONArray(raw);
             } catch (JSONException e) {

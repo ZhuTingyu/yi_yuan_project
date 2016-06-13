@@ -12,6 +12,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.avos.avoscloud.im.v2.AVIMMessage;
 import com.avos.avoscloud.im.v2.AVIMReservedMessageType;
 import com.avos.avoscloud.im.v2.AVIMTypedMessage;
@@ -36,8 +38,6 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.squareup.picasso.Picasso;
 import com.yuan.house.R;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.text.SimpleDateFormat;
@@ -170,7 +170,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         Map<String, Object> map = message.getAttrs();
         JSONObject object = (JSONObject) JSON.toJSON(map);
 
-        if (object.length() == 0) return;
+        if (object.size() == 0) return;
 
         ImageView img = ViewHolder.findViewById(conView, R.id.img);
         TextView title = ViewHolder.findViewById(conView, R.id.title);
@@ -181,17 +181,19 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         View statusSendSucceed = ViewHolder.findViewById(conView, R.id.status_send_succeed);
         View statusSendStart = ViewHolder.findViewById(conView, R.id.status_send_start);
 
-// FIXME: 16/6/11 change with data format
-        JSONArray images = object.optJSONArray("images");
+        JSONArray images = object.getJSONArray("images");
 
-        Picasso.with(ctx).load(images.optString(0)).into(img);
-        title.setText(object.optString("estate_name"));
-        area.setText(object.optString("acreage") + "㎡");
+        if (images != null) {
+            Picasso.with(ctx).load(images.getString(0)).into(img);
+        }
+
+        title.setText(object.getString("estate_name"));
+        area.setText(object.getString("acreage") + "㎡");
 
         StringBuilder sb = new StringBuilder();
-        sb.append(object.optString("room_count"));
+        sb.append(object.getString("room_count"));
         sb.append("室");
-        sb.append(object.optString("parlour_count"));
+        sb.append(object.getString("parlour_count"));
         sb.append("厅");
         house_params.setText(sb.toString());
 

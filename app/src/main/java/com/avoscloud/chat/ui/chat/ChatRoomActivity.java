@@ -344,7 +344,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
     @Override
     protected void showSuggestedHouses() {
         Intent intent = new Intent(this, SwitchHouseActivity.class);
-        intent.putExtra(Constants.kHouseSwtichParamsForChatRoom, jsonFormatSwitchParams.toString());
+        intent.putExtra(Constants.kHouseSwitchParamsForChatRoom, jsonFormatSwitchParams.toString());
 
         startActivityForResult(intent, kRequestCodeSwitchHouse);
     }
@@ -388,7 +388,9 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                         AVIMHouseInfoMessage message = new AVIMHouseInfoMessage();
                         message.setHouseName(object.optString("estate_name"));
                         message.setHouseAddress(object.optString("location_text"));
-                        message.setHouseImage(images.optString(0));
+                        if (images != null) {
+                            message.setHouseImage(images.optString(0));
+                        }
 
                         Map<String, Object> attrs = JSON.parseObject(raw, new TypeReference<Map<String, Object>>() {
                         });
