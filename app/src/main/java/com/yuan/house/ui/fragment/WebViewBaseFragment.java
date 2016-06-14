@@ -19,6 +19,8 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebStorage;
 import android.webkit.WebView;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.avoscloud.chat.ui.chat.ChatRoomActivity;
 import com.baidu.location.BDLocation;
 import com.dimo.http.RestClient;
@@ -652,7 +654,7 @@ public class WebViewBaseFragment extends Fragment {
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("chatByUserId" + data);
 
-                JSONObject object = null;
+                JSONObject object;
                 try {
                     object = new JSONObject(data);
 
@@ -689,7 +691,7 @@ public class WebViewBaseFragment extends Fragment {
                     }
 
                     if (callback != null) {
-                        callback.callback(object.toString());
+                        callback.callback(object);
                     }
                 } else {
                     if (mBridgeListener != null) {
@@ -717,15 +719,16 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        //TODO 代码已完善，待测试。
         getBridge().registerHandler("uploadFiles", new WebViewJavascriptBridge.WVJBHandler() {
 
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 mCallback = jsCallback;
 
+                List<String> datum = JSON.parseObject(data, new TypeReference<List<String>>() {
+                });
                 if (mBridgeListener != null) {
-                    mBridgeListener.onBridgeUploadFiles();
+                    mBridgeListener.onBridgeUploadFiles(datum);
                 }
             }
         });
@@ -993,7 +996,7 @@ public class WebViewBaseFragment extends Fragment {
 
         void onBridgeSetRightItem(String text, View.OnClickListener onRightItemClick);
 
-        void onBridgeUploadFiles();
+        void onBridgeUploadFiles(List<String> datum);
 
         void onBridgeResizeOrCropImage();
 
