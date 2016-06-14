@@ -62,20 +62,21 @@
                 android:text="@string/app_name"
                 android:textColor="@color/white"
                 android:textSize="18sp"
-                android:visibility="gone"
-                />
+                android:visibility="gone"/>
 
             <EditText
                 android:id="@+id/et_search"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:hint="搜索"
+                android:layout_height="match_parent"
+                android:layout_marginTop="1dp"
+                android:layout_marginBottom="1dp"
+                android:imeOptions="actionSearch"
+                android:imeActionLabel="@string/contact_search"
+                android:maxLines="1"
+                android:hint="@string/contact_search"
                 android:textSize="12dp"
                 android:drawableLeft="@drawable/img_search"
-                android:background="@drawable/search_editsharp"
-                android:visibility="gone"/>
+                android:background="@drawable/search_editsharp"/>
         </RelativeLayout>
 
         <RelativeLayout
