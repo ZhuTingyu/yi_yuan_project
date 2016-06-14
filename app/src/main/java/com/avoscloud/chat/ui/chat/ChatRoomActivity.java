@@ -288,7 +288,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
     private void initSuggestedHouseInfos() {
         String url = Constants.kWebServiceSwitchable;
 
-        if (AuthHelper.userAlreadyLogin()) {
+        if (AuthHelper.userAlreadyLogin() && AuthHelper.iAmUser()) {
             url += AuthHelper.userId() + "/" + jsonFormatParams.optString("user_id");
         } else {
             url += jsonFormatParams.optString("user_id") + "/" + AuthHelper.userId();

@@ -53,10 +53,20 @@ public class AuthHelper {
         return getUserId(userLoginInfomation());
     }
 
-    public static String userType() {
-        // TODO: 16/6/10 user / agency
-        String dummy = userLoginInfomation();
-        return dummy;
+    private static UserType userType() {
+        UserType type = UserType.USER;
+
+        String raw = prefs.getString(Constants.kWebDataKeyLoginType, null);
+        if ("agency".equals(raw)) {
+            type = UserType.AGENCY;
+        }
+        return type;
+    }
+
+    public static boolean iAmUser() {
+        if (userType() == UserType.USER) return true;
+
+        return false;
     }
 
     private static String getToken(String data) {
@@ -98,5 +108,15 @@ public class AuthHelper {
     private static String userLoginInfomation() {
         String json = prefs.getString(Constants.kWebDataKeyUserLogin, null);
         return json;
+    }
+
+    enum UserType {
+        USER(0), AGENCY(1);
+
+        private int value;
+
+        UserType(int value) {
+            this.value = value;
+        }
     }
 }
