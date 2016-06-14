@@ -152,10 +152,15 @@ dependencies {
     apt "com.squareup.dagger:dagger-compiler:1.2.2"
     compile 'com.squareup.dagger:dagger:1.2.2'
 
-    compile 'com.jakewharton:butterknife:6.1.0'
+//    compile 'com.jakewharton:butterknife:6.1.0'
+
+    compile 'com.jakewharton:butterknife:8.0.1'
+    apt 'com.jakewharton:butterknife-compiler:8.0.1'
 
     // otto is dead, long live eventbus
     compile 'de.greenrobot:eventbus:2.3.0'
+    compile 'com.squareup.okhttp3:okhttp:2.7.5'
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.7.5'
     compile 'com.squareup.picasso:picasso:2.5.2'
 
     /** Logging .        */
@@ -165,15 +170,13 @@ dependencies {
     compile 'com.github.kevinsawicki:http-request:6.0'
     compile 'com.loopj.android:android-async-http:1.4.6'
     compile 'com.mani:thindownloadmanager:1.0.0'
-    compile 'com.squareup.okhttp:okhttp:2.4.0'
     compile 'com.zhy:okhttputils:2.4.1'
-    compile 'com.squareup.retrofit2:retrofit:2.0.2'
 
     // http://stackoverflow.com/a/30725203/2619161
-    compile ('org.apache.httpcomponents:httpmime:4.3'){
+    compile('org.apache.httpcomponents:httpmime:4.3') {
         exclude group: 'org.apache.httpcomponents', module: 'httpclient'
     }
-    compile ('org.apache.httpcomponents:httpcore:4.4.1'){
+    compile('org.apache.httpcomponents:httpcore:4.4.1') {
         exclude group: 'org.apache.httpcomponents', module: 'httpclient'
     }
 

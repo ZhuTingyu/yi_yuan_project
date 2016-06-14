@@ -23,8 +23,8 @@ import com.yuan.house.event.LocationEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import butterknife.OnClick;
 import de.greenrobot.event.EventBus;
 
@@ -35,9 +35,9 @@ public class UserMainFragment extends WebViewBaseFragment {
 
     private static final int REQUEST_MAP_CODE = 0XFF01;
 
-    @InjectView(R.id.rl_center)
+    @BindView(R.id.rl_center)
     LinearLayout center;
-    @InjectView(R.id.address)
+    @BindView(R.id.address)
     TextView address;
 
     public static UserMainFragment newInstance() {
@@ -54,8 +54,7 @@ public class UserMainFragment extends WebViewBaseFragment {
 
         Injector.inject(this);
 
-        ButterKnife.reset(this);
-        ButterKnife.inject(this, view);
+        ButterKnife.bind(this, view);
 
         redirectToLoadUrl(Constants.kWebPageUserIndex);
 

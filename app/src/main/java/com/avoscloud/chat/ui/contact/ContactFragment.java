@@ -8,20 +8,20 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
-import butterknife.ButterKnife;
-import butterknife.InjectView;
-import butterknife.OnClick;
+
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVUser;
 import com.avos.avoscloud.SaveCallback;
-
-
 import com.avoscloud.chat.entity.SortUser;
 import com.avoscloud.chat.service.AddRequestService;
 import com.avoscloud.chat.service.UserService;
@@ -38,247 +38,250 @@ import com.avoscloud.leanchatlib.utils.NetAsyncTask;
 import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ContactFragment extends BaseFragment {
-  private static CharacterParser characterParser;
-  private static PinyinComparator pinyinComparator;
-  @InjectView(R.id.et_msg_search)
-  ClearEditText clearEditText;
-  @InjectView(R.id.dialog)
-  TextView dialogTextView;
-  @InjectView(R.id.list_friends)
-  BaseListView<SortUser> friendsList;
-  @InjectView(R.id.right_letter)
-  EnLetterView rightLetter;
-//  View listHeaderView;
-  private ContactFragmentAdapter userAdapter;
-  private ListHeaderViewHolder listHeaderViewHolder = new ListHeaderViewHolder();
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
-  @Override
-  public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                           Bundle savedInstanceState) {
-    // TODO Auto-generated method stub
-    View view = inflater.inflate(R.layout.contact_fragment, container, false);
-    ButterKnife.inject(this, view);
+public class ContactFragment extends BaseFragment {
+    private static CharacterParser characterParser;
+    private static PinyinComparator pinyinComparator;
+    @BindView(R.id.et_msg_search)
+    ClearEditText clearEditText;
+    @BindView(R.id.dialog)
+    TextView dialogTextView;
+    @BindView(R.id.list_friends)
+    BaseListView<SortUser> friendsList;
+    @BindView(R.id.right_letter)
+    EnLetterView rightLetter;
+    //  View listHeaderView;
+    private ContactFragmentAdapter userAdapter;
+    private ListHeaderViewHolder listHeaderViewHolder = new ListHeaderViewHolder();
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        View view = inflater.inflate(R.layout.contact_fragment, container, false);
+        ButterKnife.bind(this, view);
 
 //    listHeaderView = inflater.inflate(R.layout.contact_fragment_header_layout, null, false);
 //    ButterKnife.inject(listHeaderViewHolder, listHeaderView);
-    return view;
-  }
-
-  @Override
-  public void onActivityCreated(Bundle savedInstanceState) {
-    // TODO Auto-generated method stub
-    super.onActivityCreated(savedInstanceState);
-    characterParser = CharacterParser.getInstance();
-    pinyinComparator = new PinyinComparator();
-
-    initHeader();
-    initListView();
-    initRightLetterViewAndSearchEdit();
-    refresh();
-  }
-
-  private void initRightLetterViewAndSearchEdit() {
-    rightLetter.setTextView(dialogTextView);
-    rightLetter.setOnTouchingLetterChangedListener(new LetterListViewListener());
-    clearEditText = (ClearEditText) getView().findViewById(R.id.et_msg_search);
-    clearEditText.addTextChangedListener(new TextWatcher() {
-      @Override
-      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-      }
-
-      @Override
-      public void onTextChanged(CharSequence s, int start, int before, int count) {
-        filterData(s.toString());
-      }
-
-      @Override
-      public void afterTextChanged(Editable s) {
-
-      }
-    });
-  }
-
-  private void initHeader() {
-    headerLayout.showTitle(DMApplication.getInstance().getString(R.string.contact));
-    headerLayout.showRightImageButton(R.drawable.base_action_bar_add_bg_selector, new OnClickListener() {
-      @Override
-      public void onClick(View v) {
-//        Utils.goActivity(ctx, ContactAddFriendActivity.class);
-      }
-    });
-  }
-
-  private void filterData(String filterStr) {
-    List<SortUser> friends = userAdapter.getDatas();
-    if (TextUtils.isEmpty(filterStr)) {
-      userAdapter.setDatas(friends);
-    } else {
-      List<SortUser> filterDateList = new ArrayList<SortUser>();
-      filterDateList.clear();
-      for (SortUser sortModel : friends) {
-        String name = sortModel.getInnerUser().getUsername();
-        if (name != null && (name.contains(filterStr)
-            || characterParser.getSelling(name).startsWith(
-            filterStr))) {
-          filterDateList.add(sortModel);
-        }
-      }
-      Collections.sort(filterDateList, pinyinComparator);
-      userAdapter.setDatas(filterDateList);
+        return view;
     }
-  }
-
-  private List<SortUser> convertAVUser(List<AVUser> datas) {
-    List<SortUser> sortUsers = new ArrayList<SortUser>();
-    int total = datas.size();
-    for (int i = 0; i < total; i++) {
-      AVUser avUser = datas.get(i);
-      SortUser sortUser = new SortUser();
-      sortUser.setInnerUser(avUser);
-      String username = avUser.getUsername();
-      if (username != null) {
-        String pinyin = characterParser.getSelling(username);
-        String sortString = pinyin.substring(0, 1).toUpperCase();
-        if (sortString.matches("[A-Z]")) {
-          sortUser.setSortLetters(sortString.toUpperCase());
-        } else {
-          sortUser.setSortLetters("#");
-        }
-      } else {
-        sortUser.setSortLetters("#");
-      }
-      sortUsers.add(sortUser);
-    }
-    Collections.sort(sortUsers, pinyinComparator);
-    return sortUsers;
-  }
-
-  private void initListView() {
-    userAdapter = new ContactFragmentAdapter(getActivity());
-    friendsList.init(new BaseListView.DataFactory<SortUser>() {
-      @Override
-      public List<SortUser> getDatasInBackground(int skip, int limit, List<SortUser> currentDatas) throws Exception {
-        return convertAVUser(UserService.findFriends());
-      }
-    }, userAdapter);
-
-//    friendsList.addHeaderView(listHeaderView, null, false);
-    friendsList.setOnTouchListener(new OnTouchListener() {
-
-      @Override
-      public boolean onTouch(View v, MotionEvent event) {
-        if (getActivity().getWindow().getAttributes().softInputMode !=
-            WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN) {
-          InputMethodManager manager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-          View currentFocus = getActivity().getCurrentFocus();
-          if (currentFocus != null) {
-            manager.hideSoftInputFromWindow(currentFocus.getWindowToken(),
-                InputMethodManager.HIDE_NOT_ALWAYS);
-          }
-        }
-        return false;
-      }
-    });
-    friendsList.setItemListener(new BaseListView.ItemListener<SortUser>() {
-      @Override
-      public void onItemSelected(SortUser item) {
-        ChatRoomActivity.chatByUserId(getActivity(), item.getInnerUser().getObjectId());
-      }
-
-      @Override
-      public void onItemLongPressed(SortUser item) {
-        showDeleteDialog(item);
-      }
-    });
-    friendsList.setPullLoadEnable(false);
-  }
-
-  @Override
-  public void setUserVisibleHint(boolean isVisibleToUser) {
-    // TODO Auto-generated method stub
-    if (isVisibleToUser) {
-      //refreshMsgsFromDB();
-    }
-    super.setUserVisibleHint(isVisibleToUser);
-  }
-
-  void findAddRequest() {
-    new NetAsyncTask(ctx, false) {
-      boolean haveAddRequest;
-
-      @Override
-      protected void doInBack() throws Exception {
-        haveAddRequest = AddRequestService.hasAddRequest();
-      }
-
-      @Override
-      protected void onPost(Exception e) {
-        if (filterException(e)) {
-          listHeaderViewHolder.getMsgTipsView().setVisibility(haveAddRequest ? View.VISIBLE : View.GONE);
-        }
-      }
-    }.execute();
-  }
-
-  private void refresh() {
-    friendsList.onRefresh();
-//    findAddRequest();
-  }
-
-  public void showDeleteDialog(final SortUser user) {
-    new AlertDialog.Builder(ctx).setMessage(R.string.contact_deleteContact)
-        .setPositiveButton(R.string.common_sure, new DialogInterface.OnClickListener() {
-          @Override
-          public void onClick(DialogInterface dialog, int which) {
-            final ProgressDialog dialog1 = showSpinnerDialog();
-            UserService.removeFriend(user.getInnerUser().getObjectId(), new SaveCallback() {
-              @Override
-              public void done(AVException e) {
-                dialog1.dismiss();
-                if (filterException(e)) {
-                  refresh();
-                }
-              }
-            });
-          }
-        }).setNegativeButton(R.string.chat_common_cancel, null).show();
-  }
-
-  class ListHeaderViewHolder {
-    @InjectView(R.id.iv_msg_tips)
-    ImageView msgTipsView;
-
-    @OnClick(R.id.layout_new)
-    void goNewFriend() {
-      Utils.goActivity(ctx, ContactNewFriendActivity.class);
-    }
-
-    @OnClick(R.id.layout_group)
-    void goGroupConvList() {
-      Utils.goActivity(ctx, ConversationListActivity.class);
-    }
-
-    public ImageView getMsgTipsView() {
-      return msgTipsView;
-    }
-  }
-
-  private class LetterListViewListener implements
-      EnLetterView.OnTouchingLetterChangedListener {
 
     @Override
-    public void onTouchingLetterChanged(String s) {
-      int position = userAdapter.getPositionForSection(s.charAt(0));
-      if (position != -1) {
-        friendsList.setSelection(position);
-      }
+    public void onActivityCreated(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onActivityCreated(savedInstanceState);
+        characterParser = CharacterParser.getInstance();
+        pinyinComparator = new PinyinComparator();
+
+        initHeader();
+        initListView();
+        initRightLetterViewAndSearchEdit();
+        refresh();
     }
-  }
+
+    private void initRightLetterViewAndSearchEdit() {
+        rightLetter.setTextView(dialogTextView);
+        rightLetter.setOnTouchingLetterChangedListener(new LetterListViewListener());
+        clearEditText = (ClearEditText) getView().findViewById(R.id.et_msg_search);
+        clearEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterData(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+    }
+
+    private void initHeader() {
+        headerLayout.showTitle(DMApplication.getInstance().getString(R.string.contact));
+        headerLayout.showRightImageButton(R.drawable.base_action_bar_add_bg_selector, new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//        Utils.goActivity(ctx, ContactAddFriendActivity.class);
+            }
+        });
+    }
+
+    private void filterData(String filterStr) {
+        List<SortUser> friends = userAdapter.getDatas();
+        if (TextUtils.isEmpty(filterStr)) {
+            userAdapter.setDatas(friends);
+        } else {
+            List<SortUser> filterDateList = new ArrayList<SortUser>();
+            filterDateList.clear();
+            for (SortUser sortModel : friends) {
+                String name = sortModel.getInnerUser().getUsername();
+                if (name != null && (name.contains(filterStr)
+                        || characterParser.getSelling(name).startsWith(
+                        filterStr))) {
+                    filterDateList.add(sortModel);
+                }
+            }
+            Collections.sort(filterDateList, pinyinComparator);
+            userAdapter.setDatas(filterDateList);
+        }
+    }
+
+    private List<SortUser> convertAVUser(List<AVUser> datas) {
+        List<SortUser> sortUsers = new ArrayList<SortUser>();
+        int total = datas.size();
+        for (int i = 0; i < total; i++) {
+            AVUser avUser = datas.get(i);
+            SortUser sortUser = new SortUser();
+            sortUser.setInnerUser(avUser);
+            String username = avUser.getUsername();
+            if (username != null) {
+                String pinyin = characterParser.getSelling(username);
+                String sortString = pinyin.substring(0, 1).toUpperCase();
+                if (sortString.matches("[A-Z]")) {
+                    sortUser.setSortLetters(sortString.toUpperCase());
+                } else {
+                    sortUser.setSortLetters("#");
+                }
+            } else {
+                sortUser.setSortLetters("#");
+            }
+            sortUsers.add(sortUser);
+        }
+        Collections.sort(sortUsers, pinyinComparator);
+        return sortUsers;
+    }
+
+    private void initListView() {
+        userAdapter = new ContactFragmentAdapter(getActivity());
+        friendsList.init(new BaseListView.DataFactory<SortUser>() {
+            @Override
+            public List<SortUser> getDatasInBackground(int skip, int limit, List<SortUser> currentDatas) throws Exception {
+                return convertAVUser(UserService.findFriends());
+            }
+        }, userAdapter);
+
+//    friendsList.addHeaderView(listHeaderView, null, false);
+        friendsList.setOnTouchListener(new OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (getActivity().getWindow().getAttributes().softInputMode !=
+                        WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN) {
+                    InputMethodManager manager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    View currentFocus = getActivity().getCurrentFocus();
+                    if (currentFocus != null) {
+                        manager.hideSoftInputFromWindow(currentFocus.getWindowToken(),
+                                InputMethodManager.HIDE_NOT_ALWAYS);
+                    }
+                }
+                return false;
+            }
+        });
+        friendsList.setItemListener(new BaseListView.ItemListener<SortUser>() {
+            @Override
+            public void onItemSelected(SortUser item) {
+                ChatRoomActivity.chatByUserId(getActivity(), item.getInnerUser().getObjectId());
+            }
+
+            @Override
+            public void onItemLongPressed(SortUser item) {
+                showDeleteDialog(item);
+            }
+        });
+        friendsList.setPullLoadEnable(false);
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        // TODO Auto-generated method stub
+        if (isVisibleToUser) {
+            //refreshMsgsFromDB();
+        }
+        super.setUserVisibleHint(isVisibleToUser);
+    }
+
+    void findAddRequest() {
+        new NetAsyncTask(ctx, false) {
+            boolean haveAddRequest;
+
+            @Override
+            protected void doInBack() throws Exception {
+                haveAddRequest = AddRequestService.hasAddRequest();
+            }
+
+            @Override
+            protected void onPost(Exception e) {
+                if (filterException(e)) {
+                    listHeaderViewHolder.getMsgTipsView().setVisibility(haveAddRequest ? View.VISIBLE : View.GONE);
+                }
+            }
+        }.execute();
+    }
+
+    private void refresh() {
+        friendsList.onRefresh();
+//    findAddRequest();
+    }
+
+    public void showDeleteDialog(final SortUser user) {
+        new AlertDialog.Builder(ctx).setMessage(R.string.contact_deleteContact)
+                .setPositiveButton(R.string.common_sure, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        final ProgressDialog dialog1 = showSpinnerDialog();
+                        UserService.removeFriend(user.getInnerUser().getObjectId(), new SaveCallback() {
+                            @Override
+                            public void done(AVException e) {
+                                dialog1.dismiss();
+                                if (filterException(e)) {
+                                    refresh();
+                                }
+                            }
+                        });
+                    }
+                }).setNegativeButton(R.string.chat_common_cancel, null).show();
+    }
+
+    class ListHeaderViewHolder {
+        @BindView(R.id.iv_msg_tips)
+        ImageView msgTipsView;
+
+        @OnClick(R.id.layout_new)
+        void goNewFriend() {
+            Utils.goActivity(ctx, ContactNewFriendActivity.class);
+        }
+
+        @OnClick(R.id.layout_group)
+        void goGroupConvList() {
+            Utils.goActivity(ctx, ConversationListActivity.class);
+        }
+
+        public ImageView getMsgTipsView() {
+            return msgTipsView;
+        }
+    }
+
+    private class LetterListViewListener implements
+            EnLetterView.OnTouchingLetterChangedListener {
+
+        @Override
+        public void onTouchingLetterChanged(String s) {
+            int position = userAdapter.getPositionForSection(s.charAt(0));
+            if (position != -1) {
+                friendsList.setSelection(position);
+            }
+        }
+    }
 }

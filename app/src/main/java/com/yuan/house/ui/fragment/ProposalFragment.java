@@ -15,6 +15,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.squareup.okhttp.OkHttpClient;
+import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
@@ -22,10 +23,9 @@ import com.yuan.house.enumerate.ProposalMediaType;
 import com.yuan.house.enumerate.ProposalMessageCategory;
 import com.yuan.house.enumerate.ProposalSourceType;
 import com.yuan.house.ui.view.AudioRecorderButton;
-import com.yuan.house.R;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import butterknife.OnClick;
 
 /**
@@ -38,15 +38,15 @@ public class ProposalFragment extends WebViewBaseFragment {
     private final OkHttpClient client = new OkHttpClient();
     private final int SYS_INTENT_REQUEST = 0XFF01;
     protected OnProposalInteractionListener mBridgeListener;
-    @InjectView(R.id.proposal)
+    @BindView(R.id.proposal)
     Button proposal;
-    @InjectView(R.id.complaint)
+    @BindView(R.id.complaint)
     Button complaint;
-    @InjectView(R.id.bug)
+    @BindView(R.id.bug)
     Button bug;
-    @InjectView(R.id.et_info)
+    @BindView(R.id.et_info)
     EditText info;
-    @InjectView(R.id.btn_recorder)
+    @BindView(R.id.btn_recorder)
     AudioRecorderButton recorderButton;
 
     TextView app_upload_image, app_complaint, app_cancle;
@@ -73,8 +73,7 @@ public class ProposalFragment extends WebViewBaseFragment {
 
         Injector.inject(this);
 
-        ButterKnife.reset(this);
-        ButterKnife.inject(this, view);
+        ButterKnife.bind(this, view);
 
         if (DMApplication.getInstance().iAmUser()) {
             redirectToLoadUrl(Constants.kWebpageUserCenter);

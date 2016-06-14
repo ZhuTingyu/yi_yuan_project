@@ -15,15 +15,15 @@ import com.yuan.house.common.Constants;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import butterknife.OnClick;
 
 /**
  * Created by KevinLee on 2016/4/24.
  */
 public class AgencyMessageFragment extends WebViewBaseFragment {
-    @InjectView(R.id.rightItem)
+    @BindView(R.id.rightItem)
     TextView tvRightItem;
 
     public static AgencyMessageFragment newInstance() {
@@ -40,8 +40,7 @@ public class AgencyMessageFragment extends WebViewBaseFragment {
 
         Injector.inject(this);
 
-        ButterKnife.reset(this);
-        ButterKnife.inject(this, view);
+        ButterKnife.bind(this, view);
 
         redirectToLoadUrl(Constants.kWebPageAgencyMessage);
 
@@ -85,7 +84,7 @@ public class AgencyMessageFragment extends WebViewBaseFragment {
                 JSONObject object = new JSONObject();
                 JSONObject innerObject = new JSONObject();
                 try {
-                    innerObject.put("title", "通讯录");
+                    innerObject.put("title", "中介通讯录");
                     innerObject.put("hasBackButton", true);
                 } catch (JSONException e) {
                     e.printStackTrace();

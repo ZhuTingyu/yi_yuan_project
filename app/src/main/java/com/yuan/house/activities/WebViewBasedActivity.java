@@ -9,10 +9,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.avos.avoscloud.im.v2.AVIMConversation;
@@ -62,14 +66,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import de.greenrobot.event.EventBus;
 import me.nereo.multi_image_selector.MultiImageSelector;
 import me.nereo.multi_image_selector.MultiImageSelectorActivity;
@@ -86,7 +91,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     private final int kActivityRequestCodeSelectMapLocation = 20;
     protected FragmentManager mFragmentManager;
     protected FragmentTransaction mFragmentTransaction;
-    @InjectView(R.id.rotateloading)
+    @BindView(R.id.rotateloading)
     protected RotateLoading mLoadingDialog;
     String mUrl;
     WebViewBaseFragment webViewFragment;
@@ -158,7 +163,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             }
         }
 
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
         if (mFragmentTransaction == null) {
             mFragmentTransaction = mFragmentManager.beginTransaction();
@@ -278,6 +283,11 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             List<String> path = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
 
             // TODO: 16/6/10 invoke crop process
+            JSONArray jsonArray = new JSONArray();
+            for (String p : path) {
+                jsonArray.put(p);
+            }
+            mBridgeCallback.callback(jsonArray.toString());
         } else if (requestCode == kActivityRequestCodeSelectMapLocation) {
             Timber.v("kActivityRequestCodeSelectMapLocation");
             // TODO: 16/6/12 revert callback the selected map location
@@ -440,8 +450,8 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         setRightItem(text, onRightItemClick);
     }
 
-    public void onBridgeUploadFiles() {
-
+    public void onBridgeUploadFiles(List<String> datum) {
+        uploadMultiPartFiles(datum);
     }
 
     public void onBridgeResizeOrCropImage() {
@@ -550,6 +560,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     private RequestParams constructMultiPartParams(List<String> filePaths) {
+        // TODO: 16/6/14 failed to upload files
         RequestParams params = new RequestParams();
 
         // loopj android async http support add byte[] as RequestParam item to submit multipart data
@@ -569,7 +580,11 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                     e.printStackTrace();
                 }
             }
-            params.put("file[]", data);
+            try {
+                params.put("file[]", new File(file));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
         }
 
         return params;

@@ -55,8 +55,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
+import butterknife.Unbinder;
 import de.greenrobot.event.EventBus;
 import timber.log.Timber;
 
@@ -71,10 +72,11 @@ public class WebViewBaseFragment extends Fragment {
     @Inject
     protected SharedPreferences prefs;
     WebViewJavascriptBridge.WVJBResponseCallback mCallback;
-    @InjectView(R.id.webview)
+    @BindView(R.id.webview)
     WebView mWebView;
     HashMap<String, String> additionalHttpHeaders;
     private Calendar calendar;
+    private Unbinder unbinder;
 
     public HashMap<String, String> getAdditionalHttpHeaders() {
         return additionalHttpHeaders;
@@ -104,7 +106,7 @@ public class WebViewBaseFragment extends Fragment {
 
         super.onDestroyView();
 
-        ButterKnife.reset(this);
+        unbinder.unbind();
     }
 
     public View createView(LayoutInflater inflater, int resId, ViewGroup container, Bundle savedInstanceState) {
@@ -114,7 +116,7 @@ public class WebViewBaseFragment extends Fragment {
 
         Injector.inject(this);
 
-        ButterKnife.inject(this, view);
+        unbinder = ButterKnife.bind(this, view);
 
         Timber.v("onCreateView");
 

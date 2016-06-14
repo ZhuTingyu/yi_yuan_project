@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.yuan.house.R;
 import com.yuan.house.common.Constants;
@@ -28,6 +30,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import timber.log.Timber;
 
 /**
  * Created by KevinLee on 2016/5/9.
@@ -120,14 +126,11 @@ public class SwitchHouseActivity extends FragmentActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             ViewHolder holder;
-            if (convertView == null) {
-                holder = new ViewHolder();
 
-                convertView = LayoutInflater.from(mContext).inflate(R.layout.chat_house_info_adapter, null);
-                holder.img = (ImageView) convertView.findViewById(R.id.img);
-                holder.title = (TextView) convertView.findViewById(R.id.title);
-                holder.area = (TextView) convertView.findViewById(R.id.area);
-                holder.house_params = (TextView) convertView.findViewById(R.id.house_params);
+            if (convertView == null) {
+                convertView = LayoutInflater.from(mContext).inflate(R.layout.chat_house_info_adapter, parent, false);
+
+                holder = new ViewHolder(convertView);
 
                 convertView.setTag(holder);
             } else {
@@ -136,20 +139,37 @@ public class SwitchHouseActivity extends FragmentActivity {
 
             try {
                 JSONObject object = houseInfos.get(position);
-                JSONArray images = object.getJSONArray("images");
-                if (images != null && images.length() != 0) {
-                    // use cover image as placeholder
-                    Picasso.with(mContext).load(images.optString(0)).into(holder.img);
-                }
 
-                holder.title.setText(object.getString("estate_name"));
-                holder.area.setText(object.getString("acreage") + "㎡");
+                if (TextUtils.isEmpty(object.optString("estate_name"))) {
+                    holder.title.setText("需求");
+                } else {
+                    holder.title.setText(object.optString("estate_name"));
+                }
+                holder.area.setText(object.optString("acreage") + "㎡");
                 StringBuffer sb = new StringBuffer();
                 sb.append(object.getString("room_count"));
                 sb.append("室");
                 sb.append(object.getString("parlour_count"));
                 sb.append("厅");
                 holder.house_params.setText(sb.toString());
+
+                JSONArray images = object.optJSONArray("images");
+                if (images != null && images.length() != 0) {
+                    String imageUrl = images.optString(0);
+                    Picasso.with(mContext).load(imageUrl).placeholder(R.drawable.img_placeholder).into(holder.imageView, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            Timber.v("onSuccess");
+                        }
+
+                        @Override
+                        public void onError() {
+                            Timber.e("onError");
+                        }
+                    });
+                } else {
+                    Picasso.with(mContext).load(R.drawable.img_placeholder).fit().into(holder.imageView);
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -159,9 +179,20 @@ public class SwitchHouseActivity extends FragmentActivity {
     }
 
     final class ViewHolder {
-        public ImageView img;
+        @BindView(R.id.img)
+        public ImageView imageView;
+
+        @BindView(R.id.title)
         public TextView title;
+
+        @BindView(R.id.area)
         public TextView area;
+
+        @BindView(R.id.house_params)
         public TextView house_params;
+
+        public ViewHolder(View view) {
+            ButterKnife.bind(this, view);
+        }
     }
 }

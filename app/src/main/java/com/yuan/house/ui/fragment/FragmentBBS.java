@@ -51,8 +51,7 @@ public class FragmentBBS extends WebViewBaseFragment {
 
         Injector.inject(this);
 
-        ButterKnife.reset(this);
-        ButterKnife.inject(this, view);
+        ButterKnife.bind(this, view);
 
         Timber.v("onCreateView");
 

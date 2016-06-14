@@ -14,8 +14,8 @@ import com.yuan.house.application.Injector;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import butterknife.OnClick;
 
 /**
@@ -25,7 +25,7 @@ public class IPSettingActivity extends Activity {
     @Inject
     SharedPreferences preferences;
 
-    @InjectView(R.id.et_dummy_ip_setting)
+    @BindView(R.id.et_dummy_ip_setting)
     EditText editText;
 
     String ip;
@@ -37,7 +37,7 @@ public class IPSettingActivity extends Activity {
         setContentView(R.layout.ip_setting);
 
         Injector.inject(this);
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
     }
 
     @OnClick(R.id.btn_dummy_ip_setting)
