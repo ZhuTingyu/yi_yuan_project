@@ -16,14 +16,14 @@
         <RelativeLayout
             android:id="@+id/rl_left"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/topbar_button_margin">
 
             <ImageButton
                 android:id="@+id/topbar_left_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="20dp"
                 android:background="@android:color/transparent"
                 android:visibility="gone" />
 
@@ -43,8 +43,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp">
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp">
 
             <Button
                 android:id="@+id/topbar_title_button"
@@ -85,12 +85,12 @@
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:background="@android:color/transparent"
-            android:paddingRight="@dimen/topbar_button_margin">
+            android:layout_marginRight="@dimen/topbar_button_margin">
 
             <ImageButton
                 android:id="@+id/topbar_right_btn"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:background="@android:color/transparent"
                 android:visibility="visible" />
