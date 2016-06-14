@@ -76,7 +76,8 @@
                 android:hint="@string/contact_search"
                 android:textSize="12dp"
                 android:drawableLeft="@drawable/img_search"
-                android:background="@drawable/search_editsharp"/>
+                android:background="@drawable/search_editsharp"
+                android:visibility="gone"/>
         </RelativeLayout>
 
         <RelativeLayout
