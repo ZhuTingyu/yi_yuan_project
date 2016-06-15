@@ -33,11 +33,11 @@
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
 
     <supports-screens
-        android:smallScreens="true"
-        android:normalScreens="true"
+        android:anyDensity="true"
         android:largeScreens="true"
+        android:normalScreens="true"
         android:resizeable="true"
-        android:anyDensity="true" />
+        android:smallScreens="true" />
 
     <!-- baidumap 所需的权限 -end -->
     <application
@@ -45,17 +45,17 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name_real"
-        tools:replace="android:label"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:replace="android:label">
 
         <activity
             android:name=".activities.IPSettingActivity"
-            android:screenOrientation="portrait"
-            android:icon="@mipmap/ic_launcher_dev">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            android:icon="@mipmap/ic_launcher_dev"
+            android:screenOrientation="portrait">
+            <!--<intent-filter>-->
+            <!--<action android:name="android.intent.action.MAIN" />-->
+            <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
         </activity>
 
         <activity
@@ -67,58 +67,74 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activities.TutorialActivity"/>
+        <activity android:name=".activities.TutorialActivity" />
 
         <activity
             android:name=".activities.MainActivity"
+            android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden"
-            android:configChanges="orientation|keyboardHidden"/>
+            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
 
-        <activity android:name=".activities.WebViewActivity"
+        <activity
+            android:name=".activities.WebViewActivity"
             android:screenOrientation="portrait" />
 
-        <activity android:name=".activities.MapActivity" android:screenOrientation="portrait" />
-        <activity android:name=".activities.ImagePagerActivity" android:screenOrientation="portrait" />
-        <activity android:name=".activities.SwitchHouseActivity" android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.MapActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.SwitchHouseActivity"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name="com.avoscloud.chat.ui.chat.ChatRoomActivity"
-            android:launchMode="singleTask"/>
+            android:launchMode="singleTask" />
 
-        <activity android:name="com.avoscloud.leanchatlib.activity.ImageBrowserActivity"
-            android:launchMode="singleTask"/>
+        <activity
+            android:name="com.avoscloud.leanchatlib.activity.ImageBrowserActivity"
+            android:launchMode="singleTask" />
 
-        <activity android:name="com.yuan.cp.activity.ClipPictureActivity"
+        <activity
+            android:name="com.yuan.cp.activity.ClipPictureActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
 
-        <activity android:name="me.nereo.multi_image_selector.MultiImageSelectorActivity"
+        <activity
+            android:name="com.etiennelawlor.imagegallery.library.activities.ImageGalleryActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label=""
+            android:theme="@style/ImageGalleryTheme" />
+
+        <activity
+            android:name="me.nereo.multi_image_selector.MultiImageSelectorActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
 
         <service android:name="com.avos.avoscloud.PushService" />
 
         <!--<receiver android:name="com.dimo.receiver.Receiver">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.BOOT_COMPLETED" />-->
-                <!--<action android:name="android.intent.action.USER_PRESENT" />-->
-                <!--<action android:name="android.net.conn.CONNECTIVITY_CHANGE" />-->
-                <!--<action android:name="com.mowelltech.threec.UPDATE_STATUS" />-->
-                <!--<action android:name="com.mowelltech.threec.action" />-->
-            <!--</intent-filter>-->
+        <!--<intent-filter>-->
+        <!--<action android:name="android.intent.action.BOOT_COMPLETED" />-->
+        <!--<action android:name="android.intent.action.USER_PRESENT" />-->
+        <!--<action android:name="android.net.conn.CONNECTIVITY_CHANGE" />-->
+        <!--<action android:name="com.mowelltech.threec.UPDATE_STATUS" />-->
+        <!--<action android:name="com.mowelltech.threec.action" />-->
+        <!--</intent-filter>-->
         <!--</receiver>-->
 
-        <meta-data android:value="558bab2e67e58ee449003198" android:name="UMENG_APPKEY"/>
-        <meta-data android:value="Website" android:name="UMENG_CHANNEL"/>
+        <meta-data
+            android:name="UMENG_APPKEY"
+            android:value="558bab2e67e58ee449003198" />
+        <meta-data
+            android:name="UMENG_CHANNEL"
+            android:value="Website" />
+
         <service
             android:name="com.umeng.update.net.DownloadingService"
-            android:process=":DownloadingService" >
-        </service>
+            android:process=":DownloadingService"></service>
         <activity
             android:name="com.umeng.update.UpdateDialogActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
-        </activity>
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"></activity>
 
         <!--baidu location service-->
         <!--http://lbsyun.baidu.com/apiconsole/key/update?app-id=8228474-->
@@ -126,8 +142,10 @@
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="q3WKKSo5y2OmcZUGULswSVbP9mreqdT3" />
 
-        <service android:name="com.baidu.location.f" android:enabled="true" android:process=":remote">
-        </service>
+        <service
+            android:name="com.baidu.location.f"
+            android:enabled="true"
+            android:process=":remote"></service>
 
     </application>
 

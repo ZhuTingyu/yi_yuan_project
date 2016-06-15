@@ -33,7 +33,6 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.yuan.house.R;
-import com.yuan.house.activities.ImagePagerActivity;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
@@ -739,9 +738,13 @@ public class WebViewBaseFragment extends Fragment {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 Log.i("图片预览", data);
-                Intent intent = new Intent(getActivity(), ImagePagerActivity.class);
-                intent.putExtra("json", data);
-                startActivity(intent);
+
+                com.alibaba.fastjson.JSONArray jsonArray = JSON.parseObject(data).getJSONArray("urls");
+
+                List<String> images = JSON.parseArray(jsonArray.toString(), String.class);
+                if (mBridgeListener != null) {
+                    mBridgeListener.onBridgeShowImageGallery(images);
+                }
             }
         });
 
@@ -1017,5 +1020,7 @@ public class WebViewBaseFragment extends Fragment {
         void onBridgeSignIn(String data);
 
         void onBridgeSelectMapLocation();
+
+        void onBridgeShowImageGallery(List<String> data);
     }
 }

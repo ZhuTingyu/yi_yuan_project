@@ -16,6 +16,8 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,12 +35,19 @@ import com.bugtags.library.Bugtags;
 import com.dimo.http.RestClient;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
+import com.etiennelawlor.imagegallery.library.ImageGalleryFragment;
+import com.etiennelawlor.imagegallery.library.activities.FullScreenImageGalleryActivity;
+import com.etiennelawlor.imagegallery.library.activities.ImageGalleryActivity;
+import com.etiennelawlor.imagegallery.library.adapters.FullScreenImageGalleryAdapter;
+import com.etiennelawlor.imagegallery.library.adapters.ImageGalleryAdapter;
 import com.fourmob.datetimepicker.date.DatePickerDialog;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.sleepbot.datetimepicker.time.RadialPickerLayout;
 import com.sleepbot.datetimepicker.time.TimePickerDialog;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 import com.victor.loading.rotate.RotateLoading;
 import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
@@ -83,7 +92,9 @@ import timber.log.Timber;
 /**
  * Created by Alsor Zhou on 8/12/15.
  */
-public abstract class WebViewBasedActivity extends BaseFragmentActivity implements WebViewFragment.OnFragmentInteractionListener, WebViewFragment.OnBridgeInteractionListener, ProposalFragment.OnProposalInteractionListener {
+public abstract class WebViewBasedActivity extends BaseFragmentActivity implements WebViewFragment.OnFragmentInteractionListener,
+        WebViewFragment.OnBridgeInteractionListener, ProposalFragment.OnProposalInteractionListener,
+        ImageGalleryAdapter.ImageThumbnailLoader, FullScreenImageGalleryAdapter.FullScreenImageLoader {
     private final int kActivityRequestCodeWebActivity = 3;
     private final int kActivityRequestCodeImagePickOnly = 10;
     private final int kActivityRequestCodeImagePickThenCrop = 11;
@@ -169,6 +180,11 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             mFragmentTransaction = mFragmentManager.beginTransaction();
             mFragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         }
+
+        // configure image gallery showing
+        ImageGalleryActivity.setImageThumbnailLoader(this);
+        ImageGalleryFragment.setImageThumbnailLoader(this);
+        FullScreenImageGalleryActivity.setFullScreenImageLoader(this);
     }
 
     protected Fragment getFragment(String tag) {
@@ -483,6 +499,18 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         finish();
     }
 
+    @Override
+    public void onBridgeShowImageGallery(List<String> images) {
+        Intent intent = new Intent(this, ImageGalleryActivity.class);
+
+        Bundle bundle = new Bundle();
+        bundle.putStringArrayList(ImageGalleryActivity.KEY_IMAGES, new ArrayList<>(images));
+        bundle.putString(ImageGalleryActivity.KEY_TITLE, "图片库");
+        intent.putExtras(bundle);
+
+        startActivity(intent);
+    }
+
     public void onBridgeRequestLocation(final WebViewJavascriptBridge.WVJBResponseCallback callback) {
         final LocationClient locationClient = new LocationClient(getApplicationContext());
         locationClient.setDebug(true);
@@ -665,6 +693,41 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         return super.dispatchTouchEvent(event);
     }
 
+    // region ImageGalleryAdapter.ImageThumbnailLoader Methods
+    public void loadImageThumbnail(ImageView iv, String imageUrl, int dimension) {
+        if (!TextUtils.isEmpty(imageUrl)) {
+            Picasso.with(iv.getContext())
+                    .load(imageUrl)
+//                    .resize(dimension, dimension)
+//                    .centerCrop()
+                    .into(iv);
+        } else {
+            iv.setImageDrawable(null);
+        }
+    }
+
+    // region FullScreenImageGalleryAdapter.FullScreenImageLoader
+    public void loadFullScreenImage(final ImageView iv, String imageUrl, int width, final LinearLayout bgLinearLayout) {
+        if (!TextUtils.isEmpty(imageUrl)) {
+            Picasso.with(iv.getContext())
+                    .load(imageUrl)
+//                    .resize(width, 0)
+                    .into(iv, new Callback() {
+                        @Override
+                        public void onSuccess() {
+
+                        }
+
+                        @Override
+                        public void onError() {
+
+                        }
+                    });
+        } else {
+            iv.setImageDrawable(null);
+        }
+    }
+
     private class DataPickerOnClickListener implements DatePickerDialog.OnDateSetListener {
         @Override
         public void onDateSet(DatePickerDialog datePickerDialog, int year, int month, int day) {
@@ -677,6 +740,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 //            mCallback.callback(sb.toString());
         }
     }
+    // endregion
 
     private class TimePickerOnClickListener implements TimePickerDialog.OnTimeSetListener {
         @Override
@@ -684,6 +748,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
         }
     }
+    // endregion
 
 
 }

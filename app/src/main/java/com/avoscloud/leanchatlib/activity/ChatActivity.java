@@ -14,7 +14,6 @@ import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.Selection;
 import android.text.Spannable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -53,9 +52,9 @@ import com.avoscloud.leanchatlib.view.xlist.XListView;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.PauseOnScrollListener;
+import com.yuan.house.R;
 import com.yuan.house.activities.WebViewBasedActivity;
 import com.yuan.house.utils.ToastUtil;
-import com.yuan.house.R;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -142,7 +141,6 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
 
     private void initTitleView() {
         // FIXME: 16/6/11 conversation title
-        setTitleItem("13123");
         setLeftItem(R.drawable.back, new OnClickListener() {
             @Override
             public void onClick(View v) {
