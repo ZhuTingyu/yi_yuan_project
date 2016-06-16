@@ -25,6 +25,7 @@ import com.alibaba.fastjson.JSON;
 import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.AVIMException;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
+import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.MessageAgent;
 import com.avoscloud.leanchatlib.model.AVIMNoticeWithHouseIdMessage;
@@ -82,6 +83,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -421,16 +423,16 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
     public void onBridgeSendNoticeMessage(final String data) {
         boolean isAgency = false;
-        // TODO: 16/6/10 web传参数（house_id,lean_id(数组),text(消息文本)）,用于从web端发送消息给特定的用户
-        List<String> leanIdList = null;
+
         String houseId = null;
+        JSONArray leanIdList = null;
+        String text = null;
         try {
             JSONObject object = new JSONObject(data);
             houseId = object.optString("house_id");
-            String leanId = object.optString("lean_id");
-            String text = object.optString("text");
+            leanIdList = object.optJSONArray("lean_id");
+            text = object.optString("text");
 
-            leanIdList = new ArrayList<>(Arrays.asList(leanId.split(",")));
             if ("agency".equals(object.optString("type"))) {
                 isAgency = true;
             }
@@ -439,16 +441,23 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         }
 
         // TODO: 16/6/10 get last user id??? WTH?
-        String leanIdString = leanIdList.get(leanIdList.size() - 1);
+        String leanIdString = leanIdList.optString(leanIdList.length() - 1);
 
         // FIXME: 16/6/10 WTF!!! isAgency 的作用是什么? 中介不能发这种类型消息么?
         // 创建相应对话, 并发送文本信息到该会话
         final String finalHouseId = houseId;
+        final String finalText = text;
         ChatManager.getInstance().fetchConversationWithUserId(null, leanIdString, new AVIMConversationCreatedCallback() {
             @Override
             public void done(AVIMConversation avimConversation, AVIMException e) {
-                AVIMNoticeWithHouseIdMessage message = new AVIMNoticeWithHouseIdMessage();
-                message.setHouseId(finalHouseId);
+                AVIMTextMessage message = new AVIMTextMessage();
+
+                Map<String, Object> attrs = new HashMap<>();
+                attrs.put("houseId", finalHouseId);
+
+                message.setAttrs(attrs);
+
+                message.setText(finalText);
 
                 MessageAgent messageAgent = new MessageAgent(avimConversation);
                 messageAgent.sendEncapsulatedTypedMessage(message);

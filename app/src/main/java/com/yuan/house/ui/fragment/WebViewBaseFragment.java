@@ -650,6 +650,17 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
+        getBridge().registerHandler("sendNoticeMessage", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
+                Timber.v("sendNoticeMessage" + data);
+
+                if (mBridgeListener != null) {
+                    mBridgeListener.onBridgeSendNoticeMessage(data);
+                }
+            }
+        });
+
         getBridge().registerHandler("chatByUserId", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
@@ -1022,5 +1033,7 @@ public class WebViewBaseFragment extends Fragment {
         void onBridgeSelectMapLocation();
 
         void onBridgeShowImageGallery(List<String> data);
+
+        void onBridgeSendNoticeMessage(String data);
     }
 }
