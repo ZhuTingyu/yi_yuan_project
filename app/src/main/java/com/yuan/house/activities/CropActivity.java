@@ -35,9 +35,10 @@ public class CropActivity extends BaseFragmentActivity {
         Bundle bundle = getIntent().getExtras();
 
         String imageName = null;
-        String imageType = null;
+        int imageType = Constants.kActivityRequestCodeImagePickThenCropRectangle;
+
         if (bundle != null) {
-            imageType = bundle.getString(Constants.kBundleExtraCropImageType);
+            imageType = bundle.getInt(Constants.kBundleExtraCropImageType);
             imageName = bundle.getString(Constants.kBundleExtraCropImageName);
         }
 
@@ -71,7 +72,7 @@ public class CropActivity extends BaseFragmentActivity {
         configureCropImageView(imageType, imageName);
     }
 
-    private void configureCropImageView(String imageType, String imageName) {
+    private void configureCropImageView(int imageType, String imageName) {
         Bitmap bm = BitmapFactory.decodeFile(imageName);
         cropImageView.setImageBitmap(bm);
 
@@ -79,8 +80,8 @@ public class CropActivity extends BaseFragmentActivity {
         cropImageView.setFixedAspectRatio(true);
 
         int width, height;
-        if (Constants.kImageCropTypeRectangle.equals(imageType)) {
-            width = 1;
+        if (Constants.kActivityRequestCodeImagePickThenCropRectangle == imageType) {
+            width = 3;
             height = 2;
         } else {
             width = 1;

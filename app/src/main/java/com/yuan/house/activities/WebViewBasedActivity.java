@@ -99,8 +99,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     private final int kActivityRequestCodeWebActivity = 3;
     private final int kActivityRequestCodeImagePickOnly = 10;
     private final int kActivityRequestCodeImagePickThenUpload = 11;
-    private final int kActivityRequestCodeImagePickThenCropRectangle = 12;
-    private final int kActivityRequestCodeImagePickThenCropSquare = 13;
+
     private final int kActivityRequestCodeImageCrop = 14;
     private final int kActivityRequestCodeSelectMapLocation = 20;
     protected FragmentManager mFragmentManager;
@@ -296,8 +295,8 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
             // TODO: 16/6/10 invoke upload process
             uploadMultiPartFiles(path);
-        } else if (requestCode == kActivityRequestCodeImagePickThenCropRectangle
-                || requestCode == kActivityRequestCodeImagePickThenCropSquare) {
+        } else if (requestCode == Constants.kActivityRequestCodeImagePickThenCropRectangle
+                || requestCode == Constants.kActivityRequestCodeImagePickThenCropSquare) {
             // TODO: 16/6/9 upload files directly
             Timber.v("kActivityRequestCodeImagePickThenUpload");
             List<String> path = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
@@ -385,10 +384,10 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             String type = object.optString("type");
             if (Constants.kImageCropTypeRectangle.equals(type)) {
                 selector = selector.single(); // single mode
-                requestCode = kActivityRequestCodeImagePickThenCropRectangle;
+                requestCode = Constants.kActivityRequestCodeImagePickThenCropRectangle;
             } else if (Constants.kImageCropTypeSquare.equals(type)) {
                 selector = selector.single(); // single mode
-                requestCode = kActivityRequestCodeImagePickThenCropSquare;
+                requestCode = Constants.kActivityRequestCodeImagePickThenCropSquare;
             } else if (Constants.kImageCropTypeNone.equals(type)) {
                 selector = selector.multi(); // single mode
             }

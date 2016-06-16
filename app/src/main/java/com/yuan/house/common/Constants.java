@@ -103,4 +103,7 @@ public class Constants {
     public static String kImageCropTypeRectangle = "rectangle";
     public static String kImageCropTypeSquare = "square";
     public static String kImageCropTypeNone = "none";
+
+    public static int kActivityRequestCodeImagePickThenCropRectangle = 12;
+    public static int kActivityRequestCodeImagePickThenCropSquare = 13;
 }
