@@ -397,8 +397,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                         message.setAttrs(attrs);
 
                         messageAgent.sendEncapsulatedTypedMessage(message);
-//                    bridge.callHandler("nativeChangeHouse", map.get("id"));
-
+                        getWebViewFragment().getBridge().callHandler("nativeChangeHouse", object.getString("id"));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
