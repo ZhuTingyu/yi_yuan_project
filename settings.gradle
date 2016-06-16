@@ -1,5 +1,4 @@
 include ':app'
 include ':libraries:ShareCode'
 include ':libraries:Loading'
-include ':libraries:Clippicture'
 include ':libraries:ChatDaoGenerator'

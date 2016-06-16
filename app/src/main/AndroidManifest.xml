@@ -95,7 +95,7 @@
             android:launchMode="singleTask" />
 
         <activity
-            android:name="com.yuan.cp.activity.ClipPictureActivity"
+            android:name=".activities.CropActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
 
