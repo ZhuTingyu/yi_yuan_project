@@ -76,7 +76,6 @@ public class PickerPopWindow extends PopupWindow implements View.OnClickListener
         setFocusable(true);
 
         setBackgroundDrawable(new BitmapDrawable());
-        setAnimationStyle(R.style.FadeInPopWin);
         setContentView(contentView);
         setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
         setHeight(ViewGroup.LayoutParams.MATCH_PARENT);
