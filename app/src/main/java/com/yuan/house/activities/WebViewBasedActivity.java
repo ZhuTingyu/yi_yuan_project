@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.AVIMException;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
@@ -97,8 +98,10 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         ImageGalleryAdapter.ImageThumbnailLoader, FullScreenImageGalleryAdapter.FullScreenImageLoader {
     private final int kActivityRequestCodeWebActivity = 3;
     private final int kActivityRequestCodeImagePickOnly = 10;
-    private final int kActivityRequestCodeImagePickThenCrop = 11;
-    private final int kActivityRequestCodeImagePickThenUpload = 12;
+    private final int kActivityRequestCodeImagePickThenUpload = 11;
+    private final int kActivityRequestCodeImagePickThenCropRectangle = 12;
+    private final int kActivityRequestCodeImagePickThenCropSquare = 13;
+    private final int kActivityRequestCodeImageCrop = 14;
     private final int kActivityRequestCodeSelectMapLocation = 20;
     protected FragmentManager mFragmentManager;
     protected FragmentTransaction mFragmentTransaction;
@@ -293,21 +296,28 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
             // TODO: 16/6/10 invoke upload process
             uploadMultiPartFiles(path);
-        } else if (requestCode == kActivityRequestCodeImagePickThenCrop) {
+        } else if (requestCode == kActivityRequestCodeImagePickThenCropRectangle
+                || requestCode == kActivityRequestCodeImagePickThenCropSquare) {
             // TODO: 16/6/9 upload files directly
             Timber.v("kActivityRequestCodeImagePickThenUpload");
             List<String> path = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
 
-            // TODO: 16/6/10 invoke crop process
-            JSONArray jsonArray = new JSONArray();
-            for (String p : path) {
-                jsonArray.put(p);
-            }
-            mBridgeCallback.callback(jsonArray.toString());
+            if (path == null) return;
+
+            Intent intent = new Intent(mContext, CropActivity.class);
+            intent.putExtra(Constants.kBundleExtraCropImageType, requestCode);
+            intent.putExtra(Constants.kBundleExtraCropImageName, path.get(0));
+            startActivityForResult(intent, kActivityRequestCodeImageCrop);
+        } else if (requestCode == kActivityRequestCodeImageCrop) {
+            // handle cropped image
+            String path = data.getStringExtra("data");
+            JSONArray datum = new JSONArray();
+            datum.put(path);
+            mBridgeCallback.callback(datum.toString());
         } else if (requestCode == kActivityRequestCodeSelectMapLocation) {
             Timber.v("kActivityRequestCodeSelectMapLocation");
-            // TODO: 16/6/12 revert callback the selected map location
-            String result = null;
+            // reverse callback the selected map location
+            String result;
             if (data != null) {
                 // handle the case if activity is terminated by JS code
                 Bundle res = data.getExtras();
@@ -373,10 +383,13 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         try {
             JSONObject object = new JSONObject(data);
             String type = object.optString("type");
-            if ("rectangle".equals(type) || "square".equals(type)) {
+            if (Constants.kImageCropTypeRectangle.equals(type)) {
                 selector = selector.single(); // single mode
-                requestCode = kActivityRequestCodeImagePickThenCrop;
-            } else if ("none".equals(type)) {
+                requestCode = kActivityRequestCodeImagePickThenCropRectangle;
+            } else if (Constants.kImageCropTypeSquare.equals(type)) {
+                selector = selector.single(); // single mode
+                requestCode = kActivityRequestCodeImagePickThenCropSquare;
+            } else if (Constants.kImageCropTypeNone.equals(type)) {
                 selector = selector.multi(); // single mode
             }
 

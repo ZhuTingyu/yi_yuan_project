@@ -94,4 +94,13 @@ public class Constants {
 
     public static String kBundleKeyAfterSwitchHouseSelected = "kBundleKeyAfterSwitchHouseSelected";
     public static String kActivityParamFinishSelectLocationOnMap = "kActivityParamFinishSelectLocationOnMap";
+
+    /**
+     * Image Crop
+     */
+    public static String kBundleExtraCropImageType = "cropType";
+    public static String kBundleExtraCropImageName = "cropImage";
+    public static String kImageCropTypeRectangle = "rectangle";
+    public static String kImageCropTypeSquare = "square";
+    public static String kImageCropTypeNone = "none";
 }
