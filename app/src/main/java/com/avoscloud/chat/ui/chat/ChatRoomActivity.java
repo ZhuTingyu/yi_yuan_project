@@ -188,6 +188,8 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
+        setTitleItem(jsonFormatParams.optString("user_id"));
+
         gestureDetector = new GestureDetector(this, onGestureListener);
 
         mFragmentBBS = FragmentBBS.newInstance();
