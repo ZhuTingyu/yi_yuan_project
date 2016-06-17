@@ -17,6 +17,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
@@ -485,14 +486,14 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
     @Override
     public void onShowSampleMessageBoard() {
-        int height = ((int) ((getHeightS() + 10) * getResources().getDisplayMetrics().density));
+        int height = ((int) (getHeightS() * getResources().getDisplayMetrics().density));
 
         resizeBBSBoard(height);
     }
 
     @Override
     public void onShowHalfMessageBoard() {
-        int height = ((int) ((getHeightM() + 10) * getResources().getDisplayMetrics().density));
+        int height = ((int) (getHeightM() * getResources().getDisplayMetrics().density));
 
         resizeBBSBoard(height);
     }
@@ -509,15 +510,11 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
 
-        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) webView.getLayoutParams();
+        FrameLayout frameLayout = (FrameLayout) findViewById(R.id.fragmentBBS);
+
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) frameLayout.getLayoutParams();
         layoutParams.height = height;
 
-        webView.setLayoutParams(layoutParams);
-//        bottomLayout.setVisibility(View.INVISIBLE);
-    }
-
-    @Override
-    public void onConfigBBSHeight(int height) {
-        resizeBBSBoard(height);
+        frameLayout.setLayoutParams(layoutParams);
     }
 }

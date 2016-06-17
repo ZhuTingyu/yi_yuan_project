@@ -121,32 +121,25 @@ public class FragmentBBS extends WebViewBaseFragment {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("setData got:" + data);
+                JSONObject originObject = null;
                 try {
-                    JSONObject originObject = null;
-                    try {
-                        originObject = new JSONObject(data);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                    String key = originObject.optString("key");
-                    String value = originObject.optString("value");
-
-                    SharedPreferences.Editor editor = prefs.edit();
-                    if (value == null || value.equals("null")) {
-                        editor.remove(key);
-                    } else {
-                        editor.putString(key, value);
-                    }
-                    editor.apply();
-
-                    JSONObject object = new JSONObject(value);
-                    int height = object.optInt("height_s");
-
-                    mBridgeListener.onConfigBBSHeight(height);
+                    originObject = new JSONObject(data);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
+                String key = originObject.optString("key");
+                String value = originObject.optString("value");
+
+                SharedPreferences.Editor editor = prefs.edit();
+                if (value == null || value.equals("null")) {
+                    editor.remove(key);
+                } else {
+                    editor.putString(key, value);
+                }
+                editor.apply();
+
+                mBridgeListener.onShowSampleMessageBoard();
             }
         });
 
@@ -160,7 +153,5 @@ public class FragmentBBS extends WebViewBaseFragment {
         void onShowHalfMessageBoard();
 
         void onShowFullMessageBoard();
-
-        void onConfigBBSHeight(int height);
     }
 }
