@@ -8,17 +8,6 @@
     android:gravity="center_vertical"
     android:orientation="horizontal">
 
-    <com.avoscloud.leanchatlib.view.EmotionEditText
-        android:id="@+id/textEdit"
-        android:layout_width="0dp"
-        android:layout_height="40dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_weight="1"
-        android:background="@drawable/chat_login_edit_normal"
-        android:singleLine="true"
-        android:textSize="18sp" />
-
     <LinearLayout
         android:id="@+id/chatBottomRightLayout"
         android:layout_width="wrap_content"
@@ -26,16 +15,16 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/sendBtn"
-            android:layout_width="@dimen/chat_BottomBtnSize"
-            android:layout_height="@dimen/chat_BottomBtnSize"
-            android:layout_margin="5dp"
-            android:background="@drawable/chat_btn_send_selector"
-            android:gravity="center"
-            android:text=""
-            android:textColor="#000"
-            android:visibility="gone" />
+        <!--<Button-->
+            <!--android:id="@+id/sendBtn"-->
+            <!--android:layout_width="@dimen/chat_BottomBtnSize"-->
+            <!--android:layout_height="@dimen/chat_BottomBtnSize"-->
+            <!--android:layout_margin="5dp"-->
+            <!--android:background="@drawable/chat_btn_send_selector"-->
+            <!--android:gravity="center"-->
+            <!--android:text=""-->
+            <!--android:textColor="#000"-->
+            <!--android:visibility="gone" />-->
 
         <Button
             android:id="@+id/turnToAudioBtn"
@@ -48,5 +37,14 @@
             android:visibility="visible" />
     </LinearLayout>
 
-
+    <com.avoscloud.leanchatlib.view.EmotionEditText
+        android:id="@+id/textEdit"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_weight="1"
+        android:background="@drawable/chat_login_edit_normal"
+        android:singleLine="true"
+        android:textSize="18sp" />
 </LinearLayout>
