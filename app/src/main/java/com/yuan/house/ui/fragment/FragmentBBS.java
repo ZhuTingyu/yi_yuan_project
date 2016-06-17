@@ -1,23 +1,21 @@
 package com.yuan.house.ui.fragment;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
+import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
-import com.yuan.house.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.HashMap;
 
 import butterknife.ButterKnife;
 import timber.log.Timber;
@@ -53,8 +51,7 @@ public class FragmentBBS extends WebViewBaseFragment {
 
         Injector.inject(this);
 
-        ButterKnife.reset(this);
-        ButterKnife.inject(this, view);
+        ButterKnife.bind(this, view);
 
         Timber.v("onCreateView");
 
@@ -124,25 +121,25 @@ public class FragmentBBS extends WebViewBaseFragment {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("setData got:" + data);
-                HashMap<String, String> params;
+                JSONObject originObject = null;
                 try {
-                    params = StringUtil.JSONString2HashMap(data);
-
-                    String key = params.get("key");
-                    String value = params.get("value");
-
-                    if (value == null || value.equals("null")) {
-                        prefs.edit().remove(key).commit();
-                    } else {
-                        prefs.edit().putString(key, value).commit();
-                    }
-
-                    JSONObject object = new JSONObject(value);
-                    int height = object.optInt("height_s");
-                    mBridgeListener.onConfigBBSHeight(height);
+                    originObject = new JSONObject(data);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
+                String key = originObject.optString("key");
+                String value = originObject.optString("value");
+
+                SharedPreferences.Editor editor = prefs.edit();
+                if (value == null || value.equals("null")) {
+                    editor.remove(key);
+                } else {
+                    editor.putString(key, value);
+                }
+                editor.apply();
+
+                mBridgeListener.onShowSampleMessageBoard();
             }
         });
 
@@ -156,7 +153,5 @@ public class FragmentBBS extends WebViewBaseFragment {
         void onShowHalfMessageBoard();
 
         void onShowFullMessageBoard();
-
-        void onConfigBBSHeight(int height);
     }
 }

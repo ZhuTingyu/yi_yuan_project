@@ -57,6 +57,7 @@ public class WebService {
     private HashMap<String, String> authTokenHeader() {
         HashMap<String, String> hashMap = new HashMap<>();
 
+        hashMap.put(kHttpReqKeyContentType, "application/json");
         hashMap.put(kHttpReqKeyToken, getAuthToken());
 
         return hashMap;

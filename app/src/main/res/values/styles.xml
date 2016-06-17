@@ -170,22 +170,31 @@
         <item name="android:background">@drawable/group_detail_btn</item>
     </style>
 
-    <style name="top_proposal">
+    <style name="segment_left">
         <item name="android:layout_height">30dp</item>
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_weight">1</item>
         <item name="android:textSize">16sp</item>
-        <item name="android:textColor">@drawable/proposal_font</item>
-        <item name="android:background">@drawable/proposal_background</item>
+        <item name="android:textColor">@drawable/segment_left_font</item>
+        <item name="android:background">@drawable/segment_left_background</item>
     </style>
 
-    <style name="top_complaint">
+    <style name="segment_center">
         <item name="android:layout_height">30dp</item>
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_weight">1</item>
         <item name="android:textSize">16sp</item>
-        <item name="android:textColor">@drawable/complaint_font</item>
-        <item name="android:background">@drawable/complaint_background</item>
+        <item name="android:textColor">@drawable/segment_center_font</item>
+        <item name="android:background">@drawable/segment_center_background</item>
+    </style>
+
+    <style name="segment_right">
+        <item name="android:layout_height">30dp</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@drawable/segment_right_font</item>
+        <item name="android:background">@drawable/segment_right_background</item>
     </style>
 
     <style name="app_pop">

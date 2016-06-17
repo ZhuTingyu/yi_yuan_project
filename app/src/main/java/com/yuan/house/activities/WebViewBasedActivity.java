@@ -1,6 +1,7 @@
 package com.yuan.house.activities;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,18 +10,24 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.AVIMException;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
+import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.MessageAgent;
-import com.avoscloud.leanchatlib.model.AVIMNoticeWithHouseIdMessage;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
@@ -29,18 +36,27 @@ import com.bugtags.library.Bugtags;
 import com.dimo.http.RestClient;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
+import com.etiennelawlor.imagegallery.library.ImageGalleryFragment;
+import com.etiennelawlor.imagegallery.library.activities.FullScreenImageGalleryActivity;
+import com.etiennelawlor.imagegallery.library.activities.ImageGalleryActivity;
+import com.etiennelawlor.imagegallery.library.adapters.FullScreenImageGalleryAdapter;
+import com.etiennelawlor.imagegallery.library.adapters.ImageGalleryAdapter;
 import com.fourmob.datetimepicker.date.DatePickerDialog;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.sleepbot.datetimepicker.time.RadialPickerLayout;
 import com.sleepbot.datetimepicker.time.TimePickerDialog;
-import com.victor.loading.rotate.RotateLoading;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
+import com.tasomaniac.android.widget.DelayedProgressDialog;
+import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.base.BaseFragmentActivity;
 import com.yuan.house.bean.PayInfo;
 import com.yuan.house.common.Constants;
+import com.yuan.house.event.PageEvent;
 import com.yuan.house.event.WebBroadcastEvent;
 import com.yuan.house.helper.AuthHelper;
 import com.yuan.house.http.WebService;
@@ -48,9 +64,11 @@ import com.yuan.house.payment.AliPay;
 import com.yuan.house.ui.fragment.ProposalFragment;
 import com.yuan.house.ui.fragment.WebViewBaseFragment;
 import com.yuan.house.ui.fragment.WebViewFragment;
+import com.yuan.house.utils.FileUtil;
+import com.yuan.house.utils.ImageUtil;
 import com.yuan.house.utils.ToastUtil;
-import com.yuan.house.R;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.http.Header;
 import org.json.JSONArray;
@@ -59,13 +77,14 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.ButterKnife;
-import butterknife.InjectView;
+import de.greenrobot.event.EventBus;
 import me.nereo.multi_image_selector.MultiImageSelector;
 import me.nereo.multi_image_selector.MultiImageSelectorActivity;
 import timber.log.Timber;
@@ -73,15 +92,18 @@ import timber.log.Timber;
 /**
  * Created by Alsor Zhou on 8/12/15.
  */
-public abstract class WebViewBasedActivity extends BaseFragmentActivity implements WebViewFragment.OnFragmentInteractionListener, WebViewFragment.OnBridgeInteractionListener, ProposalFragment.OnProposalInteractionListener {
+public abstract class WebViewBasedActivity extends BaseFragmentActivity implements WebViewFragment.OnFragmentInteractionListener,
+        WebViewFragment.OnBridgeInteractionListener, ProposalFragment.OnProposalInteractionListener,
+        ImageGalleryAdapter.ImageThumbnailLoader, FullScreenImageGalleryAdapter.FullScreenImageLoader {
     private final int kActivityRequestCodeWebActivity = 3;
     private final int kActivityRequestCodeImagePickOnly = 10;
-    private final int kActivityRequestCodeImagePickThenCrop = 11;
-    private final int kActivityRequestCodeImagePickThenUpload = 12;
+    private final int kActivityRequestCodeImagePickThenUpload = 11;
+
+    private final int kActivityRequestCodeImageCrop = 14;
+    private final int kActivityRequestCodeSelectMapLocation = 20;
     protected FragmentManager mFragmentManager;
     protected FragmentTransaction mFragmentTransaction;
-    @InjectView(R.id.rotateloading)
-    protected RotateLoading mLoadingDialog;
+    protected DelayedProgressDialog mLoadingDialog;
     String mUrl;
     WebViewBaseFragment webViewFragment;
     private AliPay aliPay;
@@ -95,7 +117,6 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             }
         }
     };
-
     private WebViewJavascriptBridge.WVJBResponseCallback mBridgeCallback;
 
     @Override
@@ -109,7 +130,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         // prepare the fragment for main framelayout
         mFragmentManager = getSupportFragmentManager();
 
-        HashMap<String, String> params = null;
+        JSONObject params = null;
         String url = Constants.kWebPageEntry;
 
         Bundle bundle = getIntent().getExtras();
@@ -120,13 +141,17 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             setContentView(R.layout.activity_webview);
         }
 
-        if (bundle != null) {
-            params = (HashMap<String, String>) bundle.getSerializable("params");
+        if (bundle != null && !TextUtils.isEmpty(bundle.getString("params"))) {
+            try {
+                params = new JSONObject(bundle.getString("params"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             if (params != null) {
                 try {
                     mUrl = bundle.getString("url");
 
-                    JSONObject object = new JSONObject(params.get("params"));
+                    JSONObject object = new JSONObject(params.optString("params"));
 
                     if (!TextUtils.isEmpty(object.optString("title"))) {
                         setTitleItem(object.optString("title"));
@@ -146,16 +171,20 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
             }
         }
 
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
         if (mFragmentTransaction == null) {
             mFragmentTransaction = mFragmentManager.beginTransaction();
             mFragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         }
+
+        // configure image gallery showing
+        ImageGalleryActivity.setImageThumbnailLoader(this);
+        ImageGalleryFragment.setImageThumbnailLoader(this);
+        FullScreenImageGalleryActivity.setFullScreenImageLoader(this);
     }
 
     protected Fragment getFragment(String tag) {
@@ -178,11 +207,6 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         return f;
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
     protected void hideSoftInputView() {
         if (getWindow().getAttributes().softInputMode != WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN) {
             InputMethodManager manager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
@@ -198,24 +222,18 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
-    protected String getUserToken() throws JSONException {
-        String json = prefs.getString("userLogin", "");
-        HashMap<String, String> params = StringUtil.JSONString2HashMap(json);
-        return params.get("token");
-    }
-
     /**
      * Invoke from JS script interaction
      *
      * @param url    destination url
      * @param params params for page
      */
-    public void openLinkInNewActivity(String url, HashMap<String, String> params) {
+    public void openLinkInNewActivity(String url, JSONObject params) {
         Bundle extras = new Bundle();
-        extras.putSerializable("params", params);
+        extras.putString("params", params.toString());
 
         Intent intent = new Intent(this, WebViewActivity.class);
-        intent.putExtra("params", params);
+        intent.putExtra("params", params.toString());
         intent.putExtra("url", url);
 
         startActivityForResult(intent, kActivityRequestCodeWebActivity);
@@ -246,8 +264,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             if (data != null) {
                 // handle the case if activity is terminated by JS code
                 Bundle res = data.getExtras();
-                if (requestCode == kActivityRequestCodeWebActivity)
-                    result = res.getString("param_result_after_activity_finished");
+                result = res.getString("param_result_after_activity_finished");
             }
 
             Timber.v("Got finished result:" + result);
@@ -271,12 +288,39 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
             // TODO: 16/6/10 invoke upload process
             uploadMultiPartFiles(path);
-        } else if (requestCode == kActivityRequestCodeImagePickThenCrop) {
+        } else if (requestCode == Constants.kActivityRequestCodeImagePickThenCropRectangle
+                || requestCode == Constants.kActivityRequestCodeImagePickThenCropSquare) {
             // TODO: 16/6/9 upload files directly
             Timber.v("kActivityRequestCodeImagePickThenUpload");
             List<String> path = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
 
-            // TODO: 16/6/10 invoke crop process
+            if (path == null) return;
+
+            Intent intent = new Intent(mContext, CropActivity.class);
+            intent.putExtra(Constants.kBundleExtraCropImageType, requestCode);
+            intent.putExtra(Constants.kBundleExtraCropImageName, path.get(0));
+            startActivityForResult(intent, kActivityRequestCodeImageCrop);
+        } else if (requestCode == kActivityRequestCodeImageCrop) {
+            // handle cropped image
+            String path = data.getStringExtra("data");
+            JSONArray datum = new JSONArray();
+            datum.put(path);
+            mBridgeCallback.callback(datum.toString());
+        } else if (requestCode == kActivityRequestCodeSelectMapLocation) {
+            Timber.v("kActivityRequestCodeSelectMapLocation");
+            // reverse callback the selected map location
+            String result;
+            if (data != null) {
+                // handle the case if activity is terminated by JS code
+                Bundle res = data.getExtras();
+                result = res.getString(Constants.kActivityParamFinishSelectLocationOnMap);
+                try {
+                    JSONObject object = new JSONObject(result);
+                    getWebViewFragment().getBridge().callHandler("selectedMapLocation", object);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         } else {
             // never reach
             Timber.e("onActivityResult SHOULD NEVER REACH");
@@ -331,10 +375,13 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         try {
             JSONObject object = new JSONObject(data);
             String type = object.optString("type");
-            if ("rectangle".equals(type) || "square".equals(type)) {
+            if (Constants.kImageCropTypeRectangle.equals(type)) {
                 selector = selector.single(); // single mode
-                requestCode = kActivityRequestCodeImagePickThenCrop;
-            } else if ("none".equals(type)) {
+                requestCode = Constants.kActivityRequestCodeImagePickThenCropRectangle;
+            } else if (Constants.kImageCropTypeSquare.equals(type)) {
+                selector = selector.single(); // single mode
+                requestCode = Constants.kActivityRequestCodeImagePickThenCropSquare;
+            } else if (Constants.kImageCropTypeNone.equals(type)) {
                 selector = selector.multi(); // single mode
             }
 
@@ -344,26 +391,39 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         }
     }
 
-    public void onBridgeOpenNewLink(String url, HashMap<String, String> params) {
+    public void onBridgeOpenNewLink(String url, JSONObject params) {
         openLinkInNewActivity(url, params);
     }
 
     public void onBridgeShowSearchBar() {
-
+        EditText searchBar = setTitleSearch();
+        searchBar.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    String content = v.getText().toString();
+                    if (!TextUtils.isEmpty(content)) {
+                        getWebViewFragment().getBridge().callHandler("searchContent", content);
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     public void onBridgeSendNoticeMessage(final String data) {
         boolean isAgency = false;
-        // TODO: 16/6/10 web传参数（house_id,lean_id(数组),text(消息文本)）,用于从web端发送消息给特定的用户
-        List<String> leanIdList = null;
+
         String houseId = null;
+        JSONArray leanIdList = null;
+        String text = null;
         try {
             JSONObject object = new JSONObject(data);
             houseId = object.optString("house_id");
-            String leanId = object.optString("lean_id");
-            String text = object.optString("text");
+            leanIdList = object.optJSONArray("lean_id");
+            text = object.optString("text");
 
-            leanIdList = new ArrayList<>(Arrays.asList(leanId.split(",")));
             if ("agency".equals(object.optString("type"))) {
                 isAgency = true;
             }
@@ -372,16 +432,23 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         }
 
         // TODO: 16/6/10 get last user id??? WTH?
-        String leanIdString = leanIdList.get(leanIdList.size() - 1);
+        String leanIdString = leanIdList.optString(leanIdList.length() - 1);
 
         // FIXME: 16/6/10 WTF!!! isAgency 的作用是什么? 中介不能发这种类型消息么?
         // 创建相应对话, 并发送文本信息到该会话
         final String finalHouseId = houseId;
+        final String finalText = text;
         ChatManager.getInstance().fetchConversationWithUserId(null, leanIdString, new AVIMConversationCreatedCallback() {
             @Override
             public void done(AVIMConversation avimConversation, AVIMException e) {
-                AVIMNoticeWithHouseIdMessage message = new AVIMNoticeWithHouseIdMessage();
-                message.setHouseId(finalHouseId);
+                AVIMTextMessage message = new AVIMTextMessage();
+
+                Map<String, Object> attrs = new HashMap<>();
+                attrs.put("houseId", finalHouseId);
+
+                message.setAttrs(attrs);
+
+                message.setText(finalText);
 
                 MessageAgent messageAgent = new MessageAgent(avimConversation);
                 messageAgent.sendEncapsulatedTypedMessage(message);
@@ -396,7 +463,17 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     public void onBridgeShowProgressDialog() {
-        mLoadingDialog.start();
+        if (mLoadingDialog == null) {
+            mLoadingDialog = DelayedProgressDialog.showDelayed(mContext, null, getString(R.string.loading), true, true);
+        } else {
+            mLoadingDialog.show();
+        }
+    }
+
+    public void onBridgeDismissProgressDialog() {
+        if (mLoadingDialog != null) {
+            mLoadingDialog.hide();
+        }
     }
 
     public void onBridgeSetTitle(String title) {
@@ -411,28 +488,23 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         setRightItem(text, onRightItemClick);
     }
 
-    public void onBridgeUploadFiles() {
-
+    public void onBridgeUploadFiles(List<String> datum) {
+        uploadMultiPartFiles(datum);
     }
 
     public void onBridgeResizeOrCropImage() {
 
     }
 
-    public void onBridgeDismissProgressDialog() {
-        if (mLoadingDialog != null && mLoadingDialog.isStart())
-            mLoadingDialog.stop();
-    }
-
     public void onBridgeFinishActivity(String data) {
-        HashMap<String, String> params = null;
+        HashMap<String, Object> params = null;
         try {
             params = StringUtil.JSONString2HashMap(data);
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        String result = params.get("result");
+        String result = (String) params.get("result");
 
         Bundle conData = new Bundle();
         conData.putString("param_result_after_activity_finished", result);
@@ -442,6 +514,18 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         setResult(RESULT_OK, intent);
 
         finish();
+    }
+
+    @Override
+    public void onBridgeShowImageGallery(List<String> images) {
+        Intent intent = new Intent(this, ImageGalleryActivity.class);
+
+        Bundle bundle = new Bundle();
+        bundle.putStringArrayList(ImageGalleryActivity.KEY_IMAGES, new ArrayList<>(images));
+        bundle.putString(ImageGalleryActivity.KEY_TITLE, "图片库");
+        intent.putExtras(bundle);
+
+        startActivity(intent);
     }
 
     public void onBridgeRequestLocation(final WebViewJavascriptBridge.WVJBResponseCallback callback) {
@@ -488,14 +572,14 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     public void onBridgeOpenNewLinkWithExternalBrowser(String data) {
-        HashMap<String, String> params = null;
+        HashMap<String, Object> params = null;
         try {
             params = StringUtil.JSONString2HashMap(data);
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        String link = params.get("link");
+        String link = (String) params.get("link");
         if (!TextUtils.isEmpty(link)) {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
             startActivity(browserIntent);
@@ -503,18 +587,16 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     public void onBridgeSelectMapLocation() {
-//        Intent intent = new Intent(mContext, MapActivity.class);
-//        startActivityForResult(intent, REQUEST_MAP_CODE);
+        Intent intent = new Intent(mContext, MapActivity.class);
+        startActivityForResult(intent, kActivityRequestCodeSelectMapLocation);
     }
 
-    @Override
     public void onBridgeUpdateFriendRelationship() {
-        throw new NotImplementedException("NOT IMPLEMENTED");
+        EventBus.getDefault().post(new PageEvent(PageEvent.PageEventEnum.FRIENDSHIP_UPDATE, null));
     }
 
-    @Override
     public void onBridgeDropToMessage() {
-        throw new NotImplementedException("NOT IMPLEMENTED");
+        EventBus.getDefault().post(new PageEvent(PageEvent.PageEventEnum.DROP_TO_MESSAGE, null));
     }
 
     @Override
@@ -523,11 +605,28 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     private RequestParams constructMultiPartParams(List<String> filePaths) {
+        // TODO: 16/6/14 failed to upload files
         RequestParams params = new RequestParams();
 
-        for (String path : filePaths) {
+        // loopj android async http support add byte[] as RequestParam item to submit multipart data
+        for (String file : filePaths) {
+            byte[] data = new byte[0];
+
+            String fileType = FileUtil.getFileExt(file);
+
+            if (!fileType.equals("amr")) {
+                // image
+                data = ImageUtil.compressToByteArray(file);
+            } else {
+                // audio
+                try {
+                    data = FileUtils.readFileToByteArray(new File(file));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
             try {
-                params.put("file[]", new File(path));
+                params.put("file[]", new File(file));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -545,8 +644,13 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         uploadMultiPartFiles(datum);
     }
 
-    private void uploadMultiPartFiles(List<String> datum) {
-        RequestParams entity = constructMultiPartParams(datum);
+    /**
+     * 上传文件列表
+     *
+     * @param filenames
+     */
+    private void uploadMultiPartFiles(List<String> filenames) {
+        RequestParams entity = constructMultiPartParams(filenames);
 
         WebService.getInstance().postMultiPartFormDataFile(entity, new JsonHttpResponseHandler() {
             @Override
@@ -591,12 +695,14 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     @Override
     protected void onResume() {
         super.onResume();
+
         Bugtags.onResume(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         Bugtags.onPause(this);
     }
 
@@ -604,6 +710,41 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     public boolean dispatchTouchEvent(MotionEvent event) {
         Bugtags.onDispatchTouchEvent(this, event);
         return super.dispatchTouchEvent(event);
+    }
+
+    // region ImageGalleryAdapter.ImageThumbnailLoader Methods
+    public void loadImageThumbnail(ImageView iv, String imageUrl, int dimension) {
+        if (!TextUtils.isEmpty(imageUrl)) {
+            Picasso.with(iv.getContext())
+                    .load(imageUrl)
+//                    .resize(dimension, dimension)
+//                    .centerCrop()
+                    .into(iv);
+        } else {
+            iv.setImageDrawable(null);
+        }
+    }
+
+    // region FullScreenImageGalleryAdapter.FullScreenImageLoader
+    public void loadFullScreenImage(final ImageView iv, String imageUrl, int width, final LinearLayout bgLinearLayout) {
+        if (!TextUtils.isEmpty(imageUrl)) {
+            Picasso.with(iv.getContext())
+                    .load(imageUrl)
+//                    .resize(width, 0)
+                    .into(iv, new Callback() {
+                        @Override
+                        public void onSuccess() {
+
+                        }
+
+                        @Override
+                        public void onError() {
+
+                        }
+                    });
+        } else {
+            iv.setImageDrawable(null);
+        }
     }
 
     private class DataPickerOnClickListener implements DatePickerDialog.OnDateSetListener {
@@ -618,6 +759,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 //            mCallback.callback(sb.toString());
         }
     }
+    // endregion
 
     private class TimePickerOnClickListener implements TimePickerDialog.OnTimeSetListener {
         @Override
@@ -625,6 +767,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
         }
     }
+    // endregion
 
 
 }

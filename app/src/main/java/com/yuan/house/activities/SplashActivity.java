@@ -12,13 +12,13 @@ import android.widget.ImageView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.umeng.update.UmengUpdateAgent;
-import com.yuan.house.application.Injector;
 import com.yuan.house.R;
+import com.yuan.house.application.Injector;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import timber.log.Timber;
 
 public class SplashActivity extends FragmentActivity implements Handler.Callback {
@@ -26,7 +26,7 @@ public class SplashActivity extends FragmentActivity implements Handler.Callback
     @Inject
     public SharedPreferences prefs;
 
-    @InjectView(R.id.splash_image_view)
+    @BindView(R.id.splash_image_view)
     ImageView imageView;
 
     private Handler mHandler;
@@ -37,8 +37,8 @@ public class SplashActivity extends FragmentActivity implements Handler.Callback
 
         setContentView(R.layout.splash_view);
 
-        ButterKnife.inject(this);
         Injector.inject(this);
+        ButterKnife.bind(this);
 
         updateSplashImage();
 
@@ -70,10 +70,10 @@ public class SplashActivity extends FragmentActivity implements Handler.Callback
 //        mHandler.postDelayed(new Runnable() {
 //            @Override
 //            public void run() {
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(intent);
 
-                finish();
+        finish();
 //            }
 //        }, Constants.kSplashTimeInterval * 100);
     }

@@ -12,21 +12,19 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.baidu.location.BDLocation;
-import com.dimo.utils.StringUtil;
+import com.yuan.house.R;
 import com.yuan.house.activities.MainActivity;
 import com.yuan.house.activities.MapActivity;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
 import com.yuan.house.event.LocationEvent;
-import com.yuan.house.R;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
-import java.util.HashMap;
-
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import butterknife.OnClick;
 import de.greenrobot.event.EventBus;
 
@@ -37,9 +35,9 @@ public class UserMainFragment extends WebViewBaseFragment {
 
     private static final int REQUEST_MAP_CODE = 0XFF01;
 
-    @InjectView(R.id.rl_center)
+    @BindView(R.id.rl_center)
     LinearLayout center;
-    @InjectView(R.id.address)
+    @BindView(R.id.address)
     TextView address;
 
     public static UserMainFragment newInstance() {
@@ -56,8 +54,7 @@ public class UserMainFragment extends WebViewBaseFragment {
 
         Injector.inject(this);
 
-        ButterKnife.reset(this);
-        ButterKnife.inject(this, view);
+        ButterKnife.bind(this, view);
 
         redirectToLoadUrl(Constants.kWebPageUserIndex);
 
@@ -100,25 +97,34 @@ public class UserMainFragment extends WebViewBaseFragment {
                 break;
             case R.id.btn_arrow_down:
                 String url = "resources.html";
-                HashMap<String, String> map = new HashMap<String, String>();
-                map.put("params", "{\"title\":\"全网房源\",\"hasBackButton\":true}");
-                ((MainActivity) getActivity()).openLinkInNewActivity(url, map);
+
+                JSONObject object = new JSONObject();
+                JSONObject innerObject = new JSONObject();
+                try {
+                    innerObject.put("title", "全网房源");
+                    innerObject.put("hasBackButton", true);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    object.put("params", innerObject);
+                    mBridgeListener.onBridgeOpenNewLink(url, object);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 break;
         }
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_MAP_CODE && resultCode == Activity.RESULT_OK) {
-            //获取地图返回的地理位置
-            String mapJson = data.getStringExtra("mapJson");
-            try {
-                HashMap<String, String> hashMap = StringUtil.JSONString2HashMap(mapJson);
-                address.setText(hashMap.get("street"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mBridgeListener = (OnBridgeInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnFragmentInteractionListener");
         }
     }
 

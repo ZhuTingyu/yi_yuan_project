@@ -15,6 +15,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.squareup.okhttp.OkHttpClient;
+import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
@@ -22,10 +23,9 @@ import com.yuan.house.enumerate.ProposalMediaType;
 import com.yuan.house.enumerate.ProposalMessageCategory;
 import com.yuan.house.enumerate.ProposalSourceType;
 import com.yuan.house.ui.view.AudioRecorderButton;
-import com.yuan.house.R;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import butterknife.OnClick;
 
 /**
@@ -38,13 +38,15 @@ public class ProposalFragment extends WebViewBaseFragment {
     private final OkHttpClient client = new OkHttpClient();
     private final int SYS_INTENT_REQUEST = 0XFF01;
     protected OnProposalInteractionListener mBridgeListener;
-    @InjectView(R.id.proposal)
+    @BindView(R.id.proposal)
     Button proposal;
-    @InjectView(R.id.complaint)
+    @BindView(R.id.complaint)
     Button complaint;
-    @InjectView(R.id.et_info)
+    @BindView(R.id.bug)
+    Button bug;
+    @BindView(R.id.et_info)
     EditText info;
-    @InjectView(R.id.btn_recorder)
+    @BindView(R.id.btn_recorder)
     AudioRecorderButton recorderButton;
 
     TextView app_upload_image, app_complaint, app_cancle;
@@ -71,8 +73,7 @@ public class ProposalFragment extends WebViewBaseFragment {
 
         Injector.inject(this);
 
-        ButterKnife.reset(this);
-        ButterKnife.inject(this, view);
+        ButterKnife.bind(this, view);
 
         if (DMApplication.getInstance().iAmUser()) {
             redirectToLoadUrl(Constants.kWebpageUserCenter);
@@ -212,20 +213,31 @@ public class ProposalFragment extends WebViewBaseFragment {
         });
     }
 
-    @OnClick({R.id.proposal, R.id.complaint, R.id.btn_other})
+    @OnClick({R.id.proposal, R.id.complaint, R.id.bug, R.id.btn_more})
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.proposal:
-                proposal.setEnabled(false);
-                complaint.setEnabled(true);
-                category = ProposalMessageCategory.SUGGESTION;
-                break;
-            case R.id.complaint:
-                proposal.setEnabled(true);
-                complaint.setEnabled(false);
+            case R.id.complaint: {
+                complaint.setSelected(true);
+                proposal.setSelected(false);
+                bug.setSelected(false);
                 category = ProposalMessageCategory.COMPLAINT;
                 break;
-            case R.id.btn_other:
+            }
+            case R.id.proposal: {
+                complaint.setSelected(false);
+                proposal.setSelected(true);
+                bug.setSelected(false);
+                category = ProposalMessageCategory.SUGGESTION;
+                break;
+            }
+            case R.id.bug: {
+                complaint.setSelected(false);
+                proposal.setSelected(false);
+                bug.setSelected(true);
+                category = ProposalMessageCategory.BUG;
+                break;
+            }
+            case R.id.btn_more: {
                 mPopupWindow.showAtLocation(mWebView, Gravity.BOTTOM, 0, 0);
                 mPopupWindow.setAnimationStyle(R.style.app_pop);
                 mPopupWindow.setOutsideTouchable(true);
@@ -234,6 +246,7 @@ public class ProposalFragment extends WebViewBaseFragment {
                 params.alpha = 0.7f;
                 setWindowAttributes();
                 break;
+            }
         }
     }
 

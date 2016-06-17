@@ -23,9 +23,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:background="@null"
-                android:text="cancel"
+                android:text="@string/cancel"
                 android:textColor="@color/blue"
-                android:textSize="16px" />
+                android:textSize="16dp" />
 
             <Button
                 android:id="@+id/btn_confirm"
@@ -33,9 +33,9 @@
                 android:layout_height="30dp"
                 android:layout_alignParentRight="true"
                 android:background="@null"
-                android:text="confirm"
+                android:text="@string/confirm"
                 android:textColor="@color/blue"
-                android:textSize="16px"/>
+                android:textSize="16dp"/>
         </RelativeLayout>
 
         <RelativeLayout

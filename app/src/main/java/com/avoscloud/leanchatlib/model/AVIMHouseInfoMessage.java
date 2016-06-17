@@ -18,6 +18,7 @@ public class AVIMHouseInfoMessage extends AVIMTypedMessage {
 
     @AVIMMessageField(name = "_lcattrs")
     Map<String, Object> attrs;
+
     @AVIMMessageField(name = "_lctext")
     private String houseName;
     @AVIMMessageField(name = "_lctext")

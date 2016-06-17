@@ -33,7 +33,7 @@ public class WebViewActivity extends WebViewBasedActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_MAP_CODE && resultCode == Activity.RESULT_OK) {
             //获取地图返回的地理位置
-//            String mapJson = data.getStringExtra("mapJson");
+//            String mapJson = data.getStringExtra(Constant.kActivityParamFinishSelectLocationOnMap);
 //            try {
 //                getWebViewFragment().getBridge().callHandler("selectedMapLocation", new JSONObject(mapJson));
 //            } catch (JSONException e) {

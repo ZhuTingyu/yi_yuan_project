@@ -8,24 +8,22 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.dimo.web.WebViewJavascriptBridge;
+import com.yuan.house.R;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
-import com.yuan.house.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import butterknife.OnClick;
 
 /**
  * Created by KevinLee on 2016/4/22.
  */
 public class UserMessageFragment extends WebViewBaseFragment {
-    @InjectView(R.id.rightItem)
+    @BindView(R.id.rightItem)
     TextView tvRightItem;
 
     public static UserMessageFragment newInstance() {
@@ -42,8 +40,7 @@ public class UserMessageFragment extends WebViewBaseFragment {
 
         Injector.inject(this);
 
-        ButterKnife.reset(this);
-        ButterKnife.inject(this, view);
+        ButterKnife.bind(this, view);
 
         redirectToLoadUrl(Constants.kWebpageUserMessage);
 
@@ -81,10 +78,22 @@ public class UserMessageFragment extends WebViewBaseFragment {
         switch (v.getId()) {
             case R.id.contacts:
                 String url = "user_contacts.html";
-                HashMap<String, String> map = new HashMap<String, String>();
-                map.put("params", "{\"title\":\"通讯录\",\"hasBackButton\":true}");
-//                ((MainActivity)getActivity()).openLinkInNewActivity(url,map);
-                mBridgeListener.onBridgeOpenNewLink(url, map);
+
+                JSONObject object = new JSONObject();
+                JSONObject innerObject = new JSONObject();
+                try {
+                    innerObject.put("title", "通讯录");
+                    innerObject.put("hasBackButton", true);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    object.put("params", innerObject);
+                    mBridgeListener.onBridgeOpenNewLink(url, object);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 break;
             case R.id.sortBy:
                 getBridge().callHandler(Constants.kJavascriptFnOnRightItemClick);

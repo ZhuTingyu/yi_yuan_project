@@ -2,6 +2,7 @@ package com.yuan.house.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -29,65 +30,70 @@ import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.yuan.house.application.Injector;
 import com.yuan.house.R;
+import com.yuan.house.application.Injector;
+import com.yuan.house.common.Constants;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
-import butterknife.Optional;
 import timber.log.Timber;
 
 /**
  * Created by KevinLee on 2016/5/2.
  */
 public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderResultListener {
-
-    private GeoCoder mSearch;
+    public TCLocationListener locationListener = new TCLocationListener();
     protected MapView mMapView;
     protected BaiduMap baiduMap;
     protected LocationClient locClient;
-    private LatLng center;
-
     boolean isFirstLoc = true;// 是否首次定位
+    @Nullable
+    @BindView(R.id.confirm_location)
+    Button confirm_location;
+    @Nullable
+    @BindView(R.id.search_button)
+    Button search_button;
+    @Nullable
+    @BindView(R.id.search_edit)
+    EditText searchText;
+    private GeoCoder mSearch;
+    private LatLng center;
     private double latitude = 0.0;
     private double longitude = 0.0;
-
     private String json;
     private String city;    //当前城市
-
-    @Optional
-    @InjectView(R.id.confirm_location)
-    Button confirm_location;
-    @Optional
-    @InjectView(R.id.search_button)
-    Button search_button;
-    @Optional
-    @InjectView(R.id.search_edit)
-    EditText searchText;
-
-    public TCLocationListener locationListener = new TCLocationListener();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.map_activity, true);
 
-        ButterKnife.inject(this);
         Injector.inject(this);
+        ButterKnife.bind(this);
 
         this.mContext = this;
+
+        setLeftItem(R.drawable.back, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
         setTitleItem("位置");
+
         this.mMapView = (MapView) findViewById(R.id.bmap);
         this.baiduMap = mMapView.getMap();
+
         initLocation();
         initMapConfig();
         initViewConfig();
     }
 
-    private void initLocation(){
+    private void initLocation() {
         //获取当前位置
         locClient = new LocationClient(this);
         MapStatusUpdate msu = MapStatusUpdateFactory.zoomTo(14.0f);
@@ -109,7 +115,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         locClient.start();
     }
 
-    private void initMapConfig(){
+    private void initMapConfig() {
         // 初始化搜索模块，注册事件监听
         mSearch = GeoCoder.newInstance();
         mSearch.setOnGetGeoCodeResultListener(this);
@@ -132,10 +138,10 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
             @Override
             public void onMapStatusChangeFinish(MapStatus mapStatus) {
                 center = mapStatus.target;
-                String location = center.longitude + ","+ center.latitude;
+                String location = center.longitude + "," + center.latitude;
                 latitude = center.latitude;
                 longitude = center.longitude;
-                Log.i("中心点经纬度",location);
+                Log.i("中心点经纬度", location);
                 LatLng ptCenter = new LatLng(center.latitude, center.longitude);
                 mSearch.reverseGeoCode(new ReverseGeoCodeOption()
                         .location(ptCenter));
@@ -144,15 +150,15 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
 
     }
 
-    private void initViewConfig(){
+    private void initViewConfig() {
         //选定位置
         confirm_location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!TextUtils.isEmpty(json)){
+                if (!TextUtils.isEmpty(json)) {
                     Intent intent = new Intent();
-                    intent.putExtra("mapJson", json);
-                    setResult(RESULT_OK,intent);
+                    intent.putExtra(Constants.kActivityParamFinishSelectLocationOnMap, json);
+                    setResult(RESULT_OK, intent);
                     finish();
                 }
             }
@@ -188,24 +194,35 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
 
         city = reverseGeoCodeResult.getAddressDetail().city;
 
-//        Log.i("Address",reverseGeoCodeResult.getAddress());
-//        Log.i("city",reverseGeoCodeResult.getAddressDetail().city);
-//        Log.i("district",reverseGeoCodeResult.getAddressDetail().district);
-//        Log.i("province",reverseGeoCodeResult.getAddressDetail().province);
-//        Log.i("street",reverseGeoCodeResult.getAddressDetail().street);
-
-        Map<String,String> map = new HashMap<>();
-        map.put("addr",reverseGeoCodeResult.getAddress());
-        map.put("city",reverseGeoCodeResult.getAddressDetail().city);
-        map.put("district",reverseGeoCodeResult.getAddressDetail().district);
-        map.put("province",reverseGeoCodeResult.getAddressDetail().province);
-        map.put("street",reverseGeoCodeResult.getAddressDetail().street);
-        map.put("lat",String.valueOf(latitude));
-        map.put("lng",String.valueOf(longitude));
+        Map<String, String> map = new HashMap<>();
+        map.put("addr", reverseGeoCodeResult.getAddress());
+        map.put("city", reverseGeoCodeResult.getAddressDetail().city);
+        map.put("district", reverseGeoCodeResult.getAddressDetail().district);
+        map.put("province", reverseGeoCodeResult.getAddressDetail().province);
+        map.put("street", reverseGeoCodeResult.getAddressDetail().street);
+        map.put("lat", String.valueOf(latitude));
+        map.put("lng", String.valueOf(longitude));
 
         Gson gson = new GsonBuilder().enableComplexMapKeySerialization()
                 .create();
         json = gson.toJson(map);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        mMapView.onResume();
+        locClient.start();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        //在activity执行onPause时执行mMapView. onPause ()，实现地图生命周期管理
+        mMapView.onPause();
+        locClient.stop();
     }
 
     public class TCLocationListener implements BDLocationListener {
@@ -242,22 +259,5 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
             Timber.v("onReceiveLocation latitude=" + latitude + " longitude=" + longitude
                     + " locType=" + locType + " address=" + location.getAddrStr());
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        mMapView.onResume();
-        locClient.start();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        //在activity执行onPause时执行mMapView. onPause ()，实现地图生命周期管理
-        mMapView.onPause();
-        locClient.stop();
     }
 }

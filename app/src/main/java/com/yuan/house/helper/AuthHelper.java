@@ -2,10 +2,10 @@ package com.yuan.house.helper;
 
 import android.content.SharedPreferences;
 
-import com.dimo.utils.StringUtil;
 import com.yuan.house.common.Constants;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 
@@ -18,56 +18,65 @@ public class AuthHelper {
     @Inject
     static SharedPreferences prefs;
 
-    private static boolean userAlreadyLogin(String json) {
-        HashMap<String, String> params = null;
+    private static boolean userAlreadyLogin(String data) {
+        JSONObject object = null;
         try {
-            params = StringUtil.JSONString2HashMap(json);
+            object = new JSONObject(data);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        if (params.get("user_info") != null) {
-            return true;
-        } else {
-            return false;
-        }
+        return object.optString("user_info") != null;
     }
 
     public static boolean userAlreadyLogin() {
         return userAlreadyLogin(userLoginInfomation());
     }
 
-    public static String getUserId(String json) {
+    public static String getUserId(String data) {
+        JSONObject object = null;
+        JSONObject user = null;
         try {
-            HashMap<String, String> params = StringUtil.JSONString2HashMap(json);
-            if (params.get("user_info") != null)
-                params = StringUtil.JSONString2HashMap(params.get("user_info"));
-            else
-                params = StringUtil.JSONString2HashMap(params.get("agency_info"));
-
-            return params.get("user_id");
+            object = new JSONObject(data);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return null;
+
+        user = object.optJSONObject("user_info");
+        if (user == null) {
+            user = object.optJSONObject("agency_info");
+        }
+
+        return user.optString("user_id");
     }
 
     public static String userId() {
         return getUserId(userLoginInfomation());
     }
 
-    public static String userType() {
-        // TODO: 16/6/10 user / agency
-        String dummy = userLoginInfomation();
-        return dummy;
+    private static UserType userType() {
+        UserType type = UserType.USER;
+
+        String raw = prefs.getString(Constants.kWebDataKeyLoginType, null);
+        if ("agency".equals(raw)) {
+            type = UserType.AGENCY;
+        }
+        return type;
     }
-    private static String getToken(String json) {
+
+    public static boolean iAmUser() {
+        if (userType() == UserType.USER) return true;
+
+        return false;
+    }
+
+    private static String getToken(String data) {
+        JSONObject object = null;
         try {
-            HashMap<String, String> params = StringUtil.JSONString2HashMap(json);
-            return params.get("token");
+            object = new JSONObject(data);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return null;
+        return object.optString("token");
     }
 
     public static String userToken() {
@@ -85,19 +94,29 @@ public class AuthHelper {
     }
 
     public static String targetId() {
-        String json = userLoginInfomation();
+        String data = userLoginInfomation();
 
+        JSONObject object = null;
         try {
-            HashMap<String, String> params = StringUtil.JSONString2HashMap(json);
-            return params.get("target_id");
+            object = new JSONObject(data);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return null;
+        return object.optString("target_id");
     }
 
     private static String userLoginInfomation() {
         String json = prefs.getString(Constants.kWebDataKeyUserLogin, null);
         return json;
+    }
+
+    enum UserType {
+        USER(0), AGENCY(1);
+
+        private int value;
+
+        UserType(int value) {
+            this.value = value;
+        }
     }
 }

@@ -32,20 +32,19 @@ import com.avos.avoscloud.im.v2.messages.AVIMLocationMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
 import com.avoscloud.chat.service.CacheService;
 import com.avoscloud.chat.service.ConversationChangeEvent;
-import com.avoscloud.chat.ui.entry.SerializableMap;
 import com.avoscloud.chat.util.Utils;
 import com.avoscloud.leanchatlib.activity.ChatActivity;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.ConversationHelper;
 import com.avoscloud.leanchatlib.model.AVIMHouseInfoMessage;
-import com.dimo.utils.StringUtil;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.yuan.house.R;
+import com.yuan.house.activities.SwitchHouseActivity;
 import com.yuan.house.common.Constants;
 import com.yuan.house.helper.AuthHelper;
 import com.yuan.house.ui.fragment.FragmentBBS;
 import com.yuan.house.ui.fragment.WebViewBaseFragment;
 import com.yuan.house.utils.ToastUtil;
-import com.yuan.house.R;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
@@ -62,14 +61,17 @@ import java.util.Map;
  */
 public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSInteractionListener {
     public static final int LOCATION_REQUEST = 100;
-    public static final int REQUEST_CODE_HOUSE = 101;
+    public static final int kRequestCodeSwitchHouse = 101;
+
     private static SharedPreferences prefs;
     private static String leanId = "";
     private FragmentBBS mFragmentBBS;
-    private RelativeLayout chatroom;
+
     private LinearLayout bottomLayout;
     private String value;
     private List<JSONObject> houseInfos;
+    private JSONObject jsonFormatParams;
+
     private GestureDetector gestureDetector;
     private int mLastY = 0;
     private GestureDetector.OnGestureListener onGestureListener =
@@ -89,6 +91,18 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                 }
             };
     private WebView webView;
+    private JSONArray jsonFormatSwitchParams;
+
+    public static void chatByConversation(Context from, AVIMConversation conv, JSONObject params) {
+        CacheService.registerConv(conv);
+
+        ChatManager.getInstance().registerConversation(conv);
+        Intent intent = new Intent(from, ChatRoomActivity.class);
+        intent.putExtra(CONVID, conv.getConversationId());
+        intent.putExtra(Constants.kHouseParamsForChatRoom, params.toString());
+
+        from.startActivity(intent);
+    }
 
     public static void chatByConversation(Context from, AVIMConversation conv) {
         CacheService.registerConv(conv);
@@ -115,7 +129,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
             sb.append(houseId);
         }
 
-        ChatManager.getInstance().fetchConversationWithUserId(sb.toString(), userId, new AVIMConversationCreatedCallback() {
+        ChatManager.getInstance().fetchConversationWithUserId(sb.toString(), leanId, new AVIMConversationCreatedCallback() {
             @Override
             public void done(AVIMConversation conversation, AVIMException e) {
                 dialog.dismiss();
@@ -126,9 +140,51 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         });
     }
 
+    public static void chatByUserId(final Activity from, final JSONObject params) {
+        String userId = params.optString("user_id");
+
+        leanId = params.optString("lean_id");
+
+        final ProgressDialog dialog = Utils.showSpinnerDialog(from);
+        if (prefs == null) prefs = PreferenceManager.getDefaultSharedPreferences(from);
+
+        String houseId = params.optString("house_id");
+        String auditType = params.optString("audit_type");
+
+        StringBuilder sb = new StringBuilder();
+        if (auditType == null) {
+            sb.append(houseId);
+        } else {
+            sb.append("000");
+            sb.append(auditType);
+            sb.append(houseId);
+        }
+
+        ChatManager.getInstance().fetchConversationWithUserId(sb.toString(), leanId, new AVIMConversationCreatedCallback() {
+            @Override
+            public void done(AVIMConversation conversation, AVIMException e) {
+                dialog.dismiss();
+                if (Utils.filterException(e)) {
+                    chatByConversation(from, conversation, params);
+                }
+            }
+        });
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Bundle bundle = getIntent().getExtras();
+
+        if (bundle != null) {
+            String raw = bundle.getString(Constants.kHouseParamsForChatRoom);
+            try {
+                jsonFormatParams = new JSONObject(raw);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -140,7 +196,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         mFragmentTransaction.add(R.id.fragmentBBS, mFragmentBBS, Constants.kFragmentTagBBS);
         mFragmentTransaction.commit();
 
-        initHouseInfos();
+        initSuggestedHouseInfos();
     }
 
     @Override
@@ -216,26 +272,26 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_MOVE) {
                     final int y = (int) event.getY();
-                    if (y < mLastY)
-                        return true;
+
+                    if (y < mLastY) return true;
+
                     mLastY = y;
                 }
 
-                if (event.getAction() == MotionEvent.ACTION_UP)
-                    mLastY = 0;
+                if (event.getAction() == MotionEvent.ACTION_UP) mLastY = 0;
 
                 return false;
             }
         });
     }
 
-    private void initHouseInfos() {
+    private void initSuggestedHouseInfos() {
         String url = Constants.kWebServiceSwitchable;
 
-        if (AuthHelper.userAlreadyLogin()) {
-            url += AuthHelper.userId() + "/" + AuthHelper.targetId();
+        if (AuthHelper.userAlreadyLogin() && AuthHelper.iAmUser()) {
+            url += AuthHelper.userId() + "/" + jsonFormatParams.optString("user_id");
         } else {
-            url += AuthHelper.targetId() + "/" + AuthHelper.userId();
+            url += jsonFormatParams.optString("user_id") + "/" + AuthHelper.userId();
         }
 
         restGet(url, new JsonHttpResponseHandler() {
@@ -243,6 +299,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 super.onSuccess(statusCode, headers, response);
 
+                jsonFormatSwitchParams = response;
                 houseInfos = new ArrayList<>();
                 for (int i = 0; i < response.length(); i++) {
                     JSONObject object;
@@ -265,15 +322,38 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
     }
 
     @Override
-    protected void openHouseInfo() {
+    protected void sendText() {
+        String content = contentEdit.getText().toString();
+        if (!TextUtils.isEmpty(content)) {
+            AVIMTextMessage message = new AVIMTextMessage();
+
+            Map<String, Object> attrs = new HashMap<>();
+            attrs.put("houseId", jsonFormatParams.optString("house_id"));
+            attrs.put("username", jsonFormatParams.optString("nickname"));
+
+            message.setAttrs(attrs);
+
+            message.setText(content);
+
+            messageAgent.sendEncapsulatedTypedMessage(message);
+
+            contentEdit.setText("");
+        }
+    }
+
+    @Override
+    protected void showSuggestedHouses() {
         Intent intent = new Intent(this, SwitchHouseActivity.class);
-        startActivityForResult(intent, REQUEST_CODE_HOUSE);
+        intent.putExtra(Constants.kHouseSwitchParamsForChatRoom, jsonFormatSwitchParams.toString());
+
+        startActivityForResult(intent, kRequestCodeSwitchHouse);
     }
 
     public void onEvent(ConversationChangeEvent conversationChangeEvent) {
-        if (conversation != null && conversation.getConversationId().
-                equals(conversationChangeEvent.getConv().getConversationId())) {
+        String convId = conversationChangeEvent.getConv().getConversationId();
+        if (conversation != null && conversation.getConversationId().equals(convId)) {
             this.conversation = conversationChangeEvent.getConv();
+
             ActionBar actionBar = getActionBar();
             actionBar.setTitle(ConversationHelper.titleOfConv(this.conversation));
         }
@@ -284,8 +364,9 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
-                case LOCATION_REQUEST:
+                case LOCATION_REQUEST: {
                     final double latitude = data.getDoubleExtra(LocationActivity.LATITUDE, 0);
+
                     final double longitude = data.getDoubleExtra(LocationActivity.LONGITUDE, 0);
                     final String address = data.getStringExtra(LocationActivity.ADDRESS);
                     if (!TextUtils.isEmpty(address)) {
@@ -295,22 +376,33 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                     }
                     hideBottomLayout();
                     break;
-                case REQUEST_CODE_HOUSE:
-                    SerializableMap serializableMap = (SerializableMap) data.getSerializableExtra("data");
-                    Map<String, Object> map = serializableMap.getMap();
-                    List<String> images = JSON.parseObject(map.get("images").toString(), List.class);
+                }
+                case kRequestCodeSwitchHouse: {
+                    String raw = data.getStringExtra(Constants.kBundleKeyAfterSwitchHouseSelected);
+                    JSONObject object;
+                    try {
+                        object = new JSONObject(raw);
 
-                    AVIMHouseInfoMessage message = new AVIMHouseInfoMessage();
-                    message.setHouseName(map.get("estate_name").toString());
-                    message.setHouseAddress(map.get("location_text").toString());
-                    message.setHouseImage(images.get(0).toString());
-                    message.setAttrs(map);
+                        JSONArray images = object.optJSONArray("images");
 
-                    messageAgent.sendEncapsulatedTypedMessage(message);
+                        AVIMHouseInfoMessage message = new AVIMHouseInfoMessage();
+                        message.setHouseName(object.optString("estate_name"));
+                        message.setHouseAddress(object.optString("location_text"));
+                        if (images != null) {
+                            message.setHouseImage(images.optString(0));
+                        }
 
-//                    bridge.callHandler("nativeChangeHouse", map.get("id"));
+                        Map<String, Object> attrs = JSON.parseObject(raw, new TypeReference<Map<String, Object>>() {
+                        });
+                        message.setAttrs(attrs);
 
+                        messageAgent.sendEncapsulatedTypedMessage(message);
+                        getWebViewFragment().getBridge().callHandler("nativeChangeHouse", object.getString("id"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     break;
+                }
             }
         }
 
@@ -319,12 +411,14 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
     @Override
     protected void onResume() {
         CacheService.setCurConv(conversation);
+
         super.onResume();
     }
 
     @Override
     protected void onDestroy() {
         CacheService.setCurConv(null);
+
         super.onDestroy();
     }
 
@@ -344,78 +438,83 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
         if (object == null) return;
 
-        Map<String, Object> houseInfo = JSON.parseObject(object.toString(), new TypeReference<Map<String, Object>>() {
+        JSONArray images = object.optJSONArray("images");
+
+        AVIMHouseInfoMessage message = new AVIMHouseInfoMessage();
+        message.setHouseName(object.optString("estate_name"));
+        message.setHouseAddress(object.optString("location_text"));
+        message.setHouseImage(images.optString(0));
+
+        Map<String, Object> attrs = JSON.parseObject(jsonFormatParams.toString(), new TypeReference<Map<String, Object>>() {
         });
+        message.setAttrs(attrs);
 
-        JSONArray jsonImages = object.optJSONArray("images");
-        ArrayList<String> images = new ArrayList<>();
+        messageAgent.sendEncapsulatedTypedMessage(message);
+    }
 
-        if (jsonImages != null) {
-            for (int i = 0; i < jsonImages.length(); i++) {
-                images.add(jsonImages.optString(i));
-            }
+    private JSONObject getHeightObject() {
+        String bbsHeight = prefs.getString("bbs_height", null);
 
-            AVIMHouseInfoMessage message = new AVIMHouseInfoMessage();
-            message.setHouseName(object.optString("estate_name").toString());
-            message.setHouseAddress(object.optString("location_text").toString());
-            message.setHouseImage(images.get(0).toString());
-            message.setAttrs(houseInfo);
+        JSONObject object = null;
+        try {
+            object = new JSONObject(bbsHeight);
 
-            messageAgent.sendEncapsulatedTypedMessage(message);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+
+        return object;
+    }
+
+    private int getHeightS() {
+        JSONObject object = getHeightObject();
+        if (object != null) {
+            return object.optInt("height_s");
+        }
+
+        return 0;
+    }
+
+    private int getHeightM() {
+        JSONObject object = getHeightObject();
+        if (object != null) {
+            return object.optInt("height_m");
+        }
+
+        return 0;
     }
 
     @Override
     public void onShowSampleMessageBoard() {
-        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) webView.getLayoutParams();
-        HashMap<String, String> params = null;
-        try {
-            params = StringUtil.JSONString2HashMap(value);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        layoutParams.height = 130;
-        webView.setLayoutParams(layoutParams);
+        int height = ((int) (getHeightS() * getResources().getDisplayMetrics().density));
+
+        resizeBBSBoard(height);
     }
 
     @Override
     public void onShowHalfMessageBoard() {
-        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) webView.getLayoutParams();
-        HashMap<String, String> params = null;
-        try {
-            params = StringUtil.JSONString2HashMap(value);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        int height = Integer.parseInt(params.get("height_m"));
-        layoutParams.height = ((int) ((height + 10) * getResources().getDisplayMetrics().density));
-        webView.setLayoutParams(layoutParams);
-        bottomLayout.setVisibility(View.VISIBLE);
+        int height = ((int) (getHeightM() * getResources().getDisplayMetrics().density));
+
+        resizeBBSBoard(height);
     }
 
     @Override
     public void onShowFullMessageBoard() {
-        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) webView.getLayoutParams();
-
-        DisplayMetrics dm = new DisplayMetrics();//获取当前显示的界面大小
-        getWindowManager().getDefaultDisplay().getMetrics(dm);
-
-        layoutParams.height = dm.heightPixels;
-
-        webView.setLayoutParams(layoutParams);
-        bottomLayout.setVisibility(View.INVISIBLE);
-    }
-
-    @Override
-    public void onConfigBBSHeight(int height) {
-        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) webView.getLayoutParams();
-
-        // 获取当前显示的界面大小
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
 
-        layoutParams.height = (int) (height * dm.density);
+        resizeBBSBoard(dm.heightPixels);
+    }
 
-        webView.setLayoutParams(layoutParams);
+    private void resizeBBSBoard(int height) {
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+        FrameLayout frameLayout = (FrameLayout) findViewById(R.id.fragmentBBS);
+
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) frameLayout.getLayoutParams();
+        layoutParams.height = height;
+
+        frameLayout.setLayoutParams(layoutParams);
     }
 }

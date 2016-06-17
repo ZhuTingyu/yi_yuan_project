@@ -12,6 +12,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.avos.avoscloud.im.v2.AVIMMessage;
 import com.avos.avoscloud.im.v2.AVIMReservedMessageType;
 import com.avos.avoscloud.im.v2.AVIMTypedMessage;
@@ -19,14 +21,13 @@ import com.avos.avoscloud.im.v2.messages.AVIMAudioMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMImageMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMLocationMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
-import com.yuan.house.R;
 import com.avoscloud.leanchatlib.controller.AudioHelper;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.EmotionHelper;
 import com.avoscloud.leanchatlib.controller.MessageHelper;
 import com.avoscloud.leanchatlib.model.AVIMHouseInfoMessage;
-import com.avoscloud.leanchatlib.model.UserInfo;
 import com.avoscloud.leanchatlib.model.ConversationType;
+import com.avoscloud.leanchatlib.model.UserInfo;
 import com.avoscloud.leanchatlib.utils.PhotoUtils;
 import com.avoscloud.leanchatlib.view.PlayButton;
 import com.avoscloud.leanchatlib.view.ViewHolder;
@@ -35,12 +36,12 @@ import com.lfy.dao.DaoMaster;
 import com.lfy.dao.DaoSession;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.squareup.picasso.Picasso;
+import com.yuan.house.R;
 
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 
@@ -52,12 +53,15 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     private Context context;
     private SharedPreferences prefs;
     private DaoMaster master;
+
     public ChatMessageAdapter(Context context, ConversationType conversationType) {
         super(context);
         this.context = context;
         this.conversationType = conversationType;
         this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context,"chat-db",null);
+
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context, "chat-db", null);
+
         SQLiteDatabase db = helper.getWritableDatabase();
         this.master = new DaoMaster(db);
     }
@@ -87,7 +91,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     @Override
     public int getItemViewType(int position) {
         AVIMTypedMessage msg = datas.get(position);
-        boolean comeMsg = isComeMsg(msg);
+        boolean comeMsg = messageSentByMe(msg);
 
         MsgViewType viewType = null;
         AVIMReservedMessageType msgType = AVIMReservedMessageType.getAVIMReservedMessageType(msg.getMessageType());
@@ -105,7 +109,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 viewType = comeMsg ? MsgViewType.ComeLocation : MsgViewType.ToLocation;
                 break;
             default:
-                if(msg.getMessageType() == 2){
+                if (msg.getMessageType() == 2) {
                     viewType = comeMsg ? MsgViewType.ChangeHouse : MsgViewType.ChangeHouse;
                 }
         }
@@ -117,69 +121,83 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         return msgViewTypes;
     }
 
-    boolean isComeMsg(AVIMTypedMessage msg) {
+    boolean messageSentByMe(AVIMTypedMessage msg) {
         return !MessageHelper.fromMe(msg);
     }
 
     public View getView(int position, View conView, ViewGroup parent) {
         AVIMMessage msg = datas.get(position);
+
         if (conView == null) {
             DaoSession daoSession = master.newSession();
+
             Message bean = new Message();
             bean.setDate(String.valueOf(msg.getTimestamp()));
-            bean.setLeanId(prefs.getString("leanId","0"));
-            bean.setAuditType(prefs.getString("auditType","0"));
-            bean.setHouseId(prefs.getString("houseId","0"));
+            bean.setLeanId(prefs.getString("leanId", "0"));
+            bean.setAuditType(prefs.getString("auditType", "0"));
+            bean.setHouseId(prefs.getString("houseId", "0"));
             bean.setIs_read("1");
+
             if (msg instanceof AVIMHouseInfoMessage) {
                 AVIMHouseInfoMessage houseInfoMessage = (AVIMHouseInfoMessage) msg;
-                boolean isComMsg = isComeMsg(houseInfoMessage);
+
+                boolean isComMsg = messageSentByMe(houseInfoMessage);
                 conView = createViewByType(houseInfoMessage.getMessageType(), isComMsg);
-                initHouseMessageView(conView,houseInfoMessage,isComMsg);
+
+                initHouseMessageView(conView, houseInfoMessage, isComMsg);
+
                 bean.setMessage("[房源信息]");
-            } else if (msg instanceof AVIMTypedMessage){
+            } else if (msg instanceof AVIMTypedMessage) {
                 AVIMTypedMessage typedMessage = (AVIMTypedMessage) msg;
-                boolean isComMsg = isComeMsg(typedMessage);
+
+                boolean isComMsg = messageSentByMe(typedMessage);
                 conView = createViewByType(AVIMReservedMessageType.getAVIMReservedMessageType(typedMessage.getMessageType()), isComMsg);
-                initReservedMessageView(conView,position,typedMessage,isComMsg,bean);
+
+                initReservedMessageView(conView, position, typedMessage, isComMsg, bean);
             }
 
-            if(position == datas.size() - 1)
+            if (position == datas.size() - 1) {
                 daoSession.getMessageDao().insertOrReplace(bean);
-
+            }
         }
 
         return conView;
     }
 
-    private void initHouseMessageView(View conView,AVIMTypedMessage msg,boolean isComMsg){
-
+    private void initHouseMessageView(View conView, AVIMTypedMessage msg, boolean isMessageSentByMe) {
         AVIMHouseInfoMessage message = (AVIMHouseInfoMessage) msg;
-        Map<String, Object> objectMap = message.getAttrs();
 
-        ImageView img = ViewHolder.findViewById(conView,R.id.img);
-        TextView title = ViewHolder.findViewById(conView,R.id.title);
-        TextView area = ViewHolder.findViewById(conView,R.id.area);
-        TextView house_params = ViewHolder.findViewById(conView,R.id.house_params);
+        Map<String, Object> map = message.getAttrs();
+        JSONObject object = (JSONObject) JSON.toJSON(map);
+
+        if (object.size() == 0) return;
+
+        ImageView img = ViewHolder.findViewById(conView, R.id.img);
+        TextView title = ViewHolder.findViewById(conView, R.id.title);
+        TextView area = ViewHolder.findViewById(conView, R.id.area);
+        TextView house_params = ViewHolder.findViewById(conView, R.id.house_params);
 
         View statusSendFailed = ViewHolder.findViewById(conView, R.id.status_send_failed);
         View statusSendSucceed = ViewHolder.findViewById(conView, R.id.status_send_succeed);
         View statusSendStart = ViewHolder.findViewById(conView, R.id.status_send_start);
 
+        JSONArray images = object.getJSONArray("images");
 
-        List<String> images = JSON.parseObject(objectMap.get("images").toString(),List.class);
+        if (images != null) {
+            Picasso.with(ctx).load(images.getString(0)).into(img);
+        }
 
-        Picasso.with(ctx).load(images.get(0)).into(img);
-        title.setText(objectMap.get("estate_name").toString());
-        area.setText(objectMap.get("acreage").toString() + "㎡");
-        StringBuffer sb = new StringBuffer();
-        sb.append(objectMap.get("room_count").toString());
+        title.setText(object.getString("estate_name"));
+        area.setText(object.getString("acreage") + "㎡");
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(object.getString("room_count"));
         sb.append("室");
-        sb.append(objectMap.get("parlour_count").toString());
+        sb.append(object.getString("parlour_count"));
         sb.append("厅");
         house_params.setText(sb.toString());
 
-        if (isComMsg == false) {
+        if (isMessageSentByMe == false) {
             hideStatusViews(statusSendStart, statusSendFailed, statusSendSucceed);
             setSendFailedBtnListener(statusSendFailed, msg);
             switch (msg.getMessageStatus()) {
@@ -203,14 +221,14 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     }
 
     //初始化AVIMReservedMessageType的视图
-    private void initReservedMessageView(View conView,int position,AVIMTypedMessage msg,boolean isComMsg,Message message){
+    private void initReservedMessageView(View conView, int position, AVIMTypedMessage msg, boolean isComMsg, Message message) {
         TextView sendTimeView = ViewHolder.findViewById(conView, R.id.sendTimeView);
         TextView contentView = ViewHolder.findViewById(conView, R.id.textContent);
         View contentLayout = ViewHolder.findViewById(conView, R.id.contentLayout);
         ImageView imageView = ViewHolder.findViewById(conView, R.id.imageView);
         ImageView avatarView = ViewHolder.findViewById(conView, R.id.avatar);
         PlayButton playBtn = ViewHolder.findViewById(conView, R.id.playBtn);
-        TextView timeAudio = ViewHolder.findViewById(conView,R.id.time);
+        TextView timeAudio = ViewHolder.findViewById(conView, R.id.time);
         TextView locationView = ViewHolder.findViewById(conView, R.id.locationView);
         TextView usernameView = ViewHolder.findViewById(conView, R.id.username);
 
@@ -261,7 +279,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 break;
             case AudioMessageType:
                 AVIMAudioMessage audioMessage = (AVIMAudioMessage) msg;
-                initPlayBtn(msg, playBtn, audioMessage,timeAudio);
+                initPlayBtn(msg, playBtn, audioMessage, timeAudio);
                 message.setMessage("[语音]");
                 break;
             case LocationMessageType:
@@ -324,12 +342,12 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     }
 
     private void initPlayBtn(AVIMTypedMessage msg, PlayButton playBtn, AVIMAudioMessage audioMessage, TextView timeAudio) {
-        playBtn.setLeftSide(isComeMsg(msg));
+        playBtn.setLeftSide(messageSentByMe(msg));
         AudioHelper audioHelper = AudioHelper.getInstance();
         playBtn.setAudioHelper(audioHelper);
         playBtn.setPath(MessageHelper.getFilePath(msg));
         Object obj = audioMessage.getFileMetaData().get("duration");
-        timeAudio.setText(String.valueOf((int)Double.parseDouble(obj.toString())));
+        timeAudio.setText(String.valueOf((int) Double.parseDouble(obj.toString())));
         setItemOnLongClickListener(playBtn, audioMessage);
     }
 
@@ -421,7 +439,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     }
 
     private enum MsgViewType {
-        ComeText(0), ToText(1), ComeImage(2), ToImage(3), ComeAudio(4), ToAudio(5), ComeLocation(6), ToLocation(7),ChangeHouse(8);
+        ComeText(0), ToText(1), ComeImage(2), ToImage(3), ComeAudio(4), ToAudio(5), ComeLocation(6), ToLocation(7), ChangeHouse(8);
         int value;
 
         MsgViewType(int value) {

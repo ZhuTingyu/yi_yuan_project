@@ -29,15 +29,6 @@ import timber.log.Timber;
  */
 public class FileUtil {
     private static String TAG = FileUtil.class.getSimpleName();
-    private static String path = "";
-
-    static {
-        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
-            path = Environment.getExternalStorageDirectory() + "/3c";
-        } else {
-            path = Environment.getDataDirectory().getAbsolutePath() + "/3c";
-        }
-    }
 
     /**
      * Find the files under folder which matched the pattern
@@ -284,19 +275,23 @@ public class FileUtil {
      * 拍照路径
      * @return
      */
-    public static String getPhotoPath(){
-        File file = new File(path + "/photo/");
+    public static String getImagePath(Context context){
+        String folder = getDataDirectory(context);
+
+        File file = new File(folder + "/photo/");
         if(!file.exists()){
             file.mkdirs();
         }
-        return path + "/photo/";
+        return folder + "/photo/";
     }
 
-    public static String getClipPath(){
-        File file = new File(path + "/clip/");
+    public static String getClipPath(Context context){
+        String folder = getDataDirectory(context);
+
+        File file = new File(folder + "/clip/");
         if(!file.exists()){
             file.mkdirs();
         }
-        return path + "/clip/";
+        return folder + "/clip/";
     }
 }

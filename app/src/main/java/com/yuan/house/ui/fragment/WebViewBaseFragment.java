@@ -19,11 +19,8 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebStorage;
 import android.webkit.WebView;
 
-import com.avos.avoscloud.AVException;
-import com.avos.avoscloud.AVUser;
-import com.avos.avoscloud.FindCallback;
-import com.avos.avoscloud.SaveCallback;
-import com.avoscloud.chat.service.UserService;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.avoscloud.chat.ui.chat.ChatRoomActivity;
 import com.baidu.location.BDLocation;
 import com.dimo.http.RestClient;
@@ -35,14 +32,13 @@ import com.lfy.dao.MessageDao;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.yuan.house.activities.ImagePagerActivity;
+import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
 import com.yuan.house.event.WebBroadcastEvent;
 import com.yuan.house.ui.view.PickerPopWindow;
 import com.yuan.house.utils.ToastUtil;
-import com.yuan.house.R;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
@@ -58,8 +54,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
+import butterknife.Unbinder;
 import de.greenrobot.event.EventBus;
 import timber.log.Timber;
 
@@ -74,10 +71,11 @@ public class WebViewBaseFragment extends Fragment {
     @Inject
     protected SharedPreferences prefs;
     WebViewJavascriptBridge.WVJBResponseCallback mCallback;
-    @InjectView(R.id.webview)
+    @BindView(R.id.webview)
     WebView mWebView;
     HashMap<String, String> additionalHttpHeaders;
     private Calendar calendar;
+    private Unbinder unbinder;
 
     public HashMap<String, String> getAdditionalHttpHeaders() {
         return additionalHttpHeaders;
@@ -107,7 +105,7 @@ public class WebViewBaseFragment extends Fragment {
 
         super.onDestroyView();
 
-        ButterKnife.reset(this);
+        unbinder.unbind();
     }
 
     public View createView(LayoutInflater inflater, int resId, ViewGroup container, Bundle savedInstanceState) {
@@ -117,7 +115,7 @@ public class WebViewBaseFragment extends Fragment {
 
         Injector.inject(this);
 
-        ButterKnife.inject(this, view);
+        unbinder = ButterKnife.bind(this, view);
 
         Timber.v("onCreateView");
 
@@ -153,7 +151,7 @@ public class WebViewBaseFragment extends Fragment {
         // register all the web handlers at once
         registerHandle();
 
-        bridge.registerHandler("getParams", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("getParams", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("getParams got:" + data);
@@ -189,7 +187,7 @@ public class WebViewBaseFragment extends Fragment {
     }
 
     protected void registerHandle() {
-        bridge.registerHandler("purchase", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("purchase", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Log.i("reponse.data", data);
@@ -198,20 +196,20 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("redirectPage", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("redirectPage", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("redirectPage got:" + data);
 
-                HashMap<String, String> params = null;
+                JSONObject object = null;
                 try {
-                    params = StringUtil.JSONString2HashMap(data);
+                    object = new JSONObject(data);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
-                String url = params.get("url");
-                mBridgeListener.onBridgeOpenNewLink(url, params);
+                String url = object.optString("url");
+                mBridgeListener.onBridgeOpenNewLink(url, object);
 
                 if (null != callback) {
                     callback.callback("redirectPage answer");
@@ -220,8 +218,8 @@ public class WebViewBaseFragment extends Fragment {
         });
 
         // This will NOT working since the webview might be not ready!!!
-        // bridge.callHandler("testJavascriptHandler", "42");
-        bridge.registerHandler("replacePage", new WebViewJavascriptBridge.WVJBHandler() {
+        // getBridge().callHandler("testJavascriptHandler", "42");
+        getBridge().registerHandler("replacePage", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("replacePage got:" + data);
@@ -231,27 +229,28 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("showToast", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("showToast", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 ToastUtil.showShort(getActivity(), data);
             }
         });
 
-        bridge.registerHandler("showConfirmDialog", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("showConfirmDialog", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("showConfirmDialog got:" + data);
 
-                HashMap<String, String> params = null;
+                JSONObject params;
+                String msg = null;
                 try {
-                    params = StringUtil.JSONString2HashMap(data);
+                    params = new JSONObject(data);
+                    msg = params.optString("msg");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
                 final NiftyDialogBuilder dialogBuilder = NiftyDialogBuilder.getInstance(getActivity());
-                dialogBuilder.withMessage(params.get("msg"))
+                dialogBuilder.withMessage(msg)
                         .withDialogColor("#FFE74C3C")
                         .withEffect(Effectstype.SlideBottom)
                         .withButton1Text(getString(R.string.confirm))
@@ -274,7 +273,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("showMsg", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("showMsg", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("showMsg got:" + data);
@@ -284,7 +283,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("showProgressDialog", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("showProgressDialog", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("showProgressDialog got:" + data);
@@ -293,7 +292,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("dismissProgressDialog", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("dismissProgressDialog", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("dismissProgressDialog got:" + data);
@@ -302,7 +301,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("updatePackage", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("updatePackage", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("updatePackage got:" + data);
@@ -312,20 +311,20 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("uploadFile", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("uploadFile", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("uploadFile got:" + data);
 
                 if (null != callback) {
-                    HashMap<String, String> stringStringHashMap = null;
+                    JSONObject object = null;
                     try {
-                        stringStringHashMap = StringUtil.JSONString2HashMap(data);
+                        object = new JSONObject(data);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
 
-                    String filePath = stringStringHashMap.get("fileUrl");
+                    String filePath = object.optString("fileUrl");
 
                     File file = new File(filePath);
                     RequestParams params = new RequestParams();
@@ -354,7 +353,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("getCurrentPackageVersion", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("getCurrentPackageVersion", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("getCurrentPackageVersion got:" + data);
@@ -365,44 +364,44 @@ public class WebViewBaseFragment extends Fragment {
                 }
             }
         });
-        bridge.registerHandler("setTitle", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("setTitle", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("setTitle got:" + data);
-                HashMap<String, String> stringStringHashMap = null;
+                JSONObject object = null;
                 try {
-                    stringStringHashMap = StringUtil.JSONString2HashMap(data);
+                    object = new JSONObject(data);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
-                String title = stringStringHashMap.get("text");
+                String title = object.optString("text");
 
                 mBridgeListener.onBridgeSetTitle(title);
             }
         });
 
-        bridge.registerHandler("setRightItem", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("setRightItem", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("setRightItem got:" + data);
-                HashMap<String, String> params = null;
+                JSONObject object = null;
                 try {
-                    params = StringUtil.JSONString2HashMap(data);
+                    object = new JSONObject(data);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
-                final String text = params.get("type");
-                final String content = params.get("content").toString();
+                final String text = object.optString("type");
+                final String content = object.optString("content");
                 if (!TextUtils.isEmpty(text) && text.equals("icon")) {
                     Resources resources = getResources();
-                    String icon = content.substring(0, params.get("content").indexOf("."));
+                    String icon = content.substring(0, object.optString("content").indexOf("."));
                     int resourceId = resources.getIdentifier(icon, "drawable", getActivity().getPackageName());
                     mBridgeListener.onBridgeSetRightItem(resourceId, new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            bridge.callHandler("onRightItemClick");
+                            getBridge().callHandler("onRightItemClick");
                         }
                     });
                 } else {
@@ -410,14 +409,14 @@ public class WebViewBaseFragment extends Fragment {
                     mBridgeListener.onBridgeSetRightItem(content, new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            bridge.callHandler("onRightItemClick", content, null);
+                            getBridge().callHandler("onRightItemClick", content, null);
                         }
                     });
                 }
             }
         });
 
-        bridge.registerHandler("getAOSPVersion", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("getAOSPVersion", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("getAOSPVersion got:" + data);
@@ -427,20 +426,19 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("callNumber", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("callNumber", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("callNumber got:" + data);
 
-                HashMap<String, String> stringStringHashMap = null;
+                JSONObject object = null;
                 try {
-                    stringStringHashMap = StringUtil.JSONString2HashMap(data);
+                    object = new JSONObject(data);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-                if (stringStringHashMap != null) {
-                    final String phone = stringStringHashMap.get("phone");
+                if (object != null) {
+                    final String phone = object.optString("phone");
                     // TODO: check if phone number is valid.
                     if (!TextUtils.isEmpty(phone)) {
                         String uri = "tel:" + phone;
@@ -455,34 +453,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-//        bridge.registerHandler("showTabbar", new WebViewJavascriptBridge.WVJBHandler() {
-//            @Override
-//            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
-//                Timber.v("showTabbar got:" + data);
-//
-//                HashMap<String, String> stringStringHashMap = null;
-//                try {
-//                    stringStringHashMap = StringUtil.JSONString2HashMap(data);
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//
-//                if (null != callback) {
-//                    View view = ButterKnife.findById(MainActivity.this, R.id.tabbar_layout);
-//                    if (view != null) {
-//                        String str = stringStringHashMap.get("visible");
-//                        if (str.equals("false")) {
-//                            view.setVisibility(View.GONE);
-//                        } else {
-//                            view.setVisibility(View.VISIBLE);
-//                        }
-//                    }
-//                    callback.callback(null);
-//                }
-//            }
-//        });
-
-        bridge.registerHandler("rest_get", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("rest_get", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("get got:" + data);
@@ -496,7 +467,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("rest_post", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("rest_post", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("post got:" + data);
@@ -511,7 +482,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("rest_put", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("rest_put", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("put got:" + data);
@@ -526,7 +497,7 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("rest_delete", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("rest_delete", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("delete got:" + data);
@@ -541,14 +512,14 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("login", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("login", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("login got:" + data);
 
-                HashMap<String, String> params = null;
+                JSONObject object = null;
                 try {
-                    params = StringUtil.JSONString2HashMap(data);
+                    object = new JSONObject(data);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -558,8 +529,8 @@ public class WebViewBaseFragment extends Fragment {
                 // convert HashMap to RequestParams
                 RequestParams requestParams = new RequestParams();
                 requestParams.put("product", "KidsParentAPK");
-                requestParams.put("username", params.get("username"));
-                requestParams.put("password", params.get("password"));
+                requestParams.put("username", object.optString("username"));
+                requestParams.put("password", object.optString("password"));
                 requestParams.put("installationid", avId);
 
                 if (null != callback) {
@@ -575,7 +546,9 @@ public class WebViewBaseFragment extends Fragment {
                                     e.printStackTrace();
                                 }
                             }
-                            callback.callback(response.toString());
+                            if (callback != null) {
+                                callback.callback(response.toString());
+                            }
                         }
 
                         @Override
@@ -589,112 +562,63 @@ public class WebViewBaseFragment extends Fragment {
                                     e.printStackTrace();
                                 }
                             }
-                            callback.callback(errorResponse.toString());
+                            if (callback != null) {
+                                callback.callback(errorResponse.toString());
+                            }
                         }
                     });
                 }
             }
         });
 
-        // Preference set/get - set key/value to share preference. !!!Do not save big data
-        // Preference will be permanant even if the app is uninstalled.
-        bridge.registerHandler("setPref", new WebViewJavascriptBridge.WVJBHandler() {
-            @Override
-            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
-                Timber.v("setPref got:" + data);
-
-                HashMap<String, String> params = null;
-                try {
-                    params = StringUtil.JSONString2HashMap(data);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                String key = params.get("key");
-                String value = params.get("value");
-
-                prefs.edit().putString(key, value).apply();
-
-                if (null != callback) {
-                    callback.callback(null);
-                }
-            }
-        });
-        bridge.registerHandler("getPref", new WebViewJavascriptBridge.WVJBHandler() {
-            @Override
-            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
-                Timber.v("getPref got:" + data);
-
-                HashMap<String, String> params = null;
-                try {
-                    params = StringUtil.JSONString2HashMap(data);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                String key = params.get("key");
-                String value = prefs.getString(key, "");
-
-                JSONObject object = new JSONObject();
-                try {
-                    object.put("key", key);
-                    object.put("value", value);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                if (null != callback) {
-                    callback.callback(object.toString());
-                }
-            }
-        });
-
         // Cache Data set/get - set key/value to data. !!!Do not save preferences
         // cached data will be REMOVED after app uninstalled.
-        bridge.registerHandler("setData", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("setData", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("setData got:" + data);
 
-                HashMap<String, String> params;
+                JSONObject object = null;
                 try {
-                    params = StringUtil.JSONString2HashMap(data);
-
-                    String key = params.get("key");
-                    String value = params.get("value");
-
-                    SharedPreferences.Editor editor = prefs.edit();
-                    // TODO: 16/6/5 如果是设置 userLogin,则为登陆
-                    if (Constants.kWebDataKeyUserLogin.equals(key)) {
-                        mBridgeListener.onBridgeSignIn(data);
-
-                        return;
-                    }
-
-                    if (value == null || value.equals("null")) {
-                        editor.remove(key);
-                    } else {
-                        editor.putString(key, value);
-                    }
-                    editor.apply();
+                    object = new JSONObject(data);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
+                String key = object.optString("key");
+                String value = object.optString("value");
+
+                SharedPreferences.Editor editor = prefs.edit();
+                // 如果是设置 userLogin, 则为登陆
+                if (Constants.kWebDataKeyUserLogin.equals(key)) {
+                    if (mBridgeListener != null) {
+                        mBridgeListener.onBridgeSignIn(data);
+                    }
+
+                    return;
+                }
+
+                if (value == null || value.equals("null")) {
+                    editor.remove(key);
+                } else {
+                    editor.putString(key, value);
+                }
+                editor.apply();
             }
         });
-        bridge.registerHandler("getData", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("getData", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("getData got:" + data);
 
-                HashMap<String, String> params = null;
+                JSONObject object = null;
                 try {
-                    params = StringUtil.JSONString2HashMap(data);
+                    object = new JSONObject(data);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
-                String key = params.get("key");
+                String key = object.optString("key");
                 String value = prefs.getString(key, null);
 
                 if (null != callback) {
@@ -704,54 +628,53 @@ public class WebViewBaseFragment extends Fragment {
         });
 
         // finish activity by JS code
-        bridge.registerHandler("finishActivity", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("finishActivity", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("finishActivity" + data);
 
-                mBridgeListener.onBridgeFinishActivity(data);
+                if (mBridgeListener != null) {
+                    mBridgeListener.onBridgeFinishActivity(data);
+                }
             }
         });
 
-        bridge.registerHandler("openLinkWithBrowser", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("openLinkWithBrowser", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("openLinkWithBrowser" + data);
 
-                mBridgeListener.onBridgeOpenNewLinkWithExternalBrowser(data);
+                if (mBridgeListener != null) {
+                    mBridgeListener.onBridgeOpenNewLinkWithExternalBrowser(data);
+                }
             }
         });
 
-        bridge.registerHandler("chatByUserId", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("sendNoticeMessage", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
+                Timber.v("sendNoticeMessage" + data);
+
+                if (mBridgeListener != null) {
+                    mBridgeListener.onBridgeSendNoticeMessage(data);
+                }
+            }
+        });
+
+        getBridge().registerHandler("chatByUserId", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("chatByUserId" + data);
 
-                HashMap<String, String> params = null;
+                JSONObject object;
                 try {
-                    params = StringUtil.JSONString2HashMap(data);
+                    object = new JSONObject(data);
+
+                    /** Start Chat **/
+                    ChatRoomActivity.chatByUserId(getActivity(), object);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-                String objectId = params.get("lean_id");
-                String userId = params.get("user_id");
-                String houseId = params.get("house_id");
-
-                SharedPreferences.Editor editor = prefs.edit();
-                if (params.get("audit_type") != null) {
-                    editor.putString("auditType", params.get("audit_type"));
-                }
-
-                editor.putString("houseId", houseId);
-                editor.putString("target_id", userId);
-                editor.putString("leanId", objectId);
-                editor.putString("userId", userId);
-
-                editor.apply();
-
-                /** Start Chat **/
-                ChatRoomActivity.chatByUserId(getActivity(), objectId);
 
                 if (null != callback) {
                     callback.callback(null);
@@ -759,95 +682,10 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("followByUserId", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("getRecentLocation", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
-                Timber.v("followByUserId" + data);
-
-                HashMap<String, String> params = null;
-                try {
-                    params = StringUtil.JSONString2HashMap(data);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                String objectId = params.get("objectId");
-
-//                ChatRoomActivity.chatByUserId(WebViewBasedActivity.this, objectId);
-                UserService.addFriend(objectId, new SaveCallback() {
-                    @Override
-                    public void done(AVException e) {
-                        if (null != callback) {
-                            callback.callback(e == null ? null : e.getMessage());
-                        }
-                    }
-                });
-            }
-        });
-
-        bridge.registerHandler("getFollowees", new WebViewJavascriptBridge.WVJBHandler() {
-            @Override
-            public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
-                Timber.v("getFollowees " + data);
-                try {
-                    List<AVUser> list = UserService.findFriends(new FindCallback<AVUser>() {
-                        @Override
-                        public void done(List<AVUser> list, AVException e) {
-                            JSONArray ret;
-                            try {
-                                ret = new JSONArray();
-                                for (AVUser user : list) {
-                                    JSONObject item = new JSONObject();
-                                    item.put("nickname", user.getUsername());
-                                    item.put("chat_user_id", user.getObjectId());
-                                    ret.put(item);
-                                }
-                            } catch (Exception e1) {
-                                ret = null;
-                            }
-                            if (callback != null) {
-                                callback.callback(ret == null ? "[]" : ret.toString());
-                            }
-                        }
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        /**
-         * Invoke LeanChat login stuff
-         */
-        bridge.registerHandler("reverseLeanChatLogin", new WebViewJavascriptBridge.WVJBHandler() {
-            @Override
-            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
-                Timber.v("reverseLeanChatLogin" + data);
-
-                HashMap<String, String> params = null;
-                try {
-                    params = StringUtil.JSONString2HashMap(data);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                String username = params.get("user");
-                String passwd = params.get("passwd");
-
-
-                if (null != callback) {
-                    callback.callback(null);
-                }
-            }
-        });
-
-        /**
-         * get geo location
-         */
-        bridge.registerHandler("getGeoLocation", new WebViewJavascriptBridge.WVJBHandler() {
-            @Override
-            public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
-                Timber.v("getGeoLocation" + data);
+                Timber.v("getRecentLocation" + data);
 
                 BDLocation location = DMApplication.getInstance().getLastActivatedLocation();
                 if (location != null) {
@@ -865,126 +703,146 @@ public class WebViewBaseFragment extends Fragment {
                     }
 
                     if (callback != null) {
-                        callback.callback(object.toString());
+                        callback.callback(object);
                     }
                 } else {
-                    mBridgeListener.onBridgeRequestLocation(callback);
+                    if (mBridgeListener != null) {
+                        mBridgeListener.onBridgeRequestLocation(callback);
+                    }
                 }
             }
         });
 
-        bridge.registerHandler("cutImage", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("cutImage", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 mCallback = jsCallback;
 
-                mBridgeListener.onBridgeResizeOrCropImage();
+                if (mBridgeListener != null) {
+                    mBridgeListener.onBridgeResizeOrCropImage();
+                }
             }
         });
 
-        bridge.registerHandler("broadcast", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("broadcast", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(final String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 EventBus.getDefault().post(new WebBroadcastEvent(data, getActivity()));
             }
         });
 
-        //TODO 代码已完善，待测试。
-        bridge.registerHandler("uploadFiles", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("uploadFiles", new WebViewJavascriptBridge.WVJBHandler() {
 
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 mCallback = jsCallback;
 
-                mBridgeListener.onBridgeUploadFiles();
+                List<String> datum = JSON.parseObject(data, new TypeReference<List<String>>() {
+                });
+                if (mBridgeListener != null) {
+                    mBridgeListener.onBridgeUploadFiles(datum);
+                }
             }
         });
 
-        bridge.registerHandler("reviewImages", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("reviewImages", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 Log.i("图片预览", data);
-                Intent intent = new Intent(getActivity(), ImagePagerActivity.class);
-                intent.putExtra("json", data);
-                startActivity(intent);
+
+                com.alibaba.fastjson.JSONArray jsonArray = JSON.parseObject(data).getJSONArray("urls");
+
+                List<String> images = JSON.parseArray(jsonArray.toString(), String.class);
+                if (mBridgeListener != null) {
+                    mBridgeListener.onBridgeShowImageGallery(images);
+                }
             }
         });
 
-        bridge.registerHandler("showDateTimePicker", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("showDateTimePicker", new WebViewJavascriptBridge.WVJBHandler() {
 
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 Log.i("showDateTimePicker", data);
                 mCallback = jsCallback;
+                JSONObject object = null;
                 try {
-                    HashMap<String, String> map = StringUtil.JSONString2HashMap(data);
-                    String date = map.get("pick_date");
-                    calendar = Calendar.getInstance();
-                    if (date.equals("true")) {
-                        //选择日期
-//                        DatePickerDialog.newInstance(new WebViewBasedActivity.DataPickerOnClickListener(), calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show(mFragmentManager, "datePicker");
-                    } else {
-                        //选择时间
-//                        TimePickerDialog.newInstance(new WebViewBasedActivity.TimePickerOnClickListener(), calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show(mFragmentManager, "timePicker");
-                    }
+                    object = new JSONObject(data);
+
+                    /** Start Chat **/
+                    ChatRoomActivity.chatByUserId(getActivity(), object);
                 } catch (JSONException e) {
                     e.printStackTrace();
+                }
+
+                String date = object.optString("pick_date");
+                calendar = Calendar.getInstance();
+                if (date.equals("true")) {
+                    //选择日期
+//                        DatePickerDialog.newInstance(new WebViewBasedActivity.DataPickerOnClickListener(), calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show(mFragmentManager, "datePicker");
+                } else {
+                    //选择时间
+//                        TimePickerDialog.newInstance(new WebViewBasedActivity.TimePickerOnClickListener(), calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show(mFragmentManager, "timePicker");
                 }
             }
         });
 
-        bridge.registerHandler("logout", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("logout", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                mBridgeListener.onBridgeLogout();
+                if (mBridgeListener != null) {
+                    mBridgeListener.onBridgeLogout();
+                }
             }
         });
 
-        bridge.registerHandler("showPickerView", new WebViewJavascriptBridge.WVJBHandler() {
-
+        getBridge().registerHandler("showPickerView", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
-            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                Log.i("showPickerView", data);
-
+            public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 ArrayList item1 = new ArrayList();
                 ArrayList item2 = new ArrayList();
                 ArrayList item3 = new ArrayList();
+
                 try {
                     JSONArray jsonArray = new JSONArray(data);
+
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jsonObject = (JSONObject) jsonArray.opt(i);
                         JSONArray jsonRows = (JSONArray) jsonObject.get("rows");
                         for (int j = 0; j < jsonRows.length(); j++) {
-                            if (i == 0)
-                                item1.add(jsonRows.opt(j).toString());
-                            else if (i == 1)
-                                item2.add(jsonRows.opt(j).toString());
-                            else
-                                item3.add(jsonRows.opt(j).toString());
+                            if ("undefined".equals(jsonRows.optString(j))) break;
+
+                            if (i == 0) {
+                                item1.add(jsonRows.optString(j));
+                            } else if (i == 1) {
+                                item2.add(jsonRows.optString(j));
+                            } else {
+                                item3.add(jsonRows.optString(j));
+                            }
                         }
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
-
                 PickerPopWindow pickPopWin = new PickerPopWindow(getActivity(), item1, item2, item3, new PickerPopWindow.OnPickCompletedListener() {
                     @Override
                     public void onAddressPickCompleted(String item1, String item2, String item3) {
-                        StringBuffer sb = new StringBuffer();
-                        sb.append(item1);
-                        sb.append(item2);
-                        sb.append(item3);
-                        Log.i("result", sb.toString());
+                        JSONArray jsonArray = new JSONArray();
+
+                        if (!TextUtils.isEmpty(item1)) jsonArray.put(item1);
+                        if (!TextUtils.isEmpty(item2)) jsonArray.put(item2);
+                        if (!TextUtils.isEmpty(item3)) jsonArray.put(item3);
+
+                        getBridge().callHandler("didSelectPickerView", jsonArray);
                     }
                 });
 
                 pickPopWin.showPopWin(getActivity());
-
             }
         });
 
-        bridge.registerHandler("getLastMessageByHouse", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("getLastMessageByHouse", new WebViewJavascriptBridge.WVJBHandler() {
 
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
@@ -1014,42 +872,50 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        bridge.registerHandler("showSearchBar", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("showSearchBar", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-//                setTitleSearch();
-                mBridgeListener.onBridgeShowSearchBar();
+                if (mBridgeListener != null) {
+                    mBridgeListener.onBridgeShowSearchBar();
+                }
             }
         });
 
-        bridge.registerHandler("selectImageFromNative", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("selectImageFromNative", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 Log.i("selectImageFromNative", data);
-
-                mBridgeListener.onBridgeSelectImageFromNative(data, jsCallback);
+                if (mBridgeListener != null) {
+                    mBridgeListener.onBridgeSelectImageFromNative(data, jsCallback);
+                }
             }
         });
 
-        bridge.registerHandler("dropToMessage", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("dropToMessage", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                mBridgeListener.onBridgeDropToMessage();
+                if (mBridgeListener != null) {
+                    mBridgeListener.onBridgeDropToMessage();
+                }
             }
         });
 
-        bridge.registerHandler("updateFriendRelationship", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("updateFriendRelationship", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                mBridgeListener.onBridgeUpdateFriendRelationship();
+                if (mBridgeListener != null) {
+                    mBridgeListener.onBridgeUpdateFriendRelationship();
+                }
             }
         });
 
-        bridge.registerHandler("selectMapLocation", new WebViewJavascriptBridge.WVJBHandler() {
+        getBridge().registerHandler("selectMapLocation", new WebViewJavascriptBridge.WVJBHandler() {
 
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                mBridgeListener.onBridgeSelectMapLocation();
+                if (mBridgeListener != null) {
+                    mBridgeListener.onBridgeSelectMapLocation();
+                }
             }
         });
 
@@ -1132,7 +998,7 @@ public class WebViewBaseFragment extends Fragment {
 
         void onBridgeSelectImageFromNative(String data, WebViewJavascriptBridge.WVJBResponseCallback callback);
 
-        void onBridgeOpenNewLink(String url, HashMap<String, String> params);
+        void onBridgeOpenNewLink(String url, JSONObject params);
 
         void onBridgeShowSearchBar();
 
@@ -1140,17 +1006,17 @@ public class WebViewBaseFragment extends Fragment {
 
         void onBridgeShowProgressDialog();
 
+        void onBridgeDismissProgressDialog();
+
         void onBridgeSetTitle(String title);
 
         void onBridgeSetRightItem(int resourceId, View.OnClickListener onRightItemClick);
 
         void onBridgeSetRightItem(String text, View.OnClickListener onRightItemClick);
 
-        void onBridgeUploadFiles();
+        void onBridgeUploadFiles(List<String> datum);
 
         void onBridgeResizeOrCropImage();
-
-        void onBridgeDismissProgressDialog();
 
         void onBridgeFinishActivity(String data);
 
@@ -1165,5 +1031,9 @@ public class WebViewBaseFragment extends Fragment {
         void onBridgeSignIn(String data);
 
         void onBridgeSelectMapLocation();
+
+        void onBridgeShowImageGallery(List<String> data);
+
+        void onBridgeSendNoticeMessage(String data);
     }
 }

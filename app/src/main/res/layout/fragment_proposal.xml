@@ -42,14 +42,19 @@
                 android:orientation="horizontal">
 
                 <Button
+                    android:id="@+id/complaint"
+                    style="@style/segment_left"
+                    android:text="@string/tabbar_item_txt_complaint" />
+
+                <Button
                     android:id="@+id/proposal"
-                    style="@style/top_proposal"
+                    style="@style/segment_center"
                     android:text="@string/tabbar_item_txt_proposal" />
 
                 <Button
-                    android:id="@+id/complaint"
-                    style="@style/top_complaint"
-                    android:text="@string/tabbar_item_txt_complaint" />
+                    android:id="@+id/bug"
+                    style="@style/segment_right"
+                    android:text="@string/tabbar_item_txt_bug" />
 
             </LinearLayout>
 
@@ -118,7 +123,7 @@
                 android:textColor="#C4C4C4" />
 
             <ImageView
-                android:id="@+id/btn_other"
+                android:id="@+id/btn_more"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:scaleType="fitXY"

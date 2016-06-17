@@ -88,4 +88,22 @@ public class Constants {
     public static String kWebpageUserMessage = "user_message.html";
     public static String kWebpageUserCenter = "user_center.html";
     public static String kWebpageAgencyCenter = "agency_center.html";
+
+    public static final String kHouseParamsForChatRoom = "kHouseParamsForChatRoom";
+    public static final String kHouseSwitchParamsForChatRoom = "kHouseSwitchParamsForChatRoom";
+
+    public static String kBundleKeyAfterSwitchHouseSelected = "kBundleKeyAfterSwitchHouseSelected";
+    public static String kActivityParamFinishSelectLocationOnMap = "kActivityParamFinishSelectLocationOnMap";
+
+    /**
+     * Image Crop
+     */
+    public static String kBundleExtraCropImageType = "cropType";
+    public static String kBundleExtraCropImageName = "cropImage";
+    public static String kImageCropTypeRectangle = "rectangle";
+    public static String kImageCropTypeSquare = "square";
+    public static String kImageCropTypeNone = "none";
+
+    public static int kActivityRequestCodeImagePickThenCropRectangle = 12;
+    public static int kActivityRequestCodeImagePickThenCropSquare = 13;
 }

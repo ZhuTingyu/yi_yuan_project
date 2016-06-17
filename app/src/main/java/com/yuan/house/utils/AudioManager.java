@@ -11,10 +11,11 @@ import java.util.UUID;
  */
 public class AudioManager {
 
+    private static AudioManager mInstance;
+    public AudioStateListener mAudioStateListener;
     private MediaRecorder mMediaRecorder;
     private String mDir;
     private String mCurrentFilePath;
-    private static AudioManager mInstance;
     private boolean isPrepare;
 
     private AudioManager(String dir) {
@@ -31,15 +32,6 @@ public class AudioManager {
         }
         return mInstance;
     }
-
-    /**
-     * 使用接口 用于回调
-     */
-    public interface AudioStateListener {
-        void wellPrepared();
-    }
-
-    public AudioStateListener mAudioStateListener;
 
     /**
      * 回调方法
@@ -59,7 +51,7 @@ public class AudioManager {
             String fileName = generateFileName();
             File file = new File(dir, fileName);
 
-            mCurrentFilePath =file.getAbsolutePath();
+            mCurrentFilePath = file.getAbsolutePath();
 
             mMediaRecorder = new MediaRecorder();
             // 设置输出文件
@@ -133,4 +125,10 @@ public class AudioManager {
         return mCurrentFilePath;
     }
 
+    /**
+     * 使用接口 用于回调
+     */
+    public interface AudioStateListener {
+        void wellPrepared();
+    }
 }

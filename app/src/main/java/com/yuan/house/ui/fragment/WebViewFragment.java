@@ -6,9 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-
 import com.yuan.house.R;
-import com.yuan.house.activities.MainActivity;
 import com.yuan.house.application.Injector;
 
 import butterknife.ButterKnife;
@@ -48,7 +46,7 @@ public class WebViewFragment extends WebViewBaseFragment {
 
         Injector.inject(this);
 
-        ButterKnife.inject(this, view);
+        ButterKnife.bind(this, view);
 
         Timber.v("onCreateView");
 

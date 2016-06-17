@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -18,7 +19,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bugtags.library.Bugtags;
-
 import com.yuan.house.R;
 import com.yuan.house.application.Injector;
 
@@ -131,7 +131,7 @@ public class BaseFragmentActivity extends FragmentActivity {
         super.setContentView(viewGroup);
 
         // Used to inject views with the Butterknife library
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
     }
 
     /**
@@ -274,14 +274,21 @@ public class BaseFragmentActivity extends FragmentActivity {
         mTopBar.findViewById(R.id.topbar_title_button).setVisibility(View.GONE);
     }
 
-    public void setTitleSearch(){
-        EditText search = (EditText) mTopBar.findViewById(R.id.et_search);
-        if(mTopBar.findViewById(R.id.topbar_title_item).getVisibility() == View.VISIBLE)
+    public EditText setTitleSearch(){
+        EditText searchBar = (EditText) mTopBar.findViewById(R.id.et_search);
+        if(mTopBar.findViewById(R.id.topbar_title_item).getVisibility() == View.VISIBLE) {
             mTopBar.findViewById(R.id.topbar_title_item).setVisibility(View.GONE);
-        if(mTopBar.findViewById(R.id.topbar_title_button).getVisibility() == View.VISIBLE)
+        }
+        if(mTopBar.findViewById(R.id.topbar_title_button).getVisibility() == View.VISIBLE) {
             mTopBar.findViewById(R.id.topbar_title_button).setVisibility(View.GONE);
+        }
 
-        search.setVisibility(View.VISIBLE);
+        searchBar.setSingleLine();
+        searchBar.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
+
+        searchBar.setVisibility(View.VISIBLE);
+
+        return searchBar;
     }
 
     /**

@@ -16,14 +16,14 @@
         <RelativeLayout
             android:id="@+id/rl_left"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/topbar_button_margin">
 
             <ImageButton
                 android:id="@+id/topbar_left_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="20dp"
                 android:background="@android:color/transparent"
                 android:visibility="gone" />
 
@@ -32,7 +32,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
-                android:text="@string/text_category"
                 android:textSize="@dimen/text_size_small"
                 android:textColor="@color/white" />
         </RelativeLayout>
@@ -44,8 +43,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp">
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp">
 
             <Button
                 android:id="@+id/topbar_title_button"
@@ -63,16 +62,18 @@
                 android:text="@string/app_name"
                 android:textColor="@color/white"
                 android:textSize="18sp"
-                android:visibility="gone"
-                />
+                android:visibility="gone"/>
 
             <EditText
                 android:id="@+id/et_search"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:hint="搜索"
+                android:layout_height="match_parent"
+                android:layout_marginTop="1dp"
+                android:layout_marginBottom="1dp"
+                android:imeOptions="actionSearch"
+                android:imeActionLabel="@string/contact_search"
+                android:maxLines="1"
+                android:hint="@string/contact_search"
                 android:textSize="12dp"
                 android:drawableLeft="@drawable/img_search"
                 android:background="@drawable/search_editsharp"
@@ -85,12 +86,12 @@
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:background="@android:color/transparent"
-            android:paddingRight="@dimen/topbar_button_margin">
+            android:layout_marginRight="@dimen/topbar_button_margin">
 
             <ImageButton
                 android:id="@+id/topbar_right_btn"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:background="@android:color/transparent"
                 android:visibility="visible" />

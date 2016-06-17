@@ -14,7 +14,6 @@ import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.Selection;
 import android.text.Spannable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -53,9 +52,9 @@ import com.avoscloud.leanchatlib.view.xlist.XListView;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.PauseOnScrollListener;
+import com.yuan.house.R;
 import com.yuan.house.activities.WebViewBasedActivity;
 import com.yuan.house.utils.ToastUtil;
-import com.yuan.house.R;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -141,7 +140,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
     }
 
     private void initTitleView() {
-        setTitleItem("13123");
+        // FIXME: 16/6/11 conversation title
         setLeftItem(R.drawable.back, new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -446,13 +445,17 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         } else if (v.getId() == R.id.btnImageFromCamera) {
             selectImageFromCamera();
         } else if (v.getId() == R.id.btnSwitchHouse) {
-            //房源
-            openHouseInfo();
+            // 显示推荐房源
+            showSuggestedHouses();
         }
     }
 
-    protected void openHouseInfo() {
-        throw new NotImplementedException("NOT IMPLEMENTED");
+    protected void showSuggestedHouses() {
+        throw new NotImplementedException("IMPLEMENT IN DERIEVED CLASS");
+    }
+
+    protected void sendText() {
+        throw new NotImplementedException("IMPLEMENT IN DERIEVED CLASS");
     }
 
     private void hideBottomLayoutAndScrollToLast() {
@@ -527,14 +530,6 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         openCameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
         startActivityForResult(openCameraIntent,
                 TAKE_CAMERA_REQUEST);
-    }
-
-    private void sendText() {
-        final String content = contentEdit.getText().toString();
-        if (!TextUtils.isEmpty(content)) {
-            messageAgent.sendText(content);
-            contentEdit.setText("");
-        }
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
