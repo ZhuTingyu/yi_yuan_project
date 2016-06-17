@@ -36,7 +36,6 @@ import com.avoscloud.leanchatlib.activity.ChatActivity;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.ConversationHelper;
 import com.avoscloud.leanchatlib.model.AVIMHouseInfoMessage;
-import com.dimo.utils.StringUtil;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yuan.house.R;
 import com.yuan.house.activities.SwitchHouseActivity;
@@ -450,60 +449,75 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         message.setAttrs(attrs);
 
         messageAgent.sendEncapsulatedTypedMessage(message);
+    }
 
+    private JSONObject getHeightObject() {
+        String bbsHeight = prefs.getString("bbs_height", null);
+
+        JSONObject object = null;
+        try {
+            object = new JSONObject(bbsHeight);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return object;
+    }
+
+    private int getHeightS() {
+        JSONObject object = getHeightObject();
+        if (object != null) {
+            return object.optInt("height_s");
+        }
+
+        return 0;
+    }
+
+    private int getHeightM() {
+        JSONObject object = getHeightObject();
+        if (object != null) {
+            return object.optInt("height_m");
+        }
+
+        return 0;
     }
 
     @Override
     public void onShowSampleMessageBoard() {
-        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) webView.getLayoutParams();
-        HashMap<String, Object> params = null;
-        try {
-            params = StringUtil.JSONString2HashMap(value);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        layoutParams.height = 130;
-        webView.setLayoutParams(layoutParams);
+        int height = ((int) ((getHeightS() + 10) * getResources().getDisplayMetrics().density));
+
+        resizeBBSBoard(height);
     }
 
     @Override
     public void onShowHalfMessageBoard() {
-        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) webView.getLayoutParams();
-        HashMap<String, Object> params = null;
-        try {
-            params = StringUtil.JSONString2HashMap(value);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        int height = Integer.parseInt((String) params.get("height_m"));
-        layoutParams.height = ((int) ((height + 10) * getResources().getDisplayMetrics().density));
-        webView.setLayoutParams(layoutParams);
-        bottomLayout.setVisibility(View.VISIBLE);
+        int height = ((int) ((getHeightM() + 10) * getResources().getDisplayMetrics().density));
+
+        resizeBBSBoard(height);
     }
 
     @Override
     public void onShowFullMessageBoard() {
-        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) webView.getLayoutParams();
-
-        DisplayMetrics dm = new DisplayMetrics();//获取当前显示的界面大小
+        DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
 
-        layoutParams.height = dm.heightPixels;
+        resizeBBSBoard(dm.heightPixels);
+    }
+
+    private void resizeBBSBoard(int height) {
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) webView.getLayoutParams();
+        layoutParams.height = height;
 
         webView.setLayoutParams(layoutParams);
-        bottomLayout.setVisibility(View.INVISIBLE);
+//        bottomLayout.setVisibility(View.INVISIBLE);
     }
 
     @Override
     public void onConfigBBSHeight(int height) {
-        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) webView.getLayoutParams();
-
-        // 获取当前显示的界面大小
-        DisplayMetrics dm = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(dm);
-
-        layoutParams.height = (int) (height * dm.density);
-
-        webView.setLayoutParams(layoutParams);
+        resizeBBSBoard(height);
     }
 }
