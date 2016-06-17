@@ -1,6 +1,7 @@
 package com.yuan.house.activities;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,14 +22,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alibaba.fastjson.JSON;
 import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.AVIMException;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.MessageAgent;
-import com.avoscloud.leanchatlib.model.AVIMNoticeWithHouseIdMessage;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
@@ -50,7 +49,7 @@ import com.sleepbot.datetimepicker.time.RadialPickerLayout;
 import com.sleepbot.datetimepicker.time.TimePickerDialog;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-import com.victor.loading.rotate.RotateLoading;
+import com.tasomaniac.android.widget.DelayedProgressDialog;
 import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
@@ -80,12 +79,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.greenrobot.event.EventBus;
 import me.nereo.multi_image_selector.MultiImageSelector;
@@ -106,8 +103,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     private final int kActivityRequestCodeSelectMapLocation = 20;
     protected FragmentManager mFragmentManager;
     protected FragmentTransaction mFragmentTransaction;
-    @BindView(R.id.rotateloading)
-    protected RotateLoading mLoadingDialog;
+    protected DelayedProgressDialog mLoadingDialog;
     String mUrl;
     WebViewBaseFragment webViewFragment;
     private AliPay aliPay;
@@ -209,11 +205,6 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         Timber.v("NOT Found Fragment : " + tag + ", need to create!!!");
 
         return f;
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
     }
 
     protected void hideSoftInputView() {
@@ -472,7 +463,17 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     public void onBridgeShowProgressDialog() {
-        mLoadingDialog.start();
+        if (mLoadingDialog == null) {
+            mLoadingDialog = DelayedProgressDialog.showDelayed(mContext, null, getString(R.string.loading), true, true);
+        } else {
+            mLoadingDialog.show();
+        }
+    }
+
+    public void onBridgeDismissProgressDialog() {
+        if (mLoadingDialog != null) {
+            mLoadingDialog.hide();
+        }
     }
 
     public void onBridgeSetTitle(String title) {
@@ -493,11 +494,6 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
     public void onBridgeResizeOrCropImage() {
 
-    }
-
-    public void onBridgeDismissProgressDialog() {
-        if (mLoadingDialog != null && mLoadingDialog.isStart())
-            mLoadingDialog.stop();
     }
 
     public void onBridgeFinishActivity(String data) {
@@ -699,12 +695,14 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     @Override
     protected void onResume() {
         super.onResume();
+
         Bugtags.onResume(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         Bugtags.onPause(this);
     }
 

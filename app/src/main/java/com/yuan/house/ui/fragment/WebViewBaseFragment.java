@@ -1006,6 +1006,8 @@ public class WebViewBaseFragment extends Fragment {
 
         void onBridgeShowProgressDialog();
 
+        void onBridgeDismissProgressDialog();
+
         void onBridgeSetTitle(String title);
 
         void onBridgeSetRightItem(int resourceId, View.OnClickListener onRightItemClick);
@@ -1015,8 +1017,6 @@ public class WebViewBaseFragment extends Fragment {
         void onBridgeUploadFiles(List<String> datum);
 
         void onBridgeResizeOrCropImage();
-
-        void onBridgeDismissProgressDialog();
 
         void onBridgeFinishActivity(String data);
 

@@ -190,5 +190,6 @@
     <string name="app_name_real">房产</string>
     <string name="tabbar_item_txt_bug">BUG</string>
     <string name="title_crop_photo">裁剪</string>
+    <string name="loading">加载中...</string>
 
 </resources>
