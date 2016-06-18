@@ -22,6 +22,7 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONArray;
 import com.avos.avoscloud.im.v2.AVIMConversation;
@@ -68,6 +69,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import butterknife.BindView;
 import de.greenrobot.event.EventBus;
 import okhttp3.Call;
 import okhttp3.MediaType;
@@ -161,7 +163,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         recordBtn = (RecordButton) findViewById(R.id.recordBtn);
         chatTextLayout = findViewById(R.id.chatTextLayout);
         chatAddLayout = findViewById(R.id.chatAddLayout);
-        addFileBtn = findViewById(R.id.addFileBtn);
+        addFileBtn = findViewById(R.id.btnChooseFile);
         chatEmotionLayout = findViewById(R.id.chatEmotionLayout);
         showAddBtn = findViewById(R.id.showAddBtn);
         showEmotionBtn = findViewById(R.id.showEmotionBtn);
@@ -438,7 +440,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
             toggleBottomAddLayout();
         } else if (v.getId() == R.id.showEmotionBtn) {
             toggleEmotionLayout();
-        } else if (v.getId() == R.id.addFileBtn) {
+        } else if (v.getId() == R.id.btnChooseFile) {
             //文件
         } else if (v.getId() == R.id.textEdit) {
             hideBottomLayoutAndScrollToLast();

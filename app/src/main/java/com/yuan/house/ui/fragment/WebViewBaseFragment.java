@@ -29,7 +29,6 @@ import com.dimo.web.WebViewJavascriptBridge;
 import com.gitonway.lee.niftymodaldialogeffects.lib.Effectstype;
 import com.gitonway.lee.niftymodaldialogeffects.lib.NiftyDialogBuilder;
 import com.lfy.dao.MessageDao;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.yuan.house.R;
@@ -45,8 +44,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -232,7 +229,8 @@ public class WebViewBaseFragment extends Fragment {
         getBridge().registerHandler("showToast", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
-                ToastUtil.showShort(getActivity(), data);
+                com.alibaba.fastjson.JSONObject object = JSON.parseObject(data);
+                ToastUtil.showShort(getActivity(), object.getString("msg"));
             }
         });
 
@@ -273,16 +271,6 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
-        getBridge().registerHandler("showMsg", new WebViewJavascriptBridge.WVJBHandler() {
-            @Override
-            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
-                Timber.v("showMsg got:" + data);
-                if (null != callback) {
-                    callback.callback("showMsg answer");
-                }
-            }
-        });
-
         getBridge().registerHandler("showProgressDialog", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
@@ -307,48 +295,6 @@ public class WebViewBaseFragment extends Fragment {
                 Timber.v("updatePackage got:" + data);
                 if (null != callback) {
                     callback.callback("updatePackage answer");
-                }
-            }
-        });
-
-        getBridge().registerHandler("uploadFile", new WebViewJavascriptBridge.WVJBHandler() {
-            @Override
-            public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
-                Timber.v("uploadFile got:" + data);
-
-                if (null != callback) {
-                    JSONObject object = null;
-                    try {
-                        object = new JSONObject(data);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                    String filePath = object.optString("fileUrl");
-
-                    File file = new File(filePath);
-                    RequestParams params = new RequestParams();
-                    try {
-                        params.put("image", file);
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-
-                    //TODO: update file url
-                    RestClient.getInstance().post(null, params, new AsyncHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                            Timber.v("Success");
-
-                            //TODO: upload file
-                            callback.callback(null);
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                            Timber.e("Failed");
-                        }
-                    });
                 }
             }
         });
@@ -843,32 +789,35 @@ public class WebViewBaseFragment extends Fragment {
         });
 
         getBridge().registerHandler("getLastMessageByHouse", new WebViewJavascriptBridge.WVJBHandler() {
-
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 MessageDao messageDao = DMApplication.getInstance().getMessageDao();
+
+                // TODO: 16/6/17 返回一个这个 house 下边所有用户的最后一条消息的list
                 List<com.lfy.bean.Message> list = messageDao.queryBuilder().build().list();
-                StringBuffer sb = new StringBuffer();
+//                String retval = JSON.toJSONString(list);
+
+                JSONArray jsonArray = new JSONArray();
                 for (int i = 0; i < list.size(); i++) {
+                    StringBuilder sb = new StringBuilder();
+
                     com.lfy.bean.Message message = list.get(i);
-                    sb.append("{");
-                    sb.append(prefs.getString("userId", null) + ":");
+
                     sb.append("{");
                     sb.append(message.getHouseId() + ":");
                     sb.append("{");
                     sb.append(message.getAuditType() + ":");
                     sb.append("{");
                     sb.append(message.getLeanId() + ":");
-                    sb.append("{\"message\" : " + message.getDate() + ", \"is_read\" : " + message.getIs_read() + "}");
+                    sb.append("{'message' : " + message.getDate() + ", 'is_read' : " + message.getIs_read() + "}");
                     sb.append("}");
                     sb.append("}");
                     sb.append("}");
-                    sb.append("}");
-                    if (list.size() - 1 != i)
-                        sb.append(",");
+
+                    jsonArray.put(sb.toString());
                 }
 
-                jsCallback.callback(sb.toString());
+                jsCallback.callback(jsonArray.toString());
             }
         });
 

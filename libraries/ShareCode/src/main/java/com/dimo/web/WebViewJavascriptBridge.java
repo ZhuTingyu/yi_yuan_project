@@ -119,6 +119,7 @@ public class WebViewJavascriptBridge implements Serializable {
 
     public interface WVJBResponseCallback {
         void callback(Object data);
+        void callback(String data);
     }
 
     public void registerHandler(String handlerName, WVJBHandler handler) {
@@ -136,8 +137,12 @@ public class WebViewJavascriptBridge implements Serializable {
         public void callback(Object data) {
             _callbackJs(callbackIdJs, data);
         }
-    }
 
+        @Override
+        public void callback(String data) {
+            _callbackJs(callbackIdJs, data);
+        }
+    }
 
     private void _callbackJs(String callbackIdJs, Object data) {
         //TODO: CALL js to call back;

@@ -438,6 +438,8 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         // 创建相应对话, 并发送文本信息到该会话
         final String finalHouseId = houseId;
         final String finalText = text;
+
+        // TODO: 16/6/17 中介和用户之间, 以及中介和中介之间的聊天处理方式不同。
         ChatManager.getInstance().fetchConversationWithUserId(null, leanIdString, new AVIMConversationCreatedCallback() {
             @Override
             public void done(AVIMConversation avimConversation, AVIMException e) {
