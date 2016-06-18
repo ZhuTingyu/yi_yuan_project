@@ -425,6 +425,16 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
     }
 
     @Override
+    public void onSetContractButton(String data) {
+        findViewById(R.id.btnContract).setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onSetPreConditionButton(String data) {
+        findViewById(R.id.btnPrecondition).setVisibility(View.VISIBLE);
+    }
+
+    @Override
     public void onWebChangeHouse(String data) {
         JSONObject object = null;
         for (int i = 0; i < houseInfos.size(); i++) {

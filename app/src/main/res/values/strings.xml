@@ -191,5 +191,7 @@
     <string name="tabbar_item_txt_bug">BUG</string>
     <string name="title_crop_photo">裁剪</string>
     <string name="loading">加载中...</string>
+    <string name="chat_bottom_contract">合同</string>
+    <string name="chat_bottom_precondition">前置</string>
 
 </resources>

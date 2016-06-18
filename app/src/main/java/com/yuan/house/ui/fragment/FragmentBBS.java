@@ -117,6 +117,20 @@ public class FragmentBBS extends WebViewBaseFragment {
             }
         });
 
+        bridge.registerHandler("setContractButton", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                mBridgeListener.onSetContractButton(data);
+            }
+        });
+
+        bridge.registerHandler("setPreConditionButton", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                mBridgeListener.onSetPreConditionButton(data);
+            }
+        });
+
         bridge.registerHandler("setData", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
@@ -153,5 +167,9 @@ public class FragmentBBS extends WebViewBaseFragment {
         void onShowHalfMessageBoard();
 
         void onShowFullMessageBoard();
+
+        void onSetContractButton(String data);
+
+        void onSetPreConditionButton(String data);
     }
 }
