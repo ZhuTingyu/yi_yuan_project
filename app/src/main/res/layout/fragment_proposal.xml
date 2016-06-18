@@ -119,7 +119,7 @@
                 android:layout_margin="10dp"
                 android:layout_weight="1"
                 android:background="@drawable/proposal_send_background"
-                android:text="按下说话"
+                android:text="@string/chat_bottom_record_layout_pressToRecord"
                 android:textColor="#C4C4C4" />
 
             <ImageView

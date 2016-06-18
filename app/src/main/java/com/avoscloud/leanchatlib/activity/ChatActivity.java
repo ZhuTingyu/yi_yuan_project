@@ -92,9 +92,9 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
     protected ChatManager chatManager = ChatManager.getInstance();
     protected ChatMessageAdapter adapter;
     protected RoomsTable roomsTable;
-    protected View chatTextLayout, chatAudioLayout, chatAddLayout, chatEmotionLayout;
-    protected View sendBtn, addImageBtn, showAddBtn, addFileBtn, showEmotionBtn, addChangeHouseBtn;
-    protected ImageButton btnModeSwitch;
+    protected View chatTextLayout, chatAddLayout, chatEmotionLayout;
+    protected View addImageBtn, addFileBtn, showEmotionBtn, addChangeHouseBtn;
+    protected ImageButton btnModeSwitch, showAddBtn;
     protected ViewPager emotionPager;
     protected EmotionEditText contentEdit;
     protected XListView xListView;
@@ -161,7 +161,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         chatAddLayout = findViewById(R.id.chatAddLayout);
         addFileBtn = findViewById(R.id.btnChooseFile);
         chatEmotionLayout = findViewById(R.id.chatEmotionLayout);
-        showAddBtn = findViewById(R.id.btnMoreInput);
+        showAddBtn = (ImageButton) findViewById(R.id.btnMoreInput);
         showEmotionBtn = findViewById(R.id.btnEmotionInput);
 //        sendBtn = findViewById(R.id.sendBtn);
         emotionPager = (ViewPager) findViewById(R.id.emotionPager);
@@ -256,13 +256,13 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         mVoiceMode = !mVoiceMode;
 
         if (mVoiceMode) {
-            btnModeSwitch.setImageResource(R.drawable.chat_btn_keyboard);
+            btnModeSwitch.setBackgroundResource(R.drawable.btn_keybord_switchover);
 
             ButterKnife.findById(this, R.id.rl_field_voicemode).setVisibility(View.VISIBLE);
             ButterKnife.findById(this, R.id.rl_field_textmode).setVisibility(View.GONE);
             hideSoftInputView();
         } else {
-            btnModeSwitch.setImageResource(R.drawable.chat_btn_voice_selector);
+            btnModeSwitch.setBackgroundResource(R.drawable.chat_btn_voice_selector);
 
             ButterKnife.findById(this, R.id.rl_field_voicemode).setVisibility(View.GONE);
             ButterKnife.findById(this, R.id.rl_field_textmode).setVisibility(View.VISIBLE);

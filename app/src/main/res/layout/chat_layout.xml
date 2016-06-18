@@ -74,7 +74,7 @@
                         android:layout_height="match_parent"
                         android:layout_centerVertical="true"
                         android:layout_margin="5dp"
-                        android:background="@drawable/chat_login_edit_normal"
+                        style="@android:style/Widget.Holo.EditText"
                         android:textSize="18sp" />
 
                     <Button
@@ -98,18 +98,20 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
+                        android:background="@drawable/proposal_send_background"
+                        android:textColor="#C4C4C4"
                         android:text="@string/chat_bottom_record_layout_pressToRecord" />
                 </RelativeLayout>
             </RelativeLayout>
 
-            <Button
+            <ImageButton
                 android:id="@id/btnMoreInput"
                 android:layout_width="@dimen/chat_BottomBtnSize"
                 android:layout_height="@dimen/chat_BottomBtnSize"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_margin="@dimen/chat_BottomBtnMargin"
-                android:background="@drawable/chat_btn_add_selector" />
+                android:background="@drawable/btn_other" />
 
         </RelativeLayout>
 
