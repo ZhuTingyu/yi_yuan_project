@@ -132,6 +132,8 @@ dependencies {
     /** Android .           */
     compile 'com.android.support:support-v4:23.4.0'
     compile 'com.android.support:appcompat-v7:23.4.0'
+    compile 'com.android.support:gridlayout-v7:23.4.0'
+
     //app:transformClassesWithDexForDebug error
     compile 'com.android.support:multidex:1.0.1'
 
