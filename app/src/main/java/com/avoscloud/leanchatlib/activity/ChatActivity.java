@@ -159,7 +159,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         chatTextLayout = findViewById(R.id.chatTextLayout);
         chatAudioLayout = findViewById(R.id.chatRecordLayout);
         turnToAudioBtn = findViewById(R.id.turnToAudioBtn);
-//        turnToTextBtn = findViewById(R.id.turnToTextBtn);
+        turnToTextBtn = findViewById(R.id.turnToTextBtn);
         recordBtn = (RecordButton) findViewById(R.id.recordBtn);
         chatTextLayout = findViewById(R.id.chatTextLayout);
         chatAddLayout = findViewById(R.id.chatAddLayout);
@@ -434,11 +434,9 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
             selectImageFromLocal();
         } else if (v.getId() == R.id.turnToAudioBtn) {
             showAudioLayout();
-        }
-//        else if (v.getId() == R.id.turnToTextBtn) {
-//            showTextLayout();
-//        }
-        else if (v.getId() == R.id.showAddBtn) {
+        } else if (v.getId() == R.id.turnToTextBtn) {
+            showTextLayout();
+        } else if (v.getId() == R.id.showAddBtn) {
             toggleBottomAddLayout();
         } else if (v.getId() == R.id.showEmotionBtn) {
             toggleEmotionLayout();

@@ -17,12 +17,12 @@
         android:layout_weight="1"
         android:text="@string/chat_bottom_record_layout_pressToRecord" />
 
-    <!--<Button-->
-        <!--android:id="@+id/turnToTextBtn"-->
-        <!--android:layout_width="@dimen/chat_BottomBtnSize"-->
-        <!--android:layout_height="@dimen/chat_BottomBtnSize"-->
-        <!--android:layout_gravity="center_vertical"-->
-        <!--android:layout_margin="@dimen/chat_BottomBtnMargin"-->
-        <!--android:background="@drawable/chat_btn_keyboard" />-->
+    <Button
+        android:id="@+id/turnToTextBtn"
+        android:layout_width="@dimen/chat_BottomBtnSize"
+        android:layout_height="@dimen/chat_BottomBtnSize"
+        android:layout_gravity="center_vertical"
+        android:layout_margin="@dimen/chat_BottomBtnMargin"
+        android:background="@drawable/chat_btn_keyboard" />
 
 </LinearLayout>

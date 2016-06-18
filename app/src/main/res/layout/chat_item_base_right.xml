@@ -33,6 +33,7 @@
 
             </LinearLayout>
 
+
             <ImageView
                 android:id="@+id/avatar"
                 style="@style/chat_avatar" />
