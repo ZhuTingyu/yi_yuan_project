@@ -4,14 +4,14 @@ import de.greenrobot.daogenerator.DaoGenerator;
 import de.greenrobot.daogenerator.Entity;
 import de.greenrobot.daogenerator.Schema;
 
-public class ExampleDaoGenerator {
+public class ChatDaoGenerator {
 
     public static void main(String[] args) throws Exception {
         Schema schema = new Schema(2,"com.lfy.bean");
         schema.setDefaultJavaPackageDao("com.lfy.dao");
         addChatMessage(schema);
         DaoGenerator generator = new DaoGenerator();
-        generator.generateAll(schema, System.getProperty("user.dir")+"/libraries/chatexamplegenerator/src/main/java-gen");
+        generator.generateAll(schema, System.getProperty("user.dir")+"/libraries/ChatDaoGenerator/src/main/java-gen");
     }
 
     /**
@@ -27,6 +27,4 @@ public class ExampleDaoGenerator {
         message.addStringProperty("is_read");
         message.addStringProperty("auditType");
     }
-
-
 }
