@@ -11,10 +11,8 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
-import android.text.Editable;
 import android.text.Selection;
 import android.text.Spannable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +20,7 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.TextView;
+import android.widget.ImageButton;
 
 import com.alibaba.fastjson.JSONArray;
 import com.avos.avoscloud.im.v2.AVIMConversation;
@@ -50,7 +48,6 @@ import com.avoscloud.leanchatlib.utils.ProviderPathUtils;
 import com.avoscloud.leanchatlib.view.EmotionEditText;
 import com.avoscloud.leanchatlib.view.RecordButton;
 import com.avoscloud.leanchatlib.view.xlist.XListView;
-import com.dimo.web.WebViewJavascriptBridge;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.PauseOnScrollListener;
 import com.yuan.house.R;
@@ -69,7 +66,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import butterknife.BindView;
+import butterknife.ButterKnife;
 import de.greenrobot.event.EventBus;
 import okhttp3.Call;
 import okhttp3.MediaType;
@@ -96,15 +93,16 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
     protected ChatMessageAdapter adapter;
     protected RoomsTable roomsTable;
     protected View chatTextLayout, chatAudioLayout, chatAddLayout, chatEmotionLayout;
-    protected View turnToTextBtn, turnToAudioBtn, sendBtn, addImageBtn, showAddBtn, addFileBtn, showEmotionBtn, addChangeHouseBtn;
+    protected View sendBtn, addImageBtn, showAddBtn, addFileBtn, showEmotionBtn, addChangeHouseBtn;
+    protected ImageButton btnModeSwitch;
     protected ViewPager emotionPager;
     protected EmotionEditText contentEdit;
     protected XListView xListView;
     protected RecordButton recordBtn;
     protected String localCameraPath = PathUtils.getTmpPath();
     protected View addCameraBtn;
-    protected WebViewJavascriptBridge bridge;
     private LocationHandler locationHandler;
+    private boolean mVoiceMode = false;
 
     public static ChatActivity getChatInstance() {
         return chatInstance;
@@ -135,7 +133,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
 
         initEmotionPager();
         initRecordBtn();
-        setEditTextChangeListener();
+
         initListView();
         setSoftInputMode();
         initByIntent(getIntent());
@@ -155,29 +153,27 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         xListView = (XListView) findViewById(R.id.listview);
         addImageBtn = findViewById(R.id.btnImageFromGallery);
 
-        contentEdit = (EmotionEditText) findViewById(R.id.textEdit);
-        chatTextLayout = findViewById(R.id.chatTextLayout);
-        chatAudioLayout = findViewById(R.id.chatRecordLayout);
-        turnToAudioBtn = findViewById(R.id.turnToAudioBtn);
-        turnToTextBtn = findViewById(R.id.turnToTextBtn);
+        contentEdit = (EmotionEditText) findViewById(R.id.editChatField);
+        chatTextLayout = findViewById(R.id.rl_field_textmode);
+        btnModeSwitch = (ImageButton) findViewById(R.id.btnModeSwitch);
+//        turnToTextBtn = findViewById(R.id.turnToTextBtn);
         recordBtn = (RecordButton) findViewById(R.id.recordBtn);
-        chatTextLayout = findViewById(R.id.chatTextLayout);
         chatAddLayout = findViewById(R.id.chatAddLayout);
         addFileBtn = findViewById(R.id.btnChooseFile);
         chatEmotionLayout = findViewById(R.id.chatEmotionLayout);
-        showAddBtn = findViewById(R.id.showAddBtn);
-        showEmotionBtn = findViewById(R.id.showEmotionBtn);
-        sendBtn = findViewById(R.id.sendBtn);
+        showAddBtn = findViewById(R.id.btnMoreInput);
+        showEmotionBtn = findViewById(R.id.btnEmotionInput);
+//        sendBtn = findViewById(R.id.sendBtn);
         emotionPager = (ViewPager) findViewById(R.id.emotionPager);
         addCameraBtn = findViewById(R.id.btnImageFromCamera);
         addChangeHouseBtn = findViewById(R.id.btnSwitchHouse);
 
-        sendBtn.setOnClickListener(this);
+//        sendBtn.setOnClickListener(this);
         contentEdit.setOnClickListener(this);
         addImageBtn.setOnClickListener(this);
         addFileBtn.setOnClickListener(this);
-        turnToAudioBtn.setOnClickListener(this);
-        turnToTextBtn.setOnClickListener(this);
+        btnModeSwitch.setOnClickListener(this);
+//        turnToTextBtn.setOnClickListener(this);
         showAddBtn.setOnClickListener(this);
         showEmotionBtn.setOnClickListener(this);
         addCameraBtn.setOnClickListener(this);
@@ -256,39 +252,21 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         });
     }
 
-    public void setEditTextChangeListener() {
-        contentEdit.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+    private void switchInputMode() {
+        mVoiceMode = !mVoiceMode;
 
-            }
+        if (mVoiceMode) {
+            btnModeSwitch.setImageResource(R.drawable.chat_btn_keyboard);
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-                if (charSequence.length() > 0) {
-                    sendBtn.setEnabled(true);
-                    showSendBtn();
-                } else {
-                    sendBtn.setEnabled(false);
-                    showTurnToRecordBtn();
-                }
-            }
+            ButterKnife.findById(this, R.id.rl_field_voicemode).setVisibility(View.VISIBLE);
+            ButterKnife.findById(this, R.id.rl_field_textmode).setVisibility(View.GONE);
+            hideSoftInputView();
+        } else {
+            btnModeSwitch.setImageResource(R.drawable.chat_btn_voice_selector);
 
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-    }
-
-    private void showTurnToRecordBtn() {
-        sendBtn.setVisibility(View.GONE);
-        turnToAudioBtn.setVisibility(View.VISIBLE);
-    }
-
-    private void showSendBtn() {
-        sendBtn.setVisibility(View.VISIBLE);
-        turnToAudioBtn.setVisibility(View.GONE);
+            ButterKnife.findById(this, R.id.rl_field_voicemode).setVisibility(View.GONE);
+            ButterKnife.findById(this, R.id.rl_field_textmode).setVisibility(View.VISIBLE);
+        }
     }
 
     void commonInit() {
@@ -328,8 +306,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
             @Override
             public void onLocationViewClick(AVIMLocationMessage locMsg) {
                 if (locationHandler != null) {
-                    locationHandler.onLocationMessageViewClicked(ChatActivity.this,
-                            locMsg);
+                    locationHandler.onLocationMessageViewClicked(ChatActivity.this, locMsg);
                 }
             }
 
@@ -428,21 +405,20 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.sendBtn) {
-            sendText();
-        } else if (v.getId() == R.id.btnImageFromGallery) {
+//        if (v.getId() == R.id.sendBtn) {
+//            sendText();
+//        } else
+        if (v.getId() == R.id.btnImageFromGallery) {
             selectImageFromLocal();
-        } else if (v.getId() == R.id.turnToAudioBtn) {
-            showAudioLayout();
-        } else if (v.getId() == R.id.turnToTextBtn) {
-            showTextLayout();
-        } else if (v.getId() == R.id.showAddBtn) {
+        } else if (v.getId() == R.id.btnModeSwitch) {
+            switchInputMode();
+        } else if (v.getId() == R.id.btnMoreInput) {
             toggleBottomAddLayout();
-        } else if (v.getId() == R.id.showEmotionBtn) {
+        } else if (v.getId() == R.id.btnEmotionInput) {
             toggleEmotionLayout();
         } else if (v.getId() == R.id.btnChooseFile) {
             //文件
-        } else if (v.getId() == R.id.textEdit) {
+        } else if (v.getId() == R.id.editChatField) {
             hideBottomLayoutAndScrollToLast();
         } else if (v.getId() == R.id.btnImageFromCamera) {
             selectImageFromCamera();
@@ -476,7 +452,6 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         } else {
             chatEmotionLayout.setVisibility(View.VISIBLE);
             hideAddLayout();
-            showTextLayout();
             hideSoftInputView();
         }
     }
@@ -497,18 +472,6 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
 
     private void showAddLayout() {
         chatAddLayout.setVisibility(View.VISIBLE);
-    }
-
-    private void showTextLayout() {
-        chatTextLayout.setVisibility(View.VISIBLE);
-        chatAudioLayout.setVisibility(View.GONE);
-    }
-
-    private void showAudioLayout() {
-        chatTextLayout.setVisibility(View.GONE);
-        chatAudioLayout.setVisibility(View.VISIBLE);
-        chatEmotionLayout.setVisibility(View.GONE);
-        hideSoftInputView();
     }
 
     public void selectImageFromLocal() {

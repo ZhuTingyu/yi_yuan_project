@@ -39,40 +39,81 @@
         android:background="@drawable/chat_layout_home_bg_bottombar"
         android:orientation="vertical">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/chat_BottomHeight"
             android:orientation="horizontal">
 
-            <LinearLayout
-                android:id="@+id/chatBottomLeftLayout"
-                android:layout_width="wrap_content"
+            <ImageButton
+                android:id="@+id/btnModeSwitch"
+                android:layout_width="@dimen/chat_BottomBtnSize"
+                android:layout_height="@dimen/chat_BottomBtnSize"
+                android:layout_centerVertical="true"
+                android:layout_margin="@dimen/chat_BottomBtnMargin"
+                android:background="@drawable/chat_btn_voice_selector"
+                android:textColor="@color/chat_base_color_text_black"
+                android:visibility="visible" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center_vertical">
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/btnMoreInput"
+                android:layout_toRightOf="@id/btnModeSwitch">
 
-                <Button
-                    android:id="@+id/showAddBtn"
-                    android:layout_width="@dimen/chat_BottomBtnSize"
-                    android:layout_height="@dimen/chat_BottomBtnSize"
-                    android:layout_marginLeft="3dp"
-                    android:background="@drawable/chat_btn_add_selector" />
+                <RelativeLayout
 
-                <Button
-                    android:id="@+id/showEmotionBtn"
-                    android:layout_width="@dimen/chat_BottomBtnSize"
-                    android:layout_height="@dimen/chat_BottomBtnSize"
-                    android:layout_marginLeft="3dp"
-                    android:background="@drawable/chat_btn_emo_selector"
-                    android:gravity="center" />
+                    android:id="@+id/rl_field_textmode"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="visible">
 
-            </LinearLayout>
+                    <com.avoscloud.leanchatlib.view.EmotionEditText
+                        android:id="@+id/editChatField"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="5dp"
+                        android:background="@drawable/chat_login_edit_normal"
+                        android:textSize="18sp" />
 
-            <include layout="@layout/chat_bottom_text_layout" />
+                    <Button
+                        android:id="@+id/btnEmotionInput"
+                        android:layout_width="@dimen/chat_BottomBtnSize"
+                        android:layout_height="@dimen/chat_BottomBtnSize"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="10dp"
+                        android:background="@drawable/chat_btn_emo_selector" />
+                </RelativeLayout>
 
-            <include layout="@layout/chat_bottom_record_layout" />
-        </LinearLayout>
+                <RelativeLayout
+                    android:id="@+id/rl_field_voicemode"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone">
 
-        <include layout="@layout/chat_bottom_more_layout" />
+                    <com.avoscloud.leanchatlib.view.RecordButton
+                        android:id="@+id/recordBtn"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:text="@string/chat_bottom_record_layout_pressToRecord" />
+                </RelativeLayout>
+            </RelativeLayout>
+
+            <Button
+                android:id="@id/btnMoreInput"
+                android:layout_width="@dimen/chat_BottomBtnSize"
+                android:layout_height="@dimen/chat_BottomBtnSize"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_margin="@dimen/chat_BottomBtnMargin"
+                android:background="@drawable/chat_btn_add_selector" />
+
+        </RelativeLayout>
+
+        <include layout="@layout/chat_bottom_assit_inputs_layout" />
     </LinearLayout>
 
 </RelativeLayout>
