@@ -136,7 +136,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
             bean.setLeanId(prefs.getString("leanId", "0"));
             bean.setAuditType(prefs.getString("auditType", "0"));
             bean.setHouseId(prefs.getString("houseId", "0"));
-            bean.setIs_read("1");
+            bean.setIs_read(true);
 
             if (msg instanceof AVIMHouseInfoMessage) {
                 AVIMHouseInfoMessage houseInfoMessage = (AVIMHouseInfoMessage) msg;
@@ -156,6 +156,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 initReservedMessageView(conView, position, typedMessage, isComMsg, bean);
             }
 
+            // FIXME: 16/6/22 wtf insert database record in UI layer?
             if (position == datas.size() - 1) {
                 daoSession.getMessageDao().insertOrReplace(bean);
             }

@@ -10,7 +10,7 @@ public class Message {
     private String leanId;
     private String message;
     private String date;
-    private String is_read;
+    private Boolean is_read;
     private String auditType;
 
     public Message() {
@@ -20,7 +20,7 @@ public class Message {
         this.houseId = houseId;
     }
 
-    public Message(String houseId, String leanId, String message, String date, String is_read, String auditType) {
+    public Message(String houseId, String leanId, String message, String date, Boolean is_read, String auditType) {
         this.houseId = houseId;
         this.leanId = leanId;
         this.message = message;
@@ -61,11 +61,11 @@ public class Message {
         this.date = date;
     }
 
-    public String getIs_read() {
+    public Boolean getIs_read() {
         return is_read;
     }
 
-    public void setIs_read(String is_read) {
+    public void setIs_read(Boolean is_read) {
         this.is_read = is_read;
     }
 

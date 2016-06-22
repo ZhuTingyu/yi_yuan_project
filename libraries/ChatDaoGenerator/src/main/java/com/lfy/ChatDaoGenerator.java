@@ -24,7 +24,7 @@ public class ChatDaoGenerator {
         message.addStringProperty("leanId");
         message.addStringProperty("message");
         message.addStringProperty("date");
-        message.addStringProperty("is_read");
+        message.addBooleanProperty("is_read");
         message.addStringProperty("auditType");
     }
 }

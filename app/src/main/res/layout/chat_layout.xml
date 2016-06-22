@@ -70,11 +70,14 @@
 
                     <com.avoscloud.leanchatlib.view.EmotionEditText
                         android:id="@+id/editChatField"
+                        style="@android:style/Widget.Holo.EditText"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_centerVertical="true"
                         android:layout_margin="5dp"
-                        style="@android:style/Widget.Holo.EditText"
+                        android:imeOptions="actionSend"
+                        android:inputType="text"
+                        android:maxLines="1"
                         android:textSize="18sp" />
 
                     <Button
@@ -99,8 +102,8 @@
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
                         android:background="@drawable/proposal_send_background"
-                        android:textColor="#C4C4C4"
-                        android:text="@string/chat_bottom_record_layout_pressToRecord" />
+                        android:text="@string/chat_bottom_record_layout_pressToRecord"
+                        android:textColor="#C4C4C4" />
                 </RelativeLayout>
             </RelativeLayout>
 

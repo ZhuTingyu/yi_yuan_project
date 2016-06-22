@@ -12,12 +12,15 @@ import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
@@ -199,6 +202,19 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         mFragmentTransaction.commit();
 
         initSuggestedHouseInfos();
+
+        contentEdit.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if(actionId == EditorInfo.IME_ACTION_SEND){
+                    sendText();
+
+                    return true;
+                }
+                return false;
+            }
+        });
+
     }
 
     @Override
@@ -227,7 +243,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                 switch (type) {
                     case TextMessageType:
                         AVIMTextMessage textMsg = (AVIMTextMessage) msg;
-                        ToastUtil.showShort(getApplicationContext(), textMsg.getText());
+//                        ToastUtil.showShort(getApplicationContext(), textMsg.getText());
                         date = msg.getTimestamp();
                         resultMessage = textMsg.getText();
                         break;
@@ -340,6 +356,8 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
             messageAgent.sendEncapsulatedTypedMessage(message);
 
             contentEdit.setText("");
+
+            ChatManager.getInstance().storeLastMessage(message, jsonFormatParams);
         }
     }
 

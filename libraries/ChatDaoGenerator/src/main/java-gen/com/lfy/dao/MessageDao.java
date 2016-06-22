@@ -27,7 +27,7 @@ public class MessageDao extends AbstractDao<Message, String> {
         public final static Property LeanId = new Property(1, String.class, "leanId", false, "LEAN_ID");
         public final static Property Message = new Property(2, String.class, "message", false, "MESSAGE");
         public final static Property Date = new Property(3, String.class, "date", false, "DATE");
-        public final static Property Is_read = new Property(4, String.class, "is_read", false, "IS_READ");
+        public final static Property Is_read = new Property(4, Boolean.class, "is_read", false, "IS_READ");
         public final static Property AuditType = new Property(5, String.class, "auditType", false, "AUDIT_TYPE");
     };
 
@@ -48,7 +48,7 @@ public class MessageDao extends AbstractDao<Message, String> {
                 "'LEAN_ID' TEXT," + // 1: leanId
                 "'MESSAGE' TEXT," + // 2: message
                 "'DATE' TEXT," + // 3: date
-                "'IS_READ' TEXT," + // 4: is_read
+                "'IS_READ' INTEGER," + // 4: is_read
                 "'AUDIT_TYPE' TEXT);"); // 5: auditType
     }
 
@@ -83,9 +83,9 @@ public class MessageDao extends AbstractDao<Message, String> {
             stmt.bindString(4, date);
         }
  
-        String is_read = entity.getIs_read();
+        Boolean is_read = entity.getIs_read();
         if (is_read != null) {
-            stmt.bindString(5, is_read);
+            stmt.bindLong(5, is_read ? 1l: 0l);
         }
  
         String auditType = entity.getAuditType();
@@ -108,7 +108,7 @@ public class MessageDao extends AbstractDao<Message, String> {
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // leanId
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // message
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // date
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // is_read
+            cursor.isNull(offset + 4) ? null : cursor.getShort(offset + 4) != 0, // is_read
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5) // auditType
         );
         return entity;
@@ -121,7 +121,7 @@ public class MessageDao extends AbstractDao<Message, String> {
         entity.setLeanId(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setMessage(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setDate(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setIs_read(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setIs_read(cursor.isNull(offset + 4) ? null : cursor.getShort(offset + 4) != 0);
         entity.setAuditType(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
      }
     

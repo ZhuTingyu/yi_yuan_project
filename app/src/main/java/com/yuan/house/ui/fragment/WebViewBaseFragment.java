@@ -796,27 +796,44 @@ public class WebViewBaseFragment extends Fragment {
                 // TODO: 16/6/17 返回一个这个 house 下边所有用户的最后一条消息的list
                 List<com.lfy.bean.Message> list = messageDao.queryBuilder().build().list();
 
-                JSONArray jsonArray = new JSONArray();
+                JSONObject objectList = new JSONObject();
+
                 for (int i = 0; i < list.size(); i++) {
                     StringBuilder sb = new StringBuilder();
 
                     com.lfy.bean.Message message = list.get(i);
 
-                    sb.append("{");
-                    sb.append(message.getHouseId() + ":");
-                    sb.append("{");
-                    sb.append(message.getAuditType() + ":");
-                    sb.append("{");
-                    sb.append(message.getLeanId() + ":");
-                    sb.append("{'message' : " + message.getDate() + ", 'is_read' : " + message.getIs_read() + "}");
-                    sb.append("}");
-                    sb.append("}");
-                    sb.append("}");
+                    JSONObject object = new JSONObject();
+                    try {
+                        object.put("message", message.getMessage());
+                        object.put("date", message.getDate());
+                        object.put("is_read", message.getIs_read());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
 
-                    jsonArray.put(sb.toString());
+                    JSONObject object1 = new JSONObject();
+                    try {
+                        object1.put(message.getLeanId(), object);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    JSONObject object2 = new JSONObject();
+                    try {
+                        object2.put(message.getAuditType(), object1);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    try {
+                        objectList.put(message.getHouseId(), object2);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
 
-//                jsCallback.callback(jsonArray.toString());
+                jsCallback.callback(objectList.toString());
             }
         });
 
