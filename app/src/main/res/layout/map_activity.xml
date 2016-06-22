@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <RelativeLayout
+        android:id="@+id/map_topbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/topbar_layout"
-        android:id="@+id/map_topbar">
+        android:layout_below="@+id/topbar_layout">
 
         <EditText
             android:id="@+id/search_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/map_search_placeholder"
-            android:imeOptions="actionSearch"
             android:layout_alignParentLeft="true"
             android:layout_centerInParent="true"
             android:layout_toLeftOf="@+id/search_button"
+            android:hint="@string/map_search_placeholder"
+            android:imeOptions="actionSearch"
             android:singleLine="true" />
 
         <Button
+            android:id="@+id/search_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/search_button"
             android:layout_alignParentRight="true"
             android:text="@string/map_search_loc_button_text" />
     </RelativeLayout>
@@ -32,63 +33,62 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
 
-        android:clickable="true"
+        android:layout_above="@+id/map_control"
         android:layout_below="@+id/map_topbar"
-        android:layout_above="@+id/map_control" />
+        android:clickable="true" />
 
     <WebView
         android:id="@+id/webview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <LinearLayout
+        android:id="@+id/map_control"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:orientation="vertical"
-        android:id="@+id/map_control">
+        android:orientation="vertical">
 
         <TextView
+            android:id="@+id/loc_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/loc_text"
             android:gravity="center" />
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
+            android:layout_height="fill_parent"
+            android:orientation="horizontal">
 
             <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/add_to_fav_location"
                 android:id="@+id/add_fav_location"
-                android:layout_weight="1"
-                android:visibility="gone"/>
-
-            <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/map_confirm_location"
-                android:id="@+id/confirm_location"
                 android:layout_weight="1"
-                android:enabled="true" />
+                android:text="@string/add_to_fav_location"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/confirm_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:enabled="true"
+                android:text="@string/map_confirm_location" />
         </LinearLayout>
     </LinearLayout>
 
     <ImageView
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:src="@drawable/pin"
-        android:layout_centerInParent="true"/>
+        android:layout_centerInParent="true"
+        android:src="@drawable/pin" />
 
     <com.victor.loading.rotate.RotateLoading
         android:id="@+id/rotateloading"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:layout_centerInParent="true"
-        />
+        android:layout_centerInParent="true" />
 
 </RelativeLayout>

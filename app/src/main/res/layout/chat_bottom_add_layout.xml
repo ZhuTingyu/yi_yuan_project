@@ -2,78 +2,77 @@
 <android.support.v7.widget.GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:grid="http://schemas.android.com/apk/res-auto"
     android:id="@+id/chatAddLayout"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
     android:layout_centerHorizontal="true"
-    grid:rowOrderPreserved="false"
-    grid:useDefaultMargins="true">
+    android:layout_marginTop="10dp"
+    grid:alignmentMode="alignBounds"
+    grid:columnCount="4">
 
     <TextView
         android:id="@+id/btnImageFromGallery"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:drawablePadding="10dp"
+        android:layout_height="0dp"
+        grid:layout_columnWeight="1"
+        grid:layout_rowWeight="1"
         android:drawableTop="@drawable/chat_bottom_add_picture_selector"
         android:gravity="center"
         android:text="@string/chat_bottom_picture"
-        grid:layout_gravity="fill_horizontal" />
+        grid:layout_gravity="fill" />
 
     <TextView
         android:id="@+id/btnImageFromCamera"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:drawablePadding="10dp"
+        android:layout_height="0dp"
+        grid:layout_columnWeight="1"
+        grid:layout_rowWeight="1"
         android:drawableTop="@drawable/chat_bottom_add_camera_selector"
         android:gravity="center"
         android:text="@string/chat_bottom_camera"
-        grid:layout_gravity="fill_horizontal" />
+        grid:layout_gravity="fill" />
 
     <TextView
         android:id="@+id/btnChooseFile"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:drawablePadding="10dp"
+        android:layout_height="0dp"
+        grid:layout_columnWeight="1"
+        grid:layout_rowWeight="1"
         android:drawableTop="@drawable/btn_docment"
         android:gravity="center"
         android:text="@string/chat_bottom_file"
-        grid:layout_gravity="fill_horizontal" />
+        grid:layout_gravity="fill" />
 
     <TextView
         android:id="@+id/btnSwitchHouse"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:drawablePadding="10dp"
+        android:layout_height="0dp"
+        grid:layout_columnWeight="1"
+        grid:layout_rowWeight="1"
         android:drawableTop="@drawable/btn_house"
         android:gravity="center"
         android:text="@string/chat_bottom_change"
-        grid:layout_gravity="fill_horizontal" />
+        grid:layout_gravity="fill" />
 
     <TextView
         android:id="@+id/btnPrecondition"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:drawablePadding="10dp"
+        android:layout_height="0dp"
+        grid:layout_columnWeight="1"
+        grid:layout_rowWeight="1"
         android:drawableTop="@drawable/btn_docment"
         android:gravity="center"
         android:text="@string/chat_bottom_precondition"
-        android:visibility="gone"
-        grid:layout_gravity="fill_horizontal" />
+        grid:layout_gravity="fill" />
 
     <TextView
         android:id="@+id/btnContract"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:drawablePadding="10dp"
+        android:layout_height="0dp"
+        grid:layout_columnWeight="1"
+        grid:layout_rowWeight="1"
         android:drawableTop="@drawable/btn_house"
         android:gravity="center"
         android:text="@string/chat_bottom_contract"
-        android:visibility="gone"
-        grid:layout_gravity="fill_horizontal" />
+        grid:layout_gravity="fill" />
 
 </android.support.v7.widget.GridLayout>

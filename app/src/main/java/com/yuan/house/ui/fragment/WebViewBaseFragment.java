@@ -795,7 +795,6 @@ public class WebViewBaseFragment extends Fragment {
 
                 // TODO: 16/6/17 返回一个这个 house 下边所有用户的最后一条消息的list
                 List<com.lfy.bean.Message> list = messageDao.queryBuilder().build().list();
-//                String retval = JSON.toJSONString(list);
 
                 JSONArray jsonArray = new JSONArray();
                 for (int i = 0; i < list.size(); i++) {
@@ -817,7 +816,7 @@ public class WebViewBaseFragment extends Fragment {
                     jsonArray.put(sb.toString());
                 }
 
-                jsCallback.callback(jsonArray.toString());
+//                jsCallback.callback(jsonArray.toString());
             }
         });
 

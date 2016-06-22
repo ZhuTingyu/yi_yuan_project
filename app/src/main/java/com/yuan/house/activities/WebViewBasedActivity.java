@@ -715,16 +715,54 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     // region ImageGalleryAdapter.ImageThumbnailLoader Methods
+
+    /**
+     * load from url
+     */
     public void loadImageThumbnail(ImageView iv, String imageUrl, int dimension) {
-        if (!TextUtils.isEmpty(imageUrl)) {
+
+        if (TextUtils.isEmpty(imageUrl)) {
+            iv.setImageDrawable(null);
+            return;
+        }
+
+        if (imageUrl.contains("http")) {
             Picasso.with(iv.getContext())
                     .load(imageUrl)
 //                    .resize(dimension, dimension)
 //                    .centerCrop()
                     .into(iv);
         } else {
+            loadImageThumbnailFromFile(iv, imageUrl, dimension);
+        }
+    }
+
+    /**
+     * load from local file
+     */
+    public void loadImageThumbnailFromFile(ImageView iv, String path, int dimension) {
+        File imageFile = new File(path);
+        if (imageFile.exists()) {
+            Picasso.with(iv.getContext())
+                    .load(imageFile)
+//                    .resize(dimension, dimension)
+//                    .centerCrop()
+                    .into(iv);
+        } else {
             iv.setImageDrawable(null);
         }
+    }
+
+    /**
+     * load from local
+     * resourceId : don't be xml type drawable
+     */
+    public void loadImageThumbnail(ImageView iv, int resourceId, int dimension) {
+        Picasso.with(iv.getContext())
+                .load(resourceId)
+//              .resize(dimension, dimension)
+//              .centerCrop()
+                .into(iv);
     }
 
     // region FullScreenImageGalleryAdapter.FullScreenImageLoader
