@@ -243,7 +243,6 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                 switch (type) {
                     case TextMessageType:
                         AVIMTextMessage textMsg = (AVIMTextMessage) msg;
-//                        ToastUtil.showShort(getApplicationContext(), textMsg.getText());
                         date = msg.getTimestamp();
                         resultMessage = textMsg.getText();
                         break;

@@ -405,9 +405,6 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
 
     @Override
     public void onClick(View v) {
-//        if (v.getId() == R.id.sendBtn) {
-//            sendText();
-//        } else
         if (v.getId() == R.id.btnImageFromGallery) {
             selectImageFromLocal();
         } else if (v.getId() == R.id.btnModeSwitch) {
@@ -537,10 +534,6 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         xListView.post(new Runnable() {
             @Override
             public void run() {
-                //fast scroll
-        /*xListView.requestFocusFromTouch();
-        xListView.setSelection(xListView.getAdapter().getCount() - 1);
-        contentEdit.requestFocusFromTouch();*/
                 xListView.smoothScrollToPosition(xListView.getAdapter().getCount() - 1);
             }
         });
