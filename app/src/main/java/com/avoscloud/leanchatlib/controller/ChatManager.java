@@ -32,6 +32,7 @@ import com.dimo.utils.DateUtil;
 import com.lfy.bean.Message;
 import com.lfy.dao.MessageDao;
 import com.yuan.house.application.DMApplication;
+import com.yuan.house.common.Constants;
 
 import org.json.JSONObject;
 
@@ -282,7 +283,6 @@ public class ChatManager extends AVIMClientEventHandler {
         if (params != null) {
             auditType = params.optString("audit_type");
             leanId = params.optString("lean_id");
-            houseId = params.optString("house_id");
         } else {
             auditType = "0";
             leanId = msg.getFrom();
@@ -301,7 +301,7 @@ public class ChatManager extends AVIMClientEventHandler {
                 MessageDao.Properties.LeanId.eq(leanId)
         ).unique();
 
-        String dateString = DateUtil.toDateString(new Date(msg.getTimestamp()), "MM-dd mm:ss");
+        String dateString = DateUtil.toDateString(new Date(msg.getTimestamp()), Constants.kDateFormatStyleShort);
         if (message == null) {
             message = new Message();
             message.setHouseId(houseId);

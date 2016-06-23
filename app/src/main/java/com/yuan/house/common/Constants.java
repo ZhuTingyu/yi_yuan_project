@@ -106,4 +106,5 @@ public class Constants {
 
     public static int kActivityRequestCodeImagePickThenCropRectangle = 12;
     public static int kActivityRequestCodeImagePickThenCropSquare = 13;
+    public static String kDateFormatStyleShort = "MM-dd mm:ss";
 }

@@ -8,11 +8,13 @@ import com.avos.avoscloud.im.v2.callback.AVIMConversationCallback;
 import com.avos.avoscloud.im.v2.messages.AVIMAudioMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMImageMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMLocationMessage;
-import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
 import com.avoscloud.leanchatlib.db.MsgsTable;
 import com.avoscloud.leanchatlib.utils.Logger;
 import com.avoscloud.leanchatlib.utils.PhotoUtils;
 import com.avoscloud.leanchatlib.utils.Utils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,7 +50,17 @@ public class MessageAgent {
                     msg.setMessageId(Utils.uuid());
                     msg.setTimestamp(System.currentTimeMillis());
                 }
+
                 msgsTable.insertMsg(msg);
+
+                JSONObject object = new JSONObject();
+                try {
+                    object.put("lean_id", conv.getMembers().get(0));
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                }
+
+                ChatManager.getInstance().storeLastMessage(msg, object);
 
                 if (e == null && originPath != null) {
                     File tmpFile = new File(originPath);
@@ -82,12 +94,6 @@ public class MessageAgent {
                 }
             }
         });
-    }
-
-    public void sendText(String content) {
-        AVIMTextMessage textMsg = new AVIMTextMessage();
-        textMsg.setText(content);
-        sendMsg(textMsg, null, sendCallback);
     }
 
     /**

@@ -33,7 +33,6 @@ import com.avoscloud.leanchatlib.view.PlayButton;
 import com.avoscloud.leanchatlib.view.ViewHolder;
 import com.lfy.bean.Message;
 import com.lfy.dao.DaoMaster;
-import com.lfy.dao.DaoSession;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.squareup.picasso.Picasso;
 import com.yuan.house.R;
@@ -129,8 +128,6 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         AVIMMessage msg = datas.get(position);
 
         if (conView == null) {
-            DaoSession daoSession = master.newSession();
-
             Message bean = new Message();
             bean.setDate(String.valueOf(msg.getTimestamp()));
             bean.setLeanId(prefs.getString("leanId", "0"));
@@ -157,9 +154,9 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
             }
 
             // FIXME: 16/6/22 wtf insert database record in UI layer?
-            if (position == datas.size() - 1) {
-                daoSession.getMessageDao().insertOrReplace(bean);
-            }
+//            if (position == datas.size() - 1) {
+//                daoSession.getMessageDao().insertOrReplace(bean);
+//            }
         }
 
         return conView;

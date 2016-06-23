@@ -40,6 +40,7 @@ import com.avoscloud.leanchatlib.activity.ChatActivity;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.ConversationHelper;
 import com.avoscloud.leanchatlib.model.AVIMHouseInfoMessage;
+import com.dimo.utils.DateUtil;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yuan.house.R;
 import com.yuan.house.activities.SwitchHouseActivity;
@@ -55,6 +56,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -206,7 +208,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         contentEdit.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if(actionId == EditorInfo.IME_ACTION_SEND){
+                if (actionId == EditorInfo.IME_ACTION_SEND) {
                     sendText();
 
                     return true;
@@ -265,16 +267,29 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                         break;
                 }
 
-                Map<String, Object> params = new HashMap<>();
-                params.put("date", date);
-                params.put("message", resultMessage);
-                params.put("houseId", prefs.getString("houseId", null));
-                params.put("leanId", leanId);
-                params.put("is_read", 1);
-                params.put("auditType", prefs.getString("auditType", null));
+                String leanId = jsonFormatParams.optString("lean_id");
+                String auditType = jsonFormatParams.optString("audit_type");
+                String houseId = jsonFormatParams.optString("house_id");
 
-                String json = com.alibaba.fastjson.JSONObject.toJSONString(params);
-                mFragmentBBS.getBridge().callHandler("onLastMessageChangeByHouse", json);
+                JSONObject object = new JSONObject();
+
+                try {
+                    object.put("date", DateUtil.toDateString(new Date(date), Constants.kDateFormatStyleShort));
+                    object.put("message", resultMessage);
+                    object.put("house_id", houseId);
+                    object.put("lean_id", leanId);
+                    object.put("is_read", true);
+                    object.put("audit_type", auditType);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                mFragmentBBS.getBridge().callHandler("onLastMessageChangeByHouse", object.toString());
+
+//                if (MessageHelper.fromMe(msg) && msg.getMessageStatus() == AVIMMessage.AVIMMessageStatus.AVIMMessageStatusSent) {
+//                    // FIXME: 16/6/22 有些时候 house id 是空的
+//                    ChatManager.getInstance().storeLastMessage(msg, object);
+//                }
             }
         });
     }
@@ -355,8 +370,6 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
             messageAgent.sendEncapsulatedTypedMessage(message);
 
             contentEdit.setText("");
-
-            ChatManager.getInstance().storeLastMessage(message, jsonFormatParams);
         }
     }
 
