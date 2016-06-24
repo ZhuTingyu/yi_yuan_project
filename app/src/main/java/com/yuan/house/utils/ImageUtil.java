@@ -3,10 +3,17 @@ package com.yuan.house.utils;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.text.TextUtils;
 import android.util.Log;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 
 /**
  * Created by LiFengYi on 16/1/29.
@@ -107,5 +114,75 @@ public class ImageUtil {
         }
 
         return baos.toByteArray();
+    }
+
+    /**
+     * load from url
+     */
+    public static void loadImageThumbnail(ImageView iv, String imageUrl, int dimension) {
+
+        if (TextUtils.isEmpty(imageUrl)) {
+            iv.setImageDrawable(null);
+            return;
+        }
+
+        if (imageUrl.contains("http")) {
+            Picasso.with(iv.getContext())
+                    .load(imageUrl)
+//                    .resize(dimension, dimension)
+//                    .centerCrop()
+                    .into(iv);
+        } else {
+            loadImageThumbnailFromFile(iv, imageUrl, dimension);
+        }
+    }
+
+    /**
+     * load from local file
+     */
+    public static void loadImageThumbnailFromFile(ImageView iv, String path, int dimension) {
+        File imageFile = new File(path);
+        if (imageFile.exists()) {
+            Picasso.with(iv.getContext())
+                    .load(imageFile)
+//                    .resize(dimension, dimension)
+//                    .centerCrop()
+                    .into(iv);
+        } else {
+            iv.setImageDrawable(null);
+        }
+    }
+
+    /**
+     * load from local
+     * resourceId : don't be xml type drawable
+     */
+    public static void loadImageThumbnail(ImageView iv, int resourceId, int dimension) {
+        Picasso.with(iv.getContext())
+                .load(resourceId)
+//              .resize(dimension, dimension)
+//              .centerCrop()
+                .into(iv);
+    }
+
+    public static void loadFullScreenImage(final ImageView iv, String imageUrl, int width, final LinearLayout bgLinearLayout) {
+        if (!TextUtils.isEmpty(imageUrl)) {
+            Picasso.with(iv.getContext())
+                    .load(imageUrl)
+//                    .resize(width, 0)
+                    .into(iv, new Callback() {
+                        @Override
+                        public void onSuccess() {
+
+                        }
+
+                        @Override
+                        public void onError() {
+
+                        }
+                    });
+        } else {
+            iv.setImageDrawable(null);
+        }
     }
 }

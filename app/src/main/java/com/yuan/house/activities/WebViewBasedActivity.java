@@ -520,11 +520,11 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
     @Override
     public void onBridgeShowImageGallery(List<String> images) {
-        Intent intent = new Intent(this, ImageGalleryActivity.class);
+        Intent intent = new Intent(this, ImageViewPagerActivity.class);
 
         Bundle bundle = new Bundle();
-        bundle.putStringArrayList(ImageGalleryActivity.KEY_IMAGES, new ArrayList<>(images));
-        bundle.putString(ImageGalleryActivity.KEY_TITLE, "图片库");
+        bundle.putStringArrayList(ImageViewPagerActivity.KEY_IMAGES, new ArrayList<>(images));
+        bundle.putString(ImageViewPagerActivity.KEY_TITLE, "图片库");
         intent.putExtras(bundle);
 
         startActivity(intent);
@@ -720,71 +720,13 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
      * load from url
      */
     public void loadImageThumbnail(ImageView iv, String imageUrl, int dimension) {
-
-        if (TextUtils.isEmpty(imageUrl)) {
-            iv.setImageDrawable(null);
-            return;
-        }
-
-        if (imageUrl.contains("http")) {
-            Picasso.with(iv.getContext())
-                    .load(imageUrl)
-//                    .resize(dimension, dimension)
-//                    .centerCrop()
-                    .into(iv);
-        } else {
-            loadImageThumbnailFromFile(iv, imageUrl, dimension);
-        }
+        ImageUtil.loadImageThumbnail(iv, imageUrl, dimension);
     }
 
-    /**
-     * load from local file
-     */
-    public void loadImageThumbnailFromFile(ImageView iv, String path, int dimension) {
-        File imageFile = new File(path);
-        if (imageFile.exists()) {
-            Picasso.with(iv.getContext())
-                    .load(imageFile)
-//                    .resize(dimension, dimension)
-//                    .centerCrop()
-                    .into(iv);
-        } else {
-            iv.setImageDrawable(null);
-        }
-    }
-
-    /**
-     * load from local
-     * resourceId : don't be xml type drawable
-     */
-    public void loadImageThumbnail(ImageView iv, int resourceId, int dimension) {
-        Picasso.with(iv.getContext())
-                .load(resourceId)
-//              .resize(dimension, dimension)
-//              .centerCrop()
-                .into(iv);
-    }
 
     // region FullScreenImageGalleryAdapter.FullScreenImageLoader
     public void loadFullScreenImage(final ImageView iv, String imageUrl, int width, final LinearLayout bgLinearLayout) {
-        if (!TextUtils.isEmpty(imageUrl)) {
-            Picasso.with(iv.getContext())
-                    .load(imageUrl)
-//                    .resize(width, 0)
-                    .into(iv, new Callback() {
-                        @Override
-                        public void onSuccess() {
-
-                        }
-
-                        @Override
-                        public void onError() {
-
-                        }
-                    });
-        } else {
-            iv.setImageDrawable(null);
-        }
+        ImageUtil.loadFullScreenImage(iv, imageUrl, width, bgLinearLayout);
     }
 
     private class DataPickerOnClickListener implements DatePickerDialog.OnDateSetListener {
