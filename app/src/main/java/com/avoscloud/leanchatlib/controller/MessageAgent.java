@@ -53,9 +53,14 @@ public class MessageAgent {
 
                 msgsTable.insertMsg(msg);
 
+                // FIXME: 16/6/24 hack, conv.members 第一个位置是发送者,最后一个位置是接收者
                 JSONObject object = new JSONObject();
                 try {
-                    object.put("lean_id", conv.getMembers().get(0));
+                    if (MessageHelper.fromMe(msg)) {
+                        object.put("lean_id", conv.getMembers().get(conv.getMembers().size() - 1));
+                    } else {
+                        object.put("lean_id", conv.getMembers().get(0));
+                    }
                 } catch (JSONException e1) {
                     e1.printStackTrace();
                 }

@@ -215,7 +215,6 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                     break;
             }
         }
-
     }
 
     //初始化AVIMReservedMessageType的视图

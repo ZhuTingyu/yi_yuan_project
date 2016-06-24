@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.text.TextUtils;
 
 import com.avos.avoscloud.im.v2.AVIMClient;
 import com.avos.avoscloud.im.v2.AVIMClientEventHandler;
@@ -13,6 +14,7 @@ import com.avos.avoscloud.im.v2.AVIMConversationEventHandler;
 import com.avos.avoscloud.im.v2.AVIMConversationQuery;
 import com.avos.avoscloud.im.v2.AVIMException;
 import com.avos.avoscloud.im.v2.AVIMMessageManager;
+import com.avos.avoscloud.im.v2.AVIMReservedMessageType;
 import com.avos.avoscloud.im.v2.AVIMTypedMessage;
 import com.avos.avoscloud.im.v2.AVIMTypedMessageHandler;
 import com.avos.avoscloud.im.v2.callback.AVIMClientCallback;
@@ -276,7 +278,7 @@ public class ChatManager extends AVIMClientEventHandler {
     public void storeLastMessage(AVIMTypedMessage msg, JSONObject params) {
         String leanId;
 
-        String auditType;
+        String auditType = null;
         String houseId = null;
         String text = null;
 
@@ -284,12 +286,13 @@ public class ChatManager extends AVIMClientEventHandler {
             auditType = params.optString("audit_type");
             leanId = params.optString("lean_id");
         } else {
-            auditType = "0";
             leanId = msg.getFrom();
         }
 
-        int msgType = msg.getMessageType();
-        if (msgType == -1) {
+        if (TextUtils.isEmpty(auditType)) auditType = "0";
+
+        AVIMReservedMessageType msgType = AVIMReservedMessageType.getAVIMReservedMessageType(msg.getMessageType());
+        if (msgType == AVIMReservedMessageType.TextMessageType) {
             houseId = (String) ((AVIMTextMessage) msg).getAttrs().get("houseId");
             text = ((AVIMTextMessage) msg).getText();
         }
