@@ -5,7 +5,10 @@ import android.content.res.TypedArray;
 import android.graphics.drawable.AnimationDrawable;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
+
 import com.yuan.house.R;
 import com.avoscloud.leanchatlib.controller.AudioHelper;
 
@@ -91,4 +94,5 @@ public class PlayButton extends ImageView implements View.OnClickListener {
       anim.stop();
     }
   }
+
 }

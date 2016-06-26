@@ -23,8 +23,8 @@ import java.io.File;
 import java.io.IOException;
 
 public class RecordButton extends Button {
-  public static final int BACK_RECORDING = R.drawable.chat_voice_bg_pressed;
-  public static final int BACK_IDLE = R.drawable.chat_voice_bg;
+  public static final int BACK_RECORDING = R.drawable.chat_voice_db_pressed;
+  public static final int BACK_IDLE = R.drawable.chat_voice_db;
   public static final int SLIDE_UP_TO_CANCEL = 0;
   public static final int RELEASE_TO_CANCEL = 1;
   private static final int MIN_INTERVAL_TIME = 1000;// 2s

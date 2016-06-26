@@ -451,10 +451,11 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
             chatEmotionLayout.setVisibility(View.GONE);
         } else {
             chatEmotionLayout.setVisibility(View.VISIBLE);
-            hideAddLayout();
             hideSoftInputView();
+            hideAddLayout();
         }
     }
+
 
     private void toggleBottomAddLayout() {
         if (chatAddLayout.getVisibility() == View.VISIBLE) {
