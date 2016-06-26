@@ -36,9 +36,16 @@
         android:id="@+id/bottomLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/chat_layout_home_bg_bottombar"
-        android:orientation="vertical">
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1px"
+            android:background="@color/chat_msg_emote_divider"
+            android:focusable="false" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -95,7 +102,8 @@
                     android:id="@+id/rl_field_voicemode"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:visibility="gone">
+                    android:padding="@dimen/chat_recordBtnPadding"
+                    android:visibility="visible">
 
                     <com.avoscloud.leanchatlib.view.RecordButton
                         android:id="@+id/recordBtn"

@@ -467,6 +467,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         }
     }
 
+
     private void toggleBottomAddLayout() {
         if (assistLayout.getVisibility() == View.VISIBLE) {
             hideAddLayout();

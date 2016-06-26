@@ -50,8 +50,11 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     private ClickListener clickListener;
     private Context context;
     private DaoMaster master;
+    private View contentLayout;
 
     public ChatMessageAdapter(Context context, ConversationType conversationType, org.json.JSONObject object) {
+
+
         super(context);
         this.context = context;
         this.conversationType = conversationType;
@@ -215,7 +218,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     private void initReservedMessageView(View conView, int position, AVIMTypedMessage msg, boolean isComMsg, Message message) {
         TextView sendTimeView = ViewHolder.findViewById(conView, R.id.sendTimeView);
         TextView contentView = ViewHolder.findViewById(conView, R.id.textContent);
-        View contentLayout = ViewHolder.findViewById(conView, R.id.contentLayout);
+        contentLayout = ViewHolder.findViewById(conView, R.id.contentLayout);
         ImageView imageView = ViewHolder.findViewById(conView, R.id.imageView);
         ImageView avatarView = ViewHolder.findViewById(conView, R.id.avatar);
         PlayButton playBtn = ViewHolder.findViewById(conView, R.id.playBtn);
@@ -288,9 +291,9 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                     statusSendFailed.setVisibility(View.VISIBLE);
                     break;
                 case AVIMMessageStatusSent:
-                    if (conversationType == ConversationType.Single) {
+                    /*if (conversationType == ConversationType.Single) {
                         statusSendSucceed.setVisibility(View.VISIBLE);
-                    }
+                    }*/
                     break;
                 case AVIMMessageStatusNone:
                 case AVIMMessageStatusSending:
@@ -338,7 +341,9 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         playBtn.setAudioHelper(audioHelper);
         playBtn.setPath(MessageHelper.getFilePath(msg));
         Object obj = audioMessage.getFileMetaData().get("duration");
-        timeAudio.setText(String.valueOf((int) Double.parseDouble(obj.toString())));
+        int time = (int) Double.parseDouble(obj.toString());
+        setContentLayoutLength(time);
+        timeAudio.setText(String.valueOf(time)+"''");
         setItemOnLongClickListener(playBtn, audioMessage);
     }
 
@@ -451,4 +456,17 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
 
         void onAudioLongClick(AVIMAudioMessage audioMessage);
     }
+
+    private void setContentLayoutLength(int time){
+        ViewGroup.LayoutParams params =  contentLayout.getLayoutParams();
+        int length = 150 + time * 50;
+        int max = (int)context.getResources().getDimension(R.dimen.chat_ContentMaxWidth);
+        if(length > max){
+            params.width = max;
+        }else {
+            params.width = length;
+        }
+        contentLayout.setLayoutParams(params);
+    }
+
 }
