@@ -462,11 +462,23 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
     @Override
     public void onSetContractButton(String data) {
         findViewById(R.id.btnContract).setVisibility(View.VISIBLE);
+        findViewById(R.id.btnContract).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getWebViewFragment().getBridge().callHandler("ClickContractButton");
+            }
+        });
     }
 
     @Override
     public void onSetPreConditionButton(String data) {
         findViewById(R.id.btnPrecondition).setVisibility(View.VISIBLE);
+        findViewById(R.id.btnPrecondition).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getWebViewFragment().getBridge().callHandler("onPreConditionButtonClick");
+            }
+        });
     }
 
     @Override
