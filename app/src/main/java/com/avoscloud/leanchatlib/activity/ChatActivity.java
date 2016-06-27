@@ -57,6 +57,7 @@ import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -184,12 +185,12 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
 
     private void initByIntent(Intent intent) {
         initData(intent);
-        refreshMsgsFromDB();
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+
         initByIntent(intent);
     }
 
@@ -291,12 +292,16 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         roomsTable.insertRoom(convid);
         roomsTable.clearUnread(conversation.getConversationId());
         conversationType = ConversationHelper.typeOfConv(conversation);
-
-        bindAdapterToListView(conversationType);
     }
 
-    private void bindAdapterToListView(ConversationType conversationType) {
-        adapter = new ChatMessageAdapter(this, conversationType);
+    protected void bindAdapter(JSONObject object) {
+        bindAdapterToListView(conversationType, object);
+
+        refreshMsgsFromDB();
+    }
+
+    private void bindAdapterToListView(ConversationType conversationType, JSONObject object) {
+        adapter = new ChatMessageAdapter(this, conversationType, object);
         adapter.setClickListener(new ChatMessageAdapter.ClickListener() {
             @Override
             public void onFailButtonClick(AVIMTypedMessage msg) {

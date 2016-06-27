@@ -45,6 +45,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yuan.house.R;
 import com.yuan.house.activities.SwitchHouseActivity;
 import com.yuan.house.common.Constants;
+import com.yuan.house.event.BridgeCallbackEvent;
 import com.yuan.house.helper.AuthHelper;
 import com.yuan.house.ui.fragment.FragmentBBS;
 import com.yuan.house.ui.fragment.WebViewBaseFragment;
@@ -60,6 +61,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Created by lzw on 15/4/24.
@@ -217,6 +220,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
             }
         });
 
+        bindAdapter(jsonFormatParams);
     }
 
     @Override
@@ -284,7 +288,8 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                     e.printStackTrace();
                 }
 
-                mFragmentBBS.getBridge().callHandler("onLastMessageChangeByHouse", object.toString());
+                // dispatch the event to WebViewBaseFragment
+                EventBus.getDefault().post(new BridgeCallbackEvent(BridgeCallbackEvent.BridgeCallbackEventEnum.CALLBACK, object.toString()));
 
 //                if (MessageHelper.fromMe(msg) && msg.getMessageStatus() == AVIMMessage.AVIMMessageStatus.AVIMMessageStatusSent) {
 //                    // FIXME: 16/6/22 有些时候 house id 是空的

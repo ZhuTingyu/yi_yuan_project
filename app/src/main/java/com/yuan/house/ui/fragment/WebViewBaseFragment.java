@@ -35,6 +35,7 @@ import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
+import com.yuan.house.event.BridgeCallbackEvent;
 import com.yuan.house.event.WebBroadcastEvent;
 import com.yuan.house.ui.view.PickerPopWindow;
 import com.yuan.house.utils.ToastUtil;
@@ -93,12 +94,16 @@ public class WebViewBaseFragment extends Fragment {
     @Override
     public void onDestroyView() {
         WebStorage.getInstance().deleteAllData();
+
         ViewGroup holder = ButterKnife.findById(getActivity(), R.id.webview_parent);
         if (holder != null) {
             holder.removeView(mWebView);
         }
+        
         mWebView.removeAllViews();
         mWebView.destroy();
+
+        EventBus.getDefault().unregister(this);
 
         super.onDestroyView();
 
@@ -144,6 +149,8 @@ public class WebViewBaseFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        EventBus.getDefault().register(this);
 
         // register all the web handlers at once
         registerHandle();
@@ -884,6 +891,10 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
+    }
+
+    public void onEvent(BridgeCallbackEvent event) {
+        getBridge().callHandler("onLastMessageChangeByHouse", event.getHolder());
     }
 
     /**
