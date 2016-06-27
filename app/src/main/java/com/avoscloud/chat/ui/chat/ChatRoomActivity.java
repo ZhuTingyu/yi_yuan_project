@@ -465,14 +465,6 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
     @Override
     public void onSetContractButton(String data) {
-        GridLayout.Spec row1 = GridLayout.spec(0);
-        GridLayout.Spec row2 = GridLayout.spec(1);
-
-        GridLayout.Spec col1 = GridLayout.spec(0);
-        GridLayout.Spec col2 = GridLayout.spec(1);
-        GridLayout.Spec col3 = GridLayout.spec(2);
-        GridLayout.Spec col4 = GridLayout.spec(3);
-
         JSONArray array;
         try {
             array = new JSONArray(data);
