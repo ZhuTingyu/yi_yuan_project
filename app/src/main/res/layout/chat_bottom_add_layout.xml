@@ -20,16 +20,6 @@
         android:text="@string/chat_bottom_picture" />
 
     <TextView
-        android:id="@+id/btnImageFromCamera"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        grid:layout_columnWeight="1"
-        grid:layout_rowWeight="1"
-        android:drawableTop="@drawable/chat_bottom_add_camera_selector"
-        android:gravity="center"
-        android:text="@string/chat_bottom_camera" />
-
-    <TextView
         android:id="@+id/btnChooseFile"
         android:layout_width="0dp"
         android:layout_height="0dp"

@@ -1,14 +1,10 @@
 package com.avoscloud.leanchatlib.activity;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.text.Selection;
@@ -44,7 +40,6 @@ import com.avoscloud.leanchatlib.model.MessageEvent;
 import com.avoscloud.leanchatlib.utils.DownloadUtils;
 import com.avoscloud.leanchatlib.utils.NetAsyncTask;
 import com.avoscloud.leanchatlib.utils.PathUtils;
-import com.avoscloud.leanchatlib.utils.ProviderPathUtils;
 import com.avoscloud.leanchatlib.view.EmotionEditText;
 import com.avoscloud.leanchatlib.view.RecordButton;
 import com.avoscloud.leanchatlib.view.xlist.XListView;
@@ -69,6 +64,8 @@ import java.util.Set;
 
 import butterknife.ButterKnife;
 import de.greenrobot.event.EventBus;
+import me.nereo.multi_image_selector.MultiImageSelector;
+import me.nereo.multi_image_selector.MultiImageSelectorActivity;
 import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -77,9 +74,6 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         XListView.IXListViewListener {
     public static final String CONVID = "convid";
     private static final int PAGE_SIZE = 20;
-    private static final int TAKE_CAMERA_REQUEST = 2;
-    private static final int GALLERY_REQUEST = 0;
-    private static final int GALLERY_KITKAT_REQUEST = 3;
 
     private static ChatActivity chatInstance;
     //用来判断是否弹出通知
@@ -101,10 +95,11 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
     protected XListView xListView;
     protected RecordButton recordBtn;
     protected String localCameraPath = PathUtils.getTmpPath();
-    protected View addCameraBtn;
+    //    protected View addCameraBtn;
     private LocationHandler locationHandler;
     private boolean mVoiceMode = false;
     private View assistLayout;
+    private int kActivityRequestCodeImagePickAndSend = 10;
 
     public static ChatActivity getChatInstance() {
         return chatInstance;
@@ -167,7 +162,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         showEmotionBtn = findViewById(R.id.btnEmotionInput);
 //        sendBtn = findViewById(R.id.sendBtn);
         emotionPager = (ViewPager) findViewById(R.id.emotionPager);
-        addCameraBtn = findViewById(R.id.btnImageFromCamera);
+//        addCameraBtn = findViewById(R.id.btnImageFromCamera);
         addChangeHouseBtn = findViewById(R.id.btnSwitchHouse);
         assistLayout = findViewById(R.id.chatMoreLayout);
 
@@ -179,7 +174,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
 //        turnToTextBtn.setOnClickListener(this);
         showAddBtn.setOnClickListener(this);
         showEmotionBtn.setOnClickListener(this);
-        addCameraBtn.setOnClickListener(this);
+//        addCameraBtn.setOnClickListener(this);
         addChangeHouseBtn.setOnClickListener(this);
 //        addLocationBtn.setVisibility(View.GONE);
     }
@@ -413,7 +408,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.btnImageFromGallery) {
-            selectImageFromLocal();
+            selectImage();
         } else if (v.getId() == R.id.btnModeSwitch) {
             switchInputMode();
         } else if (v.getId() == R.id.btnMoreInput) {
@@ -424,9 +419,11 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
             //文件
         } else if (v.getId() == R.id.editChatField) {
             hideBottomLayoutAndScrollToLast();
-        } else if (v.getId() == R.id.btnImageFromCamera) {
-            selectImageFromCamera();
-        } else if (v.getId() == R.id.btnSwitchHouse) {
+        }
+//        else if (v.getId() == R.id.btnImageFromCamera) {
+//            selectImage();
+//        }
+        else if (v.getId() == R.id.btnSwitchHouse) {
             // 显示推荐房源
             showSuggestedHouses();
         }
@@ -488,62 +485,21 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         chatAddLayout.setVisibility(View.VISIBLE);
     }
 
-    public void selectImageFromLocal() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            Intent intent = new Intent();
-            intent.setType("image/*");
-            intent.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(Intent.createChooser(intent, getResources().getString(R.string.chat_activity_select_picture)),
-                    GALLERY_REQUEST);
-        } else {
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType("image/*");
-            startActivityForResult(intent, GALLERY_KITKAT_REQUEST);
-        }
+    public void selectImage() {
+        int requestCode = kActivityRequestCodeImagePickAndSend;
+        MultiImageSelector.create(mContext)
+                .showCamera(true) // show camera or not. true by default
+                .single()
+                .start(this, requestCode);
     }
 
-    public void selectImageFromCamera() {
-        Intent openCameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        Uri imageUri = Uri.fromFile(new File(localCameraPath));
-        openCameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-        startActivityForResult(openCameraIntent,
-                TAKE_CAMERA_REQUEST);
-    }
-
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            switch (requestCode) {
-                case GALLERY_REQUEST:
-                case GALLERY_KITKAT_REQUEST:
-                    if (data == null) {
-                        ToastUtil.show(mContext, "return data is null");
+        if (requestCode == kActivityRequestCodeImagePickAndSend && resultCode == RESULT_OK) {
+            List<String> path = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
 
-                        return;
-                    }
-                    Uri uri;
-                    if (requestCode == GALLERY_REQUEST) {
-                        uri = data.getData();
-                    } else {
-                        //for Android 4.4
-                        uri = data.getData();
-                        final int takeFlags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION
-                                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-
-                        getContentResolver().takePersistableUriPermission(uri, takeFlags);
-                    }
-                    String localSelectPath = ProviderPathUtils.getPath(mContext, uri);
-                    messageAgent.sendImage(localSelectPath);
+            messageAgent.sendImage(path.get(0));
                     hideBottomLayout();
-                    break;
-                case TAKE_CAMERA_REQUEST:
-                    messageAgent.sendImage(localCameraPath);
-                    hideBottomLayout();
-                    break;
-            }
         }
     }
 
