@@ -43,6 +43,7 @@ import com.avoscloud.leanchatlib.activity.ChatActivity;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.ConversationHelper;
 import com.avoscloud.leanchatlib.model.AVIMHouseInfoMessage;
+import com.dimo.helper.ViewHelper;
 import com.dimo.utils.DateUtil;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yuan.house.R;
@@ -480,20 +481,36 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
             return;
         }
 
-        // FIXME: 16/6/27 dynamic add items into GridLayout
+        // dynamic add items into GridLayout
+        GridLayout gv = (GridLayout) findViewById(R.id.chatAddLayout);
+
+        // clean all the contract button before add
+        ArrayList<View> views = ViewHelper.getViewsByTag(gv, "contract");
+        for (View v : views) {
+            gv.removeView(v);
+        }
+
         for (int i = 0; i < array.length(); i++) {
-            GridLayout gv = (GridLayout) findViewById(R.id.chatAddLayout);
             TextView tv = new TextView(this);
 
             Drawable drawable = getResources().getDrawable(R.drawable.btn_docment);
+            int h = drawable.getIntrinsicHeight();
+            int w = drawable.getIntrinsicWidth();
+            drawable.setBounds(0, 0, w, h);
+
             tv.setCompoundDrawables(null, drawable, null, null);
-            GridLayout.LayoutParams params = new GridLayout.LayoutParams(row2, GridLayout.spec(i + 1));
+
+            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+            params.rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
+            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
+
             params.width = 0;
             params.height = 0;
             tv.setLayoutParams(params);
             tv.setGravity(Gravity.CENTER);
             tv.setText(array.optString(i));
 
+            tv.setTag("contract");
             gv.addView(tv);
 
             final int finalI = i;

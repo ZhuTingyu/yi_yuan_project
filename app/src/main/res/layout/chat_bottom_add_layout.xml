@@ -17,8 +17,7 @@
         grid:layout_rowWeight="1"
         android:drawableTop="@drawable/chat_bottom_add_picture_selector"
         android:gravity="center"
-        android:text="@string/chat_bottom_picture"
-        grid:layout_gravity="fill" />
+        android:text="@string/chat_bottom_picture" />
 
     <TextView
         android:id="@+id/btnImageFromCamera"
@@ -28,8 +27,7 @@
         grid:layout_rowWeight="1"
         android:drawableTop="@drawable/chat_bottom_add_camera_selector"
         android:gravity="center"
-        android:text="@string/chat_bottom_camera"
-        grid:layout_gravity="fill" />
+        android:text="@string/chat_bottom_camera" />
 
     <TextView
         android:id="@+id/btnChooseFile"
@@ -39,8 +37,7 @@
         grid:layout_rowWeight="1"
         android:drawableTop="@drawable/btn_docment"
         android:gravity="center"
-        android:text="@string/chat_bottom_file"
-        grid:layout_gravity="fill" />
+        android:text="@string/chat_bottom_file" />
 
     <TextView
         android:id="@+id/btnSwitchHouse"
@@ -50,8 +47,7 @@
         grid:layout_rowWeight="1"
         android:drawableTop="@drawable/btn_house"
         android:gravity="center"
-        android:text="@string/chat_bottom_change"
-        grid:layout_gravity="fill" />
+        android:text="@string/chat_bottom_change" />
 
     <TextView
         android:id="@+id/btnPrecondition"
@@ -62,7 +58,6 @@
         android:drawableTop="@drawable/btn_docment"
         android:gravity="center"
         android:text="@string/chat_bottom_precondition"
-        grid:layout_gravity="fill"
         android:visibility="gone"/>
 
     <!--<TextView-->
