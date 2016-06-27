@@ -1,10 +1,8 @@
 package com.avoscloud.leanchatlib.adapter;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -47,17 +45,17 @@ import java.util.Map;
 public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     private static PrettyTime prettyTime = new PrettyTime();
     private ConversationType conversationType;
+    private org.json.JSONObject conversationObject;
     private int msgViewTypes = 9;
     private ClickListener clickListener;
     private Context context;
-    private SharedPreferences prefs;
     private DaoMaster master;
 
-    public ChatMessageAdapter(Context context, ConversationType conversationType) {
+    public ChatMessageAdapter(Context context, ConversationType conversationType, org.json.JSONObject object) {
         super(context);
         this.context = context;
         this.conversationType = conversationType;
-        this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        this.conversationObject = object;
 
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context, "chat-db", null);
 
@@ -90,7 +88,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     @Override
     public int getItemViewType(int position) {
         AVIMTypedMessage msg = datas.get(position);
-        boolean comeMsg = messageSentByMe(msg);
+        boolean comeMsg = messageSentByOthers(msg);
 
         MsgViewType viewType = null;
         AVIMReservedMessageType msgType = AVIMReservedMessageType.getAVIMReservedMessageType(msg.getMessageType());
@@ -120,7 +118,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         return msgViewTypes;
     }
 
-    boolean messageSentByMe(AVIMTypedMessage msg) {
+    boolean messageSentByOthers(AVIMTypedMessage msg) {
         return !MessageHelper.fromMe(msg);
     }
 
@@ -129,34 +127,30 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
 
         if (conView == null) {
             Message bean = new Message();
+            // FIXME: 16/6/27 date format error
             bean.setDate(String.valueOf(msg.getTimestamp()));
-            bean.setLeanId(prefs.getString("leanId", "0"));
-            bean.setAuditType(prefs.getString("auditType", "0"));
-            bean.setHouseId(prefs.getString("houseId", "0"));
+            bean.setLeanId(conversationObject.optString("lean_id"));
+            bean.setAuditType(conversationObject.optString("audit_type"));
+            bean.setHouseId(conversationObject.optString("house_id"));
             bean.setIs_read(true);
 
             if (msg instanceof AVIMHouseInfoMessage) {
                 AVIMHouseInfoMessage houseInfoMessage = (AVIMHouseInfoMessage) msg;
 
-                boolean isComMsg = messageSentByMe(houseInfoMessage);
-                conView = createViewByType(houseInfoMessage.getMessageType(), isComMsg);
+                boolean others = messageSentByOthers(houseInfoMessage);
+                conView = createViewByType(houseInfoMessage.getMessageType(), others);
 
-                initHouseMessageView(conView, houseInfoMessage, isComMsg);
+                initHouseMessageView(conView, houseInfoMessage, others);
 
                 bean.setMessage("[房源信息]");
             } else if (msg instanceof AVIMTypedMessage) {
                 AVIMTypedMessage typedMessage = (AVIMTypedMessage) msg;
 
-                boolean isComMsg = messageSentByMe(typedMessage);
-                conView = createViewByType(AVIMReservedMessageType.getAVIMReservedMessageType(typedMessage.getMessageType()), isComMsg);
+                boolean others = messageSentByOthers(typedMessage);
+                conView = createViewByType(AVIMReservedMessageType.getAVIMReservedMessageType(typedMessage.getMessageType()), others);
 
-                initReservedMessageView(conView, position, typedMessage, isComMsg, bean);
+                initReservedMessageView(conView, position, typedMessage, others, bean);
             }
-
-            // FIXME: 16/6/22 wtf insert database record in UI layer?
-//            if (position == datas.size() - 1) {
-//                daoSession.getMessageDao().insertOrReplace(bean);
-//            }
         }
 
         return conView;
@@ -339,7 +333,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     }
 
     private void initPlayBtn(AVIMTypedMessage msg, PlayButton playBtn, AVIMAudioMessage audioMessage, TextView timeAudio) {
-        playBtn.setLeftSide(messageSentByMe(msg));
+        playBtn.setLeftSide(messageSentByOthers(msg));
         AudioHelper audioHelper = AudioHelper.getInstance();
         playBtn.setAudioHelper(audioHelper);
         playBtn.setPath(MessageHelper.getFilePath(msg));
