@@ -39,7 +39,6 @@ import com.avoscloud.leanchatlib.model.ConversationType;
 import com.avoscloud.leanchatlib.model.MessageEvent;
 import com.avoscloud.leanchatlib.utils.DownloadUtils;
 import com.avoscloud.leanchatlib.utils.NetAsyncTask;
-import com.avoscloud.leanchatlib.utils.PathUtils;
 import com.avoscloud.leanchatlib.view.EmotionEditText;
 import com.avoscloud.leanchatlib.view.RecordButton;
 import com.avoscloud.leanchatlib.view.xlist.XListView;
@@ -94,9 +93,6 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
     protected EmotionEditText contentEdit;
     protected XListView xListView;
     protected RecordButton recordBtn;
-    protected String localCameraPath = PathUtils.getTmpPath();
-    //    protected View addCameraBtn;
-    private LocationHandler locationHandler;
     private boolean mVoiceMode = false;
     private View assistLayout;
     private int kActivityRequestCodeImagePickAndSend = 10;
@@ -111,10 +107,6 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
 
     public static void setCurrentChattingConvid(String currentChattingConvid) {
         ChatActivity.currentChattingConvid = currentChattingConvid;
-    }
-
-    public void setLocationHandler(LocationHandler locationHandler) {
-        this.locationHandler = locationHandler;
     }
 
     public void onCreate(Bundle savedInstanceState) {
@@ -153,30 +145,23 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         contentEdit = (EmotionEditText) findViewById(R.id.editChatField);
         chatTextLayout = findViewById(R.id.rl_field_textmode);
         btnModeSwitch = (ImageButton) findViewById(R.id.btnModeSwitch);
-//        turnToTextBtn = findViewById(R.id.turnToTextBtn);
         recordBtn = (RecordButton) findViewById(R.id.recordBtn);
         chatAddLayout = findViewById(R.id.chatAddLayout);
         addFileBtn = findViewById(R.id.btnChooseFile);
         chatEmotionLayout = findViewById(R.id.chatEmotionLayout);
         showAddBtn = (ImageButton) findViewById(R.id.btnMoreInput);
         showEmotionBtn = findViewById(R.id.btnEmotionInput);
-//        sendBtn = findViewById(R.id.sendBtn);
         emotionPager = (ViewPager) findViewById(R.id.emotionPager);
-//        addCameraBtn = findViewById(R.id.btnImageFromCamera);
         addChangeHouseBtn = findViewById(R.id.btnSwitchHouse);
         assistLayout = findViewById(R.id.chatMoreLayout);
 
-//        sendBtn.setOnClickListener(this);
         contentEdit.setOnClickListener(this);
         addImageBtn.setOnClickListener(this);
         addFileBtn.setOnClickListener(this);
         btnModeSwitch.setOnClickListener(this);
-//        turnToTextBtn.setOnClickListener(this);
         showAddBtn.setOnClickListener(this);
         showEmotionBtn.setOnClickListener(this);
-//        addCameraBtn.setOnClickListener(this);
         addChangeHouseBtn.setOnClickListener(this);
-//        addLocationBtn.setVisibility(View.GONE);
     }
 
     private void initByIntent(Intent intent) {
@@ -206,7 +191,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
     }
 
     private void initEmotionPager() {
-        List<View> views = new ArrayList<View>();
+        List<View> views = new ArrayList<>();
         for (int i = 0; i < EmotionHelper.emojiGroups.size(); i++) {
             views.add(getEmotionGridView(i));
         }
@@ -308,6 +293,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
     private void bindAdapterToListView(ConversationType conversationType, JSONObject object) {
         adapter = new ChatMessageAdapter(this, conversationType, object);
         adapter.setClickListener(new ChatMessageAdapter.ClickListener() {
+
             @Override
             public void onFailButtonClick(AVIMTypedMessage msg) {
                 messageAgent.resendMsg(msg, defaultSendCallback);
@@ -315,9 +301,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
 
             @Override
             public void onLocationViewClick(AVIMLocationMessage locMsg) {
-                if (locationHandler != null) {
-                    locationHandler.onLocationMessageViewClicked(ChatActivity.this, locMsg);
-                }
+
             }
 
             @Override
