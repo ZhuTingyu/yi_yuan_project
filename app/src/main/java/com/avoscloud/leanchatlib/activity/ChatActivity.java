@@ -195,6 +195,14 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         xListView.setPullLoadEnable(false);
         xListView.setXListViewListener(this);
         xListView.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(), true, true));
+        xListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                // TODO: 16/6/27 长按聊天消息显示『转发/复制』的 ContextMenu
+                ToastUtil.show(mContext, "Long click");
+                return false;
+            }
+        });
     }
 
     private void initEmotionPager() {
@@ -499,7 +507,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
             List<String> path = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
 
             messageAgent.sendImage(path.get(0));
-                    hideBottomLayout();
+            hideBottomLayout();
         }
     }
 
