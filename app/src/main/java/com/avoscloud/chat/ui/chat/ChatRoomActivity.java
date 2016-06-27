@@ -7,11 +7,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.DataSetObserver;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.widget.GridLayout;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -461,13 +464,46 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
     @Override
     public void onSetContractButton(String data) {
-        findViewById(R.id.btnContract).setVisibility(View.VISIBLE);
-        findViewById(R.id.btnContract).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getWebViewFragment().getBridge().callHandler("ClickContractButton");
-            }
-        });
+        GridLayout.Spec row1 = GridLayout.spec(0);
+        GridLayout.Spec row2 = GridLayout.spec(1);
+
+        GridLayout.Spec col1 = GridLayout.spec(0);
+        GridLayout.Spec col2 = GridLayout.spec(1);
+        GridLayout.Spec col3 = GridLayout.spec(2);
+        GridLayout.Spec col4 = GridLayout.spec(3);
+
+        JSONArray array;
+        try {
+            array = new JSONArray(data);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        // FIXME: 16/6/27 dynamic add items into GridLayout
+        for (int i = 0; i < array.length(); i++) {
+            GridLayout gv = (GridLayout) findViewById(R.id.chatAddLayout);
+            TextView tv = new TextView(this);
+
+            Drawable drawable = getResources().getDrawable(R.drawable.btn_docment);
+            tv.setCompoundDrawables(null, drawable, null, null);
+            GridLayout.LayoutParams params = new GridLayout.LayoutParams(row2, GridLayout.spec(i + 1));
+            params.width = 0;
+            params.height = 0;
+            tv.setLayoutParams(params);
+            tv.setGravity(Gravity.CENTER);
+            tv.setText(array.optString(i));
+
+            gv.addView(tv);
+
+            final int finalI = i;
+            tv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getWebViewFragment().getBridge().callHandler("ClickContractButton", Integer.toString(finalI));
+                }
+            });
+        }
     }
 
     @Override

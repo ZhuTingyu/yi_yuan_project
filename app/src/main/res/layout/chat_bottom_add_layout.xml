@@ -65,16 +65,16 @@
         grid:layout_gravity="fill"
         android:visibility="gone"/>
 
-    <TextView
-        android:id="@+id/btnContract"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        grid:layout_columnWeight="1"
-        grid:layout_rowWeight="1"
-        android:drawableTop="@drawable/btn_house"
-        android:gravity="center"
-        android:text="@string/chat_bottom_contract"
-        grid:layout_gravity="fill"
-        android:visibility="gone"/>
+    <!--<TextView-->
+        <!--android:id="@+id/btnContract"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="0dp"-->
+        <!--grid:layout_columnWeight="1"-->
+        <!--grid:layout_rowWeight="1"-->
+        <!--android:drawableTop="@drawable/btn_house"-->
+        <!--android:gravity="center"-->
+        <!--android:text="@string/chat_bottom_contract"-->
+        <!--grid:layout_gravity="fill"-->
+        <!--android:visibility="gone"/>-->
 
 </android.support.v7.widget.GridLayout>
