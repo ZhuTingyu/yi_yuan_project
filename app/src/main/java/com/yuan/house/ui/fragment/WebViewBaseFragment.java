@@ -99,7 +99,7 @@ public class WebViewBaseFragment extends Fragment {
         if (holder != null) {
             holder.removeView(mWebView);
         }
-        
+
         mWebView.removeAllViews();
         mWebView.destroy();
 
@@ -755,13 +755,15 @@ public class WebViewBaseFragment extends Fragment {
                 ArrayList item1 = new ArrayList();
                 ArrayList item2 = new ArrayList();
                 ArrayList item3 = new ArrayList();
+                ArrayList selection = new ArrayList();
 
                 try {
-                    JSONArray jsonArray = new JSONArray(data);
+                    JSONObject object = new JSONObject(data);
 
+                    JSONArray jsonArray = object.optJSONArray("choices");
+                    JSONArray defaultSelection = object.optJSONArray("chosen");
                     for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject jsonObject = (JSONObject) jsonArray.opt(i);
-                        JSONArray jsonRows = (JSONArray) jsonObject.get("rows");
+                        JSONArray jsonRows = jsonArray.optJSONArray(i);
                         for (int j = 0; j < jsonRows.length(); j++) {
                             if ("undefined".equals(jsonRows.optString(j))) break;
 
@@ -772,13 +774,16 @@ public class WebViewBaseFragment extends Fragment {
                             } else {
                                 item3.add(jsonRows.optString(j));
                             }
+
+                            selection.add(defaultSelection.optString(j));
                         }
                     }
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
-                PickerPopWindow pickPopWin = new PickerPopWindow(getActivity(), item1, item2, item3, new PickerPopWindow.OnPickCompletedListener() {
+                PickerPopWindow pickPopWin = new PickerPopWindow(getActivity(), item1, item2, item3, selection, new PickerPopWindow.OnPickCompletedListener() {
                     @Override
                     public void onAddressPickCompleted(String item1, String item2, String item3) {
                         JSONArray jsonArray = new JSONArray();

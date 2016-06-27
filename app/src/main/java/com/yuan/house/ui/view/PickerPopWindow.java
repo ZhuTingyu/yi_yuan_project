@@ -29,6 +29,7 @@ import java.util.List;
 public class PickerPopWindow extends PopupWindow implements View.OnClickListener, PickerView.OnPickedListener {
 
     private Context mContext; // 上下文
+    private ArrayList<String> defaultSelection;
     private OnPickCompletedListener mListener;// 选择完成事件监听器
     private List<String> item1List, item2List, item3List;
 
@@ -44,9 +45,11 @@ public class PickerPopWindow extends PopupWindow implements View.OnClickListener
                            ArrayList<String> item1List,
                            ArrayList<String> item2List,
                            ArrayList<String> item3List,
+                           ArrayList<String> defaultSelection,
                            OnPickCompletedListener completedListener) {
 
         this.mContext = context;
+        this.defaultSelection = defaultSelection;
         this.mListener = completedListener;
         this.item1List = item1List;
         this.item2List = item2List;
@@ -89,21 +92,24 @@ public class PickerPopWindow extends PopupWindow implements View.OnClickListener
         item1PickerV.setWheelData(item1List);
         item1PickerV.setSkin(WheelView.Skin.Holo);
         item1PickerV.setStyle(style);
+        item1PickerV.setSelection(item2List.indexOf(defaultSelection.get(0)));
 
         if (item2List.size() != 0) {
             item2PickerV.setWheelAdapter(new ItemArrayWheel(mContext));
             item2PickerV.setWheelData(item2List);
             item2PickerV.setStyle(style);
             item2PickerV.setSkin(WheelView.Skin.Holo);
+            item2PickerV.setSelection(item2List.indexOf(defaultSelection.get(1)));
         } else {
             item2PickerV.setVisibility(View.GONE);
         }
 
-        if (item2List.size() != 0) {
+        if (item3List.size() != 0) {
             item3PickerV.setWheelAdapter(new ItemArrayWheel(mContext));
             item3PickerV.setWheelData(item3List);
             item3PickerV.setSkin(WheelView.Skin.Holo);
             item3PickerV.setStyle(style);
+            item3PickerV.setSelection(item2List.indexOf(defaultSelection.get(2)));
         } else {
             item3PickerV.setVisibility(View.GONE);
         }
