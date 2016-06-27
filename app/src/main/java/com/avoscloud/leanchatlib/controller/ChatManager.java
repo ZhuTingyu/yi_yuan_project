@@ -299,7 +299,13 @@ public class ChatManager extends AVIMClientEventHandler {
             text = ((AVIMTextMessage) msg).getText();
         } else if (msgType == HouseMessageType.HouseMessageType) {
             houseId = "";
-            text = "[房源]";
+            text = "[房源消息]";
+        } else if (msgType == HouseMessageType.ImageMessageType) {
+            houseId = "";
+            text = "[图片消息]";
+        } else if (msgType == HouseMessageType.AudioMessageType) {
+            houseId = "";
+            text = "[语音消息]";
         }
 
         MessageDao dao = DMApplication.getInstance().getMessageDao();

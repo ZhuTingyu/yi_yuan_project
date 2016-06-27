@@ -1,7 +1,6 @@
 package com.avoscloud.leanchatlib.adapter;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +29,6 @@ import com.avoscloud.leanchatlib.utils.PhotoUtils;
 import com.avoscloud.leanchatlib.view.PlayButton;
 import com.avoscloud.leanchatlib.view.ViewHolder;
 import com.lfy.bean.Message;
-import com.lfy.dao.DaoMaster;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.squareup.picasso.Picasso;
 import com.yuan.house.R;
@@ -41,7 +39,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
-
 public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     private static PrettyTime prettyTime = new PrettyTime();
     private ConversationType conversationType;
@@ -49,21 +46,14 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     private int msgViewTypes = 9;
     private ClickListener clickListener;
     private Context context;
-    private DaoMaster master;
     private View contentLayout;
 
     public ChatMessageAdapter(Context context, ConversationType conversationType, org.json.JSONObject object) {
-
-
         super(context);
+
         this.context = context;
         this.conversationType = conversationType;
         this.conversationObject = object;
-
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context, "chat-db", null);
-
-        SQLiteDatabase db = helper.getWritableDatabase();
-        this.master = new DaoMaster(db);
     }
 
     // time
@@ -343,7 +333,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         Object obj = audioMessage.getFileMetaData().get("duration");
         int time = (int) Double.parseDouble(obj.toString());
         setContentLayoutLength(time);
-        timeAudio.setText(String.valueOf(time)+"''");
+        timeAudio.setText(String.valueOf(time) + "''");
         setItemOnLongClickListener(playBtn, audioMessage);
     }
 
@@ -434,6 +424,18 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         return baseView;
     }
 
+    private void setContentLayoutLength(int time) {
+        ViewGroup.LayoutParams params = contentLayout.getLayoutParams();
+        int length = 150 + time * 50;
+        int max = (int) context.getResources().getDimension(R.dimen.chat_ContentMaxWidth);
+        if (length > max) {
+            params.width = max;
+        } else {
+            params.width = length;
+        }
+        contentLayout.setLayoutParams(params);
+    }
+
     private enum MsgViewType {
         ComeText(0), ToText(1), ComeImage(2), ToImage(3), ComeAudio(4), ToAudio(5), ComeLocation(6), ToLocation(7), ChangeHouse(8);
         int value;
@@ -455,18 +457,6 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         void onImageViewClick(AVIMImageMessage imageMsg);
 
         void onAudioLongClick(AVIMAudioMessage audioMessage);
-    }
-
-    private void setContentLayoutLength(int time){
-        ViewGroup.LayoutParams params =  contentLayout.getLayoutParams();
-        int length = 150 + time * 50;
-        int max = (int)context.getResources().getDimension(R.dimen.chat_ContentMaxWidth);
-        if(length > max){
-            params.width = max;
-        }else {
-            params.width = length;
-        }
-        contentLayout.setLayoutParams(params);
     }
 
 }
