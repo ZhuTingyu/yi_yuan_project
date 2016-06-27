@@ -280,8 +280,8 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                 try {
                     object.put("date", DateUtil.toDateString(new Date(date), Constants.kDateFormatStyleShort));
                     object.put("message", resultMessage);
-                    object.put("house_id", houseId);
-                    object.put("lean_id", leanId);
+                    object.put("houseId", houseId);
+                    object.put("leanId", leanId);
                     object.put("is_read", true);
                     object.put("audit_type", auditType);
                 } catch (JSONException e) {

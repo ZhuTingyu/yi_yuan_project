@@ -14,7 +14,6 @@ import com.avos.avoscloud.im.v2.AVIMConversationEventHandler;
 import com.avos.avoscloud.im.v2.AVIMConversationQuery;
 import com.avos.avoscloud.im.v2.AVIMException;
 import com.avos.avoscloud.im.v2.AVIMMessageManager;
-import com.avos.avoscloud.im.v2.AVIMReservedMessageType;
 import com.avos.avoscloud.im.v2.AVIMTypedMessage;
 import com.avos.avoscloud.im.v2.AVIMTypedMessageHandler;
 import com.avos.avoscloud.im.v2.callback.AVIMClientCallback;
@@ -33,6 +32,7 @@ import com.avoscloud.leanchatlib.utils.NetAsyncTask;
 import com.dimo.utils.DateUtil;
 import com.lfy.bean.Message;
 import com.lfy.dao.MessageDao;
+import com.yuan.house.HouseMessageType;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.common.Constants;
 
@@ -271,6 +271,7 @@ public class ChatManager extends AVIMClientEventHandler {
         }.execute();
     }
 
+    // FIXME: 16/6/27 workaround,目前是在本地消息存储之外,另行存储最近的消息,理想情况是直接查msgtable
     public void storeLastMessage(AVIMTypedMessage msg) {
         storeLastMessage(msg, null);
     }
@@ -291,10 +292,14 @@ public class ChatManager extends AVIMClientEventHandler {
 
         if (TextUtils.isEmpty(auditType)) auditType = "0";
 
-        AVIMReservedMessageType msgType = AVIMReservedMessageType.getAVIMReservedMessageType(msg.getMessageType());
-        if (msgType == AVIMReservedMessageType.TextMessageType) {
+        // FIXME: 16/6/27 handle different message types
+        HouseMessageType msgType = HouseMessageType.getMessageType(msg.getMessageType());
+        if (msgType == HouseMessageType.TextMessageType) {
             houseId = (String) ((AVIMTextMessage) msg).getAttrs().get("houseId");
             text = ((AVIMTextMessage) msg).getText();
+        } else if (msgType == HouseMessageType.HouseMessageType) {
+            houseId = "";
+            text = "[房源]";
         }
 
         MessageDao dao = DMApplication.getInstance().getMessageDao();
