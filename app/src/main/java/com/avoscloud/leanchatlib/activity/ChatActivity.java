@@ -104,6 +104,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
     protected View addCameraBtn;
     private LocationHandler locationHandler;
     private boolean mVoiceMode = false;
+    private View assistLayout;
 
     public static ChatActivity getChatInstance() {
         return chatInstance;
@@ -168,6 +169,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         emotionPager = (ViewPager) findViewById(R.id.emotionPager);
         addCameraBtn = findViewById(R.id.btnImageFromCamera);
         addChangeHouseBtn = findViewById(R.id.btnSwitchHouse);
+        assistLayout = findViewById(R.id.chatMoreLayout);
 
 //        sendBtn.setOnClickListener(this);
         contentEdit.setOnClickListener(this);
@@ -179,7 +181,6 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         showEmotionBtn.setOnClickListener(this);
         addCameraBtn.setOnClickListener(this);
         addChangeHouseBtn.setOnClickListener(this);
-
 //        addLocationBtn.setVisibility(View.GONE);
     }
 
@@ -262,6 +263,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
             ButterKnife.findById(this, R.id.rl_field_voicemode).setVisibility(View.VISIBLE);
             ButterKnife.findById(this, R.id.rl_field_textmode).setVisibility(View.GONE);
             hideSoftInputView();
+            hideBottomLayout();
         } else {
             btnModeSwitch.setBackgroundResource(R.drawable.chat_btn_voice_selector);
 
@@ -446,24 +448,33 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
     protected void hideBottomLayout() {
         hideAddLayout();
         chatEmotionLayout.setVisibility(View.GONE);
+        assistLayout.setVisibility(View.GONE);
+    }
+
+    private void showBottomLayout() {
+        assistLayout.setVisibility(View.VISIBLE);
     }
 
     private void toggleEmotionLayout() {
-        if (chatEmotionLayout.getVisibility() == View.VISIBLE) {
+        if (assistLayout.getVisibility() == View.VISIBLE) {
             chatEmotionLayout.setVisibility(View.GONE);
+            hideBottomLayout();
         } else {
             chatEmotionLayout.setVisibility(View.VISIBLE);
+            showBottomLayout();
             hideAddLayout();
             hideSoftInputView();
         }
     }
 
     private void toggleBottomAddLayout() {
-        if (chatAddLayout.getVisibility() == View.VISIBLE) {
+        if (assistLayout.getVisibility() == View.VISIBLE) {
             hideAddLayout();
+            hideBottomLayout();
         } else {
             chatEmotionLayout.setVisibility(View.GONE);
             hideSoftInputView();
+            showBottomLayout();
             showAddLayout();
         }
     }

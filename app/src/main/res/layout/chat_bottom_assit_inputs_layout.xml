@@ -27,7 +27,5 @@
             android:layout_height="wrap_content" />
     </LinearLayout>
 
-    <include
-
-        layout="@layout/chat_bottom_add_layout" />
+    <include layout="@layout/chat_bottom_add_layout" />
 </LinearLayout>
