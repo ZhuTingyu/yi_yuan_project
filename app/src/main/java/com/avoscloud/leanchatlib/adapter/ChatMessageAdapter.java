@@ -1,5 +1,6 @@
 package com.avoscloud.leanchatlib.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.View;
@@ -34,9 +35,12 @@ import com.squareup.picasso.Picasso;
 import com.yuan.house.R;
 
 import org.ocpsoft.prettytime.PrettyTime;
+import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
@@ -46,7 +50,9 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     private int msgViewTypes = 9;
     private ClickListener clickListener;
     private Context context;
+
     private View contentLayout;
+    private Activity activity;
 
     public ChatMessageAdapter(Context context, ConversationType conversationType, org.json.JSONObject object) {
         super(context);
@@ -54,6 +60,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         this.context = context;
         this.conversationType = conversationType;
         this.conversationObject = object;
+        activity = (Activity)context;
     }
 
     // time
@@ -145,6 +152,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 initReservedMessageView(conView, position, typedMessage, others, bean);
             }
         }
+        activity.registerForContextMenu(contentLayout);
 
         return conView;
     }
@@ -212,7 +220,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         ImageView imageView = ViewHolder.findViewById(conView, R.id.imageView);
         ImageView avatarView = ViewHolder.findViewById(conView, R.id.avatar);
         PlayButton playBtn = ViewHolder.findViewById(conView, R.id.playBtn);
-        TextView timeAudio = ViewHolder.findViewById(conView, R.id.time);
+        TextView timeAudio = ViewHolder.findViewById(conView, R.id.dur_time);
         TextView locationView = ViewHolder.findViewById(conView, R.id.locationView);
         TextView usernameView = ViewHolder.findViewById(conView, R.id.username);
 
@@ -258,6 +266,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 AVIMImageMessage imageMsg = (AVIMImageMessage) msg;
                 PhotoUtils.displayImageCacheElseNetwork(imageView, MessageHelper.getFilePath(imageMsg),
                         imageMsg.getFileUrl());
+                contentLayout.setBackground(null);
                 setImageOnClickListener(imageView, imageMsg);
                 message.setMessage("[图片]");
                 break;
@@ -344,7 +353,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 if (clickListener != null) {
                     clickListener.onAudioLongClick(audioMessage);
                 }
-                return false;
+                return true;
             }
         });
     }
@@ -358,7 +367,15 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 }
             }
         });
+        //让imageView不拦截长按事件
+        imageView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return false;
+            }
+        });
     }
+
 
     public View createViewByType(AVIMReservedMessageType type, boolean comeMsg) {
         View baseView;
@@ -426,7 +443,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
 
     private void setContentLayoutLength(int time) {
         ViewGroup.LayoutParams params = contentLayout.getLayoutParams();
-        int length = 150 + time * 50;
+        int length = 150 + time * 20;
         int max = (int) context.getResources().getDimension(R.dimen.chat_ContentMaxWidth);
         if (length > max) {
             params.width = max;

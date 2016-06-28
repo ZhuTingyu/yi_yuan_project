@@ -244,7 +244,7 @@
         <item name="android:layout_height">@dimen/chat_style_avatar_userHead</item>
         <item name="android:clickable">true</item>
         <item name="android:visibility">visible</item>
-        <item name="android:layout_gravity">bottom</item>
+        <item name="android:layout_gravity">top</item>
         <item name="android:src">@drawable/chat_default_user_avatar</item>
     </style>
 
@@ -272,6 +272,13 @@
     <style name="chat_play_btn">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="chat_bottom_add_item">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">80dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_marginTop">10dp</item>
     </style>
 
     <style name="AlertDialogCustom" parent="Theme.AppCompat.Light.Dialog.Alert"/>

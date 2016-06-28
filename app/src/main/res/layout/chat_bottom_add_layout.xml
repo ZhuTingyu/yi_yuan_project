@@ -11,42 +11,30 @@
 
     <TextView
         android:id="@+id/btnImageFromGallery"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        style="@style/chat_bottom_add_item"
         grid:layout_columnWeight="1"
-        grid:layout_rowWeight="1"
         android:drawableTop="@drawable/chat_bottom_add_picture_selector"
-        android:gravity="center"
         android:text="@string/chat_bottom_picture" />
 
     <TextView
         android:id="@+id/btnChooseFile"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        style="@style/chat_bottom_add_item"
         grid:layout_columnWeight="1"
-        grid:layout_rowWeight="1"
         android:drawableTop="@drawable/btn_docment"
-        android:gravity="center"
         android:text="@string/chat_bottom_file" />
 
     <TextView
         android:id="@+id/btnSwitchHouse"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        style="@style/chat_bottom_add_item"
         grid:layout_columnWeight="1"
-        grid:layout_rowWeight="1"
         android:drawableTop="@drawable/btn_house"
-        android:gravity="center"
         android:text="@string/chat_bottom_change" />
 
     <TextView
         android:id="@+id/btnPrecondition"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        style="@style/chat_bottom_add_item"
         grid:layout_columnWeight="1"
-        grid:layout_rowWeight="1"
         android:drawableTop="@drawable/btn_docment"
-        android:gravity="center"
         android:text="@string/chat_bottom_precondition"
         android:visibility="gone"/>
 

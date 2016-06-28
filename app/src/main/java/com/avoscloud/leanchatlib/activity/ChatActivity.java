@@ -10,7 +10,10 @@ import android.support.v7.app.AlertDialog;
 import android.text.Selection;
 import android.text.Spannable;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -25,6 +28,7 @@ import com.avos.avoscloud.im.v2.AVIMTypedMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMAudioMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMImageMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMLocationMessage;
+import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
 import com.avoscloud.leanchatlib.adapter.ChatEmotionGridAdapter;
 import com.avoscloud.leanchatlib.adapter.ChatEmotionPagerAdapter;
 import com.avoscloud.leanchatlib.adapter.ChatMessageAdapter;
@@ -96,6 +100,8 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
     private boolean mVoiceMode = false;
     private View assistLayout;
     private int kActivityRequestCodeImagePickAndSend = 10;
+    //需要转发或复制的信息
+    private String mChatMessage;
 
     public static ChatActivity getChatInstance() {
         return chatInstance;
@@ -126,6 +132,30 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         initListView();
         setSoftInputMode();
         initByIntent(getIntent());
+
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.chat_item_longclick_menu,menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()){
+            case R.id.menu_retransmission:
+                ToastUtil.showShort(mContext,"转发"+mChatMessage);
+                return true;
+            case R.id.menu_copy:
+                ToastUtil.showShort(mContext,"复制"+mChatMessage);
+                return true;
+            case R.id.menu_more:
+                return true;
+            default: return super.onContextItemSelected(item);
+        }
     }
 
     private void initTitleView() {
@@ -184,7 +214,14 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 // TODO: 16/6/27 长按聊天消息显示『转发/复制』的 ContextMenu
-                ToastUtil.show(mContext, "Long click");
+                AVIMTypedMessage message = (AVIMTypedMessage) adapter.getItem(position-1);
+                int type = adapter.getItemViewType(position-1);
+                if(type == 0 || type == 1){
+                    AVIMTextMessage textMessage = (AVIMTextMessage)message;
+                    mChatMessage = textMessage.getText();
+                }else
+                    mChatMessage = MessageHelper.getFilePath(message);
+
                 return false;
             }
         });
@@ -349,6 +386,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
                 });
                 builder.show();
             }
+
         });
         xListView.setAdapter(adapter);
     }

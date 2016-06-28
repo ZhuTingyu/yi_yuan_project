@@ -88,6 +88,7 @@ public class RecordButton extends Button {
     switch (action) {
       case MotionEvent.ACTION_DOWN:
         startRecord();
+        setText(R.string.chat_bottom_record_layout_upToRecord);
         break;
       case MotionEvent.ACTION_UP:
         if (status == RELEASE_TO_CANCEL) {
@@ -95,6 +96,7 @@ public class RecordButton extends Button {
         } else {
           finishRecord();
         }
+        setText(R.string.chat_bottom_record_layout_pressToRecord);
         break;
       case MotionEvent.ACTION_MOVE:
         if (event.getY() < 0) {
@@ -117,11 +119,14 @@ public class RecordButton extends Button {
 
   private void setTextViewByStatus() {
     if (status == RELEASE_TO_CANCEL) {
-      textView.setTextColor(getColor(R.color.chat_record_btn_red));
+      textView.setBackgroundResource(R.drawable.record_textview_background);
       textView.setText(R.string.chat_record_button_releaseToCancel);
+      setText(R.string.chat_record_button_releaseToCancel);
     } else if (status == SLIDE_UP_TO_CANCEL) {
+      textView.setBackground(null);
       textView.setTextColor(getColor(R.color.chat_common_white));
       textView.setText(R.string.chat_record_button_slideUpToCancel);
+      setText(R.string.chat_bottom_record_layout_upToRecord);
     }
   }
 
