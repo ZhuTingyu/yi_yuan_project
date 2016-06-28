@@ -1,7 +1,6 @@
 package com.yuan.house.activities;
 
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -47,8 +46,6 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.sleepbot.datetimepicker.time.RadialPickerLayout;
 import com.sleepbot.datetimepicker.time.TimePickerDialog;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
 import com.tasomaniac.android.widget.DelayedProgressDialog;
 import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
@@ -425,7 +422,6 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             e.printStackTrace();
         }
 
-        // TODO: 16/6/10 get last user id??? WTH?
         String leanIdString = leanIdList.optString(leanIdList.length() - 1);
 
         // FIXME: 16/6/10 WTF!!! isAgency 的作用是什么? 中介不能发这种类型消息么?
@@ -449,7 +445,8 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 MessageAgent messageAgent = new MessageAgent(avimConversation);
                 messageAgent.sendEncapsulatedTypedMessage(message);
 
-                // TODO: 16/6/10 发送成功之后需要缓存该条消息到本地
+                // 发送成功之后需要缓存该条消息到本地
+                ChatManager.getInstance().storeLastMessage(message);
             }
         });
     }
