@@ -25,8 +25,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.AVIMException;
 import com.avos.avoscloud.im.v2.AVIMReservedMessageType;
@@ -42,7 +40,7 @@ import com.avoscloud.chat.util.Utils;
 import com.avoscloud.leanchatlib.activity.ChatActivity;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.ConversationHelper;
-import com.avoscloud.leanchatlib.model.AVIMHouseInfoMessage;
+import com.avoscloud.leanchatlib.model.AVIMHouseMessage;
 import com.dimo.helper.ViewHelper;
 import com.dimo.utils.DateUtil;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -420,33 +418,13 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                 }
                 case kRequestCodeSwitchHouse: {
                     String raw = data.getStringExtra(Constants.kBundleKeyAfterSwitchHouseSelected);
-                    JSONObject object;
-                    try {
-                        object = new JSONObject(raw);
+                    JSONObject object = switchHouse(raw);
 
-                        JSONArray images = object.optJSONArray("images");
-
-                        AVIMHouseInfoMessage message = new AVIMHouseInfoMessage();
-                        message.setHouseName(object.optString("estate_name"));
-                        message.setHouseAddress(object.optString("location_text"));
-                        if (images != null) {
-                            message.setHouseImage(images.optString(0));
-                        }
-
-                        Map<String, Object> attrs = JSON.parseObject(raw, new TypeReference<Map<String, Object>>() {
-                        });
-                        message.setAttrs(attrs);
-
-                        messageAgent.sendEncapsulatedTypedMessage(message);
-                        getWebViewFragment().getBridge().callHandler("nativeChangeHouse", object.getString("id"));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                    getWebViewFragment().getBridge().callHandler("nativeChangeHouse", object.optString("id"));
                     break;
                 }
             }
         }
-
     }
 
     @Override
@@ -528,6 +506,10 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
     @Override
     public void onWebChangeHouse(String data) {
+        switchHouse(data);
+    }
+
+    private JSONObject switchHouse(String data) {
         JSONObject object = null;
         for (int i = 0; i < houseInfos.size(); i++) {
             object = houseInfos.get(i);
@@ -537,23 +519,28 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                 houseId = object.optString("id");
             }
 
-            if (data.equals(houseId)) return;
+            if (data.equals(houseId)) return null;
         }
 
-        if (object == null) return;
+        if (object == null) return null;
 
         JSONArray images = object.optJSONArray("images");
 
-        AVIMHouseInfoMessage message = new AVIMHouseInfoMessage();
-        message.setHouseName(object.optString("estate_name"));
-        message.setHouseAddress(object.optString("location_text"));
-        message.setHouseImage(images.optString(0));
+        AVIMHouseMessage message = new AVIMHouseMessage();
 
-        Map<String, Object> attrs = JSON.parseObject(jsonFormatParams.toString(), new TypeReference<Map<String, Object>>() {
-        });
+        Map<String, Object> attrs = new HashMap<>();
+        attrs.put("houseName", object.optString("estate_name"));
+        // TODO: 16/6/28 要考虑和匿名系统集成
+        attrs.put("username", "wo");
+        attrs.put("houseImage", images.optString(0));
+        attrs.put("houseId", object.optString("id"));
+        attrs.put("houseAddress", object.optString("location_text"));
+
         message.setAttrs(attrs);
 
         messageAgent.sendEncapsulatedTypedMessage(message);
+
+        return object;
     }
 
     private JSONObject getHeightObject() {

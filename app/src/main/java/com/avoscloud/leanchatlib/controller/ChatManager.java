@@ -23,6 +23,7 @@ import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
 import com.avoscloud.leanchatlib.activity.ChatActivity;
 import com.avoscloud.leanchatlib.db.MsgsTable;
 import com.avoscloud.leanchatlib.db.RoomsTable;
+import com.avoscloud.leanchatlib.model.AVIMHouseMessage;
 import com.avoscloud.leanchatlib.model.ConversationType;
 import com.avoscloud.leanchatlib.model.MessageEvent;
 import com.avoscloud.leanchatlib.model.Room;
@@ -298,7 +299,8 @@ public class ChatManager extends AVIMClientEventHandler {
             houseId = (String) ((AVIMTextMessage) msg).getAttrs().get("houseId");
             text = ((AVIMTextMessage) msg).getText();
         } else if (msgType == HouseMessageType.HouseMessageType) {
-            houseId = "";
+            houseId = (String) ((AVIMHouseMessage) msg).getAttrs().get("house_id");
+            auditType = (String) ((AVIMHouseMessage) msg).getAttrs().get("audit_type");
             text = "[房源消息]";
         } else if (msgType == HouseMessageType.ImageMessageType) {
             houseId = "";

@@ -65,7 +65,7 @@ public class MessageAgent {
                     e1.printStackTrace();
                 }
 
-                ChatManager.getInstance().storeLastMessage(msg, object);
+//                ChatManager.getInstance().storeLastMessage(msg, object);
 
                 if (e == null && originPath != null) {
                     File tmpFile = new File(originPath);
