@@ -171,6 +171,8 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
     public void onBackPressed() {
         if (assistLayout.getVisibility() == View.VISIBLE) {
             assistLayout.setVisibility(View.GONE);
+        } else {
+            finish();
         }
     }
 

@@ -50,22 +50,22 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/chat_BottomHeight"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content">
 
             <ImageButton
                 android:id="@+id/btnModeSwitch"
                 android:layout_width="@dimen/chat_BottomBtnSize"
                 android:layout_height="@dimen/chat_BottomBtnSize"
-                android:layout_centerVertical="true"
+                android:layout_alignBottom="@+id/rl_bottom_parent"
                 android:layout_margin="@dimen/chat_BottomBtnMargin"
                 android:background="@drawable/chat_btn_voice_selector"
                 android:textColor="@color/chat_base_color_text_black"
                 android:visibility="visible" />
 
             <RelativeLayout
+                android:id="@id/rl_bottom_parent"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_toLeftOf="@+id/btnMoreRL"
                 android:layout_toRightOf="@id/btnModeSwitch">
@@ -73,31 +73,31 @@
                 <RelativeLayout
                     android:id="@+id/rl_field_textmode"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:visibility="visible">
 
                     <com.avoscloud.leanchatlib.view.EmotionEditText
                         android:id="@+id/editChatField"
                         style="@android:style/Widget.Holo.EditText"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:imeOptions="actionSend"
-                        android:inputType="text"
-                        android:maxLines="1"
-                        android:minHeight="40dip"
-                        android:paddingBottom="3dp"
-                        android:paddingLeft="1dp"
-                        android:paddingRight="1dp"
-                        android:paddingTop="3dp"
-                        android:textSize="18sp" />
+                        android:maxLines="3"
+                        android:minHeight="@dimen/chat_BottomHeight"
+                        android:paddingBottom="8dp"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="44dp"
+                        android:paddingTop="5dp"
+                        android:textSize="16sp" />
 
                     <Button
                         android:id="@+id/btnEmotionInput"
                         android:layout_width="@dimen/chat_BottomEmojiBtnSize"
                         android:layout_height="@dimen/chat_BottomEmojiBtnSize"
+                        android:layout_alignBottom="@id/editChatField"
                         android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
+                        android:layout_marginBottom="15dip"
                         android:layout_marginRight="10dip"
                         android:background="@drawable/chat_btn_emo_selector" />
                 </RelativeLayout>
@@ -105,7 +105,7 @@
                 <RelativeLayout
                     android:id="@+id/rl_field_voicemode"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="@dimen/chat_BottomHeight"
                     android:paddingBottom="@dimen/chat_recordBtnPadding"
                     android:paddingTop="@dimen/chat_recordBtnPadding"
                     android:visibility="gone">
@@ -125,8 +125,8 @@
                 android:id="@id/btnMoreRL"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true">
+                android:layout_alignBottom="@id/rl_bottom_parent"
+                android:layout_alignParentRight="true">
 
                 <TextView
                     android:id="@+id/btnMoreSend"
