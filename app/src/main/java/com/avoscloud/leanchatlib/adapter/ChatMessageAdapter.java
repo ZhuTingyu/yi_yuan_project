@@ -1,6 +1,5 @@
 package com.avoscloud.leanchatlib.adapter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.View;
@@ -10,7 +9,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.avos.avoscloud.im.v2.AVIMMessage;
 import com.avos.avoscloud.im.v2.AVIMReservedMessageType;
@@ -49,7 +47,6 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     private Context context;
 
     private View contentLayout;
-    private Activity activity;
 
     public ChatMessageAdapter(Context context, ConversationType conversationType, org.json.JSONObject object) {
         super(context);
@@ -57,7 +54,6 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         this.context = context;
         this.conversationType = conversationType;
         this.conversationObject = object;
-        activity = (Activity) context;
     }
 
     // time
@@ -149,7 +145,6 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 initReservedMessageView(conView, position, typedMessage, others, bean);
             }
         }
-        activity.registerForContextMenu(contentLayout);
 
         return conView;
     }
@@ -165,27 +160,17 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         ImageView img = ViewHolder.findViewById(conView, R.id.img);
         TextView title = ViewHolder.findViewById(conView, R.id.title);
         TextView area = ViewHolder.findViewById(conView, R.id.area);
-        TextView house_params = ViewHolder.findViewById(conView, R.id.house_params);
+        TextView house_param = ViewHolder.findViewById(conView, R.id.house_params);
+        house_param.setVisibility(View.GONE);
 
         View statusSendFailed = ViewHolder.findViewById(conView, R.id.status_send_failed);
         View statusSendSucceed = ViewHolder.findViewById(conView, R.id.status_send_succeed);
         View statusSendStart = ViewHolder.findViewById(conView, R.id.status_send_start);
 
-        JSONArray images = object.getJSONArray("images");
+        Picasso.with(ctx).load(object.getString("houseImage")).into(img);
 
-        if (images != null) {
-            Picasso.with(ctx).load(images.getString(0)).into(img);
-        }
-
-        title.setText(object.getString("estate_name"));
-        area.setText(object.getString("acreage") + "㎡");
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(object.getString("room_count"));
-        sb.append("室");
-        sb.append(object.getString("parlour_count"));
-        sb.append("厅");
-        house_params.setText(sb.toString());
+        title.setText(object.getString("houseName"));
+        area.setText(object.getString("houseAddress"));
 
         if (isMessageSentByMe == false) {
             hideStatusViews(statusSendStart, statusSendFailed, statusSendSucceed);

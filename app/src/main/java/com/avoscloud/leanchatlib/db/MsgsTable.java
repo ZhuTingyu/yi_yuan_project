@@ -93,7 +93,7 @@ public class MsgsTable {
   }
 
   public List<AVIMTypedMessage> selectMsgs(String convid, long maxTime, int limit) {
-    List<AVIMTypedMessage> msgs = new ArrayList<AVIMTypedMessage>();
+    List<AVIMTypedMessage> msgs = new ArrayList<>();
     SQLiteDatabase db = dbHelper.getReadableDatabase();
     Cursor c = db.query(MSGS_TABLE, null, "convid=? and time<?", new String[]{convid, maxTime + ""}, null, null,
         TIME + " desc",
