@@ -63,6 +63,7 @@ import com.yuan.house.ui.fragment.WebViewBaseFragment;
 import com.yuan.house.ui.fragment.WebViewFragment;
 import com.yuan.house.utils.FileUtil;
 import com.yuan.house.utils.ImageUtil;
+import com.yuan.house.utils.SystemServiceUtil;
 import com.yuan.house.utils.ToastUtil;
 
 import org.apache.commons.io.FileUtils;
@@ -205,18 +206,11 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     protected void hideSoftInputView() {
-        if (getWindow().getAttributes().softInputMode != WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN) {
-            InputMethodManager manager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-            View currentFocus = getCurrentFocus();
-            if (currentFocus != null) {
-                manager.hideSoftInputFromWindow(currentFocus.getWindowToken(),
-                        InputMethodManager.HIDE_NOT_ALWAYS);
-            }
-        }
+        SystemServiceUtil.hideSoftInputView(this);
     }
 
     protected void setSoftInputMode() {
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        SystemServiceUtil.setSoftInputMode(this);
     }
 
     /**

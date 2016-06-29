@@ -1,19 +1,28 @@
 package com.yuan.house.ui.fragment;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.avoscloud.leanchatlib.utils.PathUtils;
+import com.avoscloud.leanchatlib.utils.ProviderPathUtils;
 import com.squareup.okhttp.OkHttpClient;
 import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
@@ -22,39 +31,74 @@ import com.yuan.house.common.Constants;
 import com.yuan.house.enumerate.ProposalMediaType;
 import com.yuan.house.enumerate.ProposalMessageCategory;
 import com.yuan.house.enumerate.ProposalSourceType;
-import com.yuan.house.ui.view.AudioRecorderButton;
+import com.yuan.house.event.InputBottomBarEvent;
+import com.yuan.house.event.InputBottomBarRecordEvent;
+import com.yuan.house.event.InputBottomBarTextEvent;
+import com.yuan.house.helper.AuthHelper;
+import com.yuan.house.ui.view.InputBottomBar;
+import com.yuan.house.utils.ToastUtil;
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.StringCallback;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.Call;
 
 /**
  * 用户端和中介端合并在一个Fragment里
  * Created by KevinLee on 2016/4/24.
  */
 public class ProposalFragment extends WebViewBaseFragment {
-    private static final int SUCCESS = 1;
-    private static final int TIMEOUT = 0;
-    private final OkHttpClient client = new OkHttpClient();
-    private final int SYS_INTENT_REQUEST = 0XFF01;
+
+    private static final int TAKE_CAMERA_REQUEST = 2;
+    private static final int GALLERY_REQUEST = 0;
+    private static final int GALLERY_KITKAT_REQUEST = 3;
+    protected String localCameraPath;
+
     protected OnProposalInteractionListener mBridgeListener;
+
     @BindView(R.id.proposal)
     Button proposal;
+
     @BindView(R.id.complaint)
     Button complaint;
+
     @BindView(R.id.bug)
     Button bug;
-    @BindView(R.id.et_info)
-    EditText info;
-    @BindView(R.id.btn_recorder)
-    AudioRecorderButton recorderButton;
+
+    @BindView(R.id.swipe_refresh_widget)
+    SwipeRefreshLayout mSwipeRefreshWidget;
+
+    @BindView(R.id.history_info)
+    RecyclerView mRecyclerView;
+
+    @BindView(R.id.chat_inputbottombar)
+    InputBottomBar inputBottomBar;
+
+    private LinearLayoutManager mLayoutManager;
+    private int lastVisibleItem;
+    private MyAdapter adapter;
+    private int mCurrentPage = 1;
 
     TextView app_upload_image, app_complaint, app_cancle;
 
     private ProposalSourceType sourceType = ProposalSourceType.UNKNOWN;
-    private ProposalMediaType msg_type = ProposalMediaType.TEXT;           //1:文本，2：语音，3：图片
-    private ProposalMessageCategory category = ProposalMessageCategory.SUGGESTION;           //0：投诉；1：建议；2：BUG
+    private ProposalMediaType msg_type = ProposalMediaType.TEXT;                            //1:文本，2：语音，3：图片
+    private ProposalMessageCategory category = ProposalMessageCategory.SUGGESTION;          //0：投诉；1：建议；2：BUG
+    private String content;
     private int duration = 0;       //录音时长
+
+
     private View mPopView;
     private PopupWindow mPopupWindow;
     private WindowManager.LayoutParams params;
@@ -82,6 +126,10 @@ public class ProposalFragment extends WebViewBaseFragment {
             redirectToLoadUrl(Constants.kWebpageAgencyCenter);
             sourceType = ProposalSourceType.FROM_AGENCY;
         }
+
+        localCameraPath = PathUtils.getPicturePathByCurrentTime(getContext());
+        //   EventBus.getDefault().register(this);
+
         return view;
     }
 
@@ -93,73 +141,121 @@ public class ProposalFragment extends WebViewBaseFragment {
 
         this.params = getActivity().getWindow().getAttributes();
 
+        inputBottomBar.setShowDefaultActionLayout(false);
         initPopupView();
         initPopupViewConfig();
-        initOnClickListener();
+        initHistoryView();
     }
 
-    private void initOnClickListener() {
-        //TODO 监听软键盘回车按钮
-//        info.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-//            @Override
-//            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-//                if (actionId == EditorInfo.IME_ACTION_SEND
-//                        || (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
-//
-//                    if (TextUtils.isEmpty(info.getText()))
-//                        return false;
-//                    Map<String, Object> params = new HashMap<>();
-//                    msg_type = ProposalMediaType.TEXT;
-//                    params.put("msg_type", msg_type);
-//                    params.put("type", sourceType);
-//                    params.put("content", info.getText().toString());
-//                    params.put("complain_agency_id", 0);
-//                    params.put("category", category);
-//                    params.put("duration", duration);
-//                    //触发软键盘回车事件，上传服务器;
-//                    try {
-//                        OkHttpUtils.postString().url(Constants.kWebServiceSendFeedback)
-//                                .addHeader("Content-Type", "application/json")
-//                                .addHeader("token", getUserToken())
-//                                .content(com.alibaba.fastjson.JSONObject.toJSONString(params))
-//                                .mediaType(okhttp3.MediaType.parse("application/json"))
-//                                .build()
-//                                .execute(new StringCallback() {
-//
-//                                    @Override
-//                                    public void onError(Call call, Exception e) {
-//
-//                                    }
-//
-//                                    @Override
-//                                    public void onResponse(String response) {
-//                                        try {
-//                                            new JSONObject(response);
-//                                            ToastUtil.showShort(getContext(), "提交成功");
-//                                        } catch (JSONException e) {
-//                                            ToastUtil.showShort(getContext(), "提交失败");
-//                                            e.printStackTrace();
-//                                        }
-//                                    }
-//                                });
-//
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                    }
-//                    return true;
-//                }
-//                return false;
-//            }
-//        });
 
-        recorderButton.setAudioFinishRecorderListener(new AudioRecorderButton.AudioFinishRecorderListener() {
+    /**
+     * init recycler view
+     */
+    private void initHistoryView() {
+        /*mSwipeRefreshWidget.setProgressViewOffset(false, 0, (int) TypedValue
+                .applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources()
+                        .getDisplayMetrics()));*/
+
+        mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+
             @Override
-            public void onFinish(float seconds, String filePath) {
-                // Upload recorded audio to backend
-                msg_type = ProposalMediaType.AUDIO;
-                mBridgeListener.onUploadProposalAudio(filePath);
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+                if (newState == RecyclerView.SCROLL_STATE_IDLE &&
+                        (lastVisibleItem + 1 == adapter.getItemCount())) {
+                    mSwipeRefreshWidget.setRefreshing(true);
+                    int page = mCurrentPage + 1;
+                    getHistoryMessages(page);
+                }
             }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                lastVisibleItem = mLayoutManager.findLastVisibleItemPosition();
+            }
+
         });
+
+        mLayoutManager = new LinearLayoutManager((Context) mFragmentListener);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        adapter = new MyAdapter();
+        mRecyclerView.setAdapter(adapter);
+        getHistoryMessages(mCurrentPage);
+    }
+
+    /**
+     * Adapter of recyclerView
+     */
+    public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
+        public ArrayList<MyData> complainDatas = new ArrayList<>();
+        public ArrayList<MyData> proposalDatas = new ArrayList<>();
+        public ArrayList<MyData> bugDatas = new ArrayList<>();
+
+        public MyAdapter() {
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.chat_item_text, viewGroup,false);
+            ViewHolder vh = new ViewHolder(view);
+            return vh;
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder viewHolder, int position) {
+            ArrayList<MyData> datas = getCurrentDatas();
+            viewHolder.mTextView.setText(datas.get(position).content);
+        }
+
+        @Override
+        public int getItemCount() {
+            return getCurrentDatas().size();
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
+            public TextView mTextView;
+            public ViewHolder(View view){
+                super(view);
+                mTextView = (TextView) view.findViewById(R.id.textContent);
+            }
+        }
+
+        private ArrayList<MyData> getCurrentDatas() {
+            switch (category) {
+                case COMPLAINT:
+                    return complainDatas;
+                case SUGGESTION:
+                    return proposalDatas;
+                case BUG:
+                    return bugDatas;
+            }
+            return null;
+        }
+
+        public void addData(MyData data) {
+            int category = data.category;
+            if (category == ProposalMessageCategory.COMPLAINT.ordinal()) {
+                complainDatas.add(data);
+            } else if (category == ProposalMessageCategory.SUGGESTION.ordinal()) {
+                proposalDatas.add(data);
+            } else if (category == ProposalMessageCategory.BUG.ordinal()) {
+                bugDatas.add(data);
+            }
+        }
+    }
+
+    private class MyData {
+        String user_id;
+        int msg_type;
+        String content;
+        int type;
+        int complain_agency_id;
+        int category;
+        int duration;
+        String created_at;
+        String updated_at;
     }
 
     @Override
@@ -213,7 +309,7 @@ public class ProposalFragment extends WebViewBaseFragment {
         });
     }
 
-    @OnClick({R.id.proposal, R.id.complaint, R.id.bug, R.id.btn_more})
+    @OnClick({R.id.proposal, R.id.complaint, R.id.bug})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.complaint: {
@@ -221,6 +317,7 @@ public class ProposalFragment extends WebViewBaseFragment {
                 proposal.setSelected(false);
                 bug.setSelected(false);
                 category = ProposalMessageCategory.COMPLAINT;
+                if (adapter != null) adapter.notifyDataSetChanged();
                 break;
             }
             case R.id.proposal: {
@@ -228,6 +325,7 @@ public class ProposalFragment extends WebViewBaseFragment {
                 proposal.setSelected(true);
                 bug.setSelected(false);
                 category = ProposalMessageCategory.SUGGESTION;
+                if (adapter != null) adapter.notifyDataSetChanged();
                 break;
             }
             case R.id.bug: {
@@ -235,19 +333,20 @@ public class ProposalFragment extends WebViewBaseFragment {
                 proposal.setSelected(false);
                 bug.setSelected(true);
                 category = ProposalMessageCategory.BUG;
-                break;
-            }
-            case R.id.btn_more: {
-                mPopupWindow.showAtLocation(mWebView, Gravity.BOTTOM, 0, 0);
-                mPopupWindow.setAnimationStyle(R.style.app_pop);
-                mPopupWindow.setOutsideTouchable(true);
-                mPopupWindow.setFocusable(true);
-                mPopupWindow.update();
-                params.alpha = 0.7f;
-                setWindowAttributes();
+                if (adapter != null) adapter.notifyDataSetChanged();
                 break;
             }
         }
+    }
+
+    private void onBtnMore() {
+        mPopupWindow.showAtLocation(mWebView, Gravity.BOTTOM, 0, 0);
+        mPopupWindow.setAnimationStyle(R.style.app_pop);
+        mPopupWindow.setOutsideTouchable(true);
+        mPopupWindow.setFocusable(true);
+        mPopupWindow.update();
+        params.alpha = 0.7f;
+        setWindowAttributes();
     }
 
     private void closePopupWindow() {
@@ -262,88 +361,233 @@ public class ProposalFragment extends WebViewBaseFragment {
         getActivity().getWindow().setAttributes(params);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-//        if (requestCode == SYS_INTENT_REQUEST && resultCode == getActivity().RESULT_OK && data != null) {
-//            Uri uri = data.getData();
-//            try {
-//                msg_type = ProposalMediaType.IMAGE;
-//                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
-//                SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-//                String fileName = formatter.format(System.currentTimeMillis()) + ".jpg";
-//                bitmap = ImageUtil.getInstance().compress(bitmap);
-//                FileUtil.saveMyBitmap(FileUtil.getWaterPhotoPath(), fileName, bitmap);
-//                //上传至服务器
-//                uploadFile(FileUtil.getWaterPhotoPath() + fileName);
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-    }
-
     public interface OnProposalInteractionListener extends WebViewBaseFragment.OnBridgeInteractionListener {
         void onUploadProposalAudio(String data);
 
         void onSelectImageForProposal();
     }
 
-//    private class UploadResultCallBack extends OkHttpClientManager.ResultCallback<String> {
-//        @Override
-//        public void onError(Request request, Exception e) {
-//
-//        }
-//
-//        @Override
-//        public void onResponse(String response) {
-//            Log.i("response", response);
-//            try {
-//                JSONArray jsonArray = new JSONArray(response);
-//                JSONObject jsonObject = jsonArray.getJSONObject(0);
-//                String responseUrl = jsonObject.getJSONArray("original").getString(0);
-//                Map<String, Object> params = new HashMap<>();
-//                params.put("msg_type", msg_type);
-//                params.put("type", sourceType);
-//                params.put("content", responseUrl);
-//                params.put("complain_agency_id", 0);
-//                params.put("category", category);
-//                params.put("duration", duration);
-//                OkHttpClientManager.postJson(Constants.kWebServiceSendFeedback,
-//                        com.alibaba.fastjson.JSONObject.toJSONString(params),
-//                        getUserToken(),
-//                        new SendFeedBackCallBack());
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
-//
-//    private class SendFeedBackCallBack implements Callback {
-//
-//        @Override
-//        public void onFailure(Request request, IOException e) {
-//            Message message = handler.obtainMessage();
-//            message.what = TIMEOUT;
-//            handler.sendMessage(message);
-//        }
-//
-//        @Override
-//        public void onResponse(Response response) throws IOException {
-//            Message message = handler.obtainMessage();
-//            message.what = SUCCESS;
-//            if (response.isSuccessful())
-//                message.arg1 = 1;
-//            else
-//                message.arg1 = 0;
-//            handler.sendMessage(message);
-//        }
-//    }
+    /**
+     * 输入文字事件处理
+     */
+    public void onEvent(InputBottomBarTextEvent textEvent) {
+        if (null != textEvent && !TextUtils.isEmpty(textEvent.sendContent)) {
+            msg_type = ProposalMediaType.TEXT;
+            content = textEvent.sendContent;
+            sendMessage();
+        }
+    }
 
+    /**
+     * 输入语音事件处理
+     */
+    public void onEvent(InputBottomBarRecordEvent recordEvent) {
+        if (null != recordEvent && !TextUtils.isEmpty(recordEvent.audioPath)) {
+            msg_type = ProposalMediaType.AUDIO;
+            uploadFile("");
+        }
+    }
+
+    /**
+     * 发送图片等事件处理
+     */
+    public void onEvent(InputBottomBarEvent event) {
+        if (null != event) {
+            switch (event.eventAction) {
+                case InputBottomBarEvent.INPUTBOTTOMBAR_ACTION:
+                    onBtnMore();
+                    break;
+                case InputBottomBarEvent.INPUTBOTTOMBAR_IMAGE_ACTION:
+                    msg_type = ProposalMediaType.IMAGE;
+                    selectImageFromLocal();
+                    break;
+                case InputBottomBarEvent.INPUTBOTTOMBAR_CAMERA_ACTION:
+                    msg_type = ProposalMediaType.IMAGE;
+                    selectImageFromCamera();
+                    break;
+            }
+        }
+    }
+
+    /**
+     * 上次图片等文件
+     */
+    private void uploadFile(String filePath) {
+
+        OkHttpUtils.postFile().url(Constants.kWebServiceFileUpload)
+                .addHeader("Content-Type", "application/json")
+                .addHeader("token", AuthHelper.userToken())
+                .file(new File(filePath))
+                .build()
+                .execute(new StringCallback() {
+
+                    @Override
+                    public void onError(Call call, Exception e) {
+
+                    }
+
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject json = new JSONObject(response);
+                            content = json.optString("original");
+                            if (!TextUtils.isEmpty(content)) {
+                                sendMessage();
+                            }
+                        } catch (JSONException e) {
+                            ToastUtil.showShort(getContext(), "提交失败");
+                            e.printStackTrace();
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 发送投诉/建议/BUG信息
+     */
+    private void sendMessage() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("msg_type", msg_type.ordinal());
+        params.put("type", sourceType.ordinal());
+        params.put("content", content);
+        params.put("complain_agency_id", 0);
+        params.put("category", category.ordinal());
+        params.put("duration", duration);
+        OkHttpUtils.postString().url(Constants.kWebServiceSendFeedback)
+                .addHeader("Content-Type", "application/json")
+                .addHeader("token", AuthHelper.userToken())
+                .content(com.alibaba.fastjson.JSONObject.toJSONString(params))
+                .mediaType(okhttp3.MediaType.parse("application/json"))
+                .build()
+                .execute(new StringCallback() {
+
+                    @Override
+                    public void onError(Call call, Exception e) {
+
+                    }
+
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            ToastUtil.showShort(getContext(), "提交成功");
+                            MyData data = parse2MyData(jsonObject);
+                            adapter.addData(data);
+                            adapter.notifyDataSetChanged();
+                        } catch (JSONException e) {
+                            ToastUtil.showShort(getContext(), "提交失败");
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+    }
+
+    /**
+     * 获取建议/投诉/BUG的历史纪录
+     */
+    private void getHistoryMessages(int page) {
+        OkHttpUtils.get().url(Constants.kWebServiceGetFeedback + page)
+                .addHeader("Content-Type", "application/json")
+                .addHeader("token", AuthHelper.userToken())
+                .build()
+                .execute(new StringCallback() {
+
+                    @Override
+                    public void onError(Call call, Exception e) {
+                        mSwipeRefreshWidget.setRefreshing(false);
+                    }
+
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONArray jsonArray = new JSONArray(response);
+                            for (int i = 0; i < jsonArray.length(); ++i) {
+                                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                MyData data = parse2MyData(jsonObject);
+                                adapter.addData(data);
+                            }
+                            adapter.notifyDataSetChanged();
+                            ++mCurrentPage;
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        } finally {
+                            mSwipeRefreshWidget.setRefreshing(false);
+                        }
+                    }
+                });
+    }
+
+    private MyData parse2MyData(JSONObject jsonObject) {
+        MyData data = new MyData();
+        data.user_id = jsonObject.optString("user_id", "");
+        data.msg_type = jsonObject.optInt("msg_type", 0);
+        data.content = jsonObject.optString("content", "");
+        data.type = jsonObject.optInt("type", 0);
+        data.complain_agency_id = jsonObject.optInt("complain_agency_id", 0);
+        data.category = jsonObject.optInt("category", 0);
+        data.duration = jsonObject.optInt("duration", 0);
+        data.created_at = jsonObject.optString("created_at", "");
+        data.updated_at = jsonObject.optString("updated_at", "");
+        return data;
+    }
+
+    public void selectImageFromLocal() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(Intent.createChooser(intent, getResources().getString(R.string.chat_activity_select_picture)),
+                    GALLERY_REQUEST);
+        } else {
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("image/*");
+            startActivityForResult(intent, GALLERY_KITKAT_REQUEST);
+        }
+    }
+
+    public void selectImageFromCamera() {
+        Intent takePictureIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        Uri imageUri = Uri.fromFile(new File(localCameraPath));
+        takePictureIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, imageUri);
+        if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, TAKE_CAMERA_REQUEST);
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            switch (requestCode) {
+                case GALLERY_REQUEST:
+                case GALLERY_KITKAT_REQUEST:
+                    if (data == null) {
+                        //toast("return intent is null");
+                        return;
+                    }
+                    Uri uri;
+                    if (requestCode == GALLERY_REQUEST) {
+                        uri = data.getData();
+                    } else {
+                        //for Android 4.4
+                        uri = data.getData();
+                        final int takeFlags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                        //                 getActivity().getContentResolver().takePersistableUriPermission(uri, takeFlags);
+                    }
+                    String localSelectPath = ProviderPathUtils.getPath(getActivity(), uri);
+                    inputBottomBar.hideMoreLayout();
+                    uploadFile(localSelectPath);
+                    break;
+                case TAKE_CAMERA_REQUEST:
+                    inputBottomBar.hideMoreLayout();
+                    uploadFile(localCameraPath);
+                    break;
+            }
+        }
+    }
 }

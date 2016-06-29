@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bottomLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/chat_layout_home_bg_bottombar"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/chat_BottomHeight"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/btn_mode_switch"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="10dp"
+            android:layout_centerVertical="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/btn_keybord_switchover" />
+
+        <ImageView
+            android:id="@+id/btn_more"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="@dimen/chat_BottomBtnMargin"
+            android:scaleType="fitXY"
+            android:background="@drawable/btn_other" />
+
+        <RelativeLayout
+            android:id="@+id/action_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/btn_mode_switch"
+            android:layout_toLeftOf="@id/btn_more">
+
+            <RelativeLayout
+                android:id="@+id/rl_field_textmode"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="visible">
+
+                <com.avoscloud.leanchatlib.view.EmotionEditText
+                    android:id="@+id/editChatField"
+                    style="@android:style/Widget.Holo.EditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerVertical="true"
+                    android:layout_margin="5dp"
+                    android:imeOptions="actionSend"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:textSize="18sp" />
+
+                <Button
+                    android:id="@+id/btnEmotionInput"
+                    android:layout_width="@dimen/chat_BottomBtnSize"
+                    android:layout_height="@dimen/chat_BottomBtnSize"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/chat_btn_emo_selector" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rl_field_voicemode"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="@dimen/chat_recordBtnPadding"
+                android:visibility="gone">
+
+                <com.avoscloud.leanchatlib.view.RecordButton
+                    android:id="@+id/recordBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:background="@drawable/proposal_send_background"
+                    android:text="@string/chat_bottom_record_layout_pressToRecord"
+                    android:textColor="#C4C4C4" />
+            </RelativeLayout>
+        </RelativeLayout>
+
+        <!--<com.yuan.house.ui.view.AudioRecorderButton
+            android:id="@+id/btn_recorder"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_weight="1"
+            android:background="@drawable/proposal_send_background"
+            android:text="@string/chat_bottom_record_layout_pressToRecord"
+            android:textColor="#C4C4C4" />-->
+
+
+    </RelativeLayout>
+
+    <include layout="@layout/chat_bottom_more_layout"
+        android:visibility="gone"/>
+
+</LinearLayout>
