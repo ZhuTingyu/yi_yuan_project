@@ -82,62 +82,28 @@
             </LinearLayout>
         </RelativeLayout>
 
-        <EditText
-            android:id="@+id/et_info"
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_refresh_widget"
             android:layout_width="match_parent"
-            android:layout_height="135dp"
-            android:background="#FFFFFF"
-            android:gravity="top"
-            android:hint="  在这里说说你的看法或建议"
-            android:maxLength="1000"
-            android:padding="10dp"
-            android:textSize="14dp" />
+            android:layout_height="135dp">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/history_info"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbars="vertical" />
+
+        </android.support.v4.widget.SwipeRefreshLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="0.5dp"
             android:background="#BABABA" />
 
-        <LinearLayout
+        <com.yuan.house.ui.view.InputBottomBar
+            android:id="@+id/chat_inputbottombar"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="#F0F0F0"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginLeft="10dp"
-                android:scaleType="fitXY"
-                android:src="@drawable/btn_keybord_switchover" />
-
-            <com.yuan.house.ui.view.AudioRecorderButton
-                android:id="@+id/btn_recorder"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:layout_weight="1"
-                android:background="@drawable/proposal_send_background"
-                android:text="@string/chat_bottom_record_layout_pressToRecord"
-                android:textColor="#C4C4C4" />
-
-            <ImageView
-                android:id="@+id/btn_more"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:scaleType="fitXY"
-                android:src="@drawable/btn_other" />
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:scaleType="fitXY"
-                android:src="@drawable/btn_question" />
-
-        </LinearLayout>
+            android:layout_height="wrap_content" />
 
         <View
             android:layout_width="match_parent"

@@ -151,7 +151,7 @@ public class InputBottomBar extends LinearLayout {
 
         actionLayout = findViewById(R.id.chatAddLayout);
         pictureBtn = findViewById(R.id.btnImageFromGallery);
-        cameraBtn = findViewById(R.id.btnImageFromCamera);
+      //  cameraBtn = findViewById(R.id.btnImageFromCamera);
       //  locationBtn = findViewById(R.id.input_bar_btn_location);
 
         //setEditTextChangeListener();
@@ -242,12 +242,12 @@ public class InputBottomBar extends LinearLayout {
             }
         });
 
-        cameraBtn.setOnClickListener(new OnClickListener() {
+        /*cameraBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 EventBus.getDefault().post(new InputBottomBarEvent(InputBottomBarEvent.INPUTBOTTOMBAR_CAMERA_ACTION, getTag()));
             }
-        });
+        });*/
 
        /* locationBtn.setOnClickListener(new OnClickListener() {
             @Override
