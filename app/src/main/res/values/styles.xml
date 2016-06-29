@@ -203,18 +203,17 @@
     </style>
 
     <style name="AudioDialog">
-        <item name = "android:windowBackground">@drawable/dialog_content_bg</item>
-        <item name = "android:windowFrame">@null</item><!-- 设为无边框 -->
-        <item name = "android:windowIsFloating">true</item><!-- 设定为浮动的 -->
-        <item name = "android:windowIsTranslucent">false</item>
-        <item name = "android:backgroundDimEnabled">false</item>
+        <item name="android:windowBackground">@drawable/dialog_content_bg</item>
+        <item name="android:windowFrame">@null</item><!-- 设为无边框 -->
+        <item name="android:windowIsFloating">true</item><!-- 设定为浮动的 -->
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:backgroundDimEnabled">false</item>
         <item name="android:alpha">0.9</item>
     </style>
 
     <style name="chat_text_date_style">
-        <item name="android:padding">2dp</item>
-        <item name="android:paddingTop">2dip</item>
-        <item name="android:paddingBottom">2dip</item>
+        <item name="android:paddingTop">4dip</item>
+        <item name="android:paddingBottom">4dip</item>
         <item name="android:paddingLeft">12dip</item>
         <item name="android:paddingRight">12dip</item>
         <item name="android:textColor">@color/chat_base_color_text_white</item>
@@ -281,6 +280,6 @@
         <item name="android:layout_marginTop">10dp</item>
     </style>
 
-    <style name="AlertDialogCustom" parent="Theme.AppCompat.Light.Dialog.Alert"/>
+    <style name="AlertDialogCustom" parent="Theme.AppCompat.Light.Dialog.Alert" />
 
 </resources>

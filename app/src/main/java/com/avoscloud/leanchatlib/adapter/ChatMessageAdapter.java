@@ -35,12 +35,9 @@ import com.squareup.picasso.Picasso;
 import com.yuan.house.R;
 
 import org.ocpsoft.prettytime.PrettyTime;
-import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
@@ -60,7 +57,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         this.context = context;
         this.conversationType = conversationType;
         this.conversationObject = object;
-        activity = (Activity)context;
+        activity = (Activity) context;
     }
 
     // time

@@ -32,28 +32,29 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
-                android:textSize="@dimen/text_size_small"
-                android:textColor="@color/white" />
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_small" />
         </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/rl_center"
-            android:layout_toRightOf="@+id/rl_left"
-            android:layout_toLeftOf="@+id/rl_right"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
             android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp">
+            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@+id/rl_right"
+            android:layout_toRightOf="@+id/rl_left">
 
             <Button
                 android:id="@+id/topbar_title_button"
-                android:textColor="@color/white"
-                android:textSize="@dimen/text_size_large"
-                android:background="@android:color/transparent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="visible"/>
+                android:background="@android:color/transparent"
+                android:gravity="center_horizontal"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_large"
+                android:visibility="visible" />
 
             <TextView
                 android:id="@+id/topbar_title_item"
@@ -62,22 +63,22 @@
                 android:text="@string/app_name"
                 android:textColor="@color/white"
                 android:textSize="18sp"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
             <EditText
                 android:id="@+id/et_search"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="1dp"
                 android:layout_marginBottom="1dp"
-                android:imeOptions="actionSearch"
-                android:imeActionLabel="@string/contact_search"
-                android:maxLines="1"
-                android:hint="@string/contact_search"
-                android:textSize="12dp"
-                android:drawableLeft="@drawable/img_search"
+                android:layout_marginTop="1dp"
                 android:background="@drawable/search_editsharp"
-                android:visibility="gone"/>
+                android:drawableLeft="@drawable/img_search"
+                android:hint="@string/contact_search"
+                android:imeActionLabel="@string/contact_search"
+                android:imeOptions="actionSearch"
+                android:maxLines="1"
+                android:textSize="12dp"
+                android:visibility="gone" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -85,8 +86,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
-            android:background="@android:color/transparent"
-            android:layout_marginRight="@dimen/topbar_button_margin">
+            android:layout_marginRight="@dimen/topbar_button_margin"
+            android:background="@android:color/transparent">
 
             <ImageButton
                 android:id="@+id/topbar_right_btn"

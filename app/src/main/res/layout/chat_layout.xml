@@ -13,9 +13,9 @@
         android:layout_below="@+id/fragmentBBS"
         android:background="#fff"
         android:cacheColorHint="@android:color/transparent"
-        android:listSelector="@android:color/transparent"
         android:divider="@null"
         android:dividerHeight="5dp"
+        android:listSelector="@android:color/transparent"
         android:scrollbarStyle="outsideOverlay"
         android:stackFromBottom="true" />
 
@@ -37,10 +37,10 @@
         android:id="@+id/bottomLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:orientation="vertical">
 
         <View
             android:layout_width="fill_parent"
@@ -67,11 +67,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_centerVertical="true"
-                android:layout_toLeftOf="@+id/btnMoreInput"
+                android:layout_toLeftOf="@+id/btnMoreRL"
                 android:layout_toRightOf="@id/btnModeSwitch">
 
                 <RelativeLayout
-
                     android:id="@+id/rl_field_textmode"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -83,19 +82,23 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_centerVertical="true"
-                        android:layout_margin="5dp"
                         android:imeOptions="actionSend"
                         android:inputType="text"
                         android:maxLines="1"
+                        android:minHeight="40dip"
+                        android:paddingBottom="3dp"
+                        android:paddingLeft="1dp"
+                        android:paddingRight="1dp"
+                        android:paddingTop="3dp"
                         android:textSize="18sp" />
 
                     <Button
                         android:id="@+id/btnEmotionInput"
-                        android:layout_width="@dimen/chat_BottomBtnSize"
-                        android:layout_height="@dimen/chat_BottomBtnSize"
+                        android:layout_width="@dimen/chat_BottomEmojiBtnSize"
+                        android:layout_height="@dimen/chat_BottomEmojiBtnSize"
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
-                        android:layout_marginRight="10dp"
+                        android:layout_marginRight="10dip"
                         android:background="@drawable/chat_btn_emo_selector" />
                 </RelativeLayout>
 
@@ -103,8 +106,9 @@
                     android:id="@+id/rl_field_voicemode"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="@dimen/chat_recordBtnPadding"
-                    android:visibility="visible">
+                    android:paddingBottom="@dimen/chat_recordBtnPadding"
+                    android:paddingTop="@dimen/chat_recordBtnPadding"
+                    android:visibility="gone">
 
                     <com.avoscloud.leanchatlib.view.RecordButton
                         android:id="@+id/recordBtn"
@@ -113,18 +117,40 @@
                         android:layout_gravity="center"
                         android:background="@drawable/proposal_send_background"
                         android:text="@string/chat_bottom_record_layout_pressToRecord"
-                        android:textColor="#C4C4C4" />
+                        android:textColor="@color/chat_base_color_text_black" />
                 </RelativeLayout>
             </RelativeLayout>
 
-            <ImageButton
-                android:id="@id/btnMoreInput"
-                android:layout_width="@dimen/chat_BottomBtnSize"
-                android:layout_height="@dimen/chat_BottomBtnSize"
+            <RelativeLayout
+                android:id="@id/btnMoreRL"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_margin="@dimen/chat_BottomBtnMargin"
-                android:background="@drawable/btn_other" />
+                android:layout_centerVertical="true">
+
+                <TextView
+                    android:id="@+id/btnMoreSend"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/chat_SendMargin"
+                    android:background="@drawable/chat_send_normal_shape"
+                    android:paddingBottom="6dip"
+                    android:paddingLeft="8dip"
+                    android:paddingRight="8dip"
+                    android:paddingTop="6dip"
+                    android:text="@string/chat_send_text"
+                    android:textColor="@color/white"
+                    android:textSize="13.5sp"
+                    android:visibility="gone" />
+
+                <ImageButton
+                    android:id="@+id/btnMoreInput"
+                    android:layout_width="@dimen/chat_BottomBtnSize"
+                    android:layout_height="@dimen/chat_BottomBtnSize"
+                    android:layout_margin="@dimen/chat_BottomBtnMargin"
+                    android:background="@drawable/btn_other" />
+            </RelativeLayout>
+
 
         </RelativeLayout>
 
