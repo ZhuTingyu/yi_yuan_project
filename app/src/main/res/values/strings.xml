@@ -147,8 +147,9 @@
     <string name="chat_utils_right">好的</string>
     <string name="chat_utils_hardLoading">努力加载中...</string>
     <string name="chat_common_cancel">取消</string>
-    <string name="chat_bottom_record_layout_pressToRecord">按住录音</string>
-    <string name="chat_bottom_record_layout_upToRecord">松开结束</string>
+    <string name="chat_send_text">发送</string>
+    <string name="chat_bottom_record_layout_pressToRecord">按住 录音</string>
+    <string name="chat_bottom_record_layout_upToRecord">松开 结束</string>
     <string name="chat_sending">发送中</string>
     <string name="chat_received">已接收</string>
     <string name="chat_common_emptyStr" />

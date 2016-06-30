@@ -274,12 +274,12 @@ public class BaseFragmentActivity extends FragmentActivity {
         mTopBar.findViewById(R.id.topbar_title_button).setVisibility(View.GONE);
     }
 
-    public EditText setTitleSearch(){
+    public EditText setTitleSearch() {
         EditText searchBar = (EditText) mTopBar.findViewById(R.id.et_search);
-        if(mTopBar.findViewById(R.id.topbar_title_item).getVisibility() == View.VISIBLE) {
+        if (mTopBar.findViewById(R.id.topbar_title_item).getVisibility() == View.VISIBLE) {
             mTopBar.findViewById(R.id.topbar_title_item).setVisibility(View.GONE);
         }
-        if(mTopBar.findViewById(R.id.topbar_title_button).getVisibility() == View.VISIBLE) {
+        if (mTopBar.findViewById(R.id.topbar_title_button).getVisibility() == View.VISIBLE) {
             mTopBar.findViewById(R.id.topbar_title_button).setVisibility(View.GONE);
         }
 

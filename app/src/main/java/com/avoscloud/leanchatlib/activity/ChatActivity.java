@@ -7,8 +7,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
+import android.text.Editable;
 import android.text.Selection;
 import android.text.Spannable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -20,6 +23,8 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONArray;
 import com.avos.avoscloud.im.v2.AVIMConversation;
@@ -90,9 +95,11 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
     protected ChatManager chatManager = ChatManager.getInstance();
     protected ChatMessageAdapter adapter;
     protected RoomsTable roomsTable;
-    protected View chatTextLayout, chatAddLayout, chatEmotionLayout;
+    protected View chatTextLayout, chatAddLayout;
+    protected LinearLayout chatEmotionLayout;
     protected View addImageBtn, addFileBtn, showEmotionBtn, addChangeHouseBtn;
     protected ImageButton btnModeSwitch, showAddBtn;
+    protected TextView sendMsgBtn;
     protected ViewPager emotionPager;
     protected EmotionEditText contentEdit;
     protected XListView xListView;
@@ -102,6 +109,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
     private int kActivityRequestCodeImagePickAndSend = 10;
     //需要转发或复制的信息
     private String mChatMessage;
+    private boolean mHideText = false;
 
     public static ChatActivity getChatInstance() {
         return chatInstance;
@@ -139,22 +147,32 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.chat_item_longclick_menu,menu);
+        inflater.inflate(R.menu.chat_item_longclick_menu, menu);
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.menu_retransmission:
-                ToastUtil.showShort(mContext,"转发"+mChatMessage);
+                ToastUtil.showShort(mContext, "转发" + mChatMessage);
                 return true;
             case R.id.menu_copy:
-                ToastUtil.showShort(mContext,"复制"+mChatMessage);
+                ToastUtil.showShort(mContext, "复制" + mChatMessage);
                 return true;
             case R.id.menu_more:
                 return true;
-            default: return super.onContextItemSelected(item);
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (assistLayout.getVisibility() == View.VISIBLE) {
+            assistLayout.setVisibility(View.GONE);
+        } else {
+            finish();
         }
     }
 
@@ -178,8 +196,9 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         recordBtn = (RecordButton) findViewById(R.id.recordBtn);
         chatAddLayout = findViewById(R.id.chatAddLayout);
         addFileBtn = findViewById(R.id.btnChooseFile);
-        chatEmotionLayout = findViewById(R.id.chatEmotionLayout);
+        chatEmotionLayout = (LinearLayout) findViewById(R.id.chatEmotionLayout);
         showAddBtn = (ImageButton) findViewById(R.id.btnMoreInput);
+        sendMsgBtn = (TextView) findViewById(R.id.btnMoreSend);
         showEmotionBtn = findViewById(R.id.btnEmotionInput);
         emotionPager = (ViewPager) findViewById(R.id.emotionPager);
         addChangeHouseBtn = findViewById(R.id.btnSwitchHouse);
@@ -190,8 +209,34 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         addFileBtn.setOnClickListener(this);
         btnModeSwitch.setOnClickListener(this);
         showAddBtn.setOnClickListener(this);
+        sendMsgBtn.setOnClickListener(this);
         showEmotionBtn.setOnClickListener(this);
         addChangeHouseBtn.setOnClickListener(this);
+
+        contentEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String content = s.toString();
+                if (TextUtils.isEmpty(content)) {
+                    sendMsgBtn.setVisibility(View.GONE);
+                    showAddBtn.setVisibility(View.VISIBLE);
+                } else {
+                    showAddBtn.setVisibility(View.GONE);
+                    sendMsgBtn.setVisibility(View.VISIBLE);
+                    if (chatAddLayout.getVisibility() == View.VISIBLE) {
+                        chatAddLayout.setVisibility(View.GONE);
+                    }
+                }
+            }
+        });
     }
 
     private void initByIntent(Intent intent) {
@@ -214,12 +259,12 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 // TODO: 16/6/27 长按聊天消息显示『转发/复制』的 ContextMenu
-                AVIMTypedMessage message = (AVIMTypedMessage) adapter.getItem(position-1);
-                int type = adapter.getItemViewType(position-1);
-                if(type == 0 || type == 1){
-                    AVIMTextMessage textMessage = (AVIMTextMessage)message;
+                AVIMTypedMessage message = (AVIMTypedMessage) adapter.getItem(position - 1);
+                int type = adapter.getItemViewType(position - 1);
+                if (type == 0 || type == 1) {
+                    AVIMTextMessage textMessage = (AVIMTextMessage) message;
                     mChatMessage = textMessage.getText();
-                }else
+                } else
                     mChatMessage = MessageHelper.getFilePath(message);
 
                 return false;
@@ -239,7 +284,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
 
     private View getEmotionGridView(int pos) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        View emotionView = inflater.inflate(R.layout.chat_emotion_gridview, null, false);
+        View emotionView = inflater.inflate(R.layout.chat_emotion_gridview, chatEmotionLayout, false);
         GridView gridView = (GridView) emotionView.findViewById(R.id.gridview);
         final ChatEmotionGridAdapter chatEmotionGridAdapter = new ChatEmotionGridAdapter(mContext);
         List<String> pageEmotions = EmotionHelper.emojiGroups.get(pos);
@@ -283,13 +328,22 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         mVoiceMode = !mVoiceMode;
 
         if (mVoiceMode) {
+            if (sendMsgBtn.getVisibility() == View.VISIBLE) {
+                sendMsgBtn.setVisibility(View.GONE);
+                showAddBtn.setVisibility(View.VISIBLE);
+                mHideText = true;
+            }
             btnModeSwitch.setBackgroundResource(R.drawable.btn_keybord_switchover);
-
             ButterKnife.findById(this, R.id.rl_field_voicemode).setVisibility(View.VISIBLE);
             ButterKnife.findById(this, R.id.rl_field_textmode).setVisibility(View.GONE);
             hideSoftInputView();
             hideBottomLayout();
         } else {
+            if (mHideText) {
+                mHideText = false;
+                sendMsgBtn.setVisibility(View.VISIBLE);
+                showAddBtn.setVisibility(View.GONE);
+            }
             btnModeSwitch.setBackgroundResource(R.drawable.chat_btn_voice_selector);
 
             ButterKnife.findById(this, R.id.rl_field_voicemode).setVisibility(View.GONE);
@@ -456,6 +510,8 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         else if (v.getId() == R.id.btnSwitchHouse) {
             // 显示推荐房源
             showSuggestedHouses();
+        } else if (v.getId() == R.id.btnMoreSend) {
+            sendText();
         }
     }
 
@@ -487,8 +543,8 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
             chatEmotionLayout.setVisibility(View.GONE);
             hideBottomLayout();
         } else {
-            chatEmotionLayout.setVisibility(View.VISIBLE);
             showBottomLayout();
+            chatEmotionLayout.setVisibility(View.VISIBLE);
             hideAddLayout();
             hideSoftInputView();
         }
@@ -500,6 +556,11 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
             hideAddLayout();
             hideBottomLayout();
         } else {
+            mVoiceMode = false;
+            btnModeSwitch.setBackgroundResource(R.drawable.chat_btn_voice_selector);
+            ButterKnife.findById(this, R.id.rl_field_voicemode).setVisibility(View.GONE);
+            ButterKnife.findById(this, R.id.rl_field_textmode).setVisibility(View.VISIBLE);
+
             chatEmotionLayout.setVisibility(View.GONE);
             hideSoftInputView();
             showBottomLayout();

@@ -3,51 +3,53 @@
     xmlns:grid="http://schemas.android.com/apk/res-auto"
     android:id="@+id/chatAddLayout"
     android:layout_width="match_parent"
-    android:layout_height="200dp"
+    android:layout_height="wrap_content"
     android:layout_centerHorizontal="true"
     android:layout_marginTop="10dp"
+    android:paddingBottom="20dip"
+    android:paddingTop="20dip"
     grid:alignmentMode="alignBounds"
     grid:columnCount="4">
 
     <TextView
         android:id="@+id/btnImageFromGallery"
         style="@style/chat_bottom_add_item"
-        grid:layout_columnWeight="1"
         android:drawableTop="@drawable/chat_bottom_add_picture_selector"
-        android:text="@string/chat_bottom_picture" />
+        android:text="@string/chat_bottom_picture"
+        grid:layout_columnWeight="1" />
 
     <TextView
         android:id="@+id/btnChooseFile"
         style="@style/chat_bottom_add_item"
-        grid:layout_columnWeight="1"
         android:drawableTop="@drawable/btn_docment"
-        android:text="@string/chat_bottom_file" />
+        android:text="@string/chat_bottom_file"
+        grid:layout_columnWeight="1" />
 
     <TextView
         android:id="@+id/btnSwitchHouse"
         style="@style/chat_bottom_add_item"
-        grid:layout_columnWeight="1"
         android:drawableTop="@drawable/btn_house"
-        android:text="@string/chat_bottom_change" />
+        android:text="@string/chat_bottom_change"
+        grid:layout_columnWeight="1" />
 
     <TextView
         android:id="@+id/btnPrecondition"
         style="@style/chat_bottom_add_item"
-        grid:layout_columnWeight="1"
         android:drawableTop="@drawable/btn_docment"
         android:text="@string/chat_bottom_precondition"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        grid:layout_columnWeight="1" />
 
     <!--<TextView-->
-        <!--android:id="@+id/btnContract"-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="0dp"-->
-        <!--grid:layout_columnWeight="1"-->
-        <!--grid:layout_rowWeight="1"-->
-        <!--android:drawableTop="@drawable/btn_house"-->
-        <!--android:gravity="center"-->
-        <!--android:text="@string/chat_bottom_contract"-->
-        <!--grid:layout_gravity="fill"-->
-        <!--android:visibility="gone"/>-->
+    <!--android:id="@+id/btnContract"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="0dp"-->
+    <!--grid:layout_columnWeight="1"-->
+    <!--grid:layout_rowWeight="1"-->
+    <!--android:drawableTop="@drawable/btn_house"-->
+    <!--android:gravity="center"-->
+    <!--android:text="@string/chat_bottom_contract"-->
+    <!--grid:layout_gravity="fill"-->
+    <!--android:visibility="gone"/>-->
 
 </android.support.v7.widget.GridLayout>

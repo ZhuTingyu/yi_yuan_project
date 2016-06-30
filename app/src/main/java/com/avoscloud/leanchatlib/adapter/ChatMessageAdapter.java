@@ -1,6 +1,5 @@
 package com.avoscloud.leanchatlib.adapter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.View;
@@ -10,7 +9,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.avos.avoscloud.im.v2.AVIMMessage;
 import com.avos.avoscloud.im.v2.AVIMReservedMessageType;
@@ -23,7 +21,7 @@ import com.avoscloud.leanchatlib.controller.AudioHelper;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.EmotionHelper;
 import com.avoscloud.leanchatlib.controller.MessageHelper;
-import com.avoscloud.leanchatlib.model.AVIMHouseInfoMessage;
+import com.avoscloud.leanchatlib.model.AVIMHouseMessage;
 import com.avoscloud.leanchatlib.model.ConversationType;
 import com.avoscloud.leanchatlib.model.UserInfo;
 import com.avoscloud.leanchatlib.utils.PhotoUtils;
@@ -35,12 +33,9 @@ import com.squareup.picasso.Picasso;
 import com.yuan.house.R;
 
 import org.ocpsoft.prettytime.PrettyTime;
-import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
@@ -52,7 +47,6 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     private Context context;
 
     private View contentLayout;
-    private Activity activity;
 
     public ChatMessageAdapter(Context context, ConversationType conversationType, org.json.JSONObject object) {
         super(context);
@@ -60,7 +54,6 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         this.context = context;
         this.conversationType = conversationType;
         this.conversationObject = object;
-        activity = (Activity)context;
     }
 
     // time
@@ -134,8 +127,8 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
             bean.setHouseId(conversationObject.optString("house_id"));
             bean.setIs_read(true);
 
-            if (msg instanceof AVIMHouseInfoMessage) {
-                AVIMHouseInfoMessage houseInfoMessage = (AVIMHouseInfoMessage) msg;
+            if (msg instanceof AVIMHouseMessage) {
+                AVIMHouseMessage houseInfoMessage = (AVIMHouseMessage) msg;
 
                 boolean others = messageSentByOthers(houseInfoMessage);
                 conView = createViewByType(houseInfoMessage.getMessageType(), others);
@@ -152,13 +145,12 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 initReservedMessageView(conView, position, typedMessage, others, bean);
             }
         }
-        activity.registerForContextMenu(contentLayout);
 
         return conView;
     }
 
     private void initHouseMessageView(View conView, AVIMTypedMessage msg, boolean isMessageSentByMe) {
-        AVIMHouseInfoMessage message = (AVIMHouseInfoMessage) msg;
+        AVIMHouseMessage message = (AVIMHouseMessage) msg;
 
         Map<String, Object> map = message.getAttrs();
         JSONObject object = (JSONObject) JSON.toJSON(map);
@@ -168,27 +160,17 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         ImageView img = ViewHolder.findViewById(conView, R.id.img);
         TextView title = ViewHolder.findViewById(conView, R.id.title);
         TextView area = ViewHolder.findViewById(conView, R.id.area);
-        TextView house_params = ViewHolder.findViewById(conView, R.id.house_params);
+        TextView house_param = ViewHolder.findViewById(conView, R.id.house_params);
+        house_param.setVisibility(View.GONE);
 
         View statusSendFailed = ViewHolder.findViewById(conView, R.id.status_send_failed);
         View statusSendSucceed = ViewHolder.findViewById(conView, R.id.status_send_succeed);
         View statusSendStart = ViewHolder.findViewById(conView, R.id.status_send_start);
 
-        JSONArray images = object.getJSONArray("images");
+        Picasso.with(ctx).load(object.getString("houseImage")).into(img);
 
-        if (images != null) {
-            Picasso.with(ctx).load(images.getString(0)).into(img);
-        }
-
-        title.setText(object.getString("estate_name"));
-        area.setText(object.getString("acreage") + "㎡");
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(object.getString("room_count"));
-        sb.append("室");
-        sb.append(object.getString("parlour_count"));
-        sb.append("厅");
-        house_params.setText(sb.toString());
+        title.setText(object.getString("houseName"));
+        area.setText(object.getString("houseAddress"));
 
         if (isMessageSentByMe == false) {
             hideStatusViews(statusSendStart, statusSendFailed, statusSendSucceed);

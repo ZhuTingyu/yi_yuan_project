@@ -34,10 +34,12 @@
     <dimen name="chat_ContentMaxWidth">200dp</dimen>
     <dimen name="chat_item_base_left_marginToUsername">5dp</dimen>
     <dimen name="chat_BottomBtnMargin">10dp</dimen>
+    <dimen name="chat_SendMargin">6dp</dimen>
     <dimen name="chat_bottom_more_height">180dp</dimen>
     <dimen name="chat_MaxNameWidth">50dp</dimen>
     <dimen name="chat_ImageWidth">100dp</dimen>
-    <dimen name="chat_BottomBtnSize">26dp</dimen>
+    <dimen name="chat_BottomBtnSize">28dp</dimen>
+    <dimen name="chat_BottomEmojiBtnSize">24dp</dimen>
     <dimen name="chat_avatarSize">50dp</dimen>
     <dimen name="chat_playBtnWidth">30dp</dimen>
     <dimen name="chat_recordBtnPadding">8dp</dimen>

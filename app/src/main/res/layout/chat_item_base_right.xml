@@ -23,23 +23,20 @@
                 android:id="@+id/dur_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="5dp"
-                android:layout_gravity="center_vertical"/>
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="5dp" />
 
             <LinearLayout
                 android:id="@+id/contentLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="5dp"
-                android:padding="10dp"
                 android:background="@drawable/chat_right_qp"
                 android:gravity="center"
                 android:maxWidth="@dimen/chat_ContentMaxWidth"
                 android:orientation="horizontal"
-                android:textColor="#000">
-
-            </LinearLayout>
-
+                android:padding="10dp"
+                android:textColor="#000"></LinearLayout>
 
             <ImageView
                 android:id="@+id/avatar"
