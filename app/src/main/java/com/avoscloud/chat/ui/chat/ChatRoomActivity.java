@@ -461,9 +461,19 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         }
 
         for (int i = 0; i < array.length(); i++) {
-            TextView tv = new TextView(this);
+            String contractText = array.optString(i);
 
-            Drawable drawable = getResources().getDrawable(R.drawable.btn_docment);
+            int resId = R.drawable.btn_document;
+            if (contractText.equals("核心合同")) {
+                resId = R.drawable.btn_core;
+            } else if (contractText.equals("买卖合同")) {
+                resId = R.drawable.btn_deal;
+            } else if (contractText.equals("补充协议")) {
+                resId = R.drawable.btn_supplement;
+            }
+
+            TextView tv = new TextView(this);
+            Drawable drawable = getResources().getDrawable(resId);
             int h = drawable.getIntrinsicHeight();
             int w = drawable.getIntrinsicWidth();
             drawable.setBounds(0, 0, w, h);
@@ -478,7 +488,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
             params.height = 0;
             tv.setLayoutParams(params);
             tv.setGravity(Gravity.CENTER);
-            tv.setText(array.optString(i));
+            tv.setText(contractText);
 
             tv.setTag("contract");
             gv.addView(tv);

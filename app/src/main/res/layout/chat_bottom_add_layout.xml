@@ -18,24 +18,24 @@
         android:text="@string/chat_bottom_picture"
         grid:layout_columnWeight="1" />
 
-    <TextView
-        android:id="@+id/btnChooseFile"
-        style="@style/chat_bottom_add_item"
-        android:drawableTop="@drawable/btn_docment"
-        android:text="@string/chat_bottom_file"
-        grid:layout_columnWeight="1" />
+    <!--<TextView-->
+        <!--android:id="@+id/btnChooseFile"-->
+        <!--style="@style/chat_bottom_add_item"-->
+        <!--android:drawableTop="@drawable/btn_docment"-->
+        <!--android:text="@string/chat_bottom_file"-->
+        <!--grid:layout_columnWeight="1" />-->
 
     <TextView
         android:id="@+id/btnSwitchHouse"
         style="@style/chat_bottom_add_item"
-        android:drawableTop="@drawable/btn_house"
+        android:drawableTop="@drawable/btn_need"
         android:text="@string/chat_bottom_change"
         grid:layout_columnWeight="1" />
 
     <TextView
         android:id="@+id/btnPrecondition"
         style="@style/chat_bottom_add_item"
-        android:drawableTop="@drawable/btn_docment"
+        android:drawableTop="@drawable/btn_leave_message"
         android:text="@string/chat_bottom_precondition"
         android:visibility="gone"
         grid:layout_columnWeight="1" />
