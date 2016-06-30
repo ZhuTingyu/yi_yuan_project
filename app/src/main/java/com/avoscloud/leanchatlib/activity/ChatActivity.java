@@ -97,7 +97,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
     protected RoomsTable roomsTable;
     protected View chatTextLayout, chatAddLayout;
     protected LinearLayout chatEmotionLayout;
-    protected View addImageBtn, addFileBtn, showEmotionBtn, addChangeHouseBtn;
+    protected View addImageBtn, showEmotionBtn, addChangeHouseBtn;
     protected ImageButton btnModeSwitch, showAddBtn;
     protected TextView sendMsgBtn;
     protected ViewPager emotionPager;
@@ -140,7 +140,6 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         initListView();
         setSoftInputMode();
         initByIntent(getIntent());
-
     }
 
     @Override
@@ -195,7 +194,6 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         btnModeSwitch = (ImageButton) findViewById(R.id.btnModeSwitch);
         recordBtn = (RecordButton) findViewById(R.id.recordBtn);
         chatAddLayout = findViewById(R.id.chatAddLayout);
-        addFileBtn = findViewById(R.id.btnChooseFile);
         chatEmotionLayout = (LinearLayout) findViewById(R.id.chatEmotionLayout);
         showAddBtn = (ImageButton) findViewById(R.id.btnMoreInput);
         sendMsgBtn = (TextView) findViewById(R.id.btnMoreSend);
@@ -206,7 +204,6 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
 
         contentEdit.setOnClickListener(this);
         addImageBtn.setOnClickListener(this);
-        addFileBtn.setOnClickListener(this);
         btnModeSwitch.setOnClickListener(this);
         showAddBtn.setOnClickListener(this);
         sendMsgBtn.setOnClickListener(this);
@@ -499,15 +496,9 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
             toggleBottomAddLayout();
         } else if (v.getId() == R.id.btnEmotionInput) {
             toggleEmotionLayout();
-        } else if (v.getId() == R.id.btnChooseFile) {
-            //文件
         } else if (v.getId() == R.id.editChatField) {
             hideBottomLayoutAndScrollToLast();
-        }
-//        else if (v.getId() == R.id.btnImageFromCamera) {
-//            selectImage();
-//        }
-        else if (v.getId() == R.id.btnSwitchHouse) {
+        } else if (v.getId() == R.id.btnSwitchHouse) {
             // 显示推荐房源
             showSuggestedHouses();
         } else if (v.getId() == R.id.btnMoreSend) {

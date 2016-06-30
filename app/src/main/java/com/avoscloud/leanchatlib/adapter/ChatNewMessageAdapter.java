@@ -2,7 +2,6 @@ package com.avoscloud.leanchatlib.adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -22,7 +21,7 @@ import com.avoscloud.leanchatlib.controller.AudioHelper;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.EmotionHelper;
 import com.avoscloud.leanchatlib.controller.MessageHelper;
-import com.avoscloud.leanchatlib.model.AVIMHouseInfoMessage;
+import com.avoscloud.leanchatlib.model.AVIMHouseMessage;
 import com.avoscloud.leanchatlib.model.ConversationType;
 import com.avoscloud.leanchatlib.model.UserInfo;
 import com.avoscloud.leanchatlib.utils.PhotoUtils;
@@ -134,8 +133,8 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
             bean.setHouseId(conversationObject.optString("house_id"));
             bean.setIs_read(true);
 
-            if (msg instanceof AVIMHouseInfoMessage) {
-                AVIMHouseInfoMessage houseInfoMessage = (AVIMHouseInfoMessage) msg;
+            if (msg instanceof AVIMHouseMessage) {
+                AVIMHouseMessage houseInfoMessage = (AVIMHouseMessage) msg;
 
                 boolean others = messageSentByOthers(houseInfoMessage);
                 conView = createViewByType(houseInfoMessage.getMessageType(), others);
@@ -158,7 +157,7 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     }
 
     private void initHouseMessageView(View conView, AVIMTypedMessage msg, boolean isMessageSentByMe) {
-        AVIMHouseInfoMessage message = (AVIMHouseInfoMessage) msg;
+        AVIMHouseMessage message = (AVIMHouseMessage) msg;
 
         Map<String, Object> map = message.getAttrs();
         JSONObject object = (JSONObject) JSON.toJSON(map);
@@ -404,14 +403,8 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         if (type == AVIMReservedMessageType.AudioMessageType) {
             PlayButton btn = (PlayButton) baseView.findViewById(R.id.playBtn);
             btn.setLeftSide(comeMsg);
-        } else if (type == AVIMReservedMessageType.TextMessageType) {
-            TextView textView = (TextView) baseView.findViewById(R.id.textContent);
-            if (comeMsg) {
-                textView.setTextColor(Color.BLACK);
-            } else {
-                textView.setTextColor(Color.WHITE);
-            }
         }
+
         return baseView;
     }
 
