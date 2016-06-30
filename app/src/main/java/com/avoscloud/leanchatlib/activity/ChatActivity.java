@@ -36,7 +36,7 @@ import com.avos.avoscloud.im.v2.messages.AVIMLocationMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
 import com.avoscloud.leanchatlib.adapter.ChatEmotionGridAdapter;
 import com.avoscloud.leanchatlib.adapter.ChatEmotionPagerAdapter;
-import com.avoscloud.leanchatlib.adapter.ChatMessageAdapter;
+import com.avoscloud.leanchatlib.adapter.ChatNewMessageAdapter;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.ConversationHelper;
 import com.avoscloud.leanchatlib.controller.EmotionHelper;
@@ -93,7 +93,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
     protected MessageAgent.SendCallback defaultSendCallback = new DefaultSendCallback();
     protected EventBus eventBus;
     protected ChatManager chatManager = ChatManager.getInstance();
-    protected ChatMessageAdapter adapter;
+    protected ChatNewMessageAdapter adapter;
     protected RoomsTable roomsTable;
     protected View chatTextLayout, chatAddLayout;
     protected LinearLayout chatEmotionLayout;
@@ -382,8 +382,8 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
     }
 
     private void bindAdapterToListView(ConversationType conversationType, JSONObject object) {
-        adapter = new ChatMessageAdapter(this, conversationType, object);
-        adapter.setClickListener(new ChatMessageAdapter.ClickListener() {
+        adapter = new ChatNewMessageAdapter(this, conversationType, object);
+        adapter.setClickListener(new ChatNewMessageAdapter.ClickListener() {
 
             @Override
             public void onFailButtonClick(AVIMTypedMessage msg) {

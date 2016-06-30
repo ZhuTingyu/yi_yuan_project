@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="3dp">
+
+    <include layout="@layout/chat_item_base_time" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right">
+
+        <include layout="@layout/chat_item_base_status" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/chat_ItemMarginTop">
+
+            <TextView
+                android:id="@+id/dur_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="5dp" />
+
+
+            <LinearLayout
+                android:id="@+id/audioLL"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:background="@drawable/chat_right_qp">
+
+                <View
+                    android:id="@+id/audioPlaceView"
+                    android:layout_width="30dp"
+                    android:layout_height="1dip" />
+
+                <com.avoscloud.leanchatlib.view.PlayButton
+                    android:id="@+id/playBtn"
+                    style="@style/chat_play_btn"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="3dp"
+                    custom:left="true" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/avatar"
+                style="@style/chat_avatar" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>
