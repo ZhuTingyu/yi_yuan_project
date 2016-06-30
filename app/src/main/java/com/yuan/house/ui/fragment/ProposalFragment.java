@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,15 +19,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.avos.avoscloud.im.v2.AVIMReservedMessageType;
 import com.avoscloud.leanchatlib.utils.PathUtils;
 import com.avoscloud.leanchatlib.utils.ProviderPathUtils;
+import com.avoscloud.leanchatlib.view.PlayButton;
 import com.squareup.okhttp.OkHttpClient;
 import com.yuan.house.R;
+import com.yuan.house.adapter.ProposalAdapter;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
+import com.yuan.house.bean.ProposalInfo;
 import com.yuan.house.common.Constants;
 import com.yuan.house.enumerate.ProposalMediaType;
 import com.yuan.house.enumerate.ProposalMessageCategory;
@@ -87,14 +93,14 @@ public class ProposalFragment extends WebViewBaseFragment {
 
     private LinearLayoutManager mLayoutManager;
     private int lastVisibleItem;
-    private MyAdapter adapter;
+    private ProposalAdapter adapter;
     private int mCurrentPage = 1;
 
     TextView app_upload_image, app_complaint, app_cancle;
 
-    private ProposalSourceType sourceType = ProposalSourceType.UNKNOWN;
-    private ProposalMediaType msg_type = ProposalMediaType.TEXT;                            //1:文本，2：语音，3：图片
-    private ProposalMessageCategory category = ProposalMessageCategory.SUGGESTION;          //0：投诉；1：建议；2：BUG
+    public static ProposalSourceType sourceType = ProposalSourceType.UNKNOWN;
+    public static ProposalMediaType msg_type = ProposalMediaType.TEXT;                            //1:文本，2：语音，3：图片
+    public static ProposalMessageCategory category = ProposalMessageCategory.SUGGESTION;          //0：投诉；1：建议；2：BUG
     private String content;
     private int duration = 0;       //录音时长
 
@@ -180,82 +186,9 @@ public class ProposalFragment extends WebViewBaseFragment {
 
         mLayoutManager = new LinearLayoutManager((Context) mFragmentListener);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        adapter = new MyAdapter();
+        adapter = new ProposalAdapter();
         mRecyclerView.setAdapter(adapter);
         getHistoryMessages(mCurrentPage);
-    }
-
-    /**
-     * Adapter of recyclerView
-     */
-    public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
-        public ArrayList<MyData> complainDatas = new ArrayList<>();
-        public ArrayList<MyData> proposalDatas = new ArrayList<>();
-        public ArrayList<MyData> bugDatas = new ArrayList<>();
-
-        public MyAdapter() {
-        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.chat_item_text, viewGroup,false);
-            ViewHolder vh = new ViewHolder(view);
-            return vh;
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder viewHolder, int position) {
-            ArrayList<MyData> datas = getCurrentDatas();
-            viewHolder.mTextView.setText(datas.get(position).content);
-        }
-
-        @Override
-        public int getItemCount() {
-            return getCurrentDatas().size();
-        }
-
-        public class ViewHolder extends RecyclerView.ViewHolder {
-            public TextView mTextView;
-            public ViewHolder(View view){
-                super(view);
-                mTextView = (TextView) view.findViewById(R.id.textContent);
-            }
-        }
-
-        private ArrayList<MyData> getCurrentDatas() {
-            switch (category) {
-                case COMPLAINT:
-                    return complainDatas;
-                case SUGGESTION:
-                    return proposalDatas;
-                case BUG:
-                    return bugDatas;
-            }
-            return null;
-        }
-
-        public void addData(MyData data) {
-            int category = data.category;
-            if (category == ProposalMessageCategory.COMPLAINT.ordinal()) {
-                complainDatas.add(data);
-            } else if (category == ProposalMessageCategory.SUGGESTION.ordinal()) {
-                proposalDatas.add(data);
-            } else if (category == ProposalMessageCategory.BUG.ordinal()) {
-                bugDatas.add(data);
-            }
-        }
-    }
-
-    private class MyData {
-        String user_id;
-        int msg_type;
-        String content;
-        int type;
-        int complain_agency_id;
-        int category;
-        int duration;
-        String created_at;
-        String updated_at;
     }
 
     @Override
@@ -470,10 +403,15 @@ public class ProposalFragment extends WebViewBaseFragment {
                     public void onResponse(String response) {
                         try {
                             JSONObject jsonObject = new JSONObject(response);
-                            ToastUtil.showShort(getContext(), "提交成功");
-                            MyData data = parse2MyData(jsonObject);
-                            adapter.addData(data);
-                            adapter.notifyDataSetChanged();
+                            int errCode = jsonObject.optInt("error_code", 0);
+                            if (errCode == 450) {
+                                ToastUtil.showShort(getContext(), jsonObject.optString("error_msg", "未知错误!"));
+                            } else {
+                                ToastUtil.showShort(getContext(), "提交成功");
+                                ProposalInfo data = parse2MyData(jsonObject);
+                                adapter.addData(data);
+                                adapter.notifyDataSetChanged();
+                            }
                         } catch (JSONException e) {
                             ToastUtil.showShort(getContext(), "提交失败");
                             e.printStackTrace();
@@ -504,8 +442,13 @@ public class ProposalFragment extends WebViewBaseFragment {
                             JSONArray jsonArray = new JSONArray(response);
                             for (int i = 0; i < jsonArray.length(); ++i) {
                                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                MyData data = parse2MyData(jsonObject);
+                                ProposalInfo data = parse2MyData(jsonObject);
                                 adapter.addData(data);
+                                if (data.msg_type == ProposalMediaType.IMAGE.ordinal()) {
+
+                                } else if (data.msg_type == ProposalMediaType.AUDIO.ordinal()) {
+
+                                }
                             }
                             adapter.notifyDataSetChanged();
                             ++mCurrentPage;
@@ -519,8 +462,8 @@ public class ProposalFragment extends WebViewBaseFragment {
                 });
     }
 
-    private MyData parse2MyData(JSONObject jsonObject) {
-        MyData data = new MyData();
+    private ProposalInfo parse2MyData(JSONObject jsonObject) {
+        ProposalInfo data = new ProposalInfo();
         data.user_id = jsonObject.optString("user_id", "");
         data.msg_type = jsonObject.optInt("msg_type", 0);
         data.content = jsonObject.optString("content", "");
