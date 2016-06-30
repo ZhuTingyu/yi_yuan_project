@@ -108,15 +108,14 @@
 
         <service android:name="com.avos.avoscloud.PushService" />
 
-        <!-- <receiver android:name="com.dimo.receiver.Receiver"> -->
-        <!-- <intent-filter> -->
-        <!-- <action android:name="android.intent.action.BOOT_COMPLETED" /> -->
-        <!-- <action android:name="android.intent.action.USER_PRESENT" /> -->
-        <!-- <action android:name="android.net.conn.CONNECTIVITY_CHANGE" /> -->
-        <!-- <action android:name="com.mowelltech.threec.UPDATE_STATUS" /> -->
-        <!-- <action android:name="com.mowelltech.threec.action" /> -->
-        <!-- </intent-filter> -->
-        <!-- </receiver> -->
+        <receiver android:name=".receiver.PushReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="com.yuan.house.UPDATE_STATUS" />
+            </intent-filter>
+        </receiver>
 
         <meta-data
             android:name="UMENG_APPKEY"

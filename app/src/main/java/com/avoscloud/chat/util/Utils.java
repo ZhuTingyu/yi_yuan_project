@@ -27,7 +27,6 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.avos.avoscloud.AVUser;
-
 import com.avoscloud.leanchatlib.utils.DownloadUtils;
 import com.avoscloud.leanchatlib.utils.Logger;
 import com.yuan.house.R;
@@ -74,6 +73,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 
 public class Utils {
     public static BufferedReader bufferedReader(String url) throws IOException,
@@ -443,10 +443,13 @@ public class Utils {
         return String.format(cxt.getString(id), args);
     }
 
-    public static void notifyMsg(Context context, Class<?> clz, String title, String ticker, String msg, int notifyId) {
+    public static Notification notifyMsg(Context context, Class<?> clz, String title, String ticker, String msg, int notifyId) {
         int icon = context.getApplicationInfo().icon;
-        PendingIntent pend = PendingIntent.getActivity(context, 0,
-                new Intent(context, clz), 0);
+
+        //why Random().nextInt()
+        //http://stackoverflow.com/questions/13838313/android-onnewintent-always-receives-same-intent
+        PendingIntent pend = PendingIntent.getActivity(context, new Random().nextInt(), new Intent(context, clz), 0);
+
         Notification.Builder builder = new Notification.Builder(context);
         if (ticker == null) {
             ticker = msg;
@@ -458,8 +461,12 @@ public class Utils {
                 .setContentTitle(title)
                 .setContentText(msg)
                 .setAutoCancel(true);
+
         NotificationManager man = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        man.notify(notifyId, builder.getNotification());
+        Notification notification = builder.getNotification();
+        man.notify(notifyId, notification);
+
+        return notification;
     }
 
     public static void sleep(int partMilli) {

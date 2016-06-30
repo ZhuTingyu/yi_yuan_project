@@ -146,4 +146,8 @@ public class DateUtil extends android.text.format.DateUtils{
         return toDateString(Calendar.getInstance(Locale.CHINA).getTime(), format);
     }
 
+    public static String getDate(Date date) {
+        SimpleDateFormat format = new SimpleDateFormat("MM-dd HH:mm");
+        return format.format(date);
+    }
 }
