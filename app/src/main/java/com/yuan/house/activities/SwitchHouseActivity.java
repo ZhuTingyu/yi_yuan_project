@@ -17,7 +17,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.yuan.house.R;
 import com.yuan.house.common.Constants;
@@ -33,7 +32,6 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import timber.log.Timber;
 
 /**
  * Created by KevinLee on 2016/5/9.
@@ -156,17 +154,7 @@ public class SwitchHouseActivity extends FragmentActivity {
                 JSONArray images = object.optJSONArray("images");
                 if (images != null && images.length() != 0) {
                     String imageUrl = images.optString(0);
-                    Picasso.with(mContext).load(imageUrl).placeholder(R.drawable.img_placeholder).into(holder.imageView, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            Timber.v("onSuccess");
-                        }
-
-                        @Override
-                        public void onError() {
-                            Timber.e("onError");
-                        }
-                    });
+                    Picasso.with(mContext).load(imageUrl).placeholder(R.drawable.img_placeholder).into(holder.imageView);
                 } else {
                     Picasso.with(mContext).load(R.drawable.img_placeholder).fit().into(holder.imageView);
                 }

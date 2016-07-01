@@ -2,6 +2,7 @@ package com.avoscloud.leanchatlib.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -171,24 +172,25 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
 //        house_params.setVisibility(View.GONE);
 
         View statusSendFailed = ViewHolder.findViewById(conView, R.id.status_send_failed);
-        View statusSendSucceed = ViewHolder.findViewById(conView, R.id.status_send_succeed);
         View statusSendStart = ViewHolder.findViewById(conView, R.id.status_send_start);
 
-        Picasso.with(ctx).load(object.getString("houseImage")).into(img);
-        title.setText(object.getString("houseName"));
+        String imageUrl = object.getString("houseImage");
+        Picasso.with(ctx).load(imageUrl).placeholder(R.drawable.img_placeholder).into(img);
+
+        String houseName = object.getString("houseName");
+        if (TextUtils.isEmpty(houseName)) houseName = "需求";
+        title.setText(houseName);
+
         area.setText(object.getString("houseAddress"));
 
         if (isMessageSentByMe == false) {
-            hideStatusViews(statusSendStart, statusSendFailed, statusSendSucceed);
+            hideStatusViews(statusSendStart, statusSendFailed);
             setSendFailedBtnListener(statusSendFailed, msg);
             switch (msg.getMessageStatus()) {
                 case AVIMMessageStatusFailed:
                     statusSendFailed.setVisibility(View.VISIBLE);
                     break;
                 case AVIMMessageStatusSent:
-//                    if (conversationType == ConversationType.Single) {
-//                        statusSendSucceed.setVisibility(View.VISIBLE);
-//                    }
                     break;
                 case AVIMMessageStatusNone:
                 case AVIMMessageStatusSending:
@@ -215,7 +217,6 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         TextView usernameView = ViewHolder.findViewById(conView, R.id.username);
 
         View statusSendFailed = ViewHolder.findViewById(conView, R.id.status_send_failed);
-        View statusSendSucceed = ViewHolder.findViewById(conView, R.id.status_send_succeed);
         View statusSendStart = ViewHolder.findViewById(conView, R.id.status_send_start);
 
         if (null != placeView) {
@@ -283,16 +284,13 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 break;
         }
         if (isComMsg == false) {
-            hideStatusViews(statusSendStart, statusSendFailed, statusSendSucceed);
+            hideStatusViews(statusSendStart, statusSendFailed);
             setSendFailedBtnListener(statusSendFailed, msg);
             switch (msg.getMessageStatus()) {
                 case AVIMMessageStatusFailed:
                     statusSendFailed.setVisibility(View.VISIBLE);
                     break;
                 case AVIMMessageStatusSent:
-                    /*if (conversationType == ConversationType.Single) {
-                        statusSendSucceed.setVisibility(View.VISIBLE);
-                    }*/
                     break;
                 case AVIMMessageStatusNone:
                 case AVIMMessageStatusSending:
@@ -315,10 +313,9 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         });
     }
 
-    private void hideStatusViews(View statusSendStart, View statusSendFailed, View statusSendSucceed) {
+    private void hideStatusViews(View statusSendStart, View statusSendFailed) {
         statusSendFailed.setVisibility(View.GONE);
         statusSendStart.setVisibility(View.GONE);
-        statusSendSucceed.setVisibility(View.GONE);
     }
 
     public void setLocationView(AVIMTypedMessage msg, TextView locationView) {

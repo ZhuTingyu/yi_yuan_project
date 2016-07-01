@@ -13,14 +13,6 @@
         android:layout_height="25dp"
         android:visibility="gone" />
 
-    <TextView
-        android:id="@+id/status_send_succeed"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="已发送"
-        android:textSize="12sp"
-        android:visibility="gone" />
-
     <ImageView
         android:id="@+id/status_send_failed"
         android:layout_width="25dp"

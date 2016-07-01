@@ -164,7 +164,6 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         house_param.setVisibility(View.GONE);
 
         View statusSendFailed = ViewHolder.findViewById(conView, R.id.status_send_failed);
-        View statusSendSucceed = ViewHolder.findViewById(conView, R.id.status_send_succeed);
         View statusSendStart = ViewHolder.findViewById(conView, R.id.status_send_start);
 
         Picasso.with(ctx).load(object.getString("houseImage")).into(img);
@@ -173,16 +172,13 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         area.setText(object.getString("houseAddress"));
 
         if (isMessageSentByMe == false) {
-            hideStatusViews(statusSendStart, statusSendFailed, statusSendSucceed);
+            hideStatusViews(statusSendStart, statusSendFailed);
             setSendFailedBtnListener(statusSendFailed, msg);
             switch (msg.getMessageStatus()) {
                 case AVIMMessageStatusFailed:
                     statusSendFailed.setVisibility(View.VISIBLE);
                     break;
                 case AVIMMessageStatusSent:
-                    if (conversationType == ConversationType.Single) {
-                        statusSendSucceed.setVisibility(View.VISIBLE);
-                    }
                     break;
                 case AVIMMessageStatusNone:
                 case AVIMMessageStatusSending:
@@ -207,7 +203,6 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         TextView usernameView = ViewHolder.findViewById(conView, R.id.username);
 
         View statusSendFailed = ViewHolder.findViewById(conView, R.id.status_send_failed);
-        View statusSendSucceed = ViewHolder.findViewById(conView, R.id.status_send_succeed);
         View statusSendStart = ViewHolder.findViewById(conView, R.id.status_send_start);
 
         // timestamp
@@ -265,16 +260,13 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 break;
         }
         if (isComMsg == false) {
-            hideStatusViews(statusSendStart, statusSendFailed, statusSendSucceed);
+            hideStatusViews(statusSendStart, statusSendFailed);
             setSendFailedBtnListener(statusSendFailed, msg);
             switch (msg.getMessageStatus()) {
                 case AVIMMessageStatusFailed:
                     statusSendFailed.setVisibility(View.VISIBLE);
                     break;
                 case AVIMMessageStatusSent:
-                    /*if (conversationType == ConversationType.Single) {
-                        statusSendSucceed.setVisibility(View.VISIBLE);
-                    }*/
                     break;
                 case AVIMMessageStatusNone:
                 case AVIMMessageStatusSending:
@@ -297,10 +289,9 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         });
     }
 
-    private void hideStatusViews(View statusSendStart, View statusSendFailed, View statusSendSucceed) {
+    private void hideStatusViews(View statusSendStart, View statusSendFailed) {
         statusSendFailed.setVisibility(View.GONE);
         statusSendStart.setVisibility(View.GONE);
-        statusSendSucceed.setVisibility(View.GONE);
     }
 
     public void setLocationView(AVIMTypedMessage msg, TextView locationView) {
@@ -318,13 +309,16 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
 
     private void initPlayBtn(AVIMTypedMessage msg, PlayButton playBtn, AVIMAudioMessage audioMessage, TextView timeAudio) {
         playBtn.setLeftSide(messageSentByOthers(msg));
+
         AudioHelper audioHelper = AudioHelper.getInstance();
         playBtn.setAudioHelper(audioHelper);
         playBtn.setPath(MessageHelper.getFilePath(msg));
+
         Object obj = audioMessage.getFileMetaData().get("duration");
         int time = (int) Double.parseDouble(obj.toString());
         setContentLayoutLength(time);
         timeAudio.setText(String.valueOf(time) + "''");
+
         setItemOnLongClickListener(playBtn, audioMessage);
     }
 
