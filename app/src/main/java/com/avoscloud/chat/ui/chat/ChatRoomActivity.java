@@ -370,7 +370,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
             AVIMTextMessage message = new AVIMTextMessage();
 
             Map<String, Object> attrs = new HashMap<>();
-            attrs.put("houseId", jsonFormatParams.optString("house_id"));
+            attrs.put("houseId", cachedHouseIdForCurrentConv);
             attrs.put("username", jsonFormatParams.optString("nickname"));
 
             message.setAttrs(attrs);
@@ -537,6 +537,8 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
         if (object == null) return null;
 
+        cachedHouseIdForCurrentConv = object.optString("id");
+
         JSONArray images = object.optJSONArray("images");
 
         AVIMHouseMessage message = new AVIMHouseMessage();
@@ -546,12 +548,13 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         // TODO: 16/6/28 要考虑和匿名系统集成
         attrs.put("username", "wo");
         attrs.put("houseImage", images.optString(0));
-        attrs.put("houseId", object.optString("id"));
+        attrs.put("houseId", cachedHouseIdForCurrentConv);
         attrs.put("houseAddress", object.optString("location_text"));
 
         message.setAttrs(attrs);
 
         messageAgent.sendEncapsulatedTypedMessage(message);
+
 
         return object;
     }
