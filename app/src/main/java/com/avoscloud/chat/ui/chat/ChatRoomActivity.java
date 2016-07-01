@@ -446,6 +446,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
     @Override
     public void onSetContractButton(String data) {
+        // TODO: 16/7/1 Use GridView instead of GridLayout for dynamic add items
         JSONArray array;
         try {
             array = new JSONArray(data);
