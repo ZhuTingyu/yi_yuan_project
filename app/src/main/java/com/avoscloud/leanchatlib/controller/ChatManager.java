@@ -135,7 +135,7 @@ public class ChatManager extends AVIMClientEventHandler {
             username = from.getUsername();
         }
 
-        Notification notification = Utils.notifyMsg(context, null, PackageUtil.getAppLable(context),  username + "\n" + notifyContent, notifyContent.toString(), Constants.kNotifyId);
+        Notification notification = Utils.notifyMsg(context, ChatActivity.class, PackageUtil.getAppLable(context),  username + "\n" + notifyContent, notifyContent.toString(), Constants.kNotifyId);
         getUserInfoFactory().configureNotification(notification);
     }
 
@@ -143,6 +143,7 @@ public class ChatManager extends AVIMClientEventHandler {
         this.context = context;
         msgHandler = new MsgHandler();
         AVIMMessageManager.registerMessageHandler(AVIMTypedMessage.class, msgHandler);
+
 //    try {
 //      AVIMMessageManager.registerAVIMMessageType(AVIMUserInfoMessage.class);
 //    } catch (AVException e) {
@@ -150,6 +151,7 @@ public class ChatManager extends AVIMClientEventHandler {
 //    }
 
         AVIMClient.setClientEventHandler(this);
+
         //签名
         //AVIMClient.setSignatureFactory(new SignatureFactory());
     }
