@@ -435,14 +435,6 @@ public class Utils {
         return wm.getConnectionInfo().getMacAddress();
     }
 
-    public static String quote(String str) {
-        return "'" + str + "'";
-    }
-
-    public static String formatString(Context cxt, int id, Object... args) {
-        return String.format(cxt.getString(id), args);
-    }
-
     public static Notification notifyMsg(Context context, Class<?> clz, String title, String ticker, String msg, int notifyId) {
         int icon = context.getApplicationInfo().icon;
 

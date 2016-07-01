@@ -194,10 +194,11 @@
     <string name="title_crop_photo">裁剪</string>
     <string name="loading">加载中...</string>
     <string name="chat_bottom_contract">合同</string>
-    <string name="chat_bottom_precondition">前置</string>
+    <string name="chat_bottom_precondition">前置留言板</string>
 
     <string name="menu_retransmission">转发</string>
     <string name="menu_copy">复制</string>
     <string name="menu_more">更多</string>
+    <string name="txt_required_house_name">需求%1$d</string>
 
 </resources>

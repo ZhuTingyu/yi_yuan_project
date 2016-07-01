@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.dimo.utils.StringUtil;
 import com.squareup.picasso.Picasso;
 import com.yuan.house.R;
 import com.yuan.house.common.Constants;
@@ -40,11 +41,13 @@ public class SwitchHouseActivity extends FragmentActivity {
     @Inject
     SharedPreferences prefs;
 
-    private Context mContext;
-    private ListView listView;
-    private LinearLayout back;
-    private List<JSONObject> houseInfos;
-    private JSONArray jsonFormatDatum;
+    Context mContext;
+    ListView listView;
+    LinearLayout back;
+    List<JSONObject> houseInfos;
+    JSONArray jsonFormatDatum;
+
+    int anonyCounter = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -139,10 +142,11 @@ public class SwitchHouseActivity extends FragmentActivity {
                 JSONObject object = houseInfos.get(position);
 
                 if (TextUtils.isEmpty(object.optString("estate_name"))) {
-                    holder.title.setText("需求");
+                    holder.title.setText(StringUtil.formatString(mContext, R.string.txt_required_house_name, ++anonyCounter));
                 } else {
                     holder.title.setText(object.optString("estate_name"));
                 }
+
                 holder.area.setText(object.optString("acreage") + "㎡");
                 StringBuffer sb = new StringBuffer();
                 sb.append(object.getString("room_count"));
