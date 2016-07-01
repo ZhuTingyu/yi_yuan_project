@@ -27,7 +27,6 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginRight="5dp" />
 
-
             <TextView
                 android:id="@+id/textContent"
                 android:layout_width="wrap_content"

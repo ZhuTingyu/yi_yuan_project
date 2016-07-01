@@ -2,7 +2,6 @@ package com.avoscloud.leanchatlib.adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -219,6 +218,14 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         View statusSendSucceed = ViewHolder.findViewById(conView, R.id.status_send_succeed);
         View statusSendStart = ViewHolder.findViewById(conView, R.id.status_send_start);
 
+        if (null != placeView) {
+            placeView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    playBtn.performClick();
+                }
+            });
+        }
         // timestamp
         if (position == 0 || haveTimeGap(datas.get(position - 1).getTimestamp(),
                 msg.getTimestamp())) {
@@ -327,7 +334,7 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         });
     }
 
-    private void initPlayBtn(AVIMTypedMessage msg, final PlayButton playBtn, AVIMAudioMessage audioMessage, TextView timeAudio) {
+    private void initPlayBtn(AVIMTypedMessage msg, PlayButton playBtn, AVIMAudioMessage audioMessage, TextView timeAudio) {
         playBtn.setLeftSide(messageSentByOthers(msg));
         AudioHelper audioHelper = AudioHelper.getInstance();
         playBtn.setAudioHelper(audioHelper);
@@ -336,13 +343,6 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         int time = (int) Double.parseDouble(obj.toString());
         setContentLayoutLength(time);
         timeAudio.setText(String.valueOf(time) + "''");
-        placeView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("Edward", "PlaceView is Clicked");
-                playBtn.performClick();
-            }
-        });
         setItemOnLongClickListener(playBtn, audioMessage);
     }
 
