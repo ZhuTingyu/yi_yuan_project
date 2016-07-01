@@ -2,6 +2,7 @@ package com.avoscloud.leanchatlib.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -167,15 +168,14 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         ImageView img = ViewHolder.findViewById(conView, R.id.img);
         TextView title = ViewHolder.findViewById(conView, R.id.title);
         TextView area = ViewHolder.findViewById(conView, R.id.area);
-        TextView house_params = ViewHolder.findViewById(conView, R.id.house_params);
-        house_params.setVisibility(View.GONE);
+//        TextView house_params = ViewHolder.findViewById(conView, R.id.house_params);
+//        house_params.setVisibility(View.GONE);
 
         View statusSendFailed = ViewHolder.findViewById(conView, R.id.status_send_failed);
         View statusSendSucceed = ViewHolder.findViewById(conView, R.id.status_send_succeed);
         View statusSendStart = ViewHolder.findViewById(conView, R.id.status_send_start);
 
         Picasso.with(ctx).load(object.getString("houseImage")).into(img);
-
         title.setText(object.getString("houseName"));
         area.setText(object.getString("houseAddress"));
 
@@ -187,9 +187,9 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                     statusSendFailed.setVisibility(View.VISIBLE);
                     break;
                 case AVIMMessageStatusSent:
-                    if (conversationType == ConversationType.Single) {
-                        statusSendSucceed.setVisibility(View.VISIBLE);
-                    }
+//                    if (conversationType == ConversationType.Single) {
+//                        statusSendSucceed.setVisibility(View.VISIBLE);
+//                    }
                     break;
                 case AVIMMessageStatusNone:
                 case AVIMMessageStatusSending:
@@ -208,7 +208,7 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         contentLayout = ViewHolder.findViewById(conView, R.id.contentLayout);
         ImageView imageView = ViewHolder.findViewById(conView, R.id.imageView);
         ImageView avatarView = ViewHolder.findViewById(conView, R.id.avatar);
-        PlayButton playBtn = ViewHolder.findViewById(conView, R.id.playBtn);
+        final PlayButton playBtn = ViewHolder.findViewById(conView, R.id.playBtn);
         TextView timeAudio = ViewHolder.findViewById(conView, R.id.dur_time);
         placeView = ViewHolder.findViewById(conView, R.id.audioPlaceView);
         View audioView = ViewHolder.findViewById(conView, R.id.audioLL);
@@ -327,7 +327,7 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         });
     }
 
-    private void initPlayBtn(AVIMTypedMessage msg, PlayButton playBtn, AVIMAudioMessage audioMessage, TextView timeAudio) {
+    private void initPlayBtn(AVIMTypedMessage msg, final PlayButton playBtn, AVIMAudioMessage audioMessage, TextView timeAudio) {
         playBtn.setLeftSide(messageSentByOthers(msg));
         AudioHelper audioHelper = AudioHelper.getInstance();
         playBtn.setAudioHelper(audioHelper);
@@ -336,6 +336,13 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         int time = (int) Double.parseDouble(obj.toString());
         setContentLayoutLength(time);
         timeAudio.setText(String.valueOf(time) + "''");
+        placeView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("Edward", "PlaceView is Clicked");
+                playBtn.performClick();
+            }
+        });
         setItemOnLongClickListener(playBtn, audioMessage);
     }
 
