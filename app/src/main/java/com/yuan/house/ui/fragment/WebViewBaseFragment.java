@@ -74,8 +74,8 @@ public class WebViewBaseFragment extends Fragment {
     @BindView(R.id.webview)
     WebView mWebView;
     HashMap<String, String> additionalHttpHeaders;
-    private Calendar calendar;
-    private Unbinder unbinder;
+    Calendar calendar;
+    Unbinder unbinder;
 
     public HashMap<String, String> getAdditionalHttpHeaders() {
         return additionalHttpHeaders;
@@ -85,12 +85,24 @@ public class WebViewBaseFragment extends Fragment {
         return mWebView;
     }
 
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle arguments = getArguments();
         mUrl = arguments.getString("url");
+
+        dispatchHardCodeUrl();
+    }
+
+    // TODO: 16/7/1 do stuff
+    private void dispatchHardCodeUrl() {
+        if (mUrl.indexOf("agency_check_contractTwo") >= 0) {
+            getBridge().callHandler("AuditorNotification", null);
+        } else if (mUrl.indexOf("agency_check_house") >= 0) {
+            getBridge().callHandler("AuditorNotification", null);
+        } else if (mUrl.indexOf("agency_check_contract") >= 0) {
+            getBridge().callHandler("AuditorNotification", null);
+        }
     }
 
     @Override

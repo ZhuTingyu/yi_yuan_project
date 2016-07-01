@@ -7,12 +7,14 @@ import android.content.Intent;
 import com.avoscloud.chat.util.Utils;
 import com.dimo.utils.PackageUtil;
 import com.yuan.house.common.Constants;
+import com.yuan.house.event.NotificationEvent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Iterator;
 
+import de.greenrobot.event.EventBus;
 import timber.log.Timber;
 
 /**
@@ -22,7 +24,7 @@ import timber.log.Timber;
 public class PushReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Timber.v("Got notification");
+
         try {
             String action = intent.getAction();
             String channel = intent.getExtras().getString("com.avos.avoscloud.Channel");
@@ -37,10 +39,24 @@ public class PushReceiver extends BroadcastReceiver {
             }
 
             JSONObject object = json.optJSONObject("holder");
-            // TODO: 16/6/30 handle push notification and postpone
-            Utils.notifyMsg(context, null, PackageUtil.getAppLable(context),  null, json.optString("alert"), Constants.kNotifyId);
+            Utils.notifyMsg(context, null, PackageUtil.getAppLable(context), null, json.optString("alert"), Constants.kNotifyId);
+
+            // handle push notification and dispatch
+            dispatch(object);
         } catch (JSONException e) {
             Timber.d("JSONException: " + e.getMessage());
         }
+    }
+
+    /**
+     * Dispatch dispatch handler based on different message types
+     *
+     * @param object notification payload
+     */
+    private void dispatch(JSONObject object) {
+        int msgType = object.optInt("msg_type");
+        JSONObject holder = object.optJSONObject("holder");
+
+        EventBus.getDefault().post(NotificationEvent.fromType(msgType, holder));
     }
 }

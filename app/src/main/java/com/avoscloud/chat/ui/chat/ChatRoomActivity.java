@@ -49,6 +49,7 @@ import com.yuan.house.R;
 import com.yuan.house.activities.SwitchHouseActivity;
 import com.yuan.house.common.Constants;
 import com.yuan.house.event.BridgeCallbackEvent;
+import com.yuan.house.event.NotificationEvent;
 import com.yuan.house.helper.AuthHelper;
 import com.yuan.house.ui.fragment.FragmentBBS;
 import com.yuan.house.ui.fragment.WebViewBaseFragment;
@@ -398,6 +399,18 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
             ActionBar actionBar = getActionBar();
             actionBar.setTitle(ConversationHelper.titleOfConv(this.conversation));
+        }
+    }
+
+    public void onEvent(NotificationEvent event) {
+        if (event.getEventType() == NotificationEvent.NotificationEventEnum.NOTICE_MESSAGE) {
+            getWebViewFragment().getBridge().callHandler("MessageNotification", event.getHolder());
+        } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.NEW_TRANSACTION) {
+            getWebViewFragment().getBridge().callHandler("userTransactionNotification", event.getHolder());
+        } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.NEW_AGENCY_TRANSATION) {
+            getWebViewFragment().getBridge().callHandler("agencyTransactionNotification", event.getHolder());
+        } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.BBS_MESSAGE) {
+            getWebViewFragment().getBridge().callHandler("BBSNotification", event.getHolder());
         }
     }
 

@@ -12,9 +12,7 @@ import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -53,6 +51,7 @@ import com.yuan.house.application.Injector;
 import com.yuan.house.base.BaseFragmentActivity;
 import com.yuan.house.bean.PayInfo;
 import com.yuan.house.common.Constants;
+import com.yuan.house.event.NotificationEvent;
 import com.yuan.house.event.PageEvent;
 import com.yuan.house.event.WebBroadcastEvent;
 import com.yuan.house.helper.AuthHelper;
@@ -244,6 +243,36 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     //TODO: 接收 Web 端触发的 Event 事件
     public void onEvent(WebBroadcastEvent event) {
         Toast.makeText(mContext, event.result, Toast.LENGTH_SHORT).show();
+    }
+
+    public void onEvent(NotificationEvent event) {
+        if (event.getEventType() == NotificationEvent.NotificationEventEnum.HOUSE_RECOMMENDED_MESSAGE) {
+            getWebViewFragment().getBridge().callHandler("RecommendedNotification", event.getHolder());
+        } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.NEW_HOUSE_AUDIT) {
+            getWebViewFragment().getBridge().callHandler("AuditorNotification", event.getHolder());
+        } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.NEW_EXCLUSIVE_CONTRACT) {
+            getWebViewFragment().getBridge().callHandler("AuditorNotification", event.getHolder());
+        } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.NEW_PREORDER_CONTRACT) {
+            JSONObject object = new JSONObject();
+            try {
+                object.put("holder", event.getHolder());
+                object.put("auditType", 3);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            getWebViewFragment().getBridge().callHandler("AuditorNotification", object);
+        } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.NEW_BUSINESS_CONTRACT) {
+            JSONObject object = new JSONObject();
+            try {
+                object.put("holder", event.getHolder());
+                object.put("auditType", 4);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            getWebViewFragment().getBridge().callHandler("AuditorNotification", event.getHolder());
+        }
     }
 
     @Override
