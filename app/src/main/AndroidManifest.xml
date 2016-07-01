@@ -81,7 +81,8 @@
             android:screenOrientation="portrait" />
         <activity
             android:name="com.avoscloud.chat.ui.chat.ChatRoomActivity"
-            android:launchMode="singleTask" />
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
             android:name="com.avoscloud.leanchatlib.activity.ImageBrowserActivity"
             android:launchMode="singleTask" />
@@ -99,7 +100,7 @@
             android:name=".activities.ImageViewPagerActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label=""
-            android:theme="@style/ImageGalleryTheme"/>
+            android:theme="@style/ImageGalleryTheme" />
 
         <activity
             android:name="me.nereo.multi_image_selector.MultiImageSelectorActivity"
