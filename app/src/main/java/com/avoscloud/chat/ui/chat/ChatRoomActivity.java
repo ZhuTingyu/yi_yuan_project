@@ -43,6 +43,7 @@ import com.avoscloud.leanchatlib.controller.ConversationHelper;
 import com.avoscloud.leanchatlib.model.AVIMHouseMessage;
 import com.dimo.helper.ViewHelper;
 import com.dimo.utils.DateUtil;
+import com.dimo.web.WebViewJavascriptBridge;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yuan.house.R;
 import com.yuan.house.activities.SwitchHouseActivity;
@@ -75,13 +76,13 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
     private static SharedPreferences prefs;
     private static String leanId = "";
-    private FragmentBBS mFragmentBBS;
+    String cachedHouseIdForCurrentConv;
 
+    private FragmentBBS mFragmentBBS;
     private LinearLayout bottomLayout;
     private String value;
     private List<JSONObject> houseInfos;
     private JSONObject jsonFormatParams;
-
     private GestureDetector gestureDetector;
     private int mLastY = 0;
     private GestureDetector.OnGestureListener onGestureListener =
@@ -223,6 +224,8 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         });
 
         bindAdapter(jsonFormatParams);
+
+        cachedHouseIdForCurrentConv = jsonFormatParams.optString("id");
     }
 
     @Override
@@ -605,6 +608,29 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         getWindowManager().getDefaultDisplay().getMetrics(dm);
 
         resizeBBSBoard(dm.heightPixels);
+    }
+
+    @Override
+    public void onGetFirstHouseInfo(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
+        //FIXME: 记录上一次的房源id，如果web没有传house_id进聊天，则告诉web房源id。如果没有上一次，就传可切换房源的第一条。
+        JSONObject object = new JSONObject();
+
+        String id = cachedHouseIdForCurrentConv, tradeType = null;
+
+        if (TextUtils.isEmpty(id) || TextUtils.isEmpty(tradeType)) {
+            id = houseInfos.get(0).optString("id");
+            tradeType = houseInfos.get(0).optString("trade_type");
+        }
+
+        try {
+            object.put("id", id);
+            object.put("trade_type", tradeType);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (null != callback) {
+            callback.callback(object);
+        }
     }
 
     private void resizeBBSBoard(int height) {

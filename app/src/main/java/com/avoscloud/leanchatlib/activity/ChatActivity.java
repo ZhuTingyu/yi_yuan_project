@@ -351,6 +351,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
     void commonInit() {
         mContext = this;
         chatInstance = this;
+
         msgsTable = MsgsTable.getCurrentUserInstance();
         roomsTable = RoomsTable.getCurrentUserInstance();
         eventBus = EventBus.getDefault();
@@ -363,7 +364,6 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         if (conversation == null) {
             throw new NullPointerException("conv is null");
         }
-//        initActionBar(ConversationHelper.titleOfConv(conversation));
 
         messageAgent = new MessageAgent(conversation);
         messageAgent.setSendCallback(defaultSendCallback);
