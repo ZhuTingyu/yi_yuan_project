@@ -76,7 +76,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
 
         this.mContext = this;
 
-        setLeftItem(R.drawable.back, new View.OnClickListener() {
+        setLeftItem(R.drawable.btn_back, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();

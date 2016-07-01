@@ -157,7 +157,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
                     if (!TextUtils.isEmpty(object.optString("hasBackButton"))) {
                         if (object.optString("hasBackButton").equals("true")) {
-                            setLeftItem(R.mipmap.ic_back, new View.OnClickListener() {
+                            setLeftItem(R.drawable.btn_back, new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
                                     Timber.v("OnClick back button");

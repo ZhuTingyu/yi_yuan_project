@@ -466,7 +466,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         for (int i = 0; i < array.length(); i++) {
             String contractText = array.optString(i);
 
-            int resId = R.drawable.btn_document;
+            int resId = R.drawable.btn_core;
             if (contractText.equals("核心合同")) {
                 resId = R.drawable.btn_core;
             } else if (contractText.equals("买卖合同")) {
