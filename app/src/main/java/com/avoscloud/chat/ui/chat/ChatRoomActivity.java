@@ -547,7 +547,11 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         attrs.put("houseName", object.optString("estate_name"));
         // TODO: 16/6/28 要考虑和匿名系统集成
         attrs.put("username", "wo");
-        attrs.put("houseImage", images.optString(0));
+        if (images == null || images.length() == 0) {
+            attrs.put("houseImage", null);
+        } else {
+            attrs.put("houseImage", images.optString(0));
+        }
         attrs.put("houseId", cachedHouseIdForCurrentConv);
         attrs.put("houseAddress", object.optString("location_text"));
 
