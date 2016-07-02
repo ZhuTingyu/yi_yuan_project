@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.avos.avoscloud.im.v2.AVIMReservedMessageType;
+import com.avoscloud.leanchatlib.controller.AudioHelper;
 import com.avoscloud.leanchatlib.view.PlayButton;
 import com.yuan.house.R;
 import com.yuan.house.bean.ProposalInfo;
@@ -71,7 +71,8 @@ public class ProposalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         } else if (msgType == ProposalMediaType.IMAGE.ordinal()) {
             ImageUtil.loadImageThumbnail(((ImageViewHolder)viewHolder).mImageView, info.content, 200);
         } else if (msgType == ProposalMediaType.AUDIO.ordinal()) {
-
+            VoiceViewHolder vh = (VoiceViewHolder) viewHolder;
+            vh.mPlayBtnView.setPath(info.content);
         }
     }
 
@@ -107,6 +108,9 @@ public class ProposalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public VoiceViewHolder(View view){
             super(view);
             mPlayBtnView = (PlayButton) view.findViewById(R.id.playBtn);
+            mPlayBtnView.setLeftSide(true);
+            AudioHelper audioHelper = AudioHelper.getInstance();
+            mPlayBtnView.setAudioHelper(audioHelper);
         }
     }
 

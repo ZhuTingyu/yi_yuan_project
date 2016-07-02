@@ -4,33 +4,27 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-import com.avos.avoscloud.im.v2.AVIMReservedMessageType;
 import com.avoscloud.leanchatlib.utils.PathUtils;
 import com.avoscloud.leanchatlib.utils.ProviderPathUtils;
-import com.avoscloud.leanchatlib.view.PlayButton;
-import com.squareup.okhttp.OkHttpClient;
 import com.yuan.house.R;
-import com.yuan.house.activities.WebViewBasedActivity;
 import com.yuan.house.adapter.ProposalAdapter;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
@@ -42,12 +36,12 @@ import com.yuan.house.enumerate.ProposalSourceType;
 import com.yuan.house.event.InputBottomBarEvent;
 import com.yuan.house.event.InputBottomBarRecordEvent;
 import com.yuan.house.event.InputBottomBarTextEvent;
-import com.yuan.house.event.IntentEvent;
-import com.yuan.house.event.PageEvent;
 import com.yuan.house.helper.AuthHelper;
 import com.yuan.house.ui.view.InputBottomBar;
+import com.yuan.house.utils.FileUtil;
 import com.yuan.house.utils.ToastUtil;
 import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.FileCallBack;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import org.json.JSONArray;
@@ -55,16 +49,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import me.nereo.multi_image_selector.MultiImageSelector;
-import me.nereo.multi_image_selector.MultiImageSelectorActivity;
 import okhttp3.Call;
 
 /**
@@ -337,7 +327,8 @@ public class ProposalFragment extends WebViewBaseFragment {
     public void onEvent(InputBottomBarRecordEvent recordEvent) {
         if (null != recordEvent && !TextUtils.isEmpty(recordEvent.audioPath)) {
             msg_type = ProposalMediaType.AUDIO;
-            uploadFile("");
+            duration = recordEvent.audioDuration;
+            uploadFile(recordEvent.audioPath);
         }
     }
 
@@ -386,16 +377,41 @@ public class ProposalFragment extends WebViewBaseFragment {
                             JSONArray jsonArray = new JSONArray(response);
                             for (int i = 0; i < jsonArray.length(); ++i) {
                                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                content = jsonObject.optString("original");
-                                content = content.substring(2, content.length()-2);
-                                if (!TextUtils.isEmpty(content)) {
-                                    sendMessage();
+                                if (!handleErrorCode(jsonObject)) {
+                                    content = jsonObject.optString("original");
+                                    content = content.substring(2, content.length() - 2);
+                                    if (!TextUtils.isEmpty(content)) {
+                                        sendMessage();
+                                    }
                                 }
                             }
                         } catch (JSONException e) {
                             ToastUtil.showShort(getContext(), "提交失败");
                             e.printStackTrace();
                         }
+                    }
+                });
+    }
+
+    private void downloadFile(String url, String path, String name) {
+
+        OkHttpUtils.get().url(url)
+                .build()
+                .execute(new FileCallBack(path, name) {
+                    @Override
+                    public void inProgress(float progress, long total) {
+
+                    }
+
+                    @Override
+                    public void onError(Call call, Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onResponse(File response) {
+                        boolean b = response.exists();
+                        Log.d("Proposal", response.getName());
                     }
                 });
     }
@@ -428,12 +444,12 @@ public class ProposalFragment extends WebViewBaseFragment {
                     public void onResponse(String response) {
                         try {
                             JSONObject jsonObject = new JSONObject(response);
-                            int errCode = jsonObject.optInt("error_code", 0);
-                            if (errCode == 450) {
-                                ToastUtil.showShort(getContext(), jsonObject.optString("error_msg", "未知错误!"));
-                            } else {
+                            if (!handleErrorCode(jsonObject)) {
                                 ToastUtil.showShort(getContext(), "提交成功");
                                 ProposalInfo data = parse2MyData(jsonObject);
+                                if (data.msg_type == ProposalMediaType.AUDIO.ordinal()) {
+                                    getAudioFile(data);
+                                }
                                 adapter.addData(data);
                                 adapter.notifyDataSetChanged();
                             }
@@ -444,6 +460,20 @@ public class ProposalFragment extends WebViewBaseFragment {
                     }
                 });
 
+    }
+
+    private boolean handleErrorCode(JSONObject jsonObject) {
+        int errCode = jsonObject.optInt("error_code", 0);
+        switch (errCode) {
+            case 450:
+            case 401:{
+                ToastUtil.showShort(getContext(), jsonObject.optString("error_msg", "未知错误!"));
+            }
+            break;
+            default:
+                return false;
+        }
+        return true;
     }
 
     /**
@@ -468,12 +498,10 @@ public class ProposalFragment extends WebViewBaseFragment {
                             for (int i = 0; i < jsonArray.length(); ++i) {
                                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                                 ProposalInfo data = parse2MyData(jsonObject);
-                                adapter.addData(data);
-                                if (data.msg_type == ProposalMediaType.IMAGE.ordinal()) {
-
-                                } else if (data.msg_type == ProposalMediaType.AUDIO.ordinal()) {
-
+                                if (data.msg_type == ProposalMediaType.AUDIO.ordinal()) {
+                                    getAudioFile(data);
                                 }
+                                adapter.addData(data);
                             }
                             adapter.notifyDataSetChanged();
                             ++mCurrentPage;
@@ -485,6 +513,20 @@ public class ProposalFragment extends WebViewBaseFragment {
                         }
                     }
                 });
+    }
+
+    /**
+     * 下载语音
+     */
+    private void getAudioFile(ProposalInfo data) {
+        String audioUrl = data.content;
+        String fileName = audioUrl.substring(audioUrl.lastIndexOf("/")+1);
+        String path = FileUtil.getAudioFile();
+        data.content = path + fileName;
+
+        if (!FileUtil.isFileExists(path + fileName)) {
+            downloadFile(audioUrl, path, fileName);
+        }
     }
 
     private ProposalInfo parse2MyData(JSONObject jsonObject) {
