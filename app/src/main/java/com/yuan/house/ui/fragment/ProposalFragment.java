@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -29,6 +30,7 @@ import com.avoscloud.leanchatlib.utils.ProviderPathUtils;
 import com.avoscloud.leanchatlib.view.PlayButton;
 import com.squareup.okhttp.OkHttpClient;
 import com.yuan.house.R;
+import com.yuan.house.activities.WebViewBasedActivity;
 import com.yuan.house.adapter.ProposalAdapter;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
@@ -40,6 +42,8 @@ import com.yuan.house.enumerate.ProposalSourceType;
 import com.yuan.house.event.InputBottomBarEvent;
 import com.yuan.house.event.InputBottomBarRecordEvent;
 import com.yuan.house.event.InputBottomBarTextEvent;
+import com.yuan.house.event.IntentEvent;
+import com.yuan.house.event.PageEvent;
 import com.yuan.house.helper.AuthHelper;
 import com.yuan.house.ui.view.InputBottomBar;
 import com.yuan.house.utils.ToastUtil;
@@ -53,11 +57,14 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import me.nereo.multi_image_selector.MultiImageSelector;
+import me.nereo.multi_image_selector.MultiImageSelectorActivity;
 import okhttp3.Call;
 
 /**
@@ -230,6 +237,7 @@ public class ProposalFragment extends WebViewBaseFragment {
             @Override
             public void onClick(View v) {
                 closePopupWindow();
+                msg_type = ProposalMediaType.IMAGE;
                 mBridgeListener.onSelectImageForProposal();
             }
         });
@@ -300,6 +308,18 @@ public class ProposalFragment extends WebViewBaseFragment {
         void onSelectImageForProposal();
     }
 
+    /*public void OnEvent(PageEvent event) {
+
+        if (event == null) return;
+
+        *//*if (event.eventType == WebViewBasedActivity.kActivityRequestCodeImagePickThenUpload) {
+            List<String> path = event.stringLsit;
+            for (String fileName : path) {
+                uploadFile(fileName);
+            }
+        }*//*
+    }*/
+
     /**
      * 输入文字事件处理
      */
@@ -345,12 +365,13 @@ public class ProposalFragment extends WebViewBaseFragment {
     /**
      * 上次图片等文件
      */
-    private void uploadFile(String filePath) {
+    public void uploadFile(String filePath) {
 
-        OkHttpUtils.postFile().url(Constants.kWebServiceFileUpload)
-                .addHeader("Content-Type", "application/json")
+        OkHttpUtils.post().url(Constants.kWebServiceFileUpload)
+                .addHeader("Content-Type", "multipart/form-data")
                 .addHeader("token", AuthHelper.userToken())
-                .file(new File(filePath))
+                //.file(new File(filePath))
+                .addFile("file[]", filePath, new File(/*Environment.getExternalStorageDirectory() + */filePath))
                 .build()
                 .execute(new StringCallback() {
 
@@ -362,10 +383,14 @@ public class ProposalFragment extends WebViewBaseFragment {
                     @Override
                     public void onResponse(String response) {
                         try {
-                            JSONObject json = new JSONObject(response);
-                            content = json.optString("original");
-                            if (!TextUtils.isEmpty(content)) {
-                                sendMessage();
+                            JSONArray jsonArray = new JSONArray(response);
+                            for (int i = 0; i < jsonArray.length(); ++i) {
+                                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                content = jsonObject.optString("original");
+                                content = content.substring(2, content.length()-2);
+                                if (!TextUtils.isEmpty(content)) {
+                                    sendMessage();
+                                }
                             }
                         } catch (JSONException e) {
                             ToastUtil.showShort(getContext(), "提交失败");
@@ -533,4 +558,6 @@ public class ProposalFragment extends WebViewBaseFragment {
             }
         }
     }
+
+
 }

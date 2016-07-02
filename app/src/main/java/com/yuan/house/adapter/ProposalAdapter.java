@@ -69,7 +69,7 @@ public class ProposalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if (msgType == ProposalMediaType.TEXT.ordinal()) {
             ((TextViewHolder)viewHolder).mTextView.setText(info.content);
         } else if (msgType == ProposalMediaType.IMAGE.ordinal()) {
-            ImageUtil.loadImageThumbnail(((ImageViewHolder)viewHolder).mImageView, info.content, 10);
+            ImageUtil.loadImageThumbnail(((ImageViewHolder)viewHolder).mImageView, info.content, 200);
         } else if (msgType == ProposalMediaType.AUDIO.ordinal()) {
 
         }
