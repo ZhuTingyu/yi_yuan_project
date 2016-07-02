@@ -127,11 +127,19 @@ public class ImageUtil {
         }
 
         if (imageUrl.contains("http")) {
-            Picasso.with(iv.getContext())
-                    .load(imageUrl)
+            if (dimension > 0) {
+                Picasso.with(iv.getContext())
+                        .load(imageUrl)
+                        .resize(dimension, dimension)
+                        .centerCrop()
+                        .into(iv);
+            } else {
+                Picasso.with(iv.getContext())
+                        .load(imageUrl)
 //                    .resize(dimension, dimension)
 //                    .centerCrop()
-                    .into(iv);
+                        .into(iv);
+            }
         } else {
             loadImageThumbnailFromFile(iv, imageUrl, dimension);
         }
@@ -143,11 +151,19 @@ public class ImageUtil {
     public static void loadImageThumbnailFromFile(ImageView iv, String path, int dimension) {
         File imageFile = new File(path);
         if (imageFile.exists()) {
-            Picasso.with(iv.getContext())
-                    .load(imageFile)
+            if (dimension > 0) {
+                Picasso.with(iv.getContext())
+                        .load(imageFile)
+                        .resize(dimension, dimension)
+                        .centerCrop()
+                        .into(iv);
+            } else {
+                Picasso.with(iv.getContext())
+                        .load(imageFile)
 //                    .resize(dimension, dimension)
 //                    .centerCrop()
-                    .into(iv);
+                        .into(iv);
+            }
         } else {
             iv.setImageDrawable(null);
         }
@@ -158,11 +174,19 @@ public class ImageUtil {
      * resourceId : don't be xml type drawable
      */
     public static void loadImageThumbnail(ImageView iv, int resourceId, int dimension) {
-        Picasso.with(iv.getContext())
-                .load(resourceId)
+        if (dimension > 0) {
+            Picasso.with(iv.getContext())
+                    .load(resourceId)
+                    .resize(dimension, dimension)
+                    .centerCrop()
+                    .into(iv);
+        } else {
+            Picasso.with(iv.getContext())
+                    .load(resourceId)
 //              .resize(dimension, dimension)
 //              .centerCrop()
-                .into(iv);
+                    .into(iv);
+        }
     }
 
     public static void loadFullScreenImage(final ImageView iv, String imageUrl, int width, final LinearLayout bgLinearLayout) {

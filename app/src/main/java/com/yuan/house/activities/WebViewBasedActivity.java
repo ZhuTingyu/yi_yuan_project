@@ -53,6 +53,8 @@ import com.yuan.house.application.Injector;
 import com.yuan.house.base.BaseFragmentActivity;
 import com.yuan.house.bean.PayInfo;
 import com.yuan.house.common.Constants;
+import com.yuan.house.event.InputBottomBarTextEvent;
+import com.yuan.house.event.IntentEvent;
 import com.yuan.house.event.PageEvent;
 import com.yuan.house.event.WebBroadcastEvent;
 import com.yuan.house.helper.AuthHelper;
@@ -95,7 +97,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         ImageGalleryAdapter.ImageThumbnailLoader, FullScreenImageGalleryAdapter.FullScreenImageLoader {
     private final int kActivityRequestCodeWebActivity = 3;
     private final int kActivityRequestCodeImagePickOnly = 10;
-    private final int kActivityRequestCodeImagePickThenUpload = 11;
+    public static final int kActivityRequestCodeImagePickThenUpload = 11;
 
     private final int kActivityRequestCodeImageCrop = 14;
     private final int kActivityRequestCodeSelectMapLocation = 20;
@@ -273,12 +275,17 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 mBridgeCallback.callback(path);
             }
         } else if (requestCode == kActivityRequestCodeImagePickThenUpload) {
-            // TODO: 16/6/9 upload files directly
             Timber.v("kActivityRequestCodeImagePickThenUpload");
+            // 投诉/建议只允许选择一张图片,LIST中实际上只有一个文件名
             List<String> path = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
+            //uploadMultiPartFiles(path);
+            Fragment fragment = getFragment(Constants.kFragmentTagProposal);
+            if (fragment != null) {
+                ProposalFragment pfragment = (ProposalFragment) fragment;
+                String fileName = path.get(0);
+                pfragment.uploadFile(fileName);
+            }
 
-            // TODO: 16/6/10 invoke upload process
-            uploadMultiPartFiles(path);
         } else if (requestCode == Constants.kActivityRequestCodeImagePickThenCropRectangle
                 || requestCode == Constants.kActivityRequestCodeImagePickThenCropSquare) {
             // TODO: 16/6/9 upload files directly
@@ -667,7 +674,8 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         int requestCode = kActivityRequestCodeImagePickThenUpload;
         MultiImageSelector.create(mContext)
                 .showCamera(true) // show camera or not. true by default
-                .count(9) // max select image size, 9 by default. used width #.multi()
+                //.count(9) // max select image size, 9 by default. used width #.multi()
+                .count(1) // max select image size, 9 by default. used width #.multi()
                 .multi()
                 .start(this, requestCode);
     }

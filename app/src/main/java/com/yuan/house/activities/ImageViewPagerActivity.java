@@ -119,7 +119,7 @@ public class ImageViewPagerActivity extends AppCompatActivity implements ViewPag
         for(int i=0; i<mImageViews.length; i++){
             ImageView imageView = new ImageView(this);
             mImageViews[i] = imageView;
-            ImageUtil.loadImageThumbnail(imageView, images.get(i), 1);
+            ImageUtil.loadImageThumbnail(imageView, images.get(i), 0);
             //imageView.setBackgroundResource(imgIdArray[i]);
         }
     }
