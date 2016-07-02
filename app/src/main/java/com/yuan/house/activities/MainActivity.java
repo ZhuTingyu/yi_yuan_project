@@ -278,9 +278,9 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                 user = holder.optJSONObject("user_info");
                 if (user == null) {
                     user = holder.optJSONObject("agency_info");
-                    installation.put("agency_id", user.optString("id"));
+                    installation.put("agency_id", user.optString("user_id"));
                 } else {
-                    installation.put("user_id", user.optString("id"));
+                    installation.put("user_id", user.optString("user_id"));
                 }
 
                 installation.saveInBackground();

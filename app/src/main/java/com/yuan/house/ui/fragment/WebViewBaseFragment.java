@@ -25,7 +25,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.avoscloud.chat.ui.chat.ChatRoomActivity;
 import com.baidu.location.BDLocation;
-import com.dimo.http.RestClient;
+import com.yuan.house.http.RestClient;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.gitonway.lee.niftymodaldialogeffects.lib.Effectstype;

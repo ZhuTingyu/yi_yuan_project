@@ -6,6 +6,7 @@ import android.content.Intent;
 
 import com.avoscloud.chat.util.Utils;
 import com.dimo.utils.PackageUtil;
+import com.yuan.house.activities.MainActivity;
 import com.yuan.house.common.Constants;
 import com.yuan.house.event.NotificationEvent;
 
@@ -39,10 +40,10 @@ public class PushReceiver extends BroadcastReceiver {
             }
 
             JSONObject object = json.optJSONObject("holder");
-            Utils.notifyMsg(context, null, PackageUtil.getAppLable(context), null, json.optString("alert"), Constants.kNotifyId);
+            Utils.notifyMsg(context, MainActivity.class, PackageUtil.getAppLable(context), null, json.optString("alert"), Constants.kNotifyId);
 
             // handle push notification and dispatch
-            dispatch(object);
+            dispatch(json);
         } catch (JSONException e) {
             Timber.d("JSONException: " + e.getMessage());
         }

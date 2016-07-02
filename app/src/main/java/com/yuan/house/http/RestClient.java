@@ -1,4 +1,4 @@
-package com.dimo.http;
+package com.yuan.house.http;
 
 import android.os.Looper;
 
@@ -9,6 +9,7 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.SyncHttpClient;
+import com.yuan.house.event.NotificationEvent;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -21,6 +22,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import de.greenrobot.event.EventBus;
 import timber.log.Timber;
 
 /**
@@ -31,6 +33,8 @@ public class RestClient {
     public static final int METHOD_POST = 2;
     public static final int METHOD_PUT = 3;
     public static final int MEHOTD_DELETE = 4;
+
+    private static final int kHttpStatusCodeErrorKickOut = 450;
 
     private static RestClient mInstance = null;
 
@@ -71,6 +75,10 @@ public class RestClient {
     }
 
     public void get(String url, HashMap<String, String> headers, AsyncHttpResponseHandler responseHandler) {
+        get(url, headers, null, responseHandler);
+    }
+
+    public void get(String url, HashMap<String, String> headers, RequestParams params, AsyncHttpResponseHandler responseHandler) {
         String rawUrl;
         if (url.startsWith("http://") || url.startsWith("https://")) {
             rawUrl = url;
@@ -88,16 +96,6 @@ public class RestClient {
             }
         }
 
-        getClient().get(rawUrl, null, responseHandler);
-    }
-
-    public void get(String url, HashMap<String, String> headers, RequestParams params, AsyncHttpResponseHandler responseHandler) {
-        String rawUrl = null;
-        if (url.startsWith("http://") || url.startsWith("https://")) {
-            rawUrl = url;
-        } else {
-            rawUrl = getAbsoluteUrl(url);
-        }
         getClient().get(rawUrl, params, responseHandler);
     }
 
@@ -134,6 +132,7 @@ public class RestClient {
 
         getClient().post(null, rawUrl, entity, null, responseHandler);
     }
+
     public void post(String url, HashMap<String, String> headers, RequestParams requestParams, AsyncHttpResponseHandler responseHandler) {
         AsyncHttpClient httpClient = new AsyncHttpClient();
         httpClient.setResponseTimeout(20000);
@@ -169,6 +168,7 @@ public class RestClient {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         try {
             url = params.has("url") ? params.getString("url") : null;
             if (params.has("headers")) {
@@ -181,11 +181,6 @@ public class RestClient {
                     headers[i++] = new BasicHeader(key, headersJson.getString(key));
                 }
             }
-//            else {
-//                //FIXME: fake user auth
-//                headers = new Header[1];
-//                headers[0] = new BasicHeader("access-key", "test1");
-//            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -237,6 +232,11 @@ public class RestClient {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject response) {
+                if (statusCode == kHttpStatusCodeErrorKickOut) {
+                    EventBus.getDefault().post(NotificationEvent.fromType(10, null));
+                    return;
+                }
+
                 JSONObject ret = new JSONObject();
                 try {
                     ret.put("status", statusCode);
