@@ -74,8 +74,6 @@ public class UserMainFragment extends WebViewBaseFragment {
     @Override
     public void onStart() {
         super.onStart();
-
-        //EventBus.getDefault().register(this);
     }
 
     @Override

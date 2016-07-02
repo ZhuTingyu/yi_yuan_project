@@ -201,7 +201,28 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         setTitleItem(jsonFormatParams.optString("user_id"));
+        setRightItem(R.drawable.btn_search, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String url = "resources.html";
 
+                JSONObject object = new JSONObject();
+                JSONObject innerObject = new JSONObject();
+                try {
+                    innerObject.put("title", "全网房源");
+                    innerObject.put("hasBackButton", true);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    object.put("params", innerObject);
+                    openLinkInNewActivity(url, object);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
         gestureDetector = new GestureDetector(this, onGestureListener);
 
         mFragmentBBS = FragmentBBS.newInstance();

@@ -34,6 +34,7 @@ public class AgencyMainFragment extends WebViewBaseFragment {
         ButterKnife.bind(this, view);
 
         redirectToLoadUrl(Constants.kWebPageAgencyIndex);
+
         return view;
     }
 
