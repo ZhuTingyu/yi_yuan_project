@@ -218,7 +218,7 @@
         <item name="android:paddingRight">12dip</item>
         <item name="android:textColor">@color/chat_base_color_text_white</item>
         <item name="android:textSize">12sp</item>
-        <item name="android:background">@drawable/chat_time_block</item>
+        <item name="android:background">@drawable/chat_time_shape</item>
     </style>
 
     <style name="chat_text_name_style">
@@ -226,7 +226,6 @@
         <item name="android:textSize">15sp</item>
         <item name="android:gravity">center</item>
     </style>
-
 
     <style name="chat_record_button_toast_dialog_style">
         <item name="android:windowFrame">@null</item>

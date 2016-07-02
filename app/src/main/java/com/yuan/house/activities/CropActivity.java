@@ -62,7 +62,7 @@ public class CropActivity extends BaseFragmentActivity {
 
         setTitleItem(R.string.title_crop_photo);
 
-        setLeftItem(R.drawable.back, new View.OnClickListener() {
+        setLeftItem(R.drawable.btn_back, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();

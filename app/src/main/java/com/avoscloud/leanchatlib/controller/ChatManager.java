@@ -2,7 +2,6 @@ package com.avoscloud.leanchatlib.controller;
 
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
@@ -20,6 +19,7 @@ import com.avos.avoscloud.im.v2.callback.AVIMClientCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationQueryCallback;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
+import com.avoscloud.chat.util.Utils;
 import com.avoscloud.leanchatlib.activity.ChatActivity;
 import com.avoscloud.leanchatlib.db.MsgsTable;
 import com.avoscloud.leanchatlib.db.RoomsTable;
@@ -31,6 +31,7 @@ import com.avoscloud.leanchatlib.model.UserInfo;
 import com.avoscloud.leanchatlib.utils.Logger;
 import com.avoscloud.leanchatlib.utils.NetAsyncTask;
 import com.dimo.utils.DateUtil;
+import com.dimo.utils.PackageUtil;
 import com.lfy.bean.Message;
 import com.lfy.dao.MessageDao;
 import com.yuan.house.HouseMessageType;
@@ -45,7 +46,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import de.greenrobot.event.EventBus;
 
@@ -55,7 +55,6 @@ import de.greenrobot.event.EventBus;
 public class ChatManager extends AVIMClientEventHandler {
     public static final String KEY_UPDATED_AT = "updatedAt";
     private static final long NOTIFY_PERIOD = 1000;
-    private static final int REPLY_NOTIFY_ID = 1;
     private static ChatManager chatManager;
     private static long lastNotifyTime = 0;
     private static Context context;
@@ -129,34 +128,22 @@ public class ChatManager extends AVIMClientEventHandler {
         Intent intent = new Intent(context, ChatActivity.class);
         intent.putExtra(ChatActivity.CONVID, conv.getConversationId());
 
-        //why Random().nextInt()
-        //http://stackoverflow.com/questions/13838313/android-onnewintent-always-receives-same-intent
-        PendingIntent pend = PendingIntent.getActivity(context, new Random().nextInt(),
-                intent, 0);
-        Notification.Builder builder = new Notification.Builder(context);
         CharSequence notifyContent = MessageHelper.outlineOfMsg(msg);
         CharSequence username = "username";
         UserInfo from = getUserInfoFactory().getUserInfoById(msg.getFrom());
         if (from != null) {
             username = from.getUsername();
         }
-        builder.setContentIntent(pend)
-                .setSmallIcon(icon)
-                .setWhen(System.currentTimeMillis())
-                .setTicker(username + "\n" + notifyContent)
-                .setContentTitle(username)
-                .setContentText(notifyContent)
-                .setAutoCancel(true);
-        NotificationManager man = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification notification = builder.getNotification();
+
+        Notification notification = Utils.notifyMsg(context, ChatActivity.class, PackageUtil.getAppLable(context),  username + "\n" + notifyContent, notifyContent.toString(), Constants.kNotifyId);
         getUserInfoFactory().configureNotification(notification);
-        man.notify(REPLY_NOTIFY_ID, notification);
     }
 
     public void init(Context context) {
         this.context = context;
         msgHandler = new MsgHandler();
         AVIMMessageManager.registerMessageHandler(AVIMTypedMessage.class, msgHandler);
+
 //    try {
 //      AVIMMessageManager.registerAVIMMessageType(AVIMUserInfoMessage.class);
 //    } catch (AVException e) {
@@ -164,6 +151,7 @@ public class ChatManager extends AVIMClientEventHandler {
 //    }
 
         AVIMClient.setClientEventHandler(this);
+
         //签名
         //AVIMClient.setSignatureFactory(new SignatureFactory());
     }
@@ -188,7 +176,7 @@ public class ChatManager extends AVIMClientEventHandler {
 
     public void cancelNotification() {
         NotificationManager nMgr = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
-        nMgr.cancel(REPLY_NOTIFY_ID);
+        nMgr.cancel(Constants.kNotifyId);
     }
 
     public AVIMClient getImClient() {
@@ -299,8 +287,7 @@ public class ChatManager extends AVIMClientEventHandler {
             houseId = (String) ((AVIMTextMessage) msg).getAttrs().get("houseId");
             text = ((AVIMTextMessage) msg).getText();
         } else if (msgType == HouseMessageType.HouseMessageType) {
-            houseId = (String) ((AVIMHouseMessage) msg).getAttrs().get("house_id");
-            auditType = (String) ((AVIMHouseMessage) msg).getAttrs().get("audit_type");
+            houseId = (String) ((AVIMHouseMessage) msg).getAttrs().get("houseId");
             text = "[房源消息]";
         } else if (msgType == HouseMessageType.ImageMessageType) {
             houseId = "";

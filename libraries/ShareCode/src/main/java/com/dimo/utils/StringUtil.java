@@ -169,4 +169,11 @@ public class StringUtil {
         return String.format("%0"+bits+"d", i);
     }
 
+    public static String quote(String str) {
+        return "'" + str + "'";
+    }
+
+    public static String formatString(Context cxt, int id, Object... args) {
+        return String.format(cxt.getString(id), args);
+    }
 }

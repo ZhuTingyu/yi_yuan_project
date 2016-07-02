@@ -17,7 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Callback;
+import com.dimo.utils.StringUtil;
 import com.squareup.picasso.Picasso;
 import com.yuan.house.R;
 import com.yuan.house.common.Constants;
@@ -33,7 +33,6 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import timber.log.Timber;
 
 /**
  * Created by KevinLee on 2016/5/9.
@@ -42,11 +41,13 @@ public class SwitchHouseActivity extends FragmentActivity {
     @Inject
     SharedPreferences prefs;
 
-    private Context mContext;
-    private ListView listView;
-    private LinearLayout back;
-    private List<JSONObject> houseInfos;
-    private JSONArray jsonFormatDatum;
+    Context mContext;
+    ListView listView;
+    LinearLayout back;
+    List<JSONObject> houseInfos;
+    JSONArray jsonFormatDatum;
+
+    int anonyCounter = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -141,10 +142,11 @@ public class SwitchHouseActivity extends FragmentActivity {
                 JSONObject object = houseInfos.get(position);
 
                 if (TextUtils.isEmpty(object.optString("estate_name"))) {
-                    holder.title.setText("需求");
+                    holder.title.setText(StringUtil.formatString(mContext, R.string.txt_required_house_name, ++anonyCounter));
                 } else {
                     holder.title.setText(object.optString("estate_name"));
                 }
+
                 holder.area.setText(object.optString("acreage") + "㎡");
                 StringBuffer sb = new StringBuffer();
                 sb.append(object.getString("room_count"));
@@ -156,17 +158,7 @@ public class SwitchHouseActivity extends FragmentActivity {
                 JSONArray images = object.optJSONArray("images");
                 if (images != null && images.length() != 0) {
                     String imageUrl = images.optString(0);
-                    Picasso.with(mContext).load(imageUrl).placeholder(R.drawable.img_placeholder).into(holder.imageView, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            Timber.v("onSuccess");
-                        }
-
-                        @Override
-                        public void onError() {
-                            Timber.e("onError");
-                        }
-                    });
+                    Picasso.with(mContext).load(imageUrl).placeholder(R.drawable.img_placeholder).into(holder.imageView);
                 } else {
                     Picasso.with(mContext).load(R.drawable.img_placeholder).fit().into(holder.imageView);
                 }

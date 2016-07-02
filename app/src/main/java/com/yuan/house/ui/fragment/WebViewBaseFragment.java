@@ -1,6 +1,7 @@
 package com.yuan.house.ui.fragment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -15,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebStorage;
 import android.webkit.WebView;
@@ -72,8 +74,8 @@ public class WebViewBaseFragment extends Fragment {
     @BindView(R.id.webview)
     WebView mWebView;
     HashMap<String, String> additionalHttpHeaders;
-    private Calendar calendar;
-    private Unbinder unbinder;
+    Calendar calendar;
+    Unbinder unbinder;
 
     public HashMap<String, String> getAdditionalHttpHeaders() {
         return additionalHttpHeaders;
@@ -83,12 +85,24 @@ public class WebViewBaseFragment extends Fragment {
         return mWebView;
     }
 
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle arguments = getArguments();
         mUrl = arguments.getString("url");
+
+        dispatchHardCodeUrl();
+    }
+
+    // TODO: 16/7/1 do stuff
+    private void dispatchHardCodeUrl() {
+        if (mUrl.indexOf("agency_check_contractTwo") >= 0) {
+            getBridge().callHandler("AuditorNotification", null);
+        } else if (mUrl.indexOf("agency_check_house") >= 0) {
+            getBridge().callHandler("AuditorNotification", null);
+        } else if (mUrl.indexOf("agency_check_contract") >= 0) {
+            getBridge().callHandler("AuditorNotification", null);
+        }
     }
 
     @Override
@@ -521,6 +535,8 @@ public class WebViewBaseFragment extends Fragment {
                         }
                     });
                 }
+
+                hideIME();
             }
         });
 
@@ -958,6 +974,11 @@ public class WebViewBaseFragment extends Fragment {
         super.onDetach();
         mFragmentListener = null;
         mBridgeListener = null;
+    }
+
+    private void hideIME() {
+        InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(mWebView.getWindowToken(), 0);
     }
 
     /**

@@ -12,9 +12,7 @@ import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -53,8 +51,7 @@ import com.yuan.house.application.Injector;
 import com.yuan.house.base.BaseFragmentActivity;
 import com.yuan.house.bean.PayInfo;
 import com.yuan.house.common.Constants;
-import com.yuan.house.event.InputBottomBarTextEvent;
-import com.yuan.house.event.IntentEvent;
+import com.yuan.house.event.NotificationEvent;
 import com.yuan.house.event.PageEvent;
 import com.yuan.house.event.WebBroadcastEvent;
 import com.yuan.house.helper.AuthHelper;
@@ -97,7 +94,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         ImageGalleryAdapter.ImageThumbnailLoader, FullScreenImageGalleryAdapter.FullScreenImageLoader {
     private final int kActivityRequestCodeWebActivity = 3;
     private final int kActivityRequestCodeImagePickOnly = 10;
-    public static final int kActivityRequestCodeImagePickThenUpload = 11;
+    private final int kActivityRequestCodeImagePickThenUpload = 11;
 
     private final int kActivityRequestCodeImageCrop = 14;
     private final int kActivityRequestCodeSelectMapLocation = 20;
@@ -159,7 +156,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
                     if (!TextUtils.isEmpty(object.optString("hasBackButton"))) {
                         if (object.optString("hasBackButton").equals("true")) {
-                            setLeftItem(R.mipmap.ic_back, new View.OnClickListener() {
+                            setLeftItem(R.drawable.btn_back, new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
                                     Timber.v("OnClick back button");
@@ -248,6 +245,36 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         Toast.makeText(mContext, event.result, Toast.LENGTH_SHORT).show();
     }
 
+    public void onEvent(NotificationEvent event) {
+        if (event.getEventType() == NotificationEvent.NotificationEventEnum.HOUSE_RECOMMENDED_MESSAGE) {
+            getWebViewFragment().getBridge().callHandler("RecommendedNotification", event.getHolder());
+        } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.NEW_HOUSE_AUDIT) {
+            getWebViewFragment().getBridge().callHandler("AuditorNotification", event.getHolder());
+        } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.NEW_EXCLUSIVE_CONTRACT) {
+            getWebViewFragment().getBridge().callHandler("AuditorNotification", event.getHolder());
+        } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.NEW_PREORDER_CONTRACT) {
+            JSONObject object = new JSONObject();
+            try {
+                object.put("holder", event.getHolder());
+                object.put("auditType", 3);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            getWebViewFragment().getBridge().callHandler("AuditorNotification", object);
+        } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.NEW_BUSINESS_CONTRACT) {
+            JSONObject object = new JSONObject();
+            try {
+                object.put("holder", event.getHolder());
+                object.put("auditType", 4);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            getWebViewFragment().getBridge().callHandler("AuditorNotification", event.getHolder());
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == kActivityRequestCodeWebActivity) {
@@ -275,17 +302,12 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 mBridgeCallback.callback(path);
             }
         } else if (requestCode == kActivityRequestCodeImagePickThenUpload) {
+            // TODO: 16/6/9 upload files directly
             Timber.v("kActivityRequestCodeImagePickThenUpload");
-            // 投诉/建议只允许选择一张图片,LIST中实际上只有一个文件名
             List<String> path = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
-            //uploadMultiPartFiles(path);
-            Fragment fragment = getFragment(Constants.kFragmentTagProposal);
-            if (fragment != null) {
-                ProposalFragment pfragment = (ProposalFragment) fragment;
-                String fileName = path.get(0);
-                pfragment.uploadFile(fileName);
-            }
 
+            // TODO: 16/6/10 invoke upload process
+            uploadMultiPartFiles(path);
         } else if (requestCode == Constants.kActivityRequestCodeImagePickThenCropRectangle
                 || requestCode == Constants.kActivityRequestCodeImagePickThenCropSquare) {
             // TODO: 16/6/9 upload files directly
@@ -674,8 +696,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         int requestCode = kActivityRequestCodeImagePickThenUpload;
         MultiImageSelector.create(mContext)
                 .showCamera(true) // show camera or not. true by default
-                //.count(9) // max select image size, 9 by default. used width #.multi()
-                .count(1) // max select image size, 9 by default. used width #.multi()
+                .count(9) // max select image size, 9 by default. used width #.multi()
                 .multi()
                 .start(this, requestCode);
     }

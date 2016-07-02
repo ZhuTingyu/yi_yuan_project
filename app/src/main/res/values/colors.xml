@@ -263,9 +263,10 @@
     <color name="chat_transparent">#ffff</color>
     <color name="chat_base_color_text_black">#3e3e39</color>
     <color name="chat_msg_emote_divider">#ffa1a1a1</color>
-    <color name="chat_LeftText">#000</color>
+    <color name="chat_LeftText">#323232</color>
     <color name="chat_record_btn_red">#99f00000</color>
     <color name="chat_common_white">#fff</color>
     <color name="chat_common_guide_color">#898989</color>
     <color name="chat_base_color_text_white">#fff</color>
+    <color name="chat_edit_text_underline_color">#45c01a</color>
 </resources>

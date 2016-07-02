@@ -43,11 +43,13 @@ import com.avoscloud.leanchatlib.controller.ConversationHelper;
 import com.avoscloud.leanchatlib.model.AVIMHouseMessage;
 import com.dimo.helper.ViewHelper;
 import com.dimo.utils.DateUtil;
+import com.dimo.web.WebViewJavascriptBridge;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yuan.house.R;
 import com.yuan.house.activities.SwitchHouseActivity;
 import com.yuan.house.common.Constants;
 import com.yuan.house.event.BridgeCallbackEvent;
+import com.yuan.house.event.NotificationEvent;
 import com.yuan.house.helper.AuthHelper;
 import com.yuan.house.ui.fragment.FragmentBBS;
 import com.yuan.house.ui.fragment.WebViewBaseFragment;
@@ -75,13 +77,13 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
     private static SharedPreferences prefs;
     private static String leanId = "";
-    private FragmentBBS mFragmentBBS;
+    String cachedHouseIdForCurrentConv;
 
+    private FragmentBBS mFragmentBBS;
     private LinearLayout bottomLayout;
     private String value;
     private List<JSONObject> houseInfos;
     private JSONObject jsonFormatParams;
-
     private GestureDetector gestureDetector;
     private int mLastY = 0;
     private GestureDetector.OnGestureListener onGestureListener =
@@ -223,6 +225,8 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         });
 
         bindAdapter(jsonFormatParams);
+
+        cachedHouseIdForCurrentConv = jsonFormatParams.optString("id");
     }
 
     @Override
@@ -367,7 +371,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
             AVIMTextMessage message = new AVIMTextMessage();
 
             Map<String, Object> attrs = new HashMap<>();
-            attrs.put("houseId", jsonFormatParams.optString("house_id"));
+            attrs.put("houseId", cachedHouseIdForCurrentConv);
             attrs.put("username", jsonFormatParams.optString("nickname"));
 
             message.setAttrs(attrs);
@@ -395,6 +399,18 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
             ActionBar actionBar = getActionBar();
             actionBar.setTitle(ConversationHelper.titleOfConv(this.conversation));
+        }
+    }
+
+    public void onEvent(NotificationEvent event) {
+        if (event.getEventType() == NotificationEvent.NotificationEventEnum.NOTICE_MESSAGE) {
+            getWebViewFragment().getBridge().callHandler("MessageNotification", event.getHolder());
+        } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.NEW_TRANSACTION) {
+            getWebViewFragment().getBridge().callHandler("userTransactionNotification", event.getHolder());
+        } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.NEW_AGENCY_TRANSATION) {
+            getWebViewFragment().getBridge().callHandler("agencyTransactionNotification", event.getHolder());
+        } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.BBS_MESSAGE) {
+            getWebViewFragment().getBridge().callHandler("BBSNotification", event.getHolder());
         }
     }
 
@@ -443,6 +459,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
     @Override
     public void onSetContractButton(String data) {
+        // TODO: 16/7/1 Use GridView instead of GridLayout for dynamic add items
         JSONArray array;
         try {
             array = new JSONArray(data);
@@ -461,9 +478,19 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         }
 
         for (int i = 0; i < array.length(); i++) {
-            TextView tv = new TextView(this);
+            String contractText = array.optString(i);
 
-            Drawable drawable = getResources().getDrawable(R.drawable.btn_docment);
+            int resId = R.drawable.btn_core;
+            if (contractText.equals("核心合同")) {
+                resId = R.drawable.btn_core;
+            } else if (contractText.equals("买卖合同")) {
+                resId = R.drawable.btn_deal;
+            } else if (contractText.equals("补充协议")) {
+                resId = R.drawable.btn_supplement;
+            }
+
+            TextView tv = new TextView(this);
+            Drawable drawable = getResources().getDrawable(resId);
             int h = drawable.getIntrinsicHeight();
             int w = drawable.getIntrinsicWidth();
             drawable.setBounds(0, 0, w, h);
@@ -478,7 +505,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
             params.height = 0;
             tv.setLayoutParams(params);
             tv.setGravity(Gravity.CENTER);
-            tv.setText(array.optString(i));
+            tv.setText(contractText);
 
             tv.setTag("contract");
             gv.addView(tv);
@@ -524,6 +551,8 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
         if (object == null) return null;
 
+        cachedHouseIdForCurrentConv = object.optString("id");
+
         JSONArray images = object.optJSONArray("images");
 
         AVIMHouseMessage message = new AVIMHouseMessage();
@@ -532,13 +561,18 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         attrs.put("houseName", object.optString("estate_name"));
         // TODO: 16/6/28 要考虑和匿名系统集成
         attrs.put("username", "wo");
-        attrs.put("houseImage", images.optString(0));
-        attrs.put("houseId", object.optString("id"));
+        if (images == null || images.length() == 0) {
+            attrs.put("houseImage", null);
+        } else {
+            attrs.put("houseImage", images.optString(0));
+        }
+        attrs.put("houseId", cachedHouseIdForCurrentConv);
         attrs.put("houseAddress", object.optString("location_text"));
 
         message.setAttrs(attrs);
 
         messageAgent.sendEncapsulatedTypedMessage(message);
+
 
         return object;
     }
@@ -595,6 +629,29 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         getWindowManager().getDefaultDisplay().getMetrics(dm);
 
         resizeBBSBoard(dm.heightPixels);
+    }
+
+    @Override
+    public void onGetFirstHouseInfo(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
+        //FIXME: 记录上一次的房源id，如果web没有传house_id进聊天，则告诉web房源id。如果没有上一次，就传可切换房源的第一条。
+        JSONObject object = new JSONObject();
+
+        String id = cachedHouseIdForCurrentConv, tradeType = null;
+
+        if (TextUtils.isEmpty(id) || TextUtils.isEmpty(tradeType)) {
+            id = houseInfos.get(0).optString("id");
+            tradeType = houseInfos.get(0).optString("trade_type");
+        }
+
+        try {
+            object.put("id", id);
+            object.put("trade_type", tradeType);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (null != callback) {
+            callback.callback(object);
+        }
     }
 
     private void resizeBBSBoard(int height) {

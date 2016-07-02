@@ -11,7 +11,7 @@
         android:layout_height="fill_parent"
         android:layout_above="@+id/bottomLayout"
         android:layout_below="@+id/fragmentBBS"
-        android:background="#fff"
+        android:background="#ebebeb"
         android:cacheColorHint="@android:color/transparent"
         android:divider="@null"
         android:dividerHeight="5dp"
@@ -89,6 +89,7 @@
                         android:paddingLeft="5dp"
                         android:paddingRight="44dp"
                         android:paddingTop="5dp"
+                        android:textCursorDrawable="@drawable/edittext_cursor_shape"
                         android:textSize="16sp" />
 
                     <Button
