@@ -30,7 +30,7 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.bugtags.library.Bugtags;
-import com.dimo.http.RestClient;
+import com.yuan.house.http.RestClient;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.etiennelawlor.imagegallery.library.ImageGalleryFragment;
@@ -272,6 +272,8 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             }
 
             getWebViewFragment().getBridge().callHandler("AuditorNotification", event.getHolder());
+        } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.KICK_OUT) {
+            DMApplication.getInstance().kickOut();
         }
     }
 

@@ -12,6 +12,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.StrictMode;
 import android.support.v4.BuildConfig;
+import android.widget.Toast;
 
 import com.avos.avoscloud.AVAnalytics;
 import com.avos.avoscloud.AVInstallation;
@@ -34,7 +35,7 @@ import com.avoscloud.leanchatlib.model.UserInfo;
 import com.avoscloud.leanchatlib.utils.Logger;
 import com.baidu.location.BDLocation;
 import com.baidu.mapapi.SDKInitializer;
-import com.dimo.http.RestClient;
+import com.yuan.house.http.RestClient;
 import com.dimo.utils.FileUtil;
 import com.dimo.utils.StringUtil;
 import com.dimo.utils.ZipUtil;
@@ -323,6 +324,12 @@ public class DMApplication extends Application {
         editor.apply();
 
         pruneChatManager();
+    }
+
+    public void kickOut() {
+        logout();
+
+        Toast.makeText(instance, "您的账号在别处登陆", Toast.LENGTH_SHORT).show();
     }
 
     private void initDatabase() {

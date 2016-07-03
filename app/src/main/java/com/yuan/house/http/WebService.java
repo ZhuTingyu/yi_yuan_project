@@ -2,7 +2,6 @@ package com.yuan.house.http;
 
 import android.content.SharedPreferences;
 
-import com.dimo.http.RestClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.yuan.house.application.Injector;
