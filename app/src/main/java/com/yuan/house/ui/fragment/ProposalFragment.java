@@ -3,29 +3,52 @@ package com.yuan.house.ui.fragment;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.PopupWindow;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.avos.avoscloud.im.v2.AVIMMessage;
+import com.avos.avoscloud.im.v2.AVIMTypedMessage;
+import com.avos.avoscloud.im.v2.messages.AVIMAudioMessage;
+import com.avos.avoscloud.im.v2.messages.AVIMImageMessage;
+import com.avos.avoscloud.im.v2.messages.AVIMLocationMessage;
+import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
+import com.avoscloud.leanchatlib.activity.ImageBrowserActivity;
+import com.avoscloud.leanchatlib.adapter.ChatNewMessageAdapter;
+import com.avoscloud.leanchatlib.controller.ChatManager;
+import com.avoscloud.leanchatlib.controller.MessageHelper;
+import com.avoscloud.leanchatlib.model.ConversationType;
 import com.avoscloud.leanchatlib.utils.PathUtils;
 import com.avoscloud.leanchatlib.utils.ProviderPathUtils;
+import com.avoscloud.leanchatlib.view.xlist.XListView;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.listener.PauseOnScrollListener;
 import com.yuan.house.R;
 import com.yuan.house.adapter.ProposalAdapter;
+import com.yuan.house.adapter.ProposalListAdapter;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.bean.ProposalInfo;
@@ -49,6 +72,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,7 +85,7 @@ import okhttp3.Call;
  * 用户端和中介端合并在一个Fragment里
  * Created by KevinLee on 2016/4/24.
  */
-public class ProposalFragment extends WebViewBaseFragment {
+public class ProposalFragment extends WebViewBaseFragment implements XListView.IXListViewListener {
 
     private static final int TAKE_CAMERA_REQUEST = 2;
     private static final int GALLERY_REQUEST = 0;
@@ -79,18 +103,27 @@ public class ProposalFragment extends WebViewBaseFragment {
     @BindView(R.id.bug)
     Button bug;
 
-    @BindView(R.id.swipe_refresh_widget)
+    //@BindView(R.id.swipe_refresh_widget)
     SwipeRefreshLayout mSwipeRefreshWidget;
 
-    @BindView(R.id.history_info)
+    //@BindView(R.id.history_info)
     RecyclerView mRecyclerView;
 
     @BindView(R.id.chat_inputbottombar)
     InputBottomBar inputBottomBar;
 
+    @BindView(R.id.listview)
+    XListView xListView;
+
+    @BindView(R.id.proposal_scrollView)
+    ScrollView scrollView;
+
+    protected ProposalListAdapter adapter;
+
     private LinearLayoutManager mLayoutManager;
     private int lastVisibleItem;
-    private ProposalAdapter adapter;
+    private ProposalAdapter myAdapter;
+
     private int mCurrentPage = 1;
 
     TextView app_upload_image, app_complaint, app_cancle;
@@ -105,6 +138,7 @@ public class ProposalFragment extends WebViewBaseFragment {
     private View mPopView;
     private PopupWindow mPopupWindow;
     private WindowManager.LayoutParams params;
+
 
     public static ProposalFragment newInstance() {
         ProposalFragment fragment = new ProposalFragment();
@@ -147,17 +181,15 @@ public class ProposalFragment extends WebViewBaseFragment {
         inputBottomBar.setShowDefaultActionLayout(false);
         initPopupView();
         initPopupViewConfig();
-        initHistoryView();
+        //initHistoryView();
+        initListView();
     }
 
 
     /**
-     * init recycler view
+     * init lis view
      */
     private void initHistoryView() {
-        /*mSwipeRefreshWidget.setProgressViewOffset(false, 0, (int) TypedValue
-                .applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources()
-                        .getDisplayMetrics()));*/
 
         mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
 
@@ -166,7 +198,7 @@ public class ProposalFragment extends WebViewBaseFragment {
                 super.onScrollStateChanged(recyclerView, newState);
 
                 if (newState == RecyclerView.SCROLL_STATE_IDLE &&
-                        (lastVisibleItem + 1 == adapter.getItemCount())) {
+                        (lastVisibleItem + 1 == myAdapter.getItemCount())) {
                     mSwipeRefreshWidget.setRefreshing(true);
                     int page = mCurrentPage + 1;
                     getHistoryMessages(page);
@@ -183,10 +215,112 @@ public class ProposalFragment extends WebViewBaseFragment {
 
         mLayoutManager = new LinearLayoutManager((Context) mFragmentListener);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        adapter = new ProposalAdapter();
-        mRecyclerView.setAdapter(adapter);
+        myAdapter = new ProposalAdapter();
+        mRecyclerView.setAdapter(myAdapter);
+
         getHistoryMessages(mCurrentPage);
     }
+
+    private void initListView() {
+        xListView.setPullRefreshEnable(true);
+        xListView.setPullLoadEnable(false);
+        xListView.setXListViewListener(this);
+        xListView.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(), true, true));
+        /*xListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                // TODO: 16/6/27 长按聊天消息显示『转发/复制』的 ContextMenu
+                AVIMTypedMessage message = (AVIMTypedMessage) adapter.getItem(position - 1);
+                int type = adapter.getItemViewType(position - 1);
+                if (type == 0 || type == 1) {
+                    AVIMTextMessage textMessage = (AVIMTextMessage) message;
+                    mChatMessage = textMessage.getText();
+                } else
+                    mChatMessage = MessageHelper.getFilePath(message);
+
+                return false;
+            }
+        });*/
+        xListView.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_UP){
+                    scrollView.requestDisallowInterceptTouchEvent(false);
+                }else{
+                    scrollView.requestDisallowInterceptTouchEvent(true);
+                }
+                return false;
+            }
+        });
+        bindAdapterToListView();
+        getHistoryMessages(mCurrentPage);
+    }
+
+    private void bindAdapterToListView() {
+        adapter = new ProposalListAdapter((Context) mBridgeListener, ConversationType.Single, new JSONObject());
+        adapter.setClickListener(new ChatNewMessageAdapter.ClickListener() {
+
+            @Override
+            public void onFailButtonClick(AVIMTypedMessage msg) {
+               // messageAgent.resendMsg(msg, defaultSendCallback);
+            }
+
+            @Override
+            public void onLocationViewClick(AVIMLocationMessage locMsg) {
+
+            }
+
+            @Override
+            public void onImageViewClick(AVIMImageMessage imageMsg) {
+                ImageBrowserActivity.go((Context) mBridgeListener,
+                        MessageHelper.getFilePath(imageMsg),
+                        imageMsg.getFileUrl());
+            }
+
+            @Override
+            public void onAudioLongClick(final AVIMAudioMessage audioMessage) {
+                //弹出编辑文本(语音附加消息)，确认后上传。
+                /*final EditText inputServer = new EditText((Context) mBridgeListener);
+                AlertDialog.Builder builder = new AlertDialog.Builder((Context) mBridgeListener, R.style.AlertDialogCustom);
+                builder.setTitle("附加消息").setIcon(android.R.drawable.ic_dialog_info).setView(inputServer)
+                        .setNegativeButton("取消", null);
+                builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int which) {
+                        //封装成MAP对象后转换为json
+                        OkHttpUtils.get().url("https://leancloud.cn/1.1/rtm/messages/logs?convid=" + audioMessage.getConversationId())
+                                .addHeader("X-LC-Id", "IwzlUusBdjf4bEGlypaqNRIx-gzGzoHsz")
+                                .addHeader("X-LC-Key", "4iGQy4Mg1Q8o3AyvtUTGiFQl,master")
+                                .build()
+                                .execute(new StringCallback() {
+                                    @Override
+                                    public void onError(Call call, Exception e) {
+
+                                    }
+
+                                    @Override
+                                    public void onResponse(String response) {
+                                        Log.i("云端返回的JSON", response);
+                                        com.alibaba.fastjson.JSONArray jsonArray = com.alibaba.fastjson.JSONArray.parseArray(response);
+                                        for (int i = 0; i < jsonArray.size(); i++) {
+                                            if (jsonArray.getJSONObject(i).get("msg-id").toString().equals(audioMessage.getMessageId())) {
+                                                putJson2LeanChat(jsonArray.get(i).toString(), inputServer.getText().toString());
+                                                return;
+                                            }
+                                        }
+                                    }
+                                });
+
+                    }
+                });
+                builder.show();*/
+            }
+
+        });
+        xListView.setAdapter(adapter);
+    }
+
 
     @Override
     public void onAttach(Activity activity) {
@@ -290,6 +424,22 @@ public class ProposalFragment extends WebViewBaseFragment {
 
     private void setWindowAttributes() {
         getActivity().getWindow().setAttributes(params);
+    }
+
+    @Override
+    public void onRefresh() {
+        /*new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                new GetDataTask(mContext, true).execute();
+            }
+        }, 1000);*/
+    }
+
+    @Override
+    public void onLoadMore() {
+        int page = mCurrentPage + 1;
+        getHistoryMessages(page);
     }
 
     public interface OnProposalInteractionListener extends WebViewBaseFragment.OnBridgeInteractionListener {
@@ -450,8 +600,10 @@ public class ProposalFragment extends WebViewBaseFragment {
                                 if (data.msg_type == ProposalMediaType.AUDIO.ordinal()) {
                                     getAudioFile(data);
                                 }
-                                adapter.addData(data);
+                                addData2Adapter(data);
                                 adapter.notifyDataSetChanged();
+                                //myAdapter.addData(data);
+                                //myAdapter.notifyDataSetChanged();
                             }
                         } catch (JSONException e) {
                             ToastUtil.showShort(getContext(), "提交失败");
@@ -460,6 +612,36 @@ public class ProposalFragment extends WebViewBaseFragment {
                     }
                 });
 
+    }
+
+    private void addData2Adapter(ProposalInfo data) {
+        ChatManager chatManager = ChatManager.getInstance();
+        String selfId = chatManager.getSelfId();
+
+        if (data.msg_type == ProposalMediaType.TEXT.ordinal()) {
+            AVIMTextMessage message = new AVIMTextMessage();
+            message.setText(data.content);
+            message.setFrom(selfId);
+            message.setMessageStatus(AVIMMessage.AVIMMessageStatus.AVIMMessageStatusReceipt);
+            adapter.add(message);
+        }
+        else if (data.msg_type == ProposalMediaType.IMAGE.ordinal()) {
+            AVIMImageMessage imageMsg = new AVIMImageMessage();
+            imageMsg.setText(data.content);
+            imageMsg.setFrom(selfId);
+            imageMsg.setMessageStatus(AVIMMessage.AVIMMessageStatus.AVIMMessageStatusReceipt);
+            adapter.add(imageMsg);
+        }
+        else if (data.msg_type == ProposalMediaType.AUDIO.ordinal()) {
+            try {
+                AVIMAudioMessage audioMessage = new AVIMAudioMessage(data.content);
+                audioMessage.setFrom(selfId);
+                audioMessage.setMessageStatus(AVIMMessage.AVIMMessageStatus.AVIMMessageStatusReceipt);
+                adapter.add(audioMessage);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private boolean handleErrorCode(JSONObject jsonObject) {
@@ -501,15 +683,17 @@ public class ProposalFragment extends WebViewBaseFragment {
                                 if (data.msg_type == ProposalMediaType.AUDIO.ordinal()) {
                                     getAudioFile(data);
                                 }
-                                adapter.addData(data);
+                                addData2Adapter(data);
+                                //myAdapter.addData(data);
                             }
                             adapter.notifyDataSetChanged();
+                            //myAdapter.notifyDataSetChanged();
                             ++mCurrentPage;
 
                         } catch (JSONException e) {
                             e.printStackTrace();
                         } finally {
-                            mSwipeRefreshWidget.setRefreshing(false);
+//                            mSwipeRefreshWidget.setRefreshing(false);
                         }
                     }
                 });

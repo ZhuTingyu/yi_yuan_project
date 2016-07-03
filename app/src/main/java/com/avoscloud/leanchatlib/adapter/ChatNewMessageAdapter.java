@@ -263,9 +263,10 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 break;
             case ImageMessageType:
                 AVIMImageMessage imageMsg = (AVIMImageMessage) msg;
-                PhotoUtils.displayImageCacheElseNetwork(imageView, MessageHelper.getFilePath(imageMsg),
+                /*PhotoUtils.displayImageCacheElseNetwork(imageView, MessageHelper.getFilePath(imageMsg),
                         imageMsg.getFileUrl());
-                setImageOnClickListener(imageView, imageMsg);
+                setImageOnClickListener(imageView, imageMsg);*/
+                initImageView(imageView, imageMsg);
                 message.setMessage("[图片]");
                 activity.registerForContextMenu(imageView);
                 break;
@@ -331,7 +332,13 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         });
     }
 
-    private void initPlayBtn(AVIMTypedMessage msg, PlayButton playBtn, AVIMAudioMessage audioMessage, TextView timeAudio) {
+    protected void initImageView(ImageView imageView, AVIMImageMessage imageMsg) {
+        PhotoUtils.displayImageCacheElseNetwork(imageView, MessageHelper.getFilePath(imageMsg),
+                imageMsg.getFileUrl());
+        setImageOnClickListener(imageView, imageMsg);
+    }
+
+    protected void initPlayBtn(AVIMTypedMessage msg, PlayButton playBtn, AVIMAudioMessage audioMessage, TextView timeAudio) {
         playBtn.setLeftSide(messageSentByOthers(msg));
         AudioHelper audioHelper = AudioHelper.getInstance();
         playBtn.setAudioHelper(audioHelper);
@@ -355,7 +362,7 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         });
     }
 
-    private void setImageOnClickListener(ImageView imageView, final AVIMImageMessage imageMsg) {
+    protected void setImageOnClickListener(ImageView imageView, final AVIMImageMessage imageMsg) {
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

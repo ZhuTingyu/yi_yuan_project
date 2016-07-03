@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/proposal_scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:scrollbars="vertical">
@@ -82,7 +83,7 @@
             </LinearLayout>
         </RelativeLayout>
 
-        <android.support.v4.widget.SwipeRefreshLayout
+        <!--<android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/swipe_refresh_widget"
             android:layout_width="match_parent"
             android:layout_height="135dp">
@@ -94,6 +95,19 @@
                 android:scrollbars="vertical" />
 
         </android.support.v4.widget.SwipeRefreshLayout>
+-->
+        <com.avoscloud.leanchatlib.view.xlist.XListView
+            android:id="@+id/listview"
+            android:layout_width="fill_parent"
+            android:layout_height="135dp"
+            android:background="#ebebeb"
+            android:cacheColorHint="@android:color/transparent"
+            android:divider="@null"
+            android:dividerHeight="5dp"
+            android:listSelector="@android:color/transparent"
+            android:scrollbarStyle="outsideOverlay"
+            android:stackFromBottom="true" />
+
 
         <View
             android:layout_width="match_parent"

@@ -307,7 +307,15 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             List<String> path = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
 
             // TODO: 16/6/10 invoke upload process
-            uploadMultiPartFiles(path);
+            //uploadMultiPartFiles(path);
+
+            Fragment fragment = getFragment(Constants.kFragmentTagProposal);
+            if (fragment != null) {
+                ProposalFragment pfragment = (ProposalFragment) fragment;
+                String fileName = path.get(0);
+                pfragment.uploadFile(fileName);
+            }
+
         } else if (requestCode == Constants.kActivityRequestCodeImagePickThenCropRectangle
                 || requestCode == Constants.kActivityRequestCodeImagePickThenCropSquare) {
             // TODO: 16/6/9 upload files directly
