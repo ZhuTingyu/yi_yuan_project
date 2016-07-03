@@ -259,6 +259,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
 
     private void bindAdapterToListView() {
         adapter = new ProposalListAdapter((Context) mBridgeListener, ConversationType.Single, new JSONObject());
+        adapter.setCurrentDatas(category);
         adapter.setClickListener(new ChatNewMessageAdapter.ClickListener() {
 
             @Override
@@ -382,7 +383,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                 proposal.setSelected(false);
                 bug.setSelected(false);
                 category = ProposalMessageCategory.COMPLAINT;
-                if (adapter != null) adapter.notifyDataSetChanged();
+                switchAdapter(category);
                 break;
             }
             case R.id.proposal: {
@@ -390,7 +391,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                 proposal.setSelected(true);
                 bug.setSelected(false);
                 category = ProposalMessageCategory.SUGGESTION;
-                if (adapter != null) adapter.notifyDataSetChanged();
+                switchAdapter(category);
                 break;
             }
             case R.id.bug: {
@@ -398,9 +399,16 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                 proposal.setSelected(false);
                 bug.setSelected(true);
                 category = ProposalMessageCategory.BUG;
-                if (adapter != null) adapter.notifyDataSetChanged();
+                switchAdapter(category);
                 break;
             }
+        }
+    }
+
+    private void switchAdapter(ProposalMessageCategory type) {
+        if (adapter != null) {
+            adapter.setCurrentDatas(type);
+            adapter.notifyDataSetChanged();
         }
     }
 
@@ -623,21 +631,21 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
             message.setText(data.content);
             message.setFrom(selfId);
             message.setMessageStatus(AVIMMessage.AVIMMessageStatus.AVIMMessageStatusReceipt);
-            adapter.add(message);
+            adapter.add(message, category);
         }
         else if (data.msg_type == ProposalMediaType.IMAGE.ordinal()) {
             AVIMImageMessage imageMsg = new AVIMImageMessage();
             imageMsg.setText(data.content);
             imageMsg.setFrom(selfId);
             imageMsg.setMessageStatus(AVIMMessage.AVIMMessageStatus.AVIMMessageStatusReceipt);
-            adapter.add(imageMsg);
+            adapter.add(imageMsg, category);
         }
         else if (data.msg_type == ProposalMediaType.AUDIO.ordinal()) {
             try {
                 AVIMAudioMessage audioMessage = new AVIMAudioMessage(data.content);
                 audioMessage.setFrom(selfId);
                 audioMessage.setMessageStatus(AVIMMessage.AVIMMessageStatus.AVIMMessageStatusReceipt);
-                adapter.add(audioMessage);
+                adapter.add(audioMessage, category);
             } catch (IOException e) {
                 e.printStackTrace();
             }
