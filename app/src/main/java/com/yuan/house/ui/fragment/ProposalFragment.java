@@ -515,8 +515,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                                 }
                                 addData2Adapter(data);
                                 adapter.notifyDataSetChanged();
-                                //myAdapter.addData(data);
-                                //myAdapter.notifyDataSetChanged();
+                                scrollToLast();
                             }
                         } catch (JSONException e) {
                             ToastUtil.showShort(getContext(), "提交失败");
@@ -525,6 +524,19 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                     }
                 });
 
+    }
+
+    private void scrollToLast() {
+        if (xListView.getAdapter().getCount() <= 0) {
+            return;
+        }
+
+        xListView.post(new Runnable() {
+            @Override
+            public void run() {
+                xListView.smoothScrollToPosition(xListView.getAdapter().getCount() - 1);
+            }
+        });
     }
 
     private void addData2Adapter(ProposalInfo data) {
@@ -596,10 +608,9 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                                     getAudioFile(data);
                                 }
                                 addData2Adapter(data);
-                                //myAdapter.addData(data);
                             }
                             adapter.notifyDataSetChanged();
-                            //myAdapter.notifyDataSetChanged();
+                            scrollToLast();
                             ++mCurrentPage;
 
                         } catch (JSONException e) {
