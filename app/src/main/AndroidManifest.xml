@@ -106,6 +106,8 @@
             android:label=""
             android:theme="@style/ImageGalleryTheme" />
 
+        <activity android:name=".activities.SegmentalWebActivity" />
+
         <activity
             android:name="me.nereo.multi_image_selector.MultiImageSelectorActivity"
             android:launchMode="singleTask"
