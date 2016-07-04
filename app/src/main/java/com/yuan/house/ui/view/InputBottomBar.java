@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -345,10 +346,14 @@ public class InputBottomBar extends LinearLayout {
         });
     }
 
+    public EmotionEditText getEditTextView() {
+        return contentEditText;
+    }
+
     /**
      * 展示文本输入框及相关按钮，隐藏不需要的按钮及 layout
      */
-    private void showTextLayout() {
+    public void showTextLayout() {
         isTextInputMode = true;
         //contentEditText.setVisibility(View.VISIBLE);
         textLayout.setVisibility(View.VISIBLE);

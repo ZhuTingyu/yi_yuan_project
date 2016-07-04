@@ -61,6 +61,7 @@ import com.yuan.house.event.InputBottomBarRecordEvent;
 import com.yuan.house.event.InputBottomBarTextEvent;
 import com.yuan.house.helper.AuthHelper;
 import com.yuan.house.ui.view.InputBottomBar;
+import com.yuan.house.ui.view.PickerPopWindow;
 import com.yuan.house.utils.FileUtil;
 import com.yuan.house.utils.ToastUtil;
 import com.zhy.http.okhttp.OkHttpUtils;
@@ -73,6 +74,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -103,12 +105,6 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
     @BindView(R.id.bug)
     Button bug;
 
-    //@BindView(R.id.swipe_refresh_widget)
-    SwipeRefreshLayout mSwipeRefreshWidget;
-
-    //@BindView(R.id.history_info)
-    RecyclerView mRecyclerView;
-
     @BindView(R.id.chat_inputbottombar)
     InputBottomBar inputBottomBar;
 
@@ -119,11 +115,6 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
     ScrollView scrollView;
 
     protected ProposalListAdapter adapter;
-
-    private LinearLayoutManager mLayoutManager;
-    private int lastVisibleItem;
-    private ProposalAdapter myAdapter;
-
     private int mCurrentPage = 1;
 
     TextView app_upload_image, app_complaint, app_cancle;
@@ -138,6 +129,9 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
     private View mPopView;
     private PopupWindow mPopupWindow;
     private WindowManager.LayoutParams params;
+
+    private PickerPopWindow mBrokerPicker;
+    private ArrayList mBrokerList;
 
 
     public static ProposalFragment newInstance() {
@@ -180,67 +174,16 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
 
         inputBottomBar.setShowDefaultActionLayout(false);
         initPopupView();
-        initPopupViewConfig();
-        //initHistoryView();
+        initBrokerView();
         initListView();
     }
 
-
-    /**
-     * init lis view
-     */
-    private void initHistoryView() {
-
-        mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-
-                if (newState == RecyclerView.SCROLL_STATE_IDLE &&
-                        (lastVisibleItem + 1 == myAdapter.getItemCount())) {
-                    mSwipeRefreshWidget.setRefreshing(true);
-                    int page = mCurrentPage + 1;
-                    getHistoryMessages(page);
-                }
-            }
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                lastVisibleItem = mLayoutManager.findLastVisibleItemPosition();
-            }
-
-        });
-
-        mLayoutManager = new LinearLayoutManager((Context) mFragmentListener);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        myAdapter = new ProposalAdapter();
-        mRecyclerView.setAdapter(myAdapter);
-
-        getHistoryMessages(mCurrentPage);
-    }
 
     private void initListView() {
         xListView.setPullRefreshEnable(true);
         xListView.setPullLoadEnable(false);
         xListView.setXListViewListener(this);
         xListView.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(), true, true));
-        /*xListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                // TODO: 16/6/27 长按聊天消息显示『转发/复制』的 ContextMenu
-                AVIMTypedMessage message = (AVIMTypedMessage) adapter.getItem(position - 1);
-                int type = adapter.getItemViewType(position - 1);
-                if (type == 0 || type == 1) {
-                    AVIMTextMessage textMessage = (AVIMTextMessage) message;
-                    mChatMessage = textMessage.getText();
-                } else
-                    mChatMessage = MessageHelper.getFilePath(message);
-
-                return false;
-            }
-        });*/
         xListView.setOnTouchListener(new View.OnTouchListener() {
 
             @Override
@@ -281,41 +224,6 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
 
             @Override
             public void onAudioLongClick(final AVIMAudioMessage audioMessage) {
-                //弹出编辑文本(语音附加消息)，确认后上传。
-                /*final EditText inputServer = new EditText((Context) mBridgeListener);
-                AlertDialog.Builder builder = new AlertDialog.Builder((Context) mBridgeListener, R.style.AlertDialogCustom);
-                builder.setTitle("附加消息").setIcon(android.R.drawable.ic_dialog_info).setView(inputServer)
-                        .setNegativeButton("取消", null);
-                builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
-
-                    public void onClick(DialogInterface dialog, int which) {
-                        //封装成MAP对象后转换为json
-                        OkHttpUtils.get().url("https://leancloud.cn/1.1/rtm/messages/logs?convid=" + audioMessage.getConversationId())
-                                .addHeader("X-LC-Id", "IwzlUusBdjf4bEGlypaqNRIx-gzGzoHsz")
-                                .addHeader("X-LC-Key", "4iGQy4Mg1Q8o3AyvtUTGiFQl,master")
-                                .build()
-                                .execute(new StringCallback() {
-                                    @Override
-                                    public void onError(Call call, Exception e) {
-
-                                    }
-
-                                    @Override
-                                    public void onResponse(String response) {
-                                        Log.i("云端返回的JSON", response);
-                                        com.alibaba.fastjson.JSONArray jsonArray = com.alibaba.fastjson.JSONArray.parseArray(response);
-                                        for (int i = 0; i < jsonArray.size(); i++) {
-                                            if (jsonArray.getJSONObject(i).get("msg-id").toString().equals(audioMessage.getMessageId())) {
-                                                putJson2LeanChat(jsonArray.get(i).toString(), inputServer.getText().toString());
-                                                return;
-                                            }
-                                        }
-                                    }
-                                });
-
-                    }
-                });
-                builder.show();*/
             }
 
         });
@@ -347,10 +255,9 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         app_cancle = (TextView) mPopView.findViewById(R.id.app_cancle);
         app_upload_image = (TextView) mPopView.findViewById(R.id.app_upload_image);
         app_complaint = (TextView) mPopView.findViewById(R.id.app_complaint);
-    }
 
-    private void initPopupViewConfig() {
         mPopupWindow = new PopupWindow(mPopView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+
         app_cancle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -370,7 +277,40 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         app_complaint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mBrokerPicker.showPopWin(getActivity());
                 closePopupWindow();
+            }
+        });
+    }
+
+    /**
+     * 经纪人列表
+     */
+    private void initBrokerView() {
+
+        mBrokerList = new ArrayList();
+        ArrayList item2 = new ArrayList();
+        ArrayList item3 = new ArrayList();
+        ArrayList selection = new ArrayList();
+
+        getBrokers();
+
+        for (int i = 0; i < 10; i++) {
+            mBrokerList.add("test" + i);
+        }
+        selection.add("");
+        selection.add("");
+        selection.add("");
+
+        mBrokerPicker = new PickerPopWindow(getActivity(), mBrokerList, item2, item3, selection,
+                new PickerPopWindow.OnPickCompletedListener() {
+            @Override
+            public void onAddressPickCompleted(String item1, String item2, String item3) {
+                if (!TextUtils.isEmpty(item1)) {
+                    inputBottomBar.showTextLayout();
+                    inputBottomBar.getEditTextView().setText(item1);
+                    inputBottomBar.getEditTextView().setSelection(item1.length());
+                }
             }
         });
     }
@@ -456,18 +396,6 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         void onSelectImageForProposal();
     }
 
-    /*public void OnEvent(PageEvent event) {
-
-        if (event == null) return;
-
-        *//*if (event.eventType == WebViewBasedActivity.kActivityRequestCodeImagePickThenUpload) {
-            List<String> path = event.stringLsit;
-            for (String fileName : path) {
-                uploadFile(fileName);
-            }
-        }*//*
-    }*/
-
     /**
      * 输入文字事件处理
      */
@@ -547,29 +475,6 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                             ToastUtil.showShort(getContext(), "提交失败");
                             e.printStackTrace();
                         }
-                    }
-                });
-    }
-
-    private void downloadFile(String url, String path, String name) {
-
-        OkHttpUtils.get().url(url)
-                .build()
-                .execute(new FileCallBack(path, name) {
-                    @Override
-                    public void inProgress(float progress, long total) {
-
-                    }
-
-                    @Override
-                    public void onError(Call call, Exception e) {
-                        e.printStackTrace();
-                    }
-
-                    @Override
-                    public void onResponse(File response) {
-                        boolean b = response.exists();
-                        Log.d("Proposal", response.getName());
                     }
                 });
     }
@@ -678,7 +583,6 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
 
                     @Override
                     public void onError(Call call, Exception e) {
-                        mSwipeRefreshWidget.setRefreshing(false);
                     }
 
                     @Override
@@ -717,8 +621,35 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         data.content = path + fileName;
 
         if (!FileUtil.isFileExists(path + fileName)) {
-            downloadFile(audioUrl, path, fileName);
+            FileUtil.downloadFile(audioUrl, path, fileName);
         }
+    }
+
+    /**
+     * 获取经纪人名单
+     */
+    private void getBrokers() {
+        OkHttpUtils.get().url(Constants.kWebServiceGetBrokers)
+                .addHeader("Content-Type", "application/json")
+                .addHeader("token", AuthHelper.userToken())
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e) {
+                    }
+
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONArray jsonArray = new JSONArray(response);
+                            for (int i = 0; i < jsonArray.length(); i++) {
+
+                            }
+                        } catch (Exception e) {
+
+                        }
+                    }
+                });
     }
 
     private ProposalInfo parse2MyData(JSONObject jsonObject) {

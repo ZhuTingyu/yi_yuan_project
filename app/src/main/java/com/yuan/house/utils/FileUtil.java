@@ -1,8 +1,14 @@
 package com.yuan.house.utils;
 
 import android.os.Environment;
+import android.util.Log;
+
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.FileCallBack;
 
 import java.io.File;
+
+import okhttp3.Call;
 
 public class FileUtil {
     private static String path = "";
@@ -39,5 +45,28 @@ public class FileUtil {
     public static boolean isFileExists(String path) {
         File file = new File(path);
         return file.exists();
+    }
+
+    public static void downloadFile(String url, String path, String name) {
+
+        OkHttpUtils.get().url(url)
+                .build()
+                .execute(new FileCallBack(path, name) {
+                    @Override
+                    public void inProgress(float progress, long total) {
+
+                    }
+
+                    @Override
+                    public void onError(Call call, Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onResponse(File response) {
+                        boolean b = response.exists();
+                        Log.d("Proposal", response.getName());
+                    }
+                });
     }
 }
