@@ -62,6 +62,7 @@ import com.yuan.house.event.InputBottomBarTextEvent;
 import com.yuan.house.helper.AuthHelper;
 import com.yuan.house.ui.view.InputBottomBar;
 import com.yuan.house.ui.view.PickerPopWindow;
+import com.yuan.house.utils.DateUtil;
 import com.yuan.house.utils.FileUtil;
 import com.yuan.house.utils.ToastUtil;
 import com.zhy.http.okhttp.OkHttpUtils;
@@ -540,33 +541,36 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
     }
 
     private void addData2Adapter(ProposalInfo data) {
-        ChatManager chatManager = ChatManager.getInstance();
-        String selfId = chatManager.getSelfId();
 
         if (data.msg_type == ProposalMediaType.TEXT.ordinal()) {
             AVIMTextMessage message = new AVIMTextMessage();
             message.setText(data.content);
-            message.setFrom(selfId);
-            message.setMessageStatus(AVIMMessage.AVIMMessageStatus.AVIMMessageStatusReceipt);
-            adapter.add(message, category);
+            setAVIMessage(message, data);
         }
         else if (data.msg_type == ProposalMediaType.IMAGE.ordinal()) {
             AVIMImageMessage imageMsg = new AVIMImageMessage();
             imageMsg.setText(data.content);
-            imageMsg.setFrom(selfId);
-            imageMsg.setMessageStatus(AVIMMessage.AVIMMessageStatus.AVIMMessageStatusReceipt);
-            adapter.add(imageMsg, category);
+            setAVIMessage(imageMsg, data);
         }
         else if (data.msg_type == ProposalMediaType.AUDIO.ordinal()) {
             try {
                 AVIMAudioMessage audioMessage = new AVIMAudioMessage(data.content);
-                audioMessage.setFrom(selfId);
-                audioMessage.setMessageStatus(AVIMMessage.AVIMMessageStatus.AVIMMessageStatusReceipt);
-                adapter.add(audioMessage, category);
+                setAVIMessage(audioMessage, data);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void setAVIMessage(AVIMMessage message, ProposalInfo data) {
+        ChatManager chatManager = ChatManager.getInstance();
+        String selfId = chatManager.getSelfId();
+        message.setFrom(selfId);
+        String localTime = DateUtil.utc2Local(data.created_at, DateUtil.TIME_FORMAT, DateUtil.TIME_FORMAT);
+        long timeStamp = DateUtil.convert2long(localTime, DateUtil.TIME_FORMAT);
+        message.setTimestamp(timeStamp);
+        message.setMessageStatus(AVIMMessage.AVIMMessageStatus.AVIMMessageStatusReceipt);
+        adapter.add((AVIMTypedMessage) message, category);
     }
 
     private boolean handleErrorCode(JSONObject jsonObject) {
