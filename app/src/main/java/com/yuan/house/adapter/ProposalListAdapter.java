@@ -52,6 +52,16 @@ public class ProposalListAdapter extends ChatNewMessageAdapter {
         }
     }
 
+    public void add2First(AVIMTypedMessage msg, ProposalMessageCategory type) {
+            if (type == ProposalMessageCategory.COMPLAINT) {
+                datasProposal.add(0, msg);
+            } else if (type == ProposalMessageCategory.SUGGESTION) {
+                datasSuggestion.add(0, msg);
+            } else if (type == ProposalMessageCategory.BUG) {
+                datasBug.add(0, msg);
+            }
+        }
+
     @Override
     protected void initImageView(ImageView imageView, AVIMImageMessage imageMsg) {
         ImageUtil.loadImageThumbnail(imageView, imageMsg.getText(), 200);
