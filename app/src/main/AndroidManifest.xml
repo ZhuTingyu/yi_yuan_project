@@ -64,12 +64,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity android:name=".activities.TutorialActivity" />
+
         <activity
             android:name=".activities.MainActivity"
             android:configChanges="orientation|keyboardHidden"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+
         <activity
             android:name=".activities.WebViewActivity"
             android:screenOrientation="portrait" />
