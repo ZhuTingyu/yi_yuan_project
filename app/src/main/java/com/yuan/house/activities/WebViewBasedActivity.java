@@ -30,7 +30,6 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.bugtags.library.Bugtags;
-import com.yuan.house.http.RestClient;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.etiennelawlor.imagegallery.library.ImageGalleryFragment;
@@ -55,6 +54,7 @@ import com.yuan.house.event.NotificationEvent;
 import com.yuan.house.event.PageEvent;
 import com.yuan.house.event.WebBroadcastEvent;
 import com.yuan.house.helper.AuthHelper;
+import com.yuan.house.http.RestClient;
 import com.yuan.house.http.WebService;
 import com.yuan.house.payment.AliPay;
 import com.yuan.house.ui.fragment.ProposalFragment;
@@ -184,6 +184,13 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         FullScreenImageGalleryActivity.setFullScreenImageLoader(this);
     }
 
+    protected void switchToFragment(String tag) {
+        // use other method to keep the old fragment than use this simple and rude `replace`
+        mFragmentTransaction = mFragmentManager.beginTransaction();
+        mFragmentTransaction.replace(R.id.content_frame, getFragment(tag), tag);
+        mFragmentTransaction.commit();
+    }
+
     protected Fragment getFragment(String tag) {
         Fragment f = mFragmentManager.findFragmentByTag(tag);
 
@@ -222,7 +229,12 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         Bundle extras = new Bundle();
         extras.putString("params", params.toString());
 
-        Intent intent = new Intent(this, WebViewActivity.class);
+        Class cls = WebViewActivity.class;
+        // TODO: 16/7/4 hard check if url is agency_check_contract
+        if (url.indexOf("agency_check_contract.html") == 0) {
+            cls = SegmentalWebActivity.class;
+        }
+        Intent intent = new Intent(this, cls);
         intent.putExtra("params", params.toString());
         intent.putExtra("url", url);
 

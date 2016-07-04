@@ -96,7 +96,7 @@ public class WebViewBaseFragment extends Fragment {
 
     // TODO: 16/7/1 do stuff
     private void dispatchHardCodeUrl() {
-        if (mUrl == null) return;
+        if (mUrl == null || getBridge() == null) return;
 
         if (mUrl.indexOf("agency_check_contractTwo") >= 0) {
             getBridge().callHandler("AuditorNotification", null);

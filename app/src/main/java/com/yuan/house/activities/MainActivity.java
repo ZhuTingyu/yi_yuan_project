@@ -236,14 +236,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         });
     }
 
-    public void switchToFragment(String tag) {
-        // use other method to keep the old fragment than use this simple and rude `replace`
-        mFragmentTransaction = mFragmentManager.beginTransaction();
-        mFragmentTransaction.replace(R.id.content_frame, getFragment(tag), tag);
-        mFragmentTransaction.commit();
-    }
-
-
     /**
      * Callback when user has sign in
      *

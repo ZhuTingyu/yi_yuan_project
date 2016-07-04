@@ -131,7 +131,7 @@ public class BaseFragmentActivity extends FragmentActivity {
         super.setContentView(viewGroup);
 
         // Used to inject views with the Butterknife library
-        ButterKnife.bind(this);
+        ButterKnife.bind(this, viewGroup);
     }
 
     /**

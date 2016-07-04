@@ -6,6 +6,7 @@ import com.yuan.house.activities.CropActivity;
 import com.yuan.house.activities.IPSettingActivity;
 import com.yuan.house.activities.MainActivity;
 import com.yuan.house.activities.MapActivity;
+import com.yuan.house.activities.SegmentalWebActivity;
 import com.yuan.house.activities.SplashActivity;
 import com.yuan.house.activities.SwitchHouseActivity;
 import com.yuan.house.activities.TutorialActivity;
@@ -59,6 +60,7 @@ import dagger.Module;
                         MapActivity.class,
                         SwitchHouseActivity.class,
                         CropActivity.class,
+                        SegmentalWebActivity.class,
 
                         PopUpDialog.class
                 },
