@@ -61,6 +61,7 @@ public class SegmentalWebActivity extends WebViewBasedActivity {
         fragment.getBridge().callHandler("segmentedControlValueChanged", button.getId() == R.id.segment_btn_1 ? 0 : 1);
     }
 
+    @Optional
     @OnClick(R.id.btn_back)
     public void close(Button button) {
         finish();
