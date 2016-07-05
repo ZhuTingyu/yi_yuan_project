@@ -206,7 +206,9 @@ public class RestClient {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                callback.callback(ret);
+                if (callback != null) {
+                    callback.callback(ret);
+                }
             }
 
             @Override
@@ -227,7 +229,9 @@ public class RestClient {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                callback.callback(ret);
+                if (callback != null) {
+                    callback.callback(ret);
+                }
             }
 
             @Override
@@ -257,7 +261,9 @@ public class RestClient {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                callback.callback(ret);
+                if (callback != null) {
+                    callback.callback(ret);
+                }
             }
 
             @Override
@@ -278,7 +284,9 @@ public class RestClient {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                callback.callback(ret);
+                if (callback != null) {
+                    callback.callback(ret);
+                }
             }
         });
     }

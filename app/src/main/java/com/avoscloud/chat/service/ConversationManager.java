@@ -37,13 +37,13 @@ public class ConversationManager {
   private static AVIMConversationEventHandler conversationHandler = new AVIMConversationEventHandler() {
     @Override
     public void onMemberLeft(AVIMClient client, AVIMConversation conversation, List<String> members, String kickedBy) {
-      Utils.toast(MessageHelper.nameByUserIds(members) + " left, kicked by " + MessageHelper.nameByUserId(kickedBy));
+//      Utils.toast(MessageHelper.nameByUserIds(members) + " left, kicked by " + MessageHelper.nameByUserId(kickedBy));
       getInstance().postConvChanged(conversation);
     }
 
     @Override
     public void onMemberJoined(AVIMClient client, AVIMConversation conversation, List<String> members, String invitedBy) {
-      Utils.toast(MessageHelper.nameByUserIds(members) + " joined , invited by " + MessageHelper.nameByUserId(invitedBy));
+//      Utils.toast(MessageHelper.nameByUserIds(members) + " joined , invited by " + MessageHelper.nameByUserId(invitedBy));
       getInstance().postConvChanged(conversation);
     }
 
