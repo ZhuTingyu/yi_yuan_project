@@ -268,10 +268,13 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         app_complaint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mBrokerPicker == null && mBrokerList.size() > 0) {
-                    initBrokerView();
-                }
-                if (mBrokerPicker != null) {
+                if (mBrokerPicker == null) {
+                    if (mBrokerList.size() > 0) {
+                        initBrokerView();
+                    } else {
+                        ToastUtil.showShort(getContext(), "没有经纪人列表");
+                    }
+                } else {
                     mBrokerPicker.showPopWin(getActivity());
                 }
                 closePopupWindow();
