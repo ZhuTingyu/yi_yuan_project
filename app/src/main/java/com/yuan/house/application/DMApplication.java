@@ -12,7 +12,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.StrictMode;
 import android.support.v4.BuildConfig;
-import android.widget.Toast;
 
 import com.avos.avoscloud.AVAnalytics;
 import com.avos.avoscloud.AVInstallation;
@@ -35,7 +34,6 @@ import com.avoscloud.leanchatlib.model.UserInfo;
 import com.avoscloud.leanchatlib.utils.Logger;
 import com.baidu.location.BDLocation;
 import com.baidu.mapapi.SDKInitializer;
-import com.yuan.house.http.RestClient;
 import com.dimo.utils.FileUtil;
 import com.dimo.utils.StringUtil;
 import com.dimo.utils.ZipUtil;
@@ -55,6 +53,7 @@ import com.thin.downloadmanager.ThinDownloadManager;
 import com.yuan.house.activities.SplashActivity;
 import com.yuan.house.common.Constants;
 import com.yuan.house.event.AuthEvent;
+import com.yuan.house.http.RestClient;
 
 import org.apache.http.Header;
 import org.json.JSONException;
@@ -223,7 +222,7 @@ public class DMApplication extends Application {
         PushService.setDefaultPushCallback(instance, SplashActivity.class);
         AVOSCloud.setDebugLogEnabled(debug);
         AVAnalytics.enableCrashReport(this, !debug);
-        AVIMClient.setOfflineMessagePush(true);
+//        AVIMClient.setOfflineMessagePush(true);
 
         initImageLoader(instance);
 
@@ -259,6 +258,7 @@ public class DMApplication extends Application {
     private void setupChatManager() {
         final ChatManager chatManager = ChatManager.getInstance();
         chatManager.init(this);
+
         if (AVUser.getCurrentUser() != null) {
             chatManager.setupDatabaseWithSelfId(AVUser.getCurrentUser().getObjectId());
         }
@@ -309,6 +309,8 @@ public class DMApplication extends Application {
         chatManager.closeWithCallback(new AVIMClientCallback() {
             @Override
             public void done(AVIMClient avimClient, AVIMException e) {
+                Timber.v("LeanMessage : user logout success.");
+
                 EventBus.getDefault().post(new AuthEvent(AuthEvent.AuthEventEnum.LOGOUT, null));
             }
         });
@@ -328,8 +330,6 @@ public class DMApplication extends Application {
 
     public void kickOut() {
         logout();
-
-        Toast.makeText(instance, "您的账号在别处登陆", Toast.LENGTH_SHORT).show();
     }
 
     private void initDatabase() {

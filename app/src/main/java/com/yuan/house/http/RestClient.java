@@ -292,7 +292,7 @@ public class RestClient {
     }
 
     private void request(int method, String url, RequestParams params, Header[] headers, AsyncHttpResponseHandler responseHandler) {
-        String rawUrl = null;
+        String rawUrl;
         if (url.startsWith("http://") || url.startsWith("https://")) {
             rawUrl = url;
         } else {

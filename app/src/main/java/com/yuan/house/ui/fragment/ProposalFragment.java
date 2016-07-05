@@ -82,36 +82,26 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
     private static final int TAKE_CAMERA_REQUEST = 2;
     private static final int GALLERY_REQUEST = 0;
     private static final int GALLERY_KITKAT_REQUEST = 3;
-    protected String localCameraPath;
-
-    protected OnProposalInteractionListener mBridgeListener;
-
-    @BindView(R.id.proposal)
-    Button proposal;
-
-    @BindView(R.id.complaint)
-    Button complaint;
-
-    @BindView(R.id.bug)
-    Button bug;
-
-    @BindView(R.id.chat_inputbottombar)
-    InputBottomBar inputBottomBar;
-
-    @BindView(R.id.listview)
-    XListView xListView;
-
-    @BindView(R.id.proposal_scrollView)
-    ScrollView scrollView;
-
-    protected ProposalListAdapter adapter;
-    private int mCurrentPage = 1;
-
-    TextView app_upload_image, app_complaint, app_cancle;
-
     public static ProposalSourceType sourceType = ProposalSourceType.UNKNOWN;
     public static ProposalMediaType msg_type = ProposalMediaType.TEXT;                            //1:文本，2：语音，3：图片
     public static ProposalMessageCategory category = ProposalMessageCategory.SUGGESTION;          //0：投诉；1：建议；2：BUG
+    protected String localCameraPath;
+    protected OnProposalInteractionListener mBridgeListener;
+    protected ProposalListAdapter adapter;
+    @BindView(R.id.proposal)
+    Button proposal;
+    @BindView(R.id.complaint)
+    Button complaint;
+    @BindView(R.id.bug)
+    Button bug;
+    @BindView(R.id.chat_inputbottombar)
+    InputBottomBar inputBottomBar;
+    @BindView(R.id.listview)
+    XListView xListView;
+    @BindView(R.id.proposal_scrollView)
+    ScrollView scrollView;
+    TextView app_upload_image, app_complaint, app_cancle;
+    private int mCurrentPage = 1;
     private String content;
     private int duration = 0;       //录音时长
 
@@ -121,8 +111,9 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
     private WindowManager.LayoutParams params;
 
     private PickerPopWindow mBrokerPicker = null;
-    private ArrayList mBrokerList = new ArrayList();;
-
+    private ArrayList mBrokerList = new ArrayList();
+    ;
+    private String currentAudioPath = null;
 
     public static ProposalFragment newInstance() {
         ProposalFragment fragment = new ProposalFragment();
@@ -164,11 +155,14 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
 
         inputBottomBar.setShowDefaultActionLayout(false);
         initPopupView();
-       // initBrokerView();
-        getBrokers();
-        initListView();
-    }
+        // initBrokerView();
 
+        if (AuthHelper.userAlreadyLogin()) {
+            getBrokers();
+
+            initListView();
+        }
+    }
 
     private void initListView() {
         xListView.setPullRefreshEnable(true);
@@ -179,9 +173,9 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_UP){
+                if (event.getAction() == MotionEvent.ACTION_UP) {
                     scrollView.requestDisallowInterceptTouchEvent(false);
-                }else{
+                } else {
                     scrollView.requestDisallowInterceptTouchEvent(true);
                 }
                 return false;
@@ -195,10 +189,9 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         adapter = new ProposalListAdapter((Context) mBridgeListener, ConversationType.Single, new JSONObject());
         adapter.setCurrentDatas(category);
         adapter.setClickListener(new ChatNewMessageAdapter.ClickListener() {
-
             @Override
             public void onFailButtonClick(AVIMTypedMessage msg) {
-               // messageAgent.resendMsg(msg, defaultSendCallback);
+                // messageAgent.resendMsg(msg, defaultSendCallback);
             }
 
             @Override
@@ -220,7 +213,6 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         });
         xListView.setAdapter(adapter);
     }
-
 
     @Override
     public void onAttach(Activity activity) {
@@ -286,30 +278,29 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
      * 经纪人列表
      */
     private void initBrokerView() {
-
-       // mBrokerList = new ArrayList();
+        // mBrokerList = new ArrayList();
         ArrayList item2 = new ArrayList();
         ArrayList item3 = new ArrayList();
         ArrayList selection = new ArrayList();
 
-       // getBrokers();
+        // getBrokers();
 
         for (int i = 0; i < 3; i++) {
-         //   mBrokerList.add(" ");
+            //   mBrokerList.add(" ");
             selection.add("   ");
         }
 
         mBrokerPicker = new PickerPopWindow(getActivity(), mBrokerList, item2, item3, selection,
                 new PickerPopWindow.OnPickCompletedListener() {
-            @Override
-            public void onAddressPickCompleted(String item1, String item2, String item3) {
-                if (!TextUtils.isEmpty(item1)) {
-                    inputBottomBar.showTextLayout();
-                    inputBottomBar.getEditTextView().setText(item1);
-                    inputBottomBar.getEditTextView().setSelection(item1.length());
-                }
-            }
-        });
+                    @Override
+                    public void onAddressPickCompleted(String item1, String item2, String item3) {
+                        if (!TextUtils.isEmpty(item1)) {
+                            inputBottomBar.showTextLayout();
+                            inputBottomBar.getEditTextView().setText(item1);
+                            inputBottomBar.getEditTextView().setSelection(item1.length());
+                        }
+                    }
+                });
     }
 
     @OnClick({R.id.proposal, R.id.complaint, R.id.bug})
@@ -387,12 +378,6 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         getHistoryMessages(page);
     }
 
-    public interface OnProposalInteractionListener extends WebViewBaseFragment.OnBridgeInteractionListener {
-        void onUploadProposalAudio(String data);
-
-        void onSelectImageForProposal();
-    }
-
     /**
      * 输入文字事件处理
      */
@@ -404,7 +389,6 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         }
     }
 
-    private String currentAudioPath = null;
     /**
      * 输入语音事件处理
      */
@@ -546,14 +530,12 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
             message.setText(data.content);
             setAVIMessage(message, data);
             msg = message;
-        }
-        else if (data.msg_type == ProposalMediaType.IMAGE.ordinal()) {
+        } else if (data.msg_type == ProposalMediaType.IMAGE.ordinal()) {
             AVIMImageMessage imageMsg = new AVIMImageMessage();
             imageMsg.setText(data.content);
             setAVIMessage(imageMsg, data);
             msg = imageMsg;
-        }
-        else if (data.msg_type == ProposalMediaType.AUDIO.ordinal()) {
+        } else if (data.msg_type == ProposalMediaType.AUDIO.ordinal()) {
             try {
                 AVIMAudioMessage audioMessage = new AVIMAudioMessage(data.content);
                 setAVIMessage(audioMessage, data);
@@ -586,7 +568,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         int errCode = jsonObject.optInt("error_code", 0);
         switch (errCode) {
             case 450:
-            case 401:{
+            case 401: {
                 ToastUtil.showShort(getContext(), jsonObject.optString("error_msg", "未知错误!"));
             }
             break;
@@ -641,7 +623,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
      */
     private void getAudioFile(ProposalInfo data) {
         String audioUrl = data.content;
-        String fileName = audioUrl.substring(audioUrl.lastIndexOf("/")+1);
+        String fileName = audioUrl.substring(audioUrl.lastIndexOf("/") + 1);
         String path = FileUtil.getAudioFile();
         data.content = path + fileName;
 
@@ -761,6 +743,12 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                     break;
             }
         }
+    }
+
+    public interface OnProposalInteractionListener extends WebViewBaseFragment.OnBridgeInteractionListener {
+        void onUploadProposalAudio(String data);
+
+        void onSelectImageForProposal();
     }
 
 
