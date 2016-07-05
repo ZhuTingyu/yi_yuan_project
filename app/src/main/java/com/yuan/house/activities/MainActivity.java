@@ -1,6 +1,5 @@
 package com.yuan.house.activities;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,7 +16,6 @@ import com.avos.avoscloud.LogInCallback;
 import com.avos.avoscloud.PushService;
 import com.avoscloud.chat.service.CacheService;
 import com.avoscloud.chat.service.PreferenceMap;
-import com.avoscloud.chat.service.UserService;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -102,19 +100,23 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
         initBaiduLocClient();
 
-        // configure chat service
-        if (AVUser.getCurrentUser() != null) {
-            ChatManager chatManager = ChatManager.getInstance();
-            chatManager.setupDatabaseWithSelfId(AVUser.getCurrentUser().getObjectId());
-            chatManager.openClientWithSelfId(AVUser.getCurrentUser().getObjectId(), null);
-            CacheService.registerUser(AVUser.getCurrentUser());
-        }
-
         if (prefs.getString(Constants.kWebDataKeyUserLogin, null) != null) {
             switchToFragment(Constants.kFragmentTagMain);
+
+            // configure chat service
+            if (AVUser.getCurrentUser() != null) {
+                doAVUserLogin();
+            }
         } else {
             switchToFragment(Constants.kFragmentTagLogin);
         }
+    }
+
+    private void doAVUserLogin() {
+        ChatManager chatManager = ChatManager.getInstance();
+        chatManager.setupDatabaseWithSelfId(AVUser.getCurrentUser().getObjectId());
+        chatManager.openClientWithSelfId(AVUser.getCurrentUser().getObjectId(), null);
+        CacheService.registerUser(AVUser.getCurrentUser());
     }
 
     @Override
@@ -140,10 +142,10 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
     public void onEvent(AuthEvent event) {
         if (event.getEventType() == AuthEvent.AuthEventEnum.LOGOUT) {
             // 注销已完成, 重新显示登录界面
-//            switchToFragment(Constants.kFragmentTagLogin);
-            Intent intent = new Intent(mContext, MainActivity.class);
-            startActivity(intent);
-            finish();
+            if (getWebViewFragment().getClass() != LoginFragment.class) {
+                // API 11 +
+                recreate();
+            }
         }
     }
 
@@ -308,13 +310,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                                     .putString(Constants.kLeanChatCurrentUserObjectId, chatUserId)
                                     .apply();
 
-                            UserService.updateUserLocation();
-
-                            ChatManager chatManager = ChatManager.getInstance();
-                            chatManager.setupDatabaseWithSelfId(AVUser.getCurrentUser().getObjectId());
-                            chatManager.openClientWithSelfId(AVUser.getCurrentUser().getObjectId(), null);
-
-                            CacheService.registerUser(AVUser.getCurrentUser());
+                            doAVUserLogin();
 
                             switchToFragment(Constants.kFragmentTagMain);
 
@@ -367,7 +363,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                 AVGeoPoint avGeoPoint = preferenceMap.getLocation();
                 if (avGeoPoint != null && avGeoPoint.getLatitude() == location.getLatitude()
                         && avGeoPoint.getLongitude() == location.getLongitude()) {
-                    UserService.updateUserLocation();
                     locClient.stop();
                 } else {
                     AVGeoPoint newGeoPoint = new AVGeoPoint(location.getLatitude(),
