@@ -404,6 +404,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         }
     }
 
+    private String currentAudioPath = null;
     /**
      * 输入语音事件处理
      */
@@ -411,6 +412,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         if (null != recordEvent && !TextUtils.isEmpty(recordEvent.audioPath)) {
             msg_type = ProposalMediaType.AUDIO;
             duration = recordEvent.audioDuration;
+            currentAudioPath = recordEvent.audioPath;
             uploadFile(recordEvent.audioPath);
         }
     }
@@ -437,7 +439,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
     }
 
     /**
-     * 上次图片等文件
+     * 上次图片、声音等文件
      */
     public void uploadFile(String filePath) {
 
@@ -445,7 +447,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                 .addHeader("Content-Type", "multipart/form-data")
                 .addHeader("token", AuthHelper.userToken())
                 //.file(new File(filePath))
-                .addFile("file[]", filePath, new File(/*Environment.getExternalStorageDirectory() + */filePath))
+                .addFile("file[]", filePath, new File(filePath))
                 .build()
                 .execute(new StringCallback() {
 
@@ -616,6 +618,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                                 ProposalInfo data = parseProposalInfo(jsonObject);
                                 if (data.msg_type == ProposalMediaType.AUDIO.ordinal()) {
+                                    currentAudioPath = null;
                                     getAudioFile(data);
                                 }
                                 addData2Adapter(data, false);
@@ -641,6 +644,12 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         String fileName = audioUrl.substring(audioUrl.lastIndexOf("/")+1);
         String path = FileUtil.getAudioFile();
         data.content = path + fileName;
+
+        if (!TextUtils.isEmpty(currentAudioPath)) {
+            // 刚发出语音,只需要拷贝本地语音文件
+            FileUtil.copyFile(currentAudioPath, data.content);
+            return;
+        }
 
         if (!FileUtil.isFileExists(path + fileName)) {
             FileUtil.downloadFile(audioUrl, path, fileName);
