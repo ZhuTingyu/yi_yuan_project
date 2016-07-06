@@ -48,12 +48,17 @@
                     android:id="@+id/editChatField"
                     style="@android:style/Widget.Holo.EditText"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_margin="5dp"
                     android:imeOptions="actionSend"
                     android:inputType="text"
                     android:maxLines="1"
+                    android:minHeight="@dimen/chat_BottomHeight"
+                    android:paddingBottom="8dp"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="44dp"
+                    android:paddingTop="5dp"
+                    android:textCursorDrawable="@drawable/edittext_cursor_shape"
                     android:textSize="18sp" />
 
                 <Button
