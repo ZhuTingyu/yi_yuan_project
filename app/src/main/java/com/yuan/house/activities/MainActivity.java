@@ -1,6 +1,5 @@
 package com.yuan.house.activities;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,7 +16,6 @@ import com.avos.avoscloud.LogInCallback;
 import com.avos.avoscloud.PushService;
 import com.avoscloud.chat.service.CacheService;
 import com.avoscloud.chat.service.PreferenceMap;
-import com.avoscloud.chat.service.UserService;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -31,6 +29,7 @@ import com.yuan.house.common.Constants;
 import com.yuan.house.event.AuthEvent;
 import com.yuan.house.event.LocationEvent;
 import com.yuan.house.event.PageEvent;
+import com.yuan.house.helper.AuthHelper;
 import com.yuan.house.ui.fragment.AgencyMainFragment;
 import com.yuan.house.ui.fragment.AgencyMessageFragment;
 import com.yuan.house.ui.fragment.LoginFragment;
@@ -83,7 +82,11 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
         mContext = this;
 
-        setupTabbarClickListener();
+        setupTabbarAppearance();
+
+        if (AuthHelper.userAlreadyLogin()) {
+            setupTabbarClickListener();
+        }
 
         // Set default Activity when push comes
         PushService.setDefaultPushCallback(this, MainActivity.class);
@@ -97,19 +100,23 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
         initBaiduLocClient();
 
-        // configure chat service
-        if (AVUser.getCurrentUser() != null) {
-            ChatManager chatManager = ChatManager.getInstance();
-            chatManager.setupDatabaseWithSelfId(AVUser.getCurrentUser().getObjectId());
-            chatManager.openClientWithSelfId(AVUser.getCurrentUser().getObjectId(), null);
-            CacheService.registerUser(AVUser.getCurrentUser());
-        }
-
         if (prefs.getString(Constants.kWebDataKeyUserLogin, null) != null) {
             switchToFragment(Constants.kFragmentTagMain);
+
+            // configure chat service
+            if (AVUser.getCurrentUser() != null) {
+                doAVUserLogin();
+            }
         } else {
             switchToFragment(Constants.kFragmentTagLogin);
         }
+    }
+
+    private void doAVUserLogin() {
+        ChatManager chatManager = ChatManager.getInstance();
+        chatManager.setupDatabaseWithSelfId(AVUser.getCurrentUser().getObjectId());
+        chatManager.openClientWithSelfId(AVUser.getCurrentUser().getObjectId(), null);
+        CacheService.registerUser(AVUser.getCurrentUser());
     }
 
     @Override
@@ -135,10 +142,10 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
     public void onEvent(AuthEvent event) {
         if (event.getEventType() == AuthEvent.AuthEventEnum.LOGOUT) {
             // 注销已完成, 重新显示登录界面
-//            switchToFragment(Constants.kFragmentTagLogin);
-            Intent intent = new Intent(mContext, MainActivity.class);
-            startActivity(intent);
-            finish();
+            if (getWebViewFragment().getClass() != LoginFragment.class) {
+                // API 11 +
+                recreate();
+            }
         }
     }
 
@@ -199,7 +206,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         return bottomNavigationBar;
     }
 
-    public void setupTabbarClickListener() {
+    public void setupTabbarAppearance() {
         this.bottomNavigationBar = ButterKnife.findById(getTabBar(), R.id.bottom_navigation_bar);
         bottomNavigationBar
                 .addItem(new BottomNavigationItem(R.drawable.ic_home, "房源")).setActiveColor(R.color.primary_color_scheme)
@@ -207,7 +214,9 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                 .addItem(new BottomNavigationItem(R.drawable.ic_suggest, "建议")).setActiveColor(R.color.primary_color_scheme)
                 .setFirstSelectedPosition(0)
                 .initialise();
+    }
 
+    private void setupTabbarClickListener() {
         bottomNavigationBar.setTabSelectedListener(new BottomNavigationBar.OnTabSelectedListener() {
             @Override
             public void onTabSelected(int position) {
@@ -234,6 +243,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
             }
         });
+
     }
 
     /**
@@ -281,6 +291,8 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                 String passwd = user.optString("lean_passwd");
 
                 avUserLogin(userName, passwd);
+
+                setupTabbarClickListener();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -298,18 +310,12 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                                     .putString(Constants.kLeanChatCurrentUserObjectId, chatUserId)
                                     .apply();
 
-                            UserService.updateUserLocation();
-
-                            ChatManager chatManager = ChatManager.getInstance();
-                            chatManager.setupDatabaseWithSelfId(AVUser.getCurrentUser().getObjectId());
-                            chatManager.openClientWithSelfId(AVUser.getCurrentUser().getObjectId(), null);
-
-                            CacheService.registerUser(AVUser.getCurrentUser());
+                            doAVUserLogin();
 
                             switchToFragment(Constants.kFragmentTagMain);
 
                             getBottomNavigationBar().clearAll();
-                            setupTabbarClickListener();
+                            setupTabbarAppearance();
                         } else {
                             ToastUtil.showShort(mContext, "leancould登陆失败");
                         }
@@ -357,7 +363,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                 AVGeoPoint avGeoPoint = preferenceMap.getLocation();
                 if (avGeoPoint != null && avGeoPoint.getLatitude() == location.getLatitude()
                         && avGeoPoint.getLongitude() == location.getLongitude()) {
-                    UserService.updateUserLocation();
                     locClient.stop();
                 } else {
                     AVGeoPoint newGeoPoint = new AVGeoPoint(location.getLatitude(),

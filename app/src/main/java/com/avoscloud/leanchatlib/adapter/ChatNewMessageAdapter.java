@@ -45,7 +45,7 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
 
     private static PrettyTime prettyTime = new PrettyTime();
     private ConversationType conversationType;
-    private org.json.JSONObject conversationObject;
+    protected org.json.JSONObject conversationObject;
     private int msgViewTypes = 9;
     private ChatNewMessageAdapter.ClickListener clickListener;
     private Context context;
@@ -117,7 +117,7 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         return msgViewTypes;
     }
 
-    boolean messageSentByOthers(AVIMTypedMessage msg) {
+    protected boolean messageSentByOthers(AVIMTypedMessage msg) {
         return !MessageHelper.fromMe(msg);
     }
 
@@ -203,7 +203,7 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         activity.registerForContextMenu(houseView);
     }
 
-    private void initReservedMessageView(View conView, int position, AVIMTypedMessage msg, boolean isComMsg, Message message) {
+    protected void initReservedMessageView(View conView, int position, AVIMTypedMessage msg, boolean isComMsg, Message message) {
         TextView sendTimeView = ViewHolder.findViewById(conView, R.id.sendTimeView);
         TextView contentView = ViewHolder.findViewById(conView, R.id.textContent);
         contentLayout = ViewHolder.findViewById(conView, R.id.contentLayout);

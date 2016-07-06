@@ -3,29 +3,19 @@ package com.yuan.house.ui.fragment;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.PopupWindow;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -47,10 +37,10 @@ import com.avoscloud.leanchatlib.view.xlist.XListView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.PauseOnScrollListener;
 import com.yuan.house.R;
-import com.yuan.house.adapter.ProposalAdapter;
 import com.yuan.house.adapter.ProposalListAdapter;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
+import com.yuan.house.bean.BrokerInfo;
 import com.yuan.house.bean.ProposalInfo;
 import com.yuan.house.common.Constants;
 import com.yuan.house.enumerate.ProposalMediaType;
@@ -66,7 +56,6 @@ import com.yuan.house.utils.DateUtil;
 import com.yuan.house.utils.FileUtil;
 import com.yuan.house.utils.ToastUtil;
 import com.zhy.http.okhttp.OkHttpUtils;
-import com.zhy.http.okhttp.callback.FileCallBack;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import org.json.JSONArray;
@@ -93,36 +82,26 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
     private static final int TAKE_CAMERA_REQUEST = 2;
     private static final int GALLERY_REQUEST = 0;
     private static final int GALLERY_KITKAT_REQUEST = 3;
-    protected String localCameraPath;
-
-    protected OnProposalInteractionListener mBridgeListener;
-
-    @BindView(R.id.proposal)
-    Button proposal;
-
-    @BindView(R.id.complaint)
-    Button complaint;
-
-    @BindView(R.id.bug)
-    Button bug;
-
-    @BindView(R.id.chat_inputbottombar)
-    InputBottomBar inputBottomBar;
-
-    @BindView(R.id.listview)
-    XListView xListView;
-
-    @BindView(R.id.proposal_scrollView)
-    ScrollView scrollView;
-
-    protected ProposalListAdapter adapter;
-    private int mCurrentPage = 1;
-
-    TextView app_upload_image, app_complaint, app_cancle;
-
     public static ProposalSourceType sourceType = ProposalSourceType.UNKNOWN;
     public static ProposalMediaType msg_type = ProposalMediaType.TEXT;                            //1:文本，2：语音，3：图片
     public static ProposalMessageCategory category = ProposalMessageCategory.SUGGESTION;          //0：投诉；1：建议；2：BUG
+    protected String localCameraPath;
+    protected OnProposalInteractionListener mBridgeListener;
+    protected ProposalListAdapter adapter;
+    @BindView(R.id.proposal)
+    Button proposal;
+    @BindView(R.id.complaint)
+    Button complaint;
+    @BindView(R.id.bug)
+    Button bug;
+    @BindView(R.id.chat_inputbottombar)
+    InputBottomBar inputBottomBar;
+    @BindView(R.id.listview)
+    XListView xListView;
+    @BindView(R.id.proposal_scrollView)
+    ScrollView scrollView;
+    TextView app_upload_image, app_complaint, app_cancle;
+    private int mCurrentPage = 1;
     private String content;
     private int duration = 0;       //录音时长
 
@@ -131,9 +110,10 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
     private PopupWindow mPopupWindow;
     private WindowManager.LayoutParams params;
 
-    private PickerPopWindow mBrokerPicker;
-    private ArrayList mBrokerList;
-
+    private PickerPopWindow mBrokerPicker = null;
+    private ArrayList mBrokerList = new ArrayList();
+    ;
+    private String currentAudioPath = null;
 
     public static ProposalFragment newInstance() {
         ProposalFragment fragment = new ProposalFragment();
@@ -175,10 +155,14 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
 
         inputBottomBar.setShowDefaultActionLayout(false);
         initPopupView();
-        initBrokerView();
-        initListView();
-    }
+        // initBrokerView();
 
+        if (AuthHelper.userAlreadyLogin()) {
+            getBrokers();
+
+            initListView();
+        }
+    }
 
     private void initListView() {
         xListView.setPullRefreshEnable(true);
@@ -189,9 +173,9 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_UP){
+                if (event.getAction() == MotionEvent.ACTION_UP) {
                     scrollView.requestDisallowInterceptTouchEvent(false);
-                }else{
+                } else {
                     scrollView.requestDisallowInterceptTouchEvent(true);
                 }
                 return false;
@@ -205,10 +189,9 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         adapter = new ProposalListAdapter((Context) mBridgeListener, ConversationType.Single, new JSONObject());
         adapter.setCurrentDatas(category);
         adapter.setClickListener(new ChatNewMessageAdapter.ClickListener() {
-
             @Override
             public void onFailButtonClick(AVIMTypedMessage msg) {
-               // messageAgent.resendMsg(msg, defaultSendCallback);
+                // messageAgent.resendMsg(msg, defaultSendCallback);
             }
 
             @Override
@@ -230,7 +213,6 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         });
         xListView.setAdapter(adapter);
     }
-
 
     @Override
     public void onAttach(Activity activity) {
@@ -278,7 +260,15 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         app_complaint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mBrokerPicker.showPopWin(getActivity());
+                if (mBrokerPicker == null) {
+                    if (mBrokerList.size() > 0) {
+                        initBrokerView();
+                    } else {
+                        ToastUtil.showShort(getContext(), "没有经纪人列表");
+                    }
+                } else {
+                    mBrokerPicker.showPopWin(getActivity());
+                }
                 closePopupWindow();
             }
         });
@@ -288,32 +278,29 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
      * 经纪人列表
      */
     private void initBrokerView() {
-
-        mBrokerList = new ArrayList();
+        // mBrokerList = new ArrayList();
         ArrayList item2 = new ArrayList();
         ArrayList item3 = new ArrayList();
         ArrayList selection = new ArrayList();
 
-        getBrokers();
+        // getBrokers();
 
-        for (int i = 0; i < 10; i++) {
-            mBrokerList.add("test" + i);
+        for (int i = 0; i < 3; i++) {
+            //   mBrokerList.add(" ");
+            selection.add("   ");
         }
-        selection.add("");
-        selection.add("");
-        selection.add("");
 
         mBrokerPicker = new PickerPopWindow(getActivity(), mBrokerList, item2, item3, selection,
                 new PickerPopWindow.OnPickCompletedListener() {
-            @Override
-            public void onAddressPickCompleted(String item1, String item2, String item3) {
-                if (!TextUtils.isEmpty(item1)) {
-                    inputBottomBar.showTextLayout();
-                    inputBottomBar.getEditTextView().setText(item1);
-                    inputBottomBar.getEditTextView().setSelection(item1.length());
-                }
-            }
-        });
+                    @Override
+                    public void onAddressPickCompleted(String item1, String item2, String item3) {
+                        if (!TextUtils.isEmpty(item1)) {
+                            inputBottomBar.showTextLayout();
+                            inputBottomBar.getEditTextView().setText(item1);
+                            inputBottomBar.getEditTextView().setSelection(item1.length());
+                        }
+                    }
+                });
     }
 
     @OnClick({R.id.proposal, R.id.complaint, R.id.bug})
@@ -391,12 +378,6 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         getHistoryMessages(page);
     }
 
-    public interface OnProposalInteractionListener extends WebViewBaseFragment.OnBridgeInteractionListener {
-        void onUploadProposalAudio(String data);
-
-        void onSelectImageForProposal();
-    }
-
     /**
      * 输入文字事件处理
      */
@@ -415,6 +396,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         if (null != recordEvent && !TextUtils.isEmpty(recordEvent.audioPath)) {
             msg_type = ProposalMediaType.AUDIO;
             duration = recordEvent.audioDuration;
+            currentAudioPath = recordEvent.audioPath;
             uploadFile(recordEvent.audioPath);
         }
     }
@@ -441,7 +423,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
     }
 
     /**
-     * 上次图片等文件
+     * 上次图片、声音等文件
      */
     public void uploadFile(String filePath) {
 
@@ -449,7 +431,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                 .addHeader("Content-Type", "multipart/form-data")
                 .addHeader("token", AuthHelper.userToken())
                 //.file(new File(filePath))
-                .addFile("file[]", filePath, new File(/*Environment.getExternalStorageDirectory() + */filePath))
+                .addFile("file[]", filePath, new File(filePath))
                 .build()
                 .execute(new StringCallback() {
 
@@ -510,11 +492,11 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                             JSONObject jsonObject = new JSONObject(response);
                             if (!handleErrorCode(jsonObject)) {
                                 ToastUtil.showShort(getContext(), "提交成功");
-                                ProposalInfo data = parse2MyData(jsonObject);
+                                ProposalInfo data = parseProposalInfo(jsonObject);
                                 if (data.msg_type == ProposalMediaType.AUDIO.ordinal()) {
                                     getAudioFile(data);
                                 }
-                                addData2Adapter(data);
+                                addData2Adapter(data, true);
                                 adapter.notifyDataSetChanged();
                                 scrollToLast();
                             }
@@ -540,24 +522,34 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         });
     }
 
-    private void addData2Adapter(ProposalInfo data) {
+    private void addData2Adapter(ProposalInfo data, boolean order) {
 
+        AVIMTypedMessage msg = null;
         if (data.msg_type == ProposalMediaType.TEXT.ordinal()) {
             AVIMTextMessage message = new AVIMTextMessage();
             message.setText(data.content);
             setAVIMessage(message, data);
-        }
-        else if (data.msg_type == ProposalMediaType.IMAGE.ordinal()) {
+            msg = message;
+        } else if (data.msg_type == ProposalMediaType.IMAGE.ordinal()) {
             AVIMImageMessage imageMsg = new AVIMImageMessage();
             imageMsg.setText(data.content);
             setAVIMessage(imageMsg, data);
-        }
-        else if (data.msg_type == ProposalMediaType.AUDIO.ordinal()) {
+            msg = imageMsg;
+        } else if (data.msg_type == ProposalMediaType.AUDIO.ordinal()) {
             try {
                 AVIMAudioMessage audioMessage = new AVIMAudioMessage(data.content);
                 setAVIMessage(audioMessage, data);
+                msg = audioMessage;
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        }
+
+        if (msg != null) {
+            if (order) {
+                adapter.add(msg, category);
+            } else {
+                adapter.add2First(msg, category);
             }
         }
     }
@@ -570,14 +562,13 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         long timeStamp = DateUtil.convert2long(localTime, DateUtil.TIME_FORMAT);
         message.setTimestamp(timeStamp);
         message.setMessageStatus(AVIMMessage.AVIMMessageStatus.AVIMMessageStatusReceipt);
-        adapter.add((AVIMTypedMessage) message, category);
     }
 
     private boolean handleErrorCode(JSONObject jsonObject) {
         int errCode = jsonObject.optInt("error_code", 0);
         switch (errCode) {
             case 450:
-            case 401:{
+            case 401: {
                 ToastUtil.showShort(getContext(), jsonObject.optString("error_msg", "未知错误!"));
             }
             break;
@@ -607,11 +598,12 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                             JSONArray jsonArray = new JSONArray(response);
                             for (int i = 0; i < jsonArray.length(); ++i) {
                                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                ProposalInfo data = parse2MyData(jsonObject);
+                                ProposalInfo data = parseProposalInfo(jsonObject);
                                 if (data.msg_type == ProposalMediaType.AUDIO.ordinal()) {
+                                    currentAudioPath = null;
                                     getAudioFile(data);
                                 }
-                                addData2Adapter(data);
+                                addData2Adapter(data, false);
                             }
                             adapter.notifyDataSetChanged();
                             scrollToLast();
@@ -631,9 +623,15 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
      */
     private void getAudioFile(ProposalInfo data) {
         String audioUrl = data.content;
-        String fileName = audioUrl.substring(audioUrl.lastIndexOf("/")+1);
+        String fileName = audioUrl.substring(audioUrl.lastIndexOf("/") + 1);
         String path = FileUtil.getAudioFile();
         data.content = path + fileName;
+
+        if (!TextUtils.isEmpty(currentAudioPath)) {
+            // 刚发出语音,只需要拷贝本地语音文件
+            FileUtil.copyFile(currentAudioPath, data.content);
+            return;
+        }
 
         if (!FileUtil.isFileExists(path + fileName)) {
             FileUtil.downloadFile(audioUrl, path, fileName);
@@ -658,7 +656,9 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                         try {
                             JSONArray jsonArray = new JSONArray(response);
                             for (int i = 0; i < jsonArray.length(); i++) {
-
+                                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                BrokerInfo info = parseBrokerInfo(jsonObject);
+                                mBrokerList.add(info.user_id);
                             }
                         } catch (Exception e) {
 
@@ -667,7 +667,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                 });
     }
 
-    private ProposalInfo parse2MyData(JSONObject jsonObject) {
+    private ProposalInfo parseProposalInfo(JSONObject jsonObject) {
         ProposalInfo data = new ProposalInfo();
         data.user_id = jsonObject.optString("user_id", "");
         data.msg_type = jsonObject.optInt("msg_type", 0);
@@ -679,6 +679,12 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         data.created_at = jsonObject.optString("created_at", "");
         data.updated_at = jsonObject.optString("updated_at", "");
         return data;
+    }
+
+    private BrokerInfo parseBrokerInfo(JSONObject jsonObject) {
+        BrokerInfo brokerInfo = new BrokerInfo();
+        brokerInfo.user_id = jsonObject.optString("user_id", "id");
+        return brokerInfo;
     }
 
     public void selectImageFromLocal() {
@@ -737,6 +743,12 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                     break;
             }
         }
+    }
+
+    public interface OnProposalInteractionListener extends WebViewBaseFragment.OnBridgeInteractionListener {
+        void onUploadProposalAudio(String data);
+
+        void onSelectImageForProposal();
     }
 
 

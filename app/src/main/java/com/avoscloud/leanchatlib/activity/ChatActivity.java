@@ -203,12 +203,12 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         assistLayout = findViewById(R.id.chatMoreLayout);
 
         contentEdit.setOnClickListener(this);
-        addImageBtn.setOnClickListener(this);
+//        addImageBtn.setOnClickListener(this);
         btnModeSwitch.setOnClickListener(this);
         showAddBtn.setOnClickListener(this);
         sendMsgBtn.setOnClickListener(this);
         showEmotionBtn.setOnClickListener(this);
-        addChangeHouseBtn.setOnClickListener(this);
+//        addChangeHouseBtn.setOnClickListener(this);
 
         contentEdit.addTextChangedListener(new TextWatcher() {
             @Override

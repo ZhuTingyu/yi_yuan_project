@@ -1,6 +1,7 @@
 package com.yuan.house.helper;
 
 import android.content.SharedPreferences;
+import android.text.TextUtils;
 
 import com.yuan.house.common.Constants;
 
@@ -19,6 +20,8 @@ public class AuthHelper {
     static SharedPreferences prefs;
 
     private static boolean userAlreadyLogin(String data) {
+        if (TextUtils.isEmpty(data)) return false;
+        
         JSONObject object = null;
         try {
             object = new JSONObject(data);
@@ -107,6 +110,7 @@ public class AuthHelper {
 
     private static String userLoginInfomation() {
         String json = prefs.getString(Constants.kWebDataKeyUserLogin, null);
+
         return json;
     }
 

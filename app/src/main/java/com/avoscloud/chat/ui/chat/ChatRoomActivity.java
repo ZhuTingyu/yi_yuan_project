@@ -17,6 +17,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.webkit.WebView;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.LinearLayout;
@@ -247,8 +248,29 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         cachedHouseIdForCurrentConv = jsonFormatParams.optString("id");
 
         mMoreAdapter = new InputMoreAdapter(this);
+        mMoreAdapter.addItem("照片", -1);
         GridView gv = (GridView) findViewById(R.id.chatAddLayout);
         gv.setAdapter(mMoreAdapter);
+        gv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final String text = (String) mMoreAdapter.getItem(position);
+                int value = mMoreAdapter.getValue(position);
+                if (text.equals("核心合同")) {
+                    getWebViewFragment().getBridge().callHandler("ClickContractButton", Integer.toString(value));
+                } else if (text.equals("买卖合同")) {
+                    getWebViewFragment().getBridge().callHandler("ClickContractButton", Integer.toString(value));
+                } else if (text.equals("补充协议")) {
+                    getWebViewFragment().getBridge().callHandler("ClickContractButton", Integer.toString(value));
+                } else if (text.equals("前置留言板")) {
+                    getWebViewFragment().getBridge().callHandler("onPreConditionButtonClick");
+                } else if (text.equals("房源")) {
+                    showSuggestedHouses();
+                } else if (text.equals("照片")) {
+                    selectImage();
+                }
+            }
+        });
     }
 
     @Override
@@ -378,7 +400,8 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                     }
                 }
                 if (!houseInfos.isEmpty()) {
-                    mMoreAdapter.addItem("房源");
+                    mMoreAdapter.addItem("房源", -1);
+                    mMoreAdapter.notifyDataSetChanged();
                 }
             }
 
@@ -497,73 +520,16 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
         for (int i = 0; i < array.length(); i++) {
             String contractText = array.optString(i);
-            mMoreAdapter.addItem(contractText);
+            mMoreAdapter.addItem(contractText, i);
         }
         mMoreAdapter.notifyDataSetChanged();
-        // dynamic add items into GridLayout
-//        GridLayout gv = (GridLayout) findViewById(R.id.chatAddLayout);
-//
-//        // clean all the contract button before add
-//        ArrayList<View> views = ViewHelper.getViewsByTag(gv, "contract");
-//        for (View v : views) {
-//            gv.removeView(v);
-//        }
-//
-//        for (int i = 0; i < array.length(); i++) {
-//            String contractText = array.optString(i);
-//
-//            int resId = R.drawable.btn_core;
-//            if (contractText.equals("核心合同")) {
-//                resId = R.drawable.btn_core;
-//            } else if (contractText.equals("买卖合同")) {
-//                resId = R.drawable.btn_deal;
-//            } else if (contractText.equals("补充协议")) {
-//                resId = R.drawable.btn_supplement;
-//            }
-//
-//            TextView tv = new TextView(this);
-//            Drawable drawable = getResources().getDrawable(resId);
-//            int h = drawable.getIntrinsicHeight();
-//            int w = drawable.getIntrinsicWidth();
-//            drawable.setBounds(0, 0, w, h);
-//
-//            tv.setCompoundDrawables(null, drawable, null, null);
-//
-//            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-//            params.rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
-//            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
-//
-//            params.width = 0;
-//            params.height = 0;
-//            tv.setLayoutParams(params);
-//            tv.setGravity(Gravity.CENTER);
-//            tv.setText(contractText);
-//
-//            tv.setTag("contract");
-//            gv.addView(tv);
-//
-//            final int finalI = i;
-//            tv.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    getWebViewFragment().getBridge().callHandler("ClickContractButton", Integer.toString(finalI));
-//                }
-//            });
-//        }
     }
 
     @Override
     public void onSetPreConditionButton(String data) {
         String text = "前置留言板";
-        mMoreAdapter.addItem(text);
+        mMoreAdapter.addItem(text, -1);
         mMoreAdapter.notifyDataSetChanged();
-//        findViewById(R.id.btnPrecondition).setVisibility(View.VISIBLE);
-//        findViewById(R.id.btnPrecondition).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                getWebViewFragment().getBridge().callHandler("onPreConditionButtonClick");
-//            }
-//        });
     }
 
     @Override

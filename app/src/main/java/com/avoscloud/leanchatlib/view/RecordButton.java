@@ -216,9 +216,15 @@ public class RecordButton extends Button {
             recorder.setOnErrorListener(null);
             recorder.setPreviewDisplay(null);
 
-            recorder.stop();
-            recorder.release();
-            recorder = null;
+            try {
+                recorder.stop();
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }finally {
+                recorder.release();
+                recorder = null;
+            }
         }
     }
 

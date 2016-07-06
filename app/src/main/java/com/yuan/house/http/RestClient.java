@@ -206,7 +206,9 @@ public class RestClient {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                callback.callback(ret);
+                if (callback != null) {
+                    callback.callback(ret);
+                }
             }
 
             @Override
@@ -227,7 +229,9 @@ public class RestClient {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                callback.callback(ret);
+                if (callback != null) {
+                    callback.callback(ret);
+                }
             }
 
             @Override
@@ -257,7 +261,9 @@ public class RestClient {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                callback.callback(ret);
+                if (callback != null) {
+                    callback.callback(ret);
+                }
             }
 
             @Override
@@ -278,13 +284,15 @@ public class RestClient {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                callback.callback(ret);
+                if (callback != null) {
+                    callback.callback(ret);
+                }
             }
         });
     }
 
     private void request(int method, String url, RequestParams params, Header[] headers, AsyncHttpResponseHandler responseHandler) {
-        String rawUrl = null;
+        String rawUrl;
         if (url.startsWith("http://") || url.startsWith("https://")) {
             rawUrl = url;
         } else {

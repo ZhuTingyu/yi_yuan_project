@@ -103,7 +103,7 @@ public class InputBottomBar extends LinearLayout {
      * action layout
      */
     private boolean showDefaultActionLayout = true;
-    private View actionLayout;
+    //    private View actionLayout;
     private View cameraBtn;
     private View locationBtn;
     private View pictureBtn;
@@ -146,10 +146,10 @@ public class InputBottomBar extends LinearLayout {
         emotionLayout = findViewById(R.id.input_bar_layout_emotion);
         emotionPager = (ViewPager) findViewById(R.id.input_bar_viewpager_emotin);
 
-        actionLayout = findViewById(R.id.chatAddLayout);
+//        actionLayout = findViewById(R.id.chatAddLayout);
 //        pictureBtn = findViewById(R.id.btnImageFromGallery);
-      //  cameraBtn = findViewById(R.id.btnImageFromCamera);
-      //  locationBtn = findViewById(R.id.input_bar_btn_location);
+        //  cameraBtn = findViewById(R.id.btnImageFromCamera);
+        //  locationBtn = findViewById(R.id.input_bar_btn_location);
 
         //setEditTextChangeListener();
         initEmotionPager();
@@ -163,8 +163,7 @@ public class InputBottomBar extends LinearLayout {
             public void onClick(View v) {
                 if (isTextInputMode) {
                     showAudioLayout();
-                }
-                else {
+                } else {
                     showTextLayout();
                 }
             }
@@ -175,14 +174,13 @@ public class InputBottomBar extends LinearLayout {
             public void onClick(View v) {
                 if (!isShowDefaultActionLayout()) {
                     moreLayout.setVisibility(GONE);
-                    actionLayout.setVisibility(GONE);
+//                    actionLayout.setVisibility(GONE);
                     EventBus.getDefault().post(new InputBottomBarEvent(InputBottomBarEvent.INPUTBOTTOMBAR_ACTION, getTag()));
-                }
-                else {
+                } else {
                     boolean showActionView =
-                            (GONE == moreLayout.getVisibility() || GONE == actionLayout.getVisibility());
+                            (GONE == moreLayout.getVisibility());
                     moreLayout.setVisibility(showActionView ? VISIBLE : GONE);
-                    actionLayout.setVisibility(showActionView ? VISIBLE : GONE);
+//                    actionLayout.setVisibility(showActionView ? VISIBLE : GONE);
                 }
                 emotionLayout.setVisibility(View.GONE);
                 SoftInputUtils.hideSoftInput(getContext(), contentEditText);
@@ -196,7 +194,7 @@ public class InputBottomBar extends LinearLayout {
                         (GONE == moreLayout.getVisibility() || GONE == emotionLayout.getVisibility());
                 moreLayout.setVisibility(showEmotionView ? VISIBLE : GONE);
                 emotionLayout.setVisibility(showEmotionView ? VISIBLE : GONE);
-                actionLayout.setVisibility(View.GONE);
+//                actionLayout.setVisibility(View.GONE);
                 SoftInputUtils.hideSoftInput(getContext(), contentEditText);
             }
         });
@@ -232,12 +230,12 @@ public class InputBottomBar extends LinearLayout {
             }
         });*/
 
-        pictureBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EventBus.getDefault().post(new InputBottomBarEvent(InputBottomBarEvent.INPUTBOTTOMBAR_IMAGE_ACTION, getTag()));
-            }
-        });
+//        pictureBtn.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                EventBus.getDefault().post(new InputBottomBarEvent(InputBottomBarEvent.INPUTBOTTOMBAR_IMAGE_ACTION, getTag()));
+//            }
+//        });
 
         /*cameraBtn.setOnClickListener(new OnClickListener() {
             @Override
@@ -400,6 +398,7 @@ public class InputBottomBar extends LinearLayout {
             }
         });
     }*/
+
     /**
      * 设置监听软键盘确认按钮
      */
