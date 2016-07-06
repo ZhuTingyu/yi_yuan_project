@@ -23,6 +23,8 @@ import timber.log.Timber;
  */
 
 public class PushReceiver extends BroadcastReceiver {
+    Context context;
+
     @Override
     public void onReceive(Context context, Intent intent) {
 
@@ -38,9 +40,6 @@ public class PushReceiver extends BroadcastReceiver {
                 String key = (String) itr.next();
                 Timber.d("..." + key + " => " + json.getString(key));
             }
-
-            JSONObject object = json.optJSONObject("holder");
-            Utils.notifyMsg(context, MainActivity.class, PackageUtil.getAppLable(context), null, json.optString("alert"), Constants.kNotifyId);
 
             // handle push notification and dispatch
             dispatch(json);
@@ -59,5 +58,9 @@ public class PushReceiver extends BroadcastReceiver {
         JSONObject holder = object.optJSONObject("holder");
 
         EventBus.getDefault().post(NotificationEvent.fromType(msgType, holder));
+
+        if (msgType == NotificationEvent.NotificationEventEnum.NOTICE_MESSAGE.getValue()) {
+            Utils.notifyMsg(context, MainActivity.class, PackageUtil.getAppLable(context), null, object.optString("alert"), Constants.kNotifyId);
+        }
     }
 }
