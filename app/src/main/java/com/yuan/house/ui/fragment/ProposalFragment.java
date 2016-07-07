@@ -565,6 +565,10 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
 
     private void addData2Adapter(ProposalInfo data, boolean order) {
 
+        if (data.category != category.ordinal()) {
+            return;
+        }
+
         AVIMTypedMessage msg = null;
         if (data.msg_type == ProposalMediaType.TEXT.ordinal()) {
             AVIMTextMessage message = new AVIMTextMessage();
