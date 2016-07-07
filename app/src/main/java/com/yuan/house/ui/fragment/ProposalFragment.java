@@ -101,7 +101,14 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
     @BindView(R.id.proposal_scrollView)
     ScrollView scrollView;
     TextView app_upload_image, app_complaint, app_cancle;
-    private int mCurrentPage = 1;
+
+    //private int mCurrentPage = 1;
+
+    private int currentPageNumOfProposal = 1;
+    private int currentPageNumOfSuggestion = 1;
+    private int currentPageNumOfBug = 1;
+
+
     private String content;
     private int duration = 0;       //录音时长
 
@@ -182,7 +189,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
             }
         });
         bindAdapterToListView();
-        getHistoryMessages(mCurrentPage);
+        getHistoryMessages(getCurrentPageNum()/*mCurrentPage*/);
     }
 
     private void bindAdapterToListView() {
@@ -338,6 +345,10 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
             adapter.setCurrentDatas(type);
             adapter.notifyDataSetChanged();
             scrollToLast();
+
+            if (getCurrentPageNum() == 1) {
+                getHistoryMessages(1);
+            }
         }
     }
 
@@ -375,8 +386,37 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
 
     @Override
     public void onLoadMore() {
-        int page = mCurrentPage + 1;
+        int page = currentPageNumIncrease();//mCurrentPage + 1;
         getHistoryMessages(page);
+    }
+
+    private int currentPageNumIncrease() {
+        int currentNum = 1;
+        switch (category) {
+            case COMPLAINT:
+                currentNum = ++currentPageNumOfProposal;
+                break;
+            case SUGGESTION:
+                currentNum = ++currentPageNumOfSuggestion;
+                break;
+            case BUG:
+                currentNum = ++currentPageNumOfBug;
+                break;
+        }
+        return currentNum;
+    }
+
+    private int getCurrentPageNum() {
+        switch (category) {
+            case COMPLAINT:
+                return currentPageNumOfProposal;
+            case SUGGESTION:
+                return currentPageNumOfSuggestion;
+            case BUG:
+                return currentPageNumOfBug;
+            default:
+                return 1;
+        }
     }
 
     /**
@@ -608,7 +648,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                             }
                             adapter.notifyDataSetChanged();
                             scrollToLast();
-                            ++mCurrentPage;
+                            currentPageNumIncrease(); //++mCurrentPage;
 
                         } catch (JSONException e) {
                             e.printStackTrace();
