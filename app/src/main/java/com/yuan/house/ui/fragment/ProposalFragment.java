@@ -311,7 +311,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                 proposal.setSelected(false);
                 bug.setSelected(false);
                 category = ProposalMessageCategory.COMPLAINT;
-                switchAdapter(category);
+                switchPage(category);
                 break;
             }
             case R.id.proposal: {
@@ -319,7 +319,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                 proposal.setSelected(true);
                 bug.setSelected(false);
                 category = ProposalMessageCategory.SUGGESTION;
-                switchAdapter(category);
+                switchPage(category);
                 break;
             }
             case R.id.bug: {
@@ -327,16 +327,17 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                 proposal.setSelected(false);
                 bug.setSelected(true);
                 category = ProposalMessageCategory.BUG;
-                switchAdapter(category);
+                switchPage(category);
                 break;
             }
         }
     }
 
-    private void switchAdapter(ProposalMessageCategory type) {
+    private void switchPage(ProposalMessageCategory type) {
         if (adapter != null) {
             adapter.setCurrentDatas(type);
             adapter.notifyDataSetChanged();
+            scrollToLast();
         }
     }
 
