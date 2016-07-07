@@ -17,7 +17,7 @@ import java.util.Map;
 public class AVIMHouseMessage extends AVIMTypedMessage {
 
     public static final Creator<AVIMHouseMessage> CREATOR = new AVIMMessageCreator(AVIMHouseMessage.class);
-    @AVIMMessageField(name = "_lcattrs")
+    @AVIMMessageField(name="_lcattrs")
     Map<String, Object> attrs;
 
     public AVIMHouseMessage() {

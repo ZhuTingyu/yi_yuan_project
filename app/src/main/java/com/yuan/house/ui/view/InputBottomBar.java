@@ -1,38 +1,28 @@
 package com.yuan.house.ui.view;
 
 import android.content.Context;
-import android.os.Handler;
 import android.support.v4.view.ViewPager;
-import android.text.Editable;
 import android.text.Selection;
 import android.text.Spannable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-import com.yuan.house.R;
-//import com.avoscloud.leanchatlib.R;
+
 import com.avoscloud.leanchatlib.adapter.ChatEmotionGridAdapter;
 import com.avoscloud.leanchatlib.adapter.ChatEmotionPagerAdapter;
 import com.avoscloud.leanchatlib.controller.EmotionHelper;
-/*import com.avoscloud.leanchatlib.event.InputBottomBarEvent;
-import com.avoscloud.leanchatlib.event.InputBottomBarLocationClickEvent;
-import com.avoscloud.leanchatlib.event.InputBottomBarRecordEvent;
-import com.avoscloud.leanchatlib.event.InputBottomBarTextEvent;*/
 import com.avoscloud.leanchatlib.utils.SoftInputUtils;
 import com.avoscloud.leanchatlib.view.EmotionEditText;
 import com.avoscloud.leanchatlib.view.RecordButton;
+import com.yuan.house.R;
 import com.yuan.house.event.InputBottomBarEvent;
-import com.yuan.house.event.InputBottomBarLocationClickEvent;
 import com.yuan.house.event.InputBottomBarRecordEvent;
 import com.yuan.house.event.InputBottomBarTextEvent;
 
@@ -40,6 +30,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
+
+//import com.avoscloud.leanchatlib.R;
+/*import com.avoscloud.leanchatlib.event.InputBottomBarEvent;
+import com.avoscloud.leanchatlib.event.InputBottomBarLocationClickEvent;
+import com.avoscloud.leanchatlib.event.InputBottomBarRecordEvent;
+import com.avoscloud.leanchatlib.event.InputBottomBarTextEvent;*/
 
 
 /**
@@ -107,7 +103,7 @@ public class InputBottomBar extends LinearLayout {
      * action layout
      */
     private boolean showDefaultActionLayout = true;
-    private View actionLayout;
+    //    private View actionLayout;
     private View cameraBtn;
     private View locationBtn;
     private View pictureBtn;
@@ -150,10 +146,10 @@ public class InputBottomBar extends LinearLayout {
         emotionLayout = findViewById(R.id.input_bar_layout_emotion);
         emotionPager = (ViewPager) findViewById(R.id.input_bar_viewpager_emotin);
 
-        actionLayout = findViewById(R.id.chatAddLayout);
-        pictureBtn = findViewById(R.id.btnImageFromGallery);
-      //  cameraBtn = findViewById(R.id.btnImageFromCamera);
-      //  locationBtn = findViewById(R.id.input_bar_btn_location);
+//        actionLayout = findViewById(R.id.chatAddLayout);
+//        pictureBtn = findViewById(R.id.btnImageFromGallery);
+        //  cameraBtn = findViewById(R.id.btnImageFromCamera);
+        //  locationBtn = findViewById(R.id.input_bar_btn_location);
 
         //setEditTextChangeListener();
         initEmotionPager();
@@ -167,8 +163,7 @@ public class InputBottomBar extends LinearLayout {
             public void onClick(View v) {
                 if (isTextInputMode) {
                     showAudioLayout();
-                }
-                else {
+                } else {
                     showTextLayout();
                 }
             }
@@ -179,14 +174,13 @@ public class InputBottomBar extends LinearLayout {
             public void onClick(View v) {
                 if (!isShowDefaultActionLayout()) {
                     moreLayout.setVisibility(GONE);
-                    actionLayout.setVisibility(GONE);
+//                    actionLayout.setVisibility(GONE);
                     EventBus.getDefault().post(new InputBottomBarEvent(InputBottomBarEvent.INPUTBOTTOMBAR_ACTION, getTag()));
-                }
-                else {
+                } else {
                     boolean showActionView =
-                            (GONE == moreLayout.getVisibility() || GONE == actionLayout.getVisibility());
+                            (GONE == moreLayout.getVisibility());
                     moreLayout.setVisibility(showActionView ? VISIBLE : GONE);
-                    actionLayout.setVisibility(showActionView ? VISIBLE : GONE);
+//                    actionLayout.setVisibility(showActionView ? VISIBLE : GONE);
                 }
                 emotionLayout.setVisibility(View.GONE);
                 SoftInputUtils.hideSoftInput(getContext(), contentEditText);
@@ -200,7 +194,7 @@ public class InputBottomBar extends LinearLayout {
                         (GONE == moreLayout.getVisibility() || GONE == emotionLayout.getVisibility());
                 moreLayout.setVisibility(showEmotionView ? VISIBLE : GONE);
                 emotionLayout.setVisibility(showEmotionView ? VISIBLE : GONE);
-                actionLayout.setVisibility(View.GONE);
+//                actionLayout.setVisibility(View.GONE);
                 SoftInputUtils.hideSoftInput(getContext(), contentEditText);
             }
         });
@@ -236,12 +230,12 @@ public class InputBottomBar extends LinearLayout {
             }
         });*/
 
-        pictureBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EventBus.getDefault().post(new InputBottomBarEvent(InputBottomBarEvent.INPUTBOTTOMBAR_IMAGE_ACTION, getTag()));
-            }
-        });
+//        pictureBtn.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                EventBus.getDefault().post(new InputBottomBarEvent(InputBottomBarEvent.INPUTBOTTOMBAR_IMAGE_ACTION, getTag()));
+//            }
+//        });
 
         /*cameraBtn.setOnClickListener(new OnClickListener() {
             @Override
@@ -404,6 +398,7 @@ public class InputBottomBar extends LinearLayout {
             }
         });
     }*/
+
     /**
      * 设置监听软键盘确认按钮
      */

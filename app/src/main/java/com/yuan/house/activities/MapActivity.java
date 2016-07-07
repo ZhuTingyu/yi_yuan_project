@@ -19,6 +19,7 @@ import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.search.core.SearchResult;
@@ -91,28 +92,28 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         initLocation();
         initMapConfig();
         initViewConfig();
+
+        baiduMap.setOnMapLoadedCallback(new BaiduMap.OnMapLoadedCallback() {
+            @Override
+            public void onMapLoaded() {
+                // TODO Auto-generated method stub
+                locClient.start();
+            }
+        });
     }
 
     private void initLocation() {
+        baiduMap.setMyLocationEnabled(true);
         //获取当前位置
         locClient = new LocationClient(this);
-        MapStatusUpdate msu = MapStatusUpdateFactory.zoomTo(14.0f);
-        MapStatusUpdateFactory.zoomIn();
-        baiduMap.setMapStatus(msu);
-        // 开启定位图层
-        baiduMap.setMyLocationEnabled(true);
-        // 定义缩放级别10公里（3~18有效）
-        MapStatusUpdate u = MapStatusUpdateFactory.zoomTo(16);
-        baiduMap.animateMapStatus(u);
-        // 定位初始化
         locClient.registerLocationListener(locationListener);
         LocationClientOption option = new LocationClientOption();
-        option.getAddrType();
-        option.setOpenGps(true);// 打开gps
-        option.setCoorType("bd09ll"); // 设置坐标类型
-        option.setScanSpan(1000);
+        option.setOpenGps(true);
+        option.setScanSpan(5000);
+        option.setCoorType("bd09ll");
+        option.setIsNeedAddress(true);
+        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
         locClient.setLocOption(option);
-        locClient.start();
     }
 
     private void initMapConfig() {
@@ -211,49 +212,56 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
     @Override
     protected void onResume() {
         super.onResume();
-
         mMapView.onResume();
-        locClient.start();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
-        //在activity执行onPause时执行mMapView. onPause ()，实现地图生命周期管理
         mMapView.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        baiduMap.setMyLocationEnabled(false);
         locClient.stop();
     }
+
+    private MyLocationConfiguration.LocationMode mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
 
     public class TCLocationListener implements BDLocationListener {
         @Override
         public void onReceiveLocation(BDLocation location) {
             latitude = location.getLatitude();
             longitude = location.getLongitude();
-            int locType = location.getLocType();
 
             // map view 销毁后不在处理新接收的位置
-            if (location == null || mMapView == null) {
+            if (location == null) {
                 return;
             }
-            MyLocationData locData = new MyLocationData.Builder()
-                    .accuracy(location.getRadius())
-                    // 此处设置开发者获取到的方向信息，顺时针0-360
-                    .direction(100).latitude(location.getLatitude())
-                    .longitude(location.getLongitude()).build();
-            baiduMap.setMyLocationData(locData);
-            if (isFirstLoc) {
-                isFirstLoc = false;
+            int locType = location.getLocType();
+            if (locType == BDLocation.TypeGpsLocation
+                    || locType == BDLocation.TypeNetWorkLocation) {
+                MyLocationData locData = new MyLocationData.Builder()
+                        .accuracy(70).direction(0)
+                        .latitude(location.getLatitude())
+                        .longitude(location.getLongitude()).build();
+                baiduMap.setMyLocationData(locData);
+                MyLocationConfiguration config = new MyLocationConfiguration(
+                        mCurrentMode, true, null);
+                baiduMap.setMyLocationConfigeration(config);
                 LatLng ll = new LatLng(location.getLatitude(),
                         location.getLongitude());
-                MapStatusUpdate u = MapStatusUpdateFactory.newLatLng(ll);
-                baiduMap.animateMapStatus(u);
+                if (isFirstLoc) {
+                    isFirstLoc = false;
+                    MapStatusUpdate u = MapStatusUpdateFactory.newLatLngZoom(ll, 14);
+                    baiduMap.animateMapStatus(u);
 
-//                MapStatus mapStatus = baiduMap.getMapStatus();
-//                center = mapStatus.target;
-                LatLng ptCenter = new LatLng(latitude, longitude);
-                mSearch.reverseGeoCode(new ReverseGeoCodeOption()
-                        .location(ptCenter));
+//                    LatLng ptCenter = new LatLng(latitude, longitude);
+//                    mSearch.reverseGeoCode(new ReverseGeoCodeOption()
+//                            .location(ptCenter));
+                }
             }
 
             Timber.v("onReceiveLocation latitude=" + latitude + " longitude=" + longitude

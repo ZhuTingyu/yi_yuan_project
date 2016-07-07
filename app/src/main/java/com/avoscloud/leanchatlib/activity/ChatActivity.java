@@ -187,7 +187,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
 
     private void findView() {
         xListView = (XListView) findViewById(R.id.listview);
-        addImageBtn = findViewById(R.id.btnImageFromGallery);
+//        addImageBtn = findViewById(R.id.btnImageFromGallery);
 
         contentEdit = (EmotionEditText) findViewById(R.id.editChatField);
         chatTextLayout = findViewById(R.id.rl_field_textmode);
@@ -199,16 +199,16 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         sendMsgBtn = (TextView) findViewById(R.id.btnMoreSend);
         showEmotionBtn = findViewById(R.id.btnEmotionInput);
         emotionPager = (ViewPager) findViewById(R.id.emotionPager);
-        addChangeHouseBtn = findViewById(R.id.btnSwitchHouse);
+//        addChangeHouseBtn = findViewById(R.id.btnSwitchHouse);
         assistLayout = findViewById(R.id.chatMoreLayout);
 
         contentEdit.setOnClickListener(this);
-        addImageBtn.setOnClickListener(this);
+//        addImageBtn.setOnClickListener(this);
         btnModeSwitch.setOnClickListener(this);
         showAddBtn.setOnClickListener(this);
         sendMsgBtn.setOnClickListener(this);
         showEmotionBtn.setOnClickListener(this);
-        addChangeHouseBtn.setOnClickListener(this);
+//        addChangeHouseBtn.setOnClickListener(this);
 
         contentEdit.addTextChangedListener(new TextWatcher() {
             @Override
@@ -488,7 +488,9 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.btnImageFromGallery) {
+        //+++20160704 edward: use -1 instead of the unused id;
+        if (v.getId() == -1) {
+            //R.id.btnImageFromGallery
             selectImage();
         } else if (v.getId() == R.id.btnModeSwitch) {
             switchInputMode();
@@ -498,8 +500,9 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
             toggleEmotionLayout();
         } else if (v.getId() == R.id.editChatField) {
             hideBottomLayoutAndScrollToLast();
-        } else if (v.getId() == R.id.btnSwitchHouse) {
+        } else if (v.getId() == -1) {
             // 显示推荐房源
+            //R.id.btnSwitchHouse
             showSuggestedHouses();
         } else if (v.getId() == R.id.btnMoreSend) {
             sendText();
