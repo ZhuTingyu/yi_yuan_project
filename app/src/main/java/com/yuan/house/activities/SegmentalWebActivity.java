@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.yuan.house.R;
 import com.yuan.house.ui.fragment.WebViewFragment;
@@ -63,7 +64,7 @@ public class SegmentalWebActivity extends WebViewBasedActivity {
 
     @Optional
     @OnClick(R.id.btn_back)
-    public void close(Button button) {
+    public void close(ImageButton button) {
         finish();
     }
 }
