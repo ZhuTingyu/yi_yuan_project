@@ -25,7 +25,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.avoscloud.chat.ui.chat.ChatRoomActivity;
 import com.baidu.location.BDLocation;
-import com.yuan.house.http.RestClient;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.gitonway.lee.niftymodaldialogeffects.lib.Effectstype;
@@ -39,6 +38,7 @@ import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
 import com.yuan.house.event.BridgeCallbackEvent;
 import com.yuan.house.event.WebBroadcastEvent;
+import com.yuan.house.http.RestClient;
 import com.yuan.house.ui.view.PickerPopWindow;
 import com.yuan.house.utils.ToastUtil;
 
@@ -829,6 +829,15 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
+        getBridge().registerHandler("showActionSheet", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                Timber.v("showActionSheet");
+
+                mBridgeListener.onBridgeShowActionSheet(data, jsCallback);
+            }
+        });
+
         getBridge().registerHandler("getLastMessageByHouse", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
@@ -1052,5 +1061,7 @@ public class WebViewBaseFragment extends Fragment {
         void onBridgeShowImageGallery(List<String> data);
 
         void onBridgeSendNoticeMessage(String data);
+
+        void onBridgeShowActionSheet(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback);
     }
 }

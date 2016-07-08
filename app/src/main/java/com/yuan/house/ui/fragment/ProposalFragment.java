@@ -9,7 +9,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -34,6 +33,7 @@ import com.avoscloud.leanchatlib.model.ConversationType;
 import com.avoscloud.leanchatlib.utils.PathUtils;
 import com.avoscloud.leanchatlib.utils.ProviderPathUtils;
 import com.avoscloud.leanchatlib.view.xlist.XListView;
+import com.baoyz.actionsheet.ActionSheet;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.PauseOnScrollListener;
 import com.yuan.house.R;
@@ -161,14 +161,50 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         this.params = getActivity().getWindow().getAttributes();
 
         inputBottomBar.setShowDefaultActionLayout(false);
-        initPopupView();
-        // initBrokerView();
 
         if (AuthHelper.userAlreadyLogin()) {
             getBrokers();
 
             initListView();
         }
+    }
+
+    private void showOptionSheet() {
+        ActionSheet.createBuilder(getContext(), getActivity().getSupportFragmentManager())
+                .setCancelButtonTitle(R.string.cancel)
+                .setOtherButtonTitles("上传图片", "投诉经纪人")
+                .setCancelableOnTouchOutside(true)
+                .setListener(new ActionSheet.ActionSheetListener() {
+                    @Override
+                    public void onDismiss(ActionSheet actionSheet, boolean isCancel) {
+                        actionSheet.dismiss();
+                    }
+
+                    @Override
+                    public void onOtherButtonClick(ActionSheet actionSheet, int index) {
+                        switch (index) {
+                            case 0: {
+                                msg_type = ProposalMediaType.IMAGE;
+                                mBridgeListener.onSelectImageForProposal();
+                            }
+                            break;
+                            case 1: {
+                                if (mBrokerPicker == null) {
+                                    if (mBrokerList.size() > 0) {
+                                        initBrokerView();
+                                    } else {
+                                        ToastUtil.showShort(getContext(), "没有经纪人列表");
+                                    }
+                                } else {
+                                    mBrokerPicker.showPopWin(getActivity());
+                                }
+                            }
+                            break;
+                        }
+
+                        actionSheet.dismiss();
+                    }
+                }).show();
     }
 
     private void initListView() {
@@ -240,47 +276,6 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         mBridgeListener = null;
     }
 
-    private void initPopupView() {
-        mPopView = LayoutInflater.from(getContext()).inflate(R.layout.popup_other, null);
-        app_cancle = (TextView) mPopView.findViewById(R.id.app_cancle);
-        app_upload_image = (TextView) mPopView.findViewById(R.id.app_upload_image);
-        app_complaint = (TextView) mPopView.findViewById(R.id.app_complaint);
-
-        mPopupWindow = new PopupWindow(mPopView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
-
-        app_cancle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                closePopupWindow();
-            }
-        });
-
-        app_upload_image.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                closePopupWindow();
-                msg_type = ProposalMediaType.IMAGE;
-                mBridgeListener.onSelectImageForProposal();
-            }
-        });
-
-        app_complaint.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mBrokerPicker == null) {
-                    if (mBrokerList.size() > 0) {
-                        initBrokerView();
-                    } else {
-                        ToastUtil.showShort(getContext(), "没有经纪人列表");
-                    }
-                } else {
-                    mBrokerPicker.showPopWin(getActivity());
-                }
-                closePopupWindow();
-            }
-        });
-    }
-
     /**
      * 经纪人列表
      */
@@ -350,28 +345,6 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                 getHistoryMessages(1);
             }
         }
-    }
-
-    private void onBtnMore() {
-        mPopupWindow.showAtLocation(mWebView, Gravity.BOTTOM, 0, 0);
-        mPopupWindow.setAnimationStyle(R.style.app_pop);
-        mPopupWindow.setOutsideTouchable(true);
-        mPopupWindow.setFocusable(true);
-        mPopupWindow.update();
-        params.alpha = 0.7f;
-        setWindowAttributes();
-    }
-
-    private void closePopupWindow() {
-        if (mPopupWindow != null && mPopupWindow.isShowing()) {
-            mPopupWindow.dismiss();
-            params.alpha = 1;
-            setWindowAttributes();
-        }
-    }
-
-    private void setWindowAttributes() {
-        getActivity().getWindow().setAttributes(params);
     }
 
     @Override
@@ -449,7 +422,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         if (null != event) {
             switch (event.eventAction) {
                 case InputBottomBarEvent.INPUTBOTTOMBAR_ACTION:
-                    onBtnMore();
+                    showOptionSheet();
                     break;
                 case InputBottomBarEvent.INPUTBOTTOMBAR_IMAGE_ACTION:
                     msg_type = ProposalMediaType.IMAGE;
@@ -467,7 +440,6 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
      * 上次图片、声音等文件
      */
     public void uploadFile(String filePath) {
-
         OkHttpUtils.post().url(Constants.kWebServiceFileUpload)
                 .addHeader("Content-Type", "multipart/form-data")
                 .addHeader("token", AuthHelper.userToken())
@@ -521,7 +493,6 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                 .mediaType(okhttp3.MediaType.parse("application/json"))
                 .build()
                 .execute(new StringCallback() {
-
                     @Override
                     public void onError(Call call, Exception e) {
 
@@ -795,6 +766,4 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
 
         void onSelectImageForProposal();
     }
-
-
 }

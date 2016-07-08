@@ -29,6 +29,7 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
+import com.baoyz.actionsheet.ActionSheet;
 import com.bugtags.library.Bugtags;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
@@ -465,6 +466,40 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 return false;
             }
         });
+    }
+
+    @Override
+    public void onBridgeShowActionSheet(String data, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+        ArrayList<String> list = new ArrayList<>();
+
+        JSONArray datum;
+        try {
+            datum = new JSONArray(data);
+            for (int i = 0; i < datum.length(); i++) {
+                list.add(datum.get(i).toString());
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        ActionSheet.createBuilder(mContext, getSupportFragmentManager())
+                .setCancelButtonTitle(R.string.cancel)
+                .setOtherButtonTitles(list.toArray(new String[list.size()]))
+                .setCancelableOnTouchOutside(true)
+                .setListener(new ActionSheet.ActionSheetListener() {
+                    @Override
+                    public void onDismiss(ActionSheet actionSheet, boolean isCancel) {
+                        actionSheet.dismiss();
+                    }
+
+                    @Override
+                    public void onOtherButtonClick(ActionSheet actionSheet, int index) {
+                        jsCallback.callback(index);
+
+                        actionSheet.dismiss();
+                    }
+                }).show();
+
     }
 
     public void onBridgeSendNoticeMessage(final String data) {

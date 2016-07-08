@@ -118,6 +118,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
     public static void chatByConversation(Context from, AVIMConversation conv) {
         CacheService.registerConv(conv);
+
         ChatManager.getInstance().registerConversation(conv);
         Intent intent = new Intent(from, ChatRoomActivity.class);
         intent.putExtra(CONVID, conv.getConversationId());
