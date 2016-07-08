@@ -443,6 +443,13 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         openLinkInNewActivity(url, params);
     }
 
+    @Override
+    public void onBridgeReplaceLink(String url, JSONObject object) {
+        if (getWebViewFragment() != null) {
+            getWebViewFragment().redirectToLoadUrl(url);
+        }
+    }
+
     public void onBridgeShowSearchBar() {
         EditText searchBar = setTitleSearch();
         searchBar.setOnEditorActionListener(new TextView.OnEditorActionListener() {

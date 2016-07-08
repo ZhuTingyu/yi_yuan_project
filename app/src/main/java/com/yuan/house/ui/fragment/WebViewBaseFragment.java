@@ -243,6 +243,17 @@ public class WebViewBaseFragment extends Fragment {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("replacePage got:" + data);
+
+                JSONObject object = null;
+                try {
+                    object = new JSONObject(data);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                String url = object.optString("url");
+                mBridgeListener.onBridgeReplaceLink(url, object);
+
                 if (null != callback) {
                     callback.callback("replacePage answer");
                 }
@@ -1003,6 +1014,8 @@ public class WebViewBaseFragment extends Fragment {
         void onBridgeSelectImageFromNative(String data, WebViewJavascriptBridge.WVJBResponseCallback callback);
 
         void onBridgeOpenNewLink(String url, JSONObject params);
+
+        void onBridgeReplaceLink(String url, JSONObject object);
 
         void onBridgeShowSearchBar();
 
