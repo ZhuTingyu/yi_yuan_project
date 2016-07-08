@@ -37,6 +37,7 @@ import com.lfy.dao.MessageDao;
 import com.yuan.house.HouseMessageType;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.common.Constants;
+import com.yuan.house.helper.AuthHelper;
 
 import org.json.JSONObject;
 
@@ -90,7 +91,9 @@ public class ChatManager extends AVIMClientEventHandler {
         return context;
     }
 
-    // fetchConversation
+    /**
+     * Deprecated .
+     */
     public void fetchConversationWithUserId(final String param, String userId, final AVIMConversationCreatedCallback callback) {
         final List<String> members = new ArrayList<>();
         members.add(userId);
@@ -98,7 +101,10 @@ public class ChatManager extends AVIMClientEventHandler {
         AVIMConversationQuery query = imClient.getQuery();
         query.withMembers(members);
         query.whereEqualTo(ConversationType.ATTR_TYPE_KEY, ConversationType.Single.getValue());
+
+        // TODO: 16/7/8 find with houseId if user is `agency`
         query.orderByDescending(KEY_UPDATED_AT);
+
         query.findInBackground(new AVIMConversationQueryCallback() {
             @Override
             public void done(List<AVIMConversation> conversations, AVIMException e) {
@@ -111,6 +117,53 @@ public class ChatManager extends AVIMClientEventHandler {
                         Map<String, Object> attrs = new HashMap<>();
                         attrs.put(ConversationType.TYPE_KEY, ConversationType.Single.getValue());
                         attrs.put("houseId", param);
+                        imClient.createConversation(members, attrs, callback);
+                    }
+                }
+            }
+        });
+    }
+
+    public void fetchConversationWithUserId(final JSONObject param, final String userId, final AVIMConversationCreatedCallback callback) {
+        String houseId = param.optString("house_id");
+        int auditType = param.optInt("audit_type");
+        if (auditType != 0) {
+            houseId = String.format("000%d%s", auditType, houseId);
+        }
+
+        final List<String> members = new ArrayList<>();
+        members.add(userId);
+        members.add(selfId);
+        AVIMConversationQuery query = imClient.getQuery();
+        query.withMembers(members);
+        query.whereEqualTo(ConversationType.ATTR_TYPE_KEY, ConversationType.Single.getValue());
+
+        // find with houseId if user is `agency`
+        if ("agency".equals(param.optString("type"))) {
+            query.whereEqualTo(ConversationType.ATTR_HOUSEID_KEY, houseId);
+        }
+
+        query.orderByDescending(KEY_UPDATED_AT);
+
+        final String finalHouseId = houseId;
+        query.findInBackground(new AVIMConversationQueryCallback() {
+            @Override
+            public void done(List<AVIMConversation> conversations, AVIMException e) {
+                if (e != null) {
+                    callback.done(null, e);
+                } else {
+                    if (conversations.size() > 0) {
+                        callback.done(conversations.get(0), null);
+                    } else {
+                        ArrayList<Integer> ids = new ArrayList<>();
+                        ids.add(Integer.parseInt(AuthHelper.userId()));
+                        ids.add(Integer.parseInt(param.optString("user_id")));
+
+                        Map<String, Object> attrs = new HashMap<>();
+                        attrs.put(ConversationType.TYPE_KEY, ConversationType.Single.getValue());
+                        attrs.put("houseId", finalHouseId);
+                        attrs.put("userIds", ids);
+
                         imClient.createConversation(members, attrs, callback);
                     }
                 }
@@ -135,7 +188,7 @@ public class ChatManager extends AVIMClientEventHandler {
             username = from.getUsername();
         }
 
-        Notification notification = Utils.notifyMsg(context, ChatActivity.class, PackageUtil.getAppLable(context),  username + "\n" + notifyContent, notifyContent.toString(), Constants.kNotifyId);
+        Notification notification = Utils.notifyMsg(context, ChatActivity.class, PackageUtil.getAppLable(context), username + "\n" + notifyContent, notifyContent.toString(), Constants.kNotifyId);
         getUserInfoFactory().configureNotification(notification);
     }
 

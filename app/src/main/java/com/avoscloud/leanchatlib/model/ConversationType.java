@@ -7,6 +7,7 @@ public enum ConversationType {
   Single(0), Group(1);
   public static final String TYPE_KEY = "type";
   public static final String ATTR_TYPE_KEY = "attr.type";
+  public static final String ATTR_HOUSEID_KEY = "attr.houseId";
   public static final String NAME_KEY = "name";
 
   int value;

@@ -473,8 +473,9 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         String houseId = null;
         JSONArray leanIdList = null;
         String text = null;
+        JSONObject object = null;
         try {
-            JSONObject object = new JSONObject(data);
+            object = new JSONObject(data);
             houseId = object.optString("house_id");
             leanIdList = object.optJSONArray("lean_id");
             text = object.optString("text");
@@ -488,13 +489,11 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
         String leanIdString = leanIdList.optString(leanIdList.length() - 1);
 
-        // FIXME: 16/6/10 WTF!!! isAgency 的作用是什么? 中介不能发这种类型消息么?
         // 创建相应对话, 并发送文本信息到该会话
         final String finalHouseId = houseId;
         final String finalText = text;
 
-        // TODO: 16/6/17 中介和用户之间, 以及中介和中介之间的聊天处理方式不同。
-        ChatManager.getInstance().fetchConversationWithUserId(null, leanIdString, new AVIMConversationCreatedCallback() {
+        ChatManager.getInstance().fetchConversationWithUserId(object, leanIdString, new AVIMConversationCreatedCallback() {
             @Override
             public void done(AVIMConversation avimConversation, AVIMException e) {
                 AVIMTextMessage message = new AVIMTextMessage();

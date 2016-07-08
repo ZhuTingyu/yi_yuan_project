@@ -157,26 +157,12 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
     }
 
     public static void chatByUserId(final Activity from, final JSONObject params) {
-        String userId = params.optString("user_id");
-
         leanId = params.optString("lean_id");
 
         final ProgressDialog dialog = Utils.showSpinnerDialog(from);
         if (prefs == null) prefs = PreferenceManager.getDefaultSharedPreferences(from);
 
-        String houseId = params.optString("house_id");
-        String auditType = params.optString("audit_type");
-
-        StringBuilder sb = new StringBuilder();
-        if (auditType == null) {
-            sb.append(houseId);
-        } else {
-            sb.append("000");
-            sb.append(auditType);
-            sb.append(houseId);
-        }
-
-        ChatManager.getInstance().fetchConversationWithUserId(sb.toString(), leanId, new AVIMConversationCreatedCallback() {
+        ChatManager.getInstance().fetchConversationWithUserId(params, leanId, new AVIMConversationCreatedCallback() {
             @Override
             public void done(AVIMConversation conversation, AVIMException e) {
                 dialog.dismiss();
@@ -293,11 +279,11 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         super.onStop();
 
         if (!TextUtils.isEmpty(cachedHouseIdForCurrentConv)) {
-        prefs.edit().putString(Constants.kLastActivatedHouseId, cachedHouseIdForCurrentConv).apply();
+            prefs.edit().putString(Constants.kLastActivatedHouseId, cachedHouseIdForCurrentConv).apply();
         }
         if (!TextUtils.isEmpty(cachedHouseTradeTypeForCurrentConv)) {
-        prefs.edit().putString(Constants.kLastActivatedHouseTradeType, cachedHouseTradeTypeForCurrentConv).apply();
-    }
+            prefs.edit().putString(Constants.kLastActivatedHouseTradeType, cachedHouseTradeTypeForCurrentConv).apply();
+        }
     }
 
     // TODO: 16/6/6 WTF ???
@@ -667,9 +653,9 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
             tradeType = prefs.getString(Constants.kLastActivatedHouseTradeType, null);
 
             if (TextUtils.isEmpty(id) && houseInfos != null) {
-            id = houseInfos.get(0).optString("id");
-            tradeType = houseInfos.get(0).optString("trade_type");
-        }
+                id = houseInfos.get(0).optString("id");
+                tradeType = houseInfos.get(0).optString("trade_type");
+            }
         }
 
         try {
