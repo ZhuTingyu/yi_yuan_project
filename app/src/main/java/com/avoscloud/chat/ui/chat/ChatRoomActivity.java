@@ -102,6 +102,8 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
             };
     private WebView webView;
     private JSONArray jsonFormatSwitchParams;
+    private String cachedHouseTradeTypeForCurrentConv;
+    private InputMoreAdapter mMoreAdapter;
 
     public static void chatByConversation(Context from, AVIMConversation conv, JSONObject params) {
         CacheService.registerConv(conv);
@@ -122,8 +124,12 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         from.startActivity(intent);
     }
 
+    /**
+     * Deprecated
+     */
     public static void chatByUserId(final Activity from, String userId) {
         leanId = userId;
+
         final ProgressDialog dialog = Utils.showSpinnerDialog(from);
         if (prefs == null) prefs = PreferenceManager.getDefaultSharedPreferences(from);
 
@@ -245,7 +251,8 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
         bindAdapter(jsonFormatParams);
 
-        cachedHouseIdForCurrentConv = jsonFormatParams.optString("id");
+        cachedHouseIdForCurrentConv = jsonFormatParams.optString("house_id");
+        cachedHouseTradeTypeForCurrentConv = jsonFormatParams.optString("trade_type");
 
         mMoreAdapter = new InputMoreAdapter(this);
         mMoreAdapter.addItem("照片", -1);
@@ -279,6 +286,18 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
         updateWebViewSettings();
         doOtherStuff();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if (!TextUtils.isEmpty(cachedHouseIdForCurrentConv)) {
+        prefs.edit().putString(Constants.kLastActivatedHouseId, cachedHouseIdForCurrentConv).apply();
+        }
+        if (!TextUtils.isEmpty(cachedHouseTradeTypeForCurrentConv)) {
+        prefs.edit().putString(Constants.kLastActivatedHouseTradeType, cachedHouseTradeTypeForCurrentConv).apply();
+    }
     }
 
     // TODO: 16/6/6 WTF ???
@@ -505,11 +524,8 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         super.onDestroy();
     }
 
-    private InputMoreAdapter mMoreAdapter;
-
     @Override
     public void onSetContractButton(String data) {
-        // TODO: 16/7/1 Use GridView instead of GridLayout for dynamic add items
         JSONArray array;
         try {
             array = new JSONArray(data);
@@ -641,14 +657,19 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
     @Override
     public void onGetFirstHouseInfo(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
-        //FIXME: 记录上一次的房源id，如果web没有传house_id进聊天，则告诉web房源id。如果没有上一次，就传可切换房源的第一条。
+        // 记录上一次的房源id，如果web没有传house_id进聊天，则告诉web房源id。如果没有上一次，就传可切换房源的第一条。
         JSONObject object = new JSONObject();
 
-        String id = cachedHouseIdForCurrentConv, tradeType = null;
+        String id = cachedHouseIdForCurrentConv, tradeType = cachedHouseTradeTypeForCurrentConv;
 
         if (TextUtils.isEmpty(id) || TextUtils.isEmpty(tradeType)) {
+            id = prefs.getString(Constants.kLastActivatedHouseId, null);
+            tradeType = prefs.getString(Constants.kLastActivatedHouseTradeType, null);
+
+            if (TextUtils.isEmpty(id) && houseInfos != null) {
             id = houseInfos.get(0).optString("id");
             tradeType = houseInfos.get(0).optString("trade_type");
+        }
         }
 
         try {

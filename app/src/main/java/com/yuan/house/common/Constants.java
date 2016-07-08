@@ -110,4 +110,6 @@ public class Constants {
     public static int kActivityRequestCodeImagePickThenCropSquare = 13;
     public static String kDateFormatStyleShort = "MM-dd mm:ss";
     public static int kNotifyId = 1;
+    public static String kLastActivatedHouseId = "kLastActivatedHouseId";
+    public static String kLastActivatedHouseTradeType = "kLastActivatedHouseTradeType";
 }
