@@ -20,17 +20,24 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.avos.avoscloud.im.v2.AVIMConversation;
+import com.avos.avoscloud.im.v2.AVIMConversationQuery;
 import com.avos.avoscloud.im.v2.AVIMException;
+import com.avos.avoscloud.im.v2.AVIMMessage;
+import com.avos.avoscloud.im.v2.AVIMTypedMessage;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
+import com.avos.avoscloud.im.v2.callback.AVIMConversationQueryCallback;
+import com.avos.avoscloud.im.v2.callback.AVIMSingleMessageQueryCallback;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.MessageAgent;
+import com.avoscloud.leanchatlib.controller.MessageHelper;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baoyz.actionsheet.ActionSheet;
 import com.bugtags.library.Bugtags;
+import com.dimo.utils.DateUtil;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.etiennelawlor.imagegallery.library.ImageGalleryFragment;
@@ -499,7 +506,65 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                         actionSheet.dismiss();
                     }
                 }).show();
+    }
 
+    @Override
+    public void onBridgeGetRecentChatList(String data, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+        AVIMConversationQuery query = ChatManager.getInstance().getImClient().getQuery();
+        // FIXME: 16/7/9 只获取最近的 20 条对话
+        query.limit(20);
+        query.findInBackground(new AVIMConversationQueryCallback() {
+            @Override
+            public void done(List<AVIMConversation> convs, AVIMException e) {
+                if (e == null) {
+                    // 处理并返回相应格式的会话列表
+                    final JSONArray array = new JSONArray();
+
+                    for (int i = 0; i < convs.size(); i++) {
+                        final AVIMConversation conversation = convs.get(i);
+                        conversation.getLastMessage(new AVIMSingleMessageQueryCallback() {
+                            @Override
+                            public void done(AVIMMessage avimMessage, AVIMException e) {
+                                if (avimMessage == null) return;
+
+                                AVIMTypedMessage message = (AVIMTypedMessage)avimMessage;
+
+                                JSONObject object = new JSONObject();
+
+                                String otherId = "0";
+                                com.alibaba.fastjson.JSONArray ids = (com.alibaba.fastjson.JSONArray) conversation.getAttribute("userIds");
+                                if (ids == null || ids.size() == 0) {
+                                    otherId = "0";
+                                } else {
+                                    for (int j = 0; j < ids.size(); j++) {
+                                        if (Integer.parseInt(AuthHelper.userId()) != ids.getInteger(j)) {
+                                            otherId = ids.getString(j);
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                try {
+                                    object.put("date", DateUtil.getDate(message.getTimestamp()));
+                                    object.put("message", MessageHelper.outlineOfMsg(message));
+                                    object.put("is_read", true);
+                                    object.put("otherId", conversation.getMembers().get(0));
+                                    object.put("auditType", "0");
+                                    object.put("houseId", conversation.getAttribute("houseId"));
+                                    object.put("otherUserId", otherId);
+                                } catch (JSONException e1) {
+                                    e1.printStackTrace();
+                                }
+
+                                array.put(object);
+                            }
+                        });
+                    }
+
+                    jsCallback.callback(array.toString());
+                }
+            }
+        });
     }
 
     public void onBridgeSendNoticeMessage(final String data) {
