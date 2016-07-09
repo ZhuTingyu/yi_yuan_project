@@ -14,7 +14,6 @@ import com.yuan.house.activities.WebViewActivity;
 import com.yuan.house.activities.WebViewBasedActivity;
 import com.yuan.house.helper.AuthHelper;
 import com.yuan.house.http.WebService;
-import com.yuan.house.ui.dialog.PopUpDialog;
 import com.yuan.house.ui.fragment.AgencyMainFragment;
 import com.yuan.house.ui.fragment.AgencyMessageFragment;
 import com.yuan.house.ui.fragment.FragmentBBS;
@@ -60,10 +59,9 @@ import dagger.Module;
                         MapActivity.class,
                         SwitchHouseActivity.class,
                         CropActivity.class,
-                        SegmentalWebActivity.class,
-
-                        PopUpDialog.class
+                        SegmentalWebActivity.class
                 },
+
                 staticInjections = {
                         AuthHelper.class
                 }

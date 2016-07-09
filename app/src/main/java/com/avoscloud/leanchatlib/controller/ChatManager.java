@@ -441,7 +441,6 @@ public class ChatManager extends AVIMClientEventHandler {
     }
 
     //ChatUser
-
     public List<Room> findRecentRooms() {
         RoomsTable roomsTable = RoomsTable.getCurrentUserInstance();
         return roomsTable.selectRooms();
