@@ -27,15 +27,12 @@ import com.avoscloud.leanchatlib.model.UserInfo;
 import com.avoscloud.leanchatlib.utils.PhotoUtils;
 import com.avoscloud.leanchatlib.view.PlayButton;
 import com.avoscloud.leanchatlib.view.ViewHolder;
+import com.dimo.utils.DateUtil;
 import com.lfy.bean.Message;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.squareup.picasso.Picasso;
 import com.yuan.house.R;
 
-import org.ocpsoft.prettytime.PrettyTime;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Map;
 
 /**
@@ -43,9 +40,8 @@ import java.util.Map;
  */
 public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
 
-    private static PrettyTime prettyTime = new PrettyTime();
-    private ConversationType conversationType;
     protected org.json.JSONObject conversationObject;
+    private ConversationType conversationType;
     private int msgViewTypes = 9;
     private ChatNewMessageAdapter.ClickListener clickListener;
     private Context context;
@@ -61,23 +57,6 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         this.conversationType = conversationType;
         this.conversationObject = object;
         activity = (Activity) context;
-    }
-
-    public static String millisecsToDateString(long timestamp) {
-        long gap = System.currentTimeMillis() - timestamp;
-        if (gap < 1000 * 60 * 60 * 24) {
-            String s = prettyTime.format(new Date(timestamp));
-            //return s.replace(" ", "");
-            return s;
-        } else {
-            SimpleDateFormat format = new SimpleDateFormat("MM-dd HH:mm");
-            return format.format(new Date(timestamp));
-        }
-    }
-
-    public static boolean haveTimeGap(long lastTime, long time) {
-        int gap = 1000 * 60 * 3;
-        return time - lastTime > gap;
     }
 
     public void setClickListener(ChatNewMessageAdapter.ClickListener clickListener) {
@@ -228,10 +207,10 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
             });
         }
         // timestamp
-        if (position == 0 || haveTimeGap(datas.get(position - 1).getTimestamp(),
+        if (position == 0 || DateUtil.haveTimeGap(datas.get(position - 1).getTimestamp(),
                 msg.getTimestamp())) {
             sendTimeView.setVisibility(View.VISIBLE);
-            sendTimeView.setText(millisecsToDateString(msg.getTimestamp()));
+            sendTimeView.setText(DateUtil.getDate(msg.getTimestamp()));
         } else {
             sendTimeView.setVisibility(View.GONE);
         }
@@ -244,12 +223,6 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
             if (conversationType == null) {
                 throw new NullPointerException("conv type is null");
             }
-//            if (conversationType == ConversationType.Single) {
-//                usernameView.setVisibility(View.GONE);
-//            } else {
-//                usernameView.setVisibility(View.VISIBLE);
-//                usernameView.setText(user.getUsername());
-//            }
         }
         ImageLoader.getInstance().displayImage(user.getAvatarUrl(), avatarView, PhotoUtils.avatarImageOptions);
 

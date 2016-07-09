@@ -2,6 +2,8 @@ package com.dimo.utils;
 
 import android.annotation.SuppressLint;
 
+import org.ocpsoft.prettytime.PrettyTime;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -149,5 +151,22 @@ public class DateUtil extends android.text.format.DateUtils{
     public static String getDate(Date date) {
         SimpleDateFormat format = new SimpleDateFormat("MM-dd HH:mm");
         return format.format(date);
+    }
+
+    public static String getDate(long timestamp) {
+        PrettyTime prettyTime = new PrettyTime();
+        long gap = System.currentTimeMillis() - timestamp;
+        if (gap < 1000 * 60 * 60 * 24) {
+            String s = prettyTime.format(new Date(timestamp));
+            return s;
+        } else {
+            SimpleDateFormat format = new SimpleDateFormat("MM-dd HH:mm");
+            return format.format(new Date(timestamp));
+        }
+    }
+
+    public static boolean haveTimeGap(long lastTime, long time) {
+        int gap = 1000 * 60 * 3;
+        return time - lastTime > gap;
     }
 }
