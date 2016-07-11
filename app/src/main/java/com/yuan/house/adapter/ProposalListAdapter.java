@@ -12,9 +12,9 @@ import com.avos.avoscloud.im.v2.AVIMTypedMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMAudioMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMImageMessage;
 import com.avoscloud.leanchatlib.adapter.ChatNewMessageAdapter;
-import com.avoscloud.leanchatlib.model.AVIMHouseMessage;
 import com.avoscloud.leanchatlib.model.ConversationType;
 import com.avoscloud.leanchatlib.view.PlayButton;
+import com.dimo.utils.DateUtil;
 import com.lfy.bean.Message;
 import com.yuan.house.enumerate.ProposalMessageCategory;
 import com.yuan.house.utils.ImageUtil;
@@ -86,8 +86,7 @@ public class ProposalListAdapter extends ChatNewMessageAdapter {
         //if (conView == null)
         {
             Message bean = new Message();
-            // FIXME: 16/6/27 date format error
-            bean.setDate(String.valueOf(msg.getTimestamp()));
+            bean.setDate(DateUtil.getDate(msg.getTimestamp()));
             bean.setLeanId(conversationObject.optString("lean_id"));
             bean.setAuditType(conversationObject.optString("audit_type"));
             bean.setHouseId(conversationObject.optString("house_id"));
