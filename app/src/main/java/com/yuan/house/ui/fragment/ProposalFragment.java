@@ -72,6 +72,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import okhttp3.Call;
+import timber.log.Timber;
 
 /**
  * 用户端和中介端合并在一个Fragment里
@@ -503,7 +504,8 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             if (!handleErrorCode(jsonObject)) {
-                                ToastUtil.showShort(getContext(), "提交成功");
+                                Timber.v("提交成功");
+
                                 ProposalInfo data = parseProposalInfo(jsonObject);
                                 if (data.msg_type == ProposalMediaType.AUDIO.ordinal()) {
                                     getAudioFile(data);
@@ -513,7 +515,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                                 scrollToLast();
                             }
                         } catch (JSONException e) {
-                            ToastUtil.showShort(getContext(), "提交失败");
+                            ToastUtil.showShort(getContext(), "提交失败, 请检查网络连接。");
                             e.printStackTrace();
                         }
                     }

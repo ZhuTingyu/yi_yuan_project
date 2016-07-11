@@ -13,6 +13,7 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -72,6 +73,9 @@ import com.yuan.house.utils.FileUtil;
 import com.yuan.house.utils.ImageUtil;
 import com.yuan.house.utils.SystemServiceUtil;
 import com.yuan.house.utils.ToastUtil;
+
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.NotImplementedException;
@@ -190,6 +194,17 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         ImageGalleryActivity.setImageThumbnailLoader(this);
         ImageGalleryFragment.setImageThumbnailLoader(this);
         FullScreenImageGalleryActivity.setFullScreenImageLoader(this);
+
+        KeyboardVisibilityEvent.setEventListener(this, new KeyboardVisibilityEventListener() {
+            @Override
+            public void onVisibilityChanged(boolean isOpen) {
+                WebView webView = getWebViewFragment().getWebView();
+
+                if (!isOpen) {
+                    webView.clearFocus();
+                }
+            }
+        });
     }
 
     protected void switchToFragment(String tag) {
@@ -238,7 +253,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         extras.putString("params", params.toString());
 
         Class cls = WebViewActivity.class;
-        // TODO: 16/7/4 hard check if url is agency_check_contract
+
         if (url.indexOf("agency_check_contract.html") == 0) {
             cls = SegmentalWebActivity.class;
         }
@@ -346,8 +361,9 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
         } else if (requestCode == Constants.kActivityRequestCodeImagePickThenCropRectangle
                 || requestCode == Constants.kActivityRequestCodeImagePickThenCropSquare) {
-            // TODO: 16/6/9 upload files directly
             Timber.v("kActivityRequestCodeImagePickThenUpload");
+            if (data == null) return;
+
             List<String> path = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
 
             if (path == null) return;
