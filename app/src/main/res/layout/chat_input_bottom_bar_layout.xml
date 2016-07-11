@@ -11,14 +11,13 @@
         android:layout_height="@dimen/chat_BottomHeight"
         android:orientation="horizontal">
 
-        <ImageView
+        <ImageButton
             android:id="@+id/btn_mode_switch"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginLeft="10dp"
             android:layout_centerVertical="true"
-            android:scaleType="fitXY"
-            android:src="@drawable/btn_keybord_switchover" />
+            android:background="@drawable/chat_btn_voice_selector" />
 
         <ImageView
             android:id="@+id/btn_more"
@@ -63,8 +62,8 @@
 
                 <Button
                     android:id="@+id/btnEmotionInput"
-                    android:layout_width="@dimen/chat_BottomBtnSize"
-                    android:layout_height="@dimen/chat_BottomBtnSize"
+                    android:layout_width="@dimen/chat_BottomEmojiBtnSize"
+                    android:layout_height="@dimen/chat_BottomEmojiBtnSize"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="10dp"

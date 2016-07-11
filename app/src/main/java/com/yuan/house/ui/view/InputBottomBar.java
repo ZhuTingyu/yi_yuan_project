@@ -348,6 +348,7 @@ public class InputBottomBar extends LinearLayout {
      * 展示文本输入框及相关按钮，隐藏不需要的按钮及 layout
      */
     public void showTextLayout() {
+        switchModeBtn.setBackgroundResource(R.drawable.chat_btn_voice_selector);
         isTextInputMode = true;
         //contentEditText.setVisibility(View.VISIBLE);
         textLayout.setVisibility(View.VISIBLE);
@@ -365,6 +366,7 @@ public class InputBottomBar extends LinearLayout {
      * 展示录音相关按钮，隐藏不需要的按钮及 layout
      */
     private void showAudioLayout() {
+        switchModeBtn.setBackgroundResource(R.drawable.btn_keybord_switchover);
         isTextInputMode = false;
         //contentEditText.setVisibility(View.GONE);
         textLayout.setVisibility(View.GONE);
