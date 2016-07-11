@@ -13,6 +13,7 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -72,6 +73,9 @@ import com.yuan.house.utils.FileUtil;
 import com.yuan.house.utils.ImageUtil;
 import com.yuan.house.utils.SystemServiceUtil;
 import com.yuan.house.utils.ToastUtil;
+
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.NotImplementedException;
@@ -190,6 +194,17 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         ImageGalleryActivity.setImageThumbnailLoader(this);
         ImageGalleryFragment.setImageThumbnailLoader(this);
         FullScreenImageGalleryActivity.setFullScreenImageLoader(this);
+
+        KeyboardVisibilityEvent.setEventListener(this, new KeyboardVisibilityEventListener() {
+            @Override
+            public void onVisibilityChanged(boolean isOpen) {
+                WebView webView = getWebViewFragment().getWebView();
+
+                if (!isOpen) {
+                    webView.clearFocus();
+                }
+            }
+        });
     }
 
     protected void switchToFragment(String tag) {
