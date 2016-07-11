@@ -191,7 +191,13 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        setTitleItem(jsonFormatParams.optString("user_id"));
+        String peerUserName = jsonFormatParams.optString("name");
+        if (!TextUtils.isEmpty(peerUserName)) {
+            setTitleItem(peerUserName);
+        } else {
+            requestAnonymousInfo();
+        }
+
         setRightItem(R.drawable.btn_search, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -214,6 +220,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                 }
             }
         });
+
         gestureDetector = new GestureDetector(this, onGestureListener);
 
         mFragmentBBS = FragmentBBS.newInstance();
@@ -263,6 +270,38 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                 } else if (text.equals("照片")) {
                     selectImage();
                 }
+            }
+        });
+    }
+
+    private void requestAnonymousInfo() {
+        String userId, agencyId;
+
+        if (AuthHelper.userAlreadyLogin() && AuthHelper.iAmUser()) {
+            userId = AuthHelper.userId();
+            agencyId = jsonFormatParams.optString("user_id");
+        } else {
+            agencyId = AuthHelper.userId();
+            userId = jsonFormatParams.optString("user_id");
+        }
+
+        String url = String.format("/chat-info/user/%s/agency/%s", userId, agencyId);
+
+        restGet(url, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+
+                // TODO: 16/7/11 update activity title
+                setTitleItem("");
+
+                // TODO: 16/7/11 update adapter incoming avatar
+
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
             }
         });
     }

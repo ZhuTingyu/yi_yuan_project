@@ -35,6 +35,8 @@ import com.yuan.house.R;
 
 import java.util.Map;
 
+import butterknife.ButterKnife;
+
 /**
  * Created by edwardliu on 16/6/30.
  */
@@ -130,6 +132,12 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 initReservedMessageView(conView, position, typedMessage, others, bean);
             }
         }
+
+        ImageView avatar = ButterKnife.findById(conView, R.id.avatar);
+
+        // TODO: 16/7/11 use real avatar link instead
+//        Picasso.with(context).load("").placeholder(R.drawable.photo_agent_boy).into(avatar);
+
 //        activity.registerForContextMenu(contentLayout);
 
         return conView;
@@ -381,6 +389,7 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         return baseView;
     }
 
+    // TODO: 16/7/11 wtf, refactor to use HouseInfoMessageType
     public View createViewByType(int type, boolean comeMsg) {
         View baseView;
         switch (type) {
