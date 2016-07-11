@@ -69,15 +69,7 @@
                 android:id="@+id/et_search"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginBottom="1dp"
-                android:layout_marginTop="1dp"
-                android:background="@drawable/search_editsharp"
-                android:drawableLeft="@drawable/img_search"
-                android:hint="@string/contact_search"
-                android:imeActionLabel="@string/contact_search"
-                android:imeOptions="actionSearch"
-                android:maxLines="1"
-                android:textSize="12dp"
+                style="@style/SearchBarStyle"
                 android:visibility="gone" />
         </RelativeLayout>
 
