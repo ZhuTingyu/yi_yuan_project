@@ -24,7 +24,6 @@ public class Constants {
     public static String kPrefsFirstLaunch = "kPrefsFirstLaunch";
     public static int kSplashTimeInterval = 20;
 
-    //TODO: not working with query parameters..
     public static String kWebPageEntry = "nearby.html";
     public static String kWebPageLogin = "login.html";
     // Web package version

@@ -96,7 +96,6 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         baiduMap.setOnMapLoadedCallback(new BaiduMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
-                // TODO Auto-generated method stub
                 locClient.start();
             }
         });

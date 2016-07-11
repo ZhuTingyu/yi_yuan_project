@@ -26,12 +26,12 @@
         android:layout_height="60dp"
         android:layout_marginTop="@dimen/topbar_height" />
 
-    <FrameLayout
-        android:id="@+id/fr"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <!--<FrameLayout-->
+        <!--android:id="@+id/fr"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent">-->
 
-    </FrameLayout>
+    <!--</FrameLayout>-->
 
     <LinearLayout
         android:id="@+id/bottomLayout"
