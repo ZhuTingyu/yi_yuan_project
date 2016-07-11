@@ -88,18 +88,19 @@
                         android:minHeight="@dimen/chat_BottomHeight"
                         android:paddingBottom="8dp"
                         android:paddingLeft="5dp"
-                        android:paddingRight="44dp"
+                        android:paddingRight="5dp"
                         android:paddingTop="5dp"
                         android:textCursorDrawable="@drawable/edittext_cursor_shape"
+                        android:layout_toLeftOf="@+id/btnEmotionInput"
+                        android:layout_toStartOf="@+id/btnEmotionInput"
                         android:textSize="16sp" />
 
                     <Button
                         android:id="@+id/btnEmotionInput"
-                        android:layout_width="@dimen/chat_BottomEmojiBtnSize"
-                        android:layout_height="@dimen/chat_BottomEmojiBtnSize"
+                        android:layout_width="@dimen/chat_BottomBtnSize"
+                        android:layout_height="@dimen/chat_BottomBtnSize"
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
-                        android:layout_marginRight="10dip"
                         android:background="@drawable/chat_btn_emo_selector" />
                 </RelativeLayout>
 
