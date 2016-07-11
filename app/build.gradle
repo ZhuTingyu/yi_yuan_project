@@ -179,6 +179,7 @@ dependencies {
 
     /** MISC .        */
     compile 'com.bugtags.library:bugtags-lib:latest.integration'
+    compile 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:1.0.1'
 
     /** UI .        */
     compile 'com.tasomaniac:delayed-progress:0.3'
