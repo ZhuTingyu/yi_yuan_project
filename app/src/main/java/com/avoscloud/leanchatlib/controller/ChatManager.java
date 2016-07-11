@@ -101,8 +101,6 @@ public class ChatManager extends AVIMClientEventHandler {
         AVIMConversationQuery query = imClient.getQuery();
         query.withMembers(members);
         query.whereEqualTo(ConversationType.ATTR_TYPE_KEY, ConversationType.Single.getValue());
-
-        // TODO: 16/7/8 find with houseId if user is `agency`
         query.orderByDescending(KEY_UPDATED_AT);
 
         query.findInBackground(new AVIMConversationQueryCallback() {

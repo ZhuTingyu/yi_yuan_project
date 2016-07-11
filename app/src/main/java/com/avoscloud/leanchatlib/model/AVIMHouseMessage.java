@@ -15,10 +15,12 @@ import java.util.Map;
         type = 2
 )
 public class AVIMHouseMessage extends AVIMTypedMessage {
+    @AVIMMessageField(
+            name = "_lcattrs"
+    )
+    Map<String, Object> attrs;
 
     public static final Creator<AVIMHouseMessage> CREATOR = new AVIMMessageCreator(AVIMHouseMessage.class);
-    @AVIMMessageField(name="_lcattrs")
-    Map<String, Object> attrs;
 
     public AVIMHouseMessage() {
         AVIMMessageManager.registerAVIMMessageType(this.getClass());
