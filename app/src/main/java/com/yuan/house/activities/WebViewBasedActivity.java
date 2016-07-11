@@ -238,7 +238,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         extras.putString("params", params.toString());
 
         Class cls = WebViewActivity.class;
-        // TODO: 16/7/4 hard check if url is agency_check_contract
+
         if (url.indexOf("agency_check_contract.html") == 0) {
             cls = SegmentalWebActivity.class;
         }
@@ -346,8 +346,9 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
         } else if (requestCode == Constants.kActivityRequestCodeImagePickThenCropRectangle
                 || requestCode == Constants.kActivityRequestCodeImagePickThenCropSquare) {
-            // TODO: 16/6/9 upload files directly
             Timber.v("kActivityRequestCodeImagePickThenUpload");
+            if (data == null) return;
+
             List<String> path = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
 
             if (path == null) return;
