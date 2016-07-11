@@ -58,6 +58,7 @@
                 android:layout_height="@dimen/chat_BottomBtnSize"
                 android:layout_alignBottom="@+id/rl_bottom_parent"
                 android:layout_margin="@dimen/chat_BottomBtnMargin"
+                android:layout_centerVertical="true"
                 android:background="@drawable/chat_btn_voice_selector"
                 android:textColor="@color/chat_base_color_text_black"
                 android:visibility="visible" />
@@ -73,7 +74,7 @@
                 <RelativeLayout
                     android:id="@+id/rl_field_textmode"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/chat_BottomHeight"
                     android:visibility="visible">
 
                     <com.avoscloud.leanchatlib.view.EmotionEditText
@@ -96,9 +97,8 @@
                         android:id="@+id/btnEmotionInput"
                         android:layout_width="@dimen/chat_BottomEmojiBtnSize"
                         android:layout_height="@dimen/chat_BottomEmojiBtnSize"
-                        android:layout_alignBottom="@id/editChatField"
                         android:layout_alignParentRight="true"
-                        android:layout_marginBottom="15dip"
+                        android:layout_centerVertical="true"
                         android:layout_marginRight="10dip"
                         android:background="@drawable/chat_btn_emo_selector" />
                 </RelativeLayout>
@@ -139,6 +139,7 @@
                     android:paddingLeft="8dip"
                     android:paddingRight="8dip"
                     android:paddingTop="6dip"
+                    android:layout_centerVertical="true"
                     android:text="@string/chat_send_text"
                     android:textColor="@color/white"
                     android:textSize="13.5sp"
@@ -149,6 +150,7 @@
                     android:layout_width="@dimen/chat_BottomBtnSize"
                     android:layout_height="@dimen/chat_BottomBtnSize"
                     android:layout_margin="@dimen/chat_BottomBtnMargin"
+                    android:layout_centerVertical="true"
                     android:background="@drawable/btn_other" />
             </RelativeLayout>
 

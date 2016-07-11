@@ -38,7 +38,7 @@
     <dimen name="chat_bottom_more_height">180dp</dimen>
     <dimen name="chat_MaxNameWidth">50dp</dimen>
     <dimen name="chat_ImageWidth">100dp</dimen>
-    <dimen name="chat_BottomBtnSize">28dp</dimen>
+    <dimen name="chat_BottomBtnSize">30dp</dimen>
     <dimen name="chat_BottomEmojiBtnSize">24dp</dimen>
     <dimen name="chat_avatarSize">50dp</dimen>
     <dimen name="chat_playBtnWidth">30dp</dimen>
