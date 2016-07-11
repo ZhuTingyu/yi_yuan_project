@@ -627,6 +627,13 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
 
                         } catch (JSONException e) {
                             e.printStackTrace();
+                            try {
+                                JSONObject jsonObject = new JSONObject(response);
+                                handleErrorCode(jsonObject);
+                            }
+                            catch (JSONException ex) {
+                                ex.printStackTrace();
+                            }
                         } finally {
 //                            mSwipeRefreshWidget.setRefreshing(false);
                         }
