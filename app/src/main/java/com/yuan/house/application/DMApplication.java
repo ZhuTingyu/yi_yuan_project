@@ -30,6 +30,7 @@ import com.avoscloud.chat.service.PreferenceMap;
 import com.avoscloud.chat.util.Utils;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.UserInfoFactory;
+import com.avoscloud.leanchatlib.db.DBHelper;
 import com.avoscloud.leanchatlib.model.UserInfo;
 import com.avoscloud.leanchatlib.utils.Logger;
 import com.baidu.location.BDLocation;
@@ -504,5 +505,9 @@ public class DMApplication extends Application {
 
     public boolean iAmUser() {
         return "user".equals(prefs.getString(Constants.kWebDataKeyLoginType, ""));
+    }
+
+    public void stopSelf() {
+        DBHelper.getCurrentUserInstance().closeHelper();
     }
 }
