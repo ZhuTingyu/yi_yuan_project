@@ -198,6 +198,7 @@
     <color name="Navy">#000080</color>
     <color name="Black">#000000</color>
     <color name="transparentGray">#99aaaaaa</color>
+    <color name="transparentDarkGray">#EE222222</color>
 
 
     <!--http://stackoverflow.com/a/3770183-->

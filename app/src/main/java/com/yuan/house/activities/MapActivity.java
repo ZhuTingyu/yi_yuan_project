@@ -1,16 +1,15 @@
 package com.yuan.house.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baidu.location.Address;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
@@ -30,17 +29,13 @@ import com.baidu.mapapi.search.geocode.GeoCoder;
 import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.yuan.house.R;
 import com.yuan.house.application.Injector;
-import com.yuan.house.common.Constants;
-
-import java.util.HashMap;
-import java.util.Map;
+import com.yuan.house.event.LocationEvent;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import de.greenrobot.event.EventBus;
 import timber.log.Timber;
 
 /**
@@ -52,6 +47,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
     protected BaiduMap baiduMap;
     protected LocationClient locClient;
     boolean isFirstLoc = true;// 是否首次定位
+    BDLocation bdLocation;
 
     @Nullable
     @BindView(R.id.tv_location_field)
@@ -69,7 +65,6 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
     private LatLng center;
     private double latitude = 0.0;
     private double longitude = 0.0;
-    private String json;
     private String city;    //当前城市
 
     @Override
@@ -81,6 +76,8 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         ButterKnife.bind(this);
 
         this.mContext = this;
+
+        bdLocation = new BDLocation();
 
         setLeftItem(R.drawable.btn_back, new View.OnClickListener() {
             @Override
@@ -94,10 +91,9 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         setRightItem("选定", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!TextUtils.isEmpty(json)) {
-                    Intent intent = new Intent();
-                    intent.putExtra(Constants.kActivityParamFinishSelectLocationOnMap, json);
-                    setResult(RESULT_OK, intent);
+                if (!TextUtils.isEmpty(bdLocation.getAddrStr())) {
+                    EventBus.getDefault().post(new LocationEvent(LocationEvent.LocationEventEnum.UPDATED, bdLocation));
+
                     finish();
                 }
             }
@@ -155,24 +151,19 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
             @Override
             public void onMapStatusChangeFinish(MapStatus mapStatus) {
                 center = mapStatus.target;
-                String location = center.longitude + "," + center.latitude;
                 latitude = center.latitude;
                 longitude = center.longitude;
-                Log.i("中心点经纬度", location);
                 LatLng ptCenter = new LatLng(center.latitude, center.longitude);
-                mSearch.reverseGeoCode(new ReverseGeoCodeOption()
-                        .location(ptCenter));
+                mSearch.reverseGeoCode(new ReverseGeoCodeOption().location(ptCenter));
             }
         });
 
     }
 
     private void initViewConfig() {
-        //选定位置
         search_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Geo搜索
                 mSearch.geocode(new GeoCodeOption().city(city).address(searchText.getText().toString()));
             }
         });
@@ -192,27 +183,23 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
     @Override
     public void onGetReverseGeoCodeResult(ReverseGeoCodeResult reverseGeoCodeResult) {
         if (reverseGeoCodeResult == null || reverseGeoCodeResult.error != SearchResult.ERRORNO.NO_ERROR) {
-            Toast.makeText(mContext, "抱歉，未能找到结果", Toast.LENGTH_LONG)
-                    .show();
+            Toast.makeText(mContext, "抱歉，未能找到结果", Toast.LENGTH_LONG).show();
             return;
         }
 
         city = reverseGeoCodeResult.getAddressDetail().city;
 
-        Map<String, String> map = new HashMap<>();
-        map.put("addr", reverseGeoCodeResult.getAddress());
-        map.put("city", reverseGeoCodeResult.getAddressDetail().city);
-        map.put("district", reverseGeoCodeResult.getAddressDetail().district);
-        map.put("province", reverseGeoCodeResult.getAddressDetail().province);
-        map.put("street", reverseGeoCodeResult.getAddressDetail().street);
-        map.put("lat", String.valueOf(latitude));
-        map.put("lng", String.valueOf(longitude));
+        tvLocationField.setText(reverseGeoCodeResult.getAddress());
 
-        Gson gson = new GsonBuilder().enableComplexMapKeySerialization()
-                .create();
-        json = gson.toJson(map);
-
-        tvLocationField.setText(reverseGeoCodeResult.getAddressDetail().street);
+        bdLocation.setLatitude(latitude);
+        bdLocation.setLongitude(longitude);
+        Address address = new Address.Builder().province(reverseGeoCodeResult.getAddressDetail().province)
+                .city(reverseGeoCodeResult.getAddressDetail().city)
+                .district(reverseGeoCodeResult.getAddressDetail().district)
+                .street(reverseGeoCodeResult.getAddressDetail().street)
+                .build();
+        bdLocation.setAddr(address);
+        bdLocation.setAddrStr(reverseGeoCodeResult.getAddress());
     }
 
     @Override

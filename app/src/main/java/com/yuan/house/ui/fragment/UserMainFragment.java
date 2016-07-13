@@ -1,7 +1,6 @@
 package com.yuan.house.ui.fragment;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -14,7 +13,6 @@ import android.widget.TextView;
 import com.baidu.location.BDLocation;
 import com.yuan.house.R;
 import com.yuan.house.activities.MainActivity;
-import com.yuan.house.activities.MapActivity;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
@@ -26,7 +24,6 @@ import org.json.JSONObject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import de.greenrobot.event.EventBus;
 
 /**
  * Created by KevinLee on 2016/4/21.
@@ -79,16 +76,13 @@ public class UserMainFragment extends WebViewBaseFragment {
     @Override
     public void onStop() {
         super.onStop();
-
-        EventBus.getDefault().unregister(this);
     }
 
     @OnClick({R.id.rl_center, R.id.position, R.id.btn_arrow_down})
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.rl_center:
-                Intent intent = new Intent(getContext(), MapActivity.class);
-                startActivityForResult(intent, REQUEST_MAP_CODE);
+                mBridgeListener.onBridgeSelectMapLocation();
                 break;
             case R.id.position:
                 ((MainActivity) getActivity()).getBottomNavigationBar().selectTab(2);
@@ -118,6 +112,7 @@ public class UserMainFragment extends WebViewBaseFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+
         try {
             mBridgeListener = (OnBridgeInteractionListener) activity;
         } catch (ClassCastException e) {

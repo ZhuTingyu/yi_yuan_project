@@ -32,23 +32,21 @@
         android:id="@+id/bmap"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
-        android:layout_above="@+id/map_control"
         android:layout_below="@+id/map_topbar"
         android:clickable="true" />
 
-    <WebView
-        android:id="@+id/webview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone" />
+    <!--<WebView-->
+    <!--android:id="@+id/webview"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:visibility="gone" />-->
 
     <LinearLayout
         android:id="@+id/map_control"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@android:color/transparent"
+        android:background="@color/transparentDarkGray"
         android:orientation="vertical">
 
         <TextView
@@ -56,10 +54,12 @@
             style="@style/TextAppearance.AppCompat.Medium"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@android:color/transparent"
             android:gravity="center"
-            android:text="@string/map_location_default_address_text" />
+            android:text="@string/map_location_default_address_text"
+            android:textColor="@color/WhiteSmoke" />
     </LinearLayout>
 
     <ImageView
@@ -67,11 +67,4 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:src="@drawable/pin" />
-
-    <!--<com.victor.loading.rotate.RotateLoading-->
-    <!--android:id="@+id/rotateloading"-->
-    <!--android:layout_width="80dp"-->
-    <!--android:layout_height="80dp"-->
-    <!--android:layout_centerInParent="true" />-->
-
 </RelativeLayout>
