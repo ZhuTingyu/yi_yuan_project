@@ -310,7 +310,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.KICK_OUT) {
             JSONObject object = event.getHolder();
 
-            if (AuthHelper.userAlreadyLogin() && !AuthHelper.userToken().equals(object.optString("exclusive_token"))) {
+            if (object == null || (AuthHelper.userAlreadyLogin() && !AuthHelper.userToken().equals(object.optString("exclusive_token")))) {
                 Toast.makeText(mContext, "您的账号在别处登陆", Toast.LENGTH_SHORT).show();
 
                 DMApplication.getInstance().kickOut();
