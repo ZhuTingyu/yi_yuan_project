@@ -151,6 +151,7 @@
             android:enabled="true"
             android:process=":remote" />
 
+        <service android:name=".HeartbeatService" android:stopWithTask="false" />
     </application>
 
 </manifest>
