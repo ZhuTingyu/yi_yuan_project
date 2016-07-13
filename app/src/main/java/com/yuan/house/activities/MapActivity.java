@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
@@ -51,15 +52,19 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
     protected BaiduMap baiduMap;
     protected LocationClient locClient;
     boolean isFirstLoc = true;// 是否首次定位
+
     @Nullable
-    @BindView(R.id.confirm_location)
-    Button confirm_location;
+    @BindView(R.id.tv_location_field)
+    TextView tvLocationField;
+
     @Nullable
     @BindView(R.id.search_button)
     Button search_button;
+
     @Nullable
     @BindView(R.id.search_edit)
     EditText searchText;
+
     private GeoCoder mSearch;
     private LatLng center;
     private double latitude = 0.0;
@@ -85,6 +90,18 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         });
 
         setTitleItem("位置");
+
+        setRightItem("选定", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!TextUtils.isEmpty(json)) {
+                    Intent intent = new Intent();
+                    intent.putExtra(Constants.kActivityParamFinishSelectLocationOnMap, json);
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }
+            }
+        });
 
         this.mMapView = (MapView) findViewById(R.id.bmap);
         this.baiduMap = mMapView.getMap();
@@ -152,18 +169,6 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
 
     private void initViewConfig() {
         //选定位置
-        confirm_location.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!TextUtils.isEmpty(json)) {
-                    Intent intent = new Intent();
-                    intent.putExtra(Constants.kActivityParamFinishSelectLocationOnMap, json);
-                    setResult(RESULT_OK, intent);
-                    finish();
-                }
-            }
-        });
-
         search_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -206,6 +211,8 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         Gson gson = new GsonBuilder().enableComplexMapKeySerialization()
                 .create();
         json = gson.toJson(map);
+
+        tvLocationField.setText(reverseGeoCodeResult.getAddressDetail().street);
     }
 
     @Override
@@ -254,7 +261,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
                         location.getLongitude());
                 if (isFirstLoc) {
                     isFirstLoc = false;
-                    MapStatusUpdate u = MapStatusUpdateFactory.newLatLngZoom(ll, 14);
+                    MapStatusUpdate u = MapStatusUpdateFactory.newLatLngZoom(ll, 17);
                     baiduMap.animateMapStatus(u);
 
 //                    LatLng ptCenter = new LatLng(latitude, longitude);

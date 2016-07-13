@@ -702,7 +702,6 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
     public void onBridgeRequestLocation(final WebViewJavascriptBridge.WVJBResponseCallback callback) {
         final LocationClient locationClient = new LocationClient(getApplicationContext());
-        locationClient.setDebug(true);
         LocationClientOption option = new LocationClientOption();
         option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
         option.setScanSpan(1000);
