@@ -35,6 +35,7 @@ import com.avoscloud.leanchatlib.model.UserInfo;
 import com.avoscloud.leanchatlib.utils.Logger;
 import com.baidu.location.BDLocation;
 import com.baidu.mapapi.SDKInitializer;
+import com.bugtags.library.Bugtags;
 import com.dimo.utils.FileUtil;
 import com.dimo.utils.StringUtil;
 import com.dimo.utils.ZipUtil;
@@ -155,6 +156,8 @@ public class DMApplication extends Application {
 
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
+        } else {
+            Bugtags.start(Constants.kBugTagsKey, this, Bugtags.BTGInvocationEventBubble);
         }
 
         PackageInfo pInfo = null;
@@ -179,7 +182,6 @@ public class DMApplication extends Application {
 
         editor.commit();
 
-//        Bugtags.start(Constants.kBugTagsKey, this, Bugtags.BTGInvocationEventBubble);
 
 //        try {
 //            PackageInfo info = getPackageManager().getPackageInfo(Constants.kApplicationId, PackageManager.GET_SIGNATURES);
