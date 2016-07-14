@@ -1,5 +1,8 @@
 package com.avoscloud.leanchatlib.model;
 
+import android.os.Parcel;
+
+import com.avos.avoscloud.im.v2.AVIMMessage;
 import com.avos.avoscloud.im.v2.AVIMMessageCreator;
 import com.avos.avoscloud.im.v2.AVIMMessageField;
 import com.avos.avoscloud.im.v2.AVIMMessageManager;
@@ -32,5 +35,10 @@ public class AVIMHouseMessage extends AVIMTypedMessage {
 
     public void setAttrs(Map<String, Object> attrs) {
         this.attrs = attrs;
+    }
+
+    public static void registerMessageType() {
+        AVIMHouseMessage temp = new AVIMHouseMessage();
+        AVIMMessageManager.registerAVIMMessageType(temp.getClass());
     }
 }

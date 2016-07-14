@@ -192,6 +192,9 @@ public class ChatManager extends AVIMClientEventHandler {
 
     public void init(Context context) {
         this.context = context;
+
+        AVIMHouseMessage.registerMessageType();
+
         msgHandler = new MsgHandler();
         AVIMMessageManager.registerMessageHandler(AVIMTypedMessage.class, msgHandler);
 
