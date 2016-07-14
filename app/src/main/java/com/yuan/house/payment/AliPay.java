@@ -57,29 +57,28 @@ public class AliPay {
 
     private WebViewJavascriptBridge.WVJBResponseCallback mPayCallback;
 
-    public AliPay(PayInfo payInfo, Context context, Activity activity){
+    public AliPay(PayInfo payInfo, Context context, Activity activity) {
         super();
         this.payInfo = payInfo;
         this.context = context;
         this.activity = activity;
     }
 
-    public AliPay(){
+    public AliPay() {
 
     }
 
-    public void setHandler(Handler handler){
+    public void setHandler(Handler handler) {
         this.handler = handler;
     }
 
-    public void setPayCallback(WebViewJavascriptBridge.WVJBResponseCallback mPayCallback){
+    public void setPayCallback(WebViewJavascriptBridge.WVJBResponseCallback mPayCallback) {
         this.mPayCallback = mPayCallback;
     }
 
 
     /**
      * call alipay sdk pay. 调用SDK支付
-     *
      */
     public void pay() {
         if (TextUtils.isEmpty(PARTNER) || TextUtils.isEmpty(RSA_PRIVATE)
@@ -138,7 +137,6 @@ public class AliPay {
 
     /**
      * create the order info. 创建订单信息
-     *
      */
     public String getOrderInfo(String subject, String body, String price) {
 
@@ -161,7 +159,7 @@ public class AliPay {
         orderInfo += "&total_fee=" + "\"" + price + "\"";
 
         // 服务器异步通知页面路径
-        orderInfo += "&notify_url=" + "\"" + Constants.kWebServiceAPIEndpoint +"/orders/alipay_callback"
+        orderInfo += "&notify_url=" + "\"" + Constants.kWebServiceAPIEndpoint + "/orders/alipay_callback"
                 + "\"";
 
         // 服务接口名称， 固定值
@@ -198,7 +196,6 @@ public class AliPay {
 
     /**
      * get the sign type we use. 获取签名方式
-     *
      */
     public String getSignType() {
         return "sign_type=\"RSA\"";
@@ -216,8 +213,7 @@ public class AliPay {
 
                 // 判断resultStatus 为“9000”则代表支付成功，具体状态码代表含义可参考接口文档
                 if (TextUtils.equals(resultStatus, "9000")) {
-                    Toast.makeText(context, "支付成功",
-                            Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "支付成功", Toast.LENGTH_SHORT).show();
 
                     mPayCallback.callback("{\"result\":true}");
 
@@ -225,8 +221,7 @@ public class AliPay {
                     // 判断resultStatus 为非“9000”则代表可能支付失败
                     // “8000”代表支付结果因为支付渠道原因或者系统原因还在等待支付结果确认，最终交易是否成功以服务端异步通知为准（小概率状态）
                     if (TextUtils.equals(resultStatus, "8000")) {
-                        Toast.makeText(context, "支付结果确认中",
-                                Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "支付结果确认中", Toast.LENGTH_SHORT).show();
                         try {
                             JSONObject data = new JSONObject();
                             data.put("code", "8000");
@@ -236,8 +231,7 @@ public class AliPay {
                         }
                     } else {
                         // 其他值就可以判断为支付失败，包括用户主动取消支付，或者系统返回的错误
-                        Toast.makeText(context, "支付失败",
-                                Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "支付失败", Toast.LENGTH_SHORT).show();
                         try {
                             JSONObject data = new JSONObject();
                             data.put("code", resultStatus);
@@ -250,8 +244,7 @@ public class AliPay {
                 }
                 break;
             case SDK_CHECK_FLAG: {
-                Toast.makeText(context, "检查结果为：" + msg.obj,
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "检查结果为：" + msg.obj, Toast.LENGTH_SHORT).show();
                 break;
             }
             default:
