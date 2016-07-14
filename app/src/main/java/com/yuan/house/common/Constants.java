@@ -8,13 +8,16 @@ public class Constants {
     public static final String kServiceCheckUpdate = "checkupdate";
     public static final String kServiceLogin = "login";
 
-    // Production Server
+    // Development Server
     public static String kWebServiceAPIEndpoint = "http://house.ieyuan.com/api";
+    // Production Server
+//    public static String kWebServiceAPIEndpoint = "http://test.house.ieyuan.com/api";
 
     /**
      * Web Service Url
      */
     public static String kWebServiceFileUpload = kWebServiceAPIEndpoint + "/file-upload/feedback";
+    public static String kWebServiceImageUpload = kWebServiceAPIEndpoint + "/image-upload";
     public static String kWebServiceUploadCommon = kWebServiceAPIEndpoint + "/file-upload/common";
     public static String kWebServiceSendFeedback = kWebServiceAPIEndpoint + "/feedback";
     public static String kWebServiceGetFeedback = kWebServiceAPIEndpoint + "/feedback?page=";

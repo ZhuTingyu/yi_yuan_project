@@ -7,6 +7,7 @@ import com.loopj.android.http.RequestParams;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
 
+import org.apache.http.HttpEntity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -40,6 +41,10 @@ public class WebService {
         RestClient.getInstance().post(Constants.kWebServiceFileUpload, authTokenHeader(), requestParams, responseHandler);
     }
 
+    public void postMultiPartFormImageFile(HttpEntity entity, AsyncHttpResponseHandler responseHandler) {
+        RestClient.getInstance().post(Constants.kWebServiceImageUpload, authTokenHeader(), entity, responseHandler);
+    }
+
     private String getAuthToken() {
         String token = null;
         String json = prefs.getString(Constants.kWebDataKeyUserLogin, null);
@@ -56,7 +61,7 @@ public class WebService {
     private HashMap<String, String> authTokenHeader() {
         HashMap<String, String> hashMap = new HashMap<>();
 
-        hashMap.put(kHttpReqKeyContentType, "application/json");
+//        hashMap.put(kHttpReqKeyContentType, "multipart/form-data");
         hashMap.put(kHttpReqKeyToken, getAuthToken());
 
         return hashMap;
