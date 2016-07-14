@@ -43,9 +43,15 @@ public class MsgsTable {
     static AVIMTypedMessage createMsgByCursor(Cursor c) {
         byte[] msgBytes = c.getBlob(c.getColumnIndex(OBJECT));
         if (msgBytes != null) {
-            // FIXME: 16/6/4 com.avos.avoscloud.im.v2.AVIMMessage cannot be cast to com.avos.avoscloud.im.v2.AVIMTypedMessage
-            AVIMTypedMessage msg = (AVIMTypedMessage) ParcelableUtil.unmarshall(msgBytes, AVIMTypedMessage.CREATOR);
-            return msg;
+            try {
+                // FIXME: 16/6/4 com.avos.avoscloud.im.v2.AVIMMessage cannot be cast to com.avos.avoscloud.im.v2.AVIMTypedMessage
+                AVIMTypedMessage msg = (AVIMTypedMessage) ParcelableUtil.unmarshall(msgBytes, AVIMTypedMessage.CREATOR);
+                return msg;
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
         } else {
             return null;
         }
@@ -101,7 +107,9 @@ public class MsgsTable {
                 limit + "");
         while (c.moveToNext()) {
             AVIMTypedMessage msg = createMsgByCursor(c);
-            msgs.add(msg);
+            if (msg != null) {
+                msgs.add(msg);
+            }
         }
         c.close();
         Collections.reverse(msgs);

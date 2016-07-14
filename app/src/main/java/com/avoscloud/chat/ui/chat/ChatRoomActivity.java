@@ -491,7 +491,9 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
             this.conversation = conversationChangeEvent.getConv();
 
             ActionBar actionBar = getActionBar();
-            actionBar.setTitle(ConversationHelper.titleOfConv(this.conversation));
+            if (actionBar != null) {
+                actionBar.setTitle(ConversationHelper.titleOfConv(this.conversation));
+            }
         }
     }
 
