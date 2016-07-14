@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -34,6 +35,7 @@ import com.avoscloud.leanchatlib.utils.PathUtils;
 import com.avoscloud.leanchatlib.utils.ProviderPathUtils;
 import com.avoscloud.leanchatlib.view.xlist.XListView;
 import com.baoyz.actionsheet.ActionSheet;
+import com.dimo.utils.StringUtil;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.PauseOnScrollListener;
 import com.yuan.house.R;
@@ -85,6 +87,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
     private static final int TAKE_CAMERA_REQUEST = 2;
     private static final int GALLERY_REQUEST = 0;
     private static final int GALLERY_KITKAT_REQUEST = 3;
+    private static final String TAG = "ProposalFragment";
     public static ProposalSourceType sourceType = ProposalSourceType.UNKNOWN;
     public static ProposalMediaType msg_type = ProposalMediaType.TEXT;                            //1:文本，2：语音，3：图片
     public static ProposalMessageCategory category = ProposalMessageCategory.SUGGESTION;          //0：投诉；1：建议；2：BUG
@@ -651,6 +654,12 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
      */
     private void getAudioFile(ProposalInfo data) {
         String audioUrl = data.content;
+
+        if (!StringUtil.isValidHTTPUrl(audioUrl)) {
+            Log.e(TAG, "getAudioFile url err!");
+            return;
+        }
+
         String fileName = audioUrl.substring(audioUrl.lastIndexOf("/") + 1);
         String path = FileUtil.getAudioFile();
         data.content = path + fileName;
