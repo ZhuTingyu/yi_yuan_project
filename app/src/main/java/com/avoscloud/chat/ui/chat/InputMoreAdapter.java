@@ -27,8 +27,10 @@ public class InputMoreAdapter extends BaseAdapter {
     }
 
     public void addItem(String text, int value) {
-        mItems.add(text);
-        mValues.add(value);
+        if (!mItems.contains(text)) {
+            mItems.add(text);
+            mValues.add(value);
+        }
     }
 
     public int getValue(int position) {
