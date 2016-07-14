@@ -51,6 +51,7 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     private View contentLayout;
     private View placeView;
     private Activity activity;
+    String peerAvatar;
 
     public ChatNewMessageAdapter(Context context, ConversationType conversationType, org.json.JSONObject object) {
         super(context);
@@ -59,6 +60,7 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         this.conversationType = conversationType;
         this.conversationObject = object;
         activity = (Activity) context;
+        peerAvatar = object.optString("avatar");
     }
 
     public void setClickListener(ChatNewMessageAdapter.ClickListener clickListener) {
@@ -105,6 +107,8 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     public View getView(int position, View conView, ViewGroup parent) {
         AVIMMessage msg = datas.get(position);
 
+        boolean others = false;
+
         if (conView == null) {
             Message bean = new Message();
             // FIXME: 16/6/27 date format error
@@ -117,7 +121,7 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
             if (msg instanceof AVIMHouseMessage) {
                 AVIMHouseMessage houseInfoMessage = (AVIMHouseMessage) msg;
 
-                boolean others = messageSentByOthers(houseInfoMessage);
+                others = messageSentByOthers(houseInfoMessage);
                 conView = createViewByType(houseInfoMessage.getMessageType(), others);
 
                 initHouseMessageView(conView, houseInfoMessage, others);
@@ -126,7 +130,7 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
             } else if (msg instanceof AVIMTypedMessage) {
                 AVIMTypedMessage typedMessage = (AVIMTypedMessage) msg;
 
-                boolean others = messageSentByOthers(typedMessage);
+                others = messageSentByOthers(typedMessage);
                 conView = createViewByType(AVIMReservedMessageType.getAVIMReservedMessageType(typedMessage.getMessageType()), others);
 
                 initReservedMessageView(conView, position, typedMessage, others, bean);
@@ -135,8 +139,9 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
 
         ImageView avatar = ButterKnife.findById(conView, R.id.avatar);
 
-        // TODO: 16/7/11 use real avatar link instead
-//        Picasso.with(context).load("").placeholder(R.drawable.photo_agent_boy).into(avatar);
+        if (others == true && peerAvatar != null) {
+            Picasso.with(context).load(peerAvatar).placeholder(R.drawable.photo_agent_boy).into(avatar);
+        }
 
 //        activity.registerForContextMenu(contentLayout);
 
