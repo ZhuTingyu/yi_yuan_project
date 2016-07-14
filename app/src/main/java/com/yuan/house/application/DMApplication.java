@@ -209,7 +209,7 @@ public class DMApplication extends Application {
 
         // 启用崩溃错误统计
         AVAnalytics.enableCrashReport(mContext, true);
-        AVOSCloud.setDebugLogEnabled(true);
+        //AVOSCloud.setDebugLogEnabled(true);
 
         AVObject.registerSubclass(AddRequest.class);
         AVObject.registerSubclass(UpdateInfo.class);
