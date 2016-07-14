@@ -325,7 +325,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
     private void initBaiduLocClient() {
         locClient = new LocationClient(mContext);
-        locClient.setDebug(true);
         LocationClientOption option = new LocationClientOption();
         option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
         option.setScanSpan(5000);

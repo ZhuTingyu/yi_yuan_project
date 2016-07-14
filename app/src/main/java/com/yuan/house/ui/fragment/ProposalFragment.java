@@ -49,6 +49,7 @@ import com.yuan.house.enumerate.ProposalSourceType;
 import com.yuan.house.event.InputBottomBarEvent;
 import com.yuan.house.event.InputBottomBarRecordEvent;
 import com.yuan.house.event.InputBottomBarTextEvent;
+import com.yuan.house.event.NotificationEvent;
 import com.yuan.house.helper.AuthHelper;
 import com.yuan.house.ui.view.InputBottomBar;
 import com.yuan.house.ui.view.PickerPopWindow;
@@ -71,6 +72,7 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import de.greenrobot.event.EventBus;
 import okhttp3.Call;
 import timber.log.Timber;
 
@@ -587,7 +589,8 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         switch (errCode) {
             case 450:
             case 401: {
-                ToastUtil.showShort(getContext(), jsonObject.optString("error_msg", "未知错误!"));
+                // 重新登录
+                EventBus.getDefault().post(NotificationEvent.fromType(10, null));
             }
             break;
             default:

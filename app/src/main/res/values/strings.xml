@@ -106,7 +106,7 @@
     <!--map activity-->
     <string name="map_search_placeholder">搜索</string>
     <string name="add_to_fav_location">收藏位置</string>
-    <string name="map_confirm_location">选定位置</string>
+    <string name="map_location_default_address_text">四川省成都市新世纪环球中心N5</string>
     <string name="map_search_loc_button_text">搜索</string>
     <string name="map_no_location_found">没有找到相似的地址</string>
     <string name="hint_input_text">在这里输入你想说的话...</string>
