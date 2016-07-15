@@ -92,16 +92,6 @@ public class ProposalListAdapter extends ChatNewMessageAdapter {
             bean.setHouseId(conversationObject.optString("house_id"));
             bean.setIs_read(true);
 
-            /*if (msg instanceof AVIMHouseMessage) {
-                AVIMHouseMessage houseInfoMessage = (AVIMHouseMessage) msg;
-
-                boolean others = messageSentByOthers(houseInfoMessage);
-                conView = createViewByType(houseInfoMessage.getMessageType(), others);
-
-                initHouseMessageView(conView, houseInfoMessage, others);
-
-                bean.setMessage("[房源信息]");
-            } else*/
             if (msg instanceof AVIMTypedMessage) {
                 AVIMTypedMessage typedMessage = (AVIMTypedMessage) msg;
 
@@ -111,6 +101,8 @@ public class ProposalListAdapter extends ChatNewMessageAdapter {
                 initReservedMessageView(conView, position, typedMessage, others, bean);
             }
         }
+
+        setSendTimeView(conView, position, msg);
 //        activity.registerForContextMenu(contentLayout);
 
         return conView;

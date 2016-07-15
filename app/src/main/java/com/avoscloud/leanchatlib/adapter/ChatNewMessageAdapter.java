@@ -116,23 +116,20 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
 
             if (msg instanceof AVIMHouseMessage) {
                 AVIMHouseMessage houseInfoMessage = (AVIMHouseMessage) msg;
-
                 boolean others = messageSentByOthers(houseInfoMessage);
                 conView = createViewByType(houseInfoMessage.getMessageType(), others);
-
                 initHouseMessageView(conView, houseInfoMessage, others);
-
                 bean.setMessage("[房源信息]");
-            } else if (msg instanceof AVIMTypedMessage) {
+            }
+            else if (msg instanceof AVIMTypedMessage) {
                 AVIMTypedMessage typedMessage = (AVIMTypedMessage) msg;
-
                 boolean others = messageSentByOthers(typedMessage);
                 conView = createViewByType(AVIMReservedMessageType.getAVIMReservedMessageType(typedMessage.getMessageType()), others);
-
                 initReservedMessageView(conView, position, typedMessage, others, bean);
             }
         }
 
+        setSendTimeView(conView, position, msg);
         ImageView avatar = ButterKnife.findById(conView, R.id.avatar);
 
         // TODO: 16/7/11 use real avatar link instead
@@ -190,8 +187,25 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         activity.registerForContextMenu(houseView);
     }
 
-    protected void initReservedMessageView(View conView, int position, AVIMTypedMessage msg, boolean isComMsg, Message message) {
+    /**
+     * 设置时间显示栏
+     * @param conView
+     * @param position
+     * @param msg
+     */
+    protected void setSendTimeView(View conView, int position, AVIMMessage msg) {
         TextView sendTimeView = ViewHolder.findViewById(conView, R.id.sendTimeView);
+        if (position == 0 || DateUtil.haveTimeGap(datas.get(position - 1).getTimestamp(),
+                msg.getTimestamp())) {
+            sendTimeView.setVisibility(View.VISIBLE);
+            sendTimeView.setText(DateUtil.getDate(msg.getTimestamp()));
+        } else {
+            sendTimeView.setVisibility(View.GONE);
+        }
+    }
+
+    protected void initReservedMessageView(View conView, int position, AVIMTypedMessage msg, boolean isComMsg, Message message) {
+
         TextView contentView = ViewHolder.findViewById(conView, R.id.textContent);
         contentLayout = ViewHolder.findViewById(conView, R.id.contentLayout);
         ImageView imageView = ViewHolder.findViewById(conView, R.id.imageView);
@@ -214,14 +228,7 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 }
             });
         }
-        // timestamp
-        if (position == 0 || DateUtil.haveTimeGap(datas.get(position - 1).getTimestamp(),
-                msg.getTimestamp())) {
-            sendTimeView.setVisibility(View.VISIBLE);
-            sendTimeView.setText(DateUtil.getDate(msg.getTimestamp()));
-        } else {
-            sendTimeView.setVisibility(View.GONE);
-        }
+
 
         UserInfo user = ChatManager.getInstance().getUserInfoFactory().getUserInfoById(msg.getFrom());
         if (user == null) {
