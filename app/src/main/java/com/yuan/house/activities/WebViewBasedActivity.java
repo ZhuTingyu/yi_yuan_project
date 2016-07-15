@@ -80,6 +80,11 @@ import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventList
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -87,6 +92,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -350,7 +356,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             List<String> path = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
 
             // TODO: 16/6/10 invoke upload process
-            //uploadMultiPartFiles(path);
+            //nativeUploadMultiPartFiles(path);
 
             Fragment fragment = getFragment(Constants.kFragmentTagProposal);
             if (fragment != null) {
@@ -543,7 +549,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                             public void done(AVIMMessage avimMessage, AVIMException e) {
                                 if (avimMessage == null) return;
 
-                                AVIMTypedMessage message = (AVIMTypedMessage)avimMessage;
+                                AVIMTypedMessage message = (AVIMTypedMessage) avimMessage;
 
                                 JSONObject object = new JSONObject();
 
@@ -660,8 +666,10 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         setRightItem(text, onRightItemClick);
     }
 
-    public void onBridgeUploadFiles(List<String> datum) {
-        uploadMultiPartFiles(datum);
+    public void onBridgeUploadFiles(String datum, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+        // TODO: 16/7/14 parse datum
+
+        nativeUploadImageFiles(datum, jsCallback);
     }
 
     public void onBridgeResizeOrCropImage() {
@@ -806,13 +814,36 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         return params;
     }
 
+    private HttpEntity constructImageEntity(JSONObject datum) {
+        String path = datum.optString("imageName");
+        JSONArray sizes = datum.optJSONArray("imageSize");
+
+        // loopj android async http support add byte[] as RequestParam item to submit multipart data
+        byte[] data = ImageUtil.compressToByteArray(path);
+
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+
+        ByteArrayBody fileBody = new ByteArrayBody(data, "abc.jpg");
+        StringBody sizeBody = null;
+        try {
+            sizeBody = new StringBody(sizes.toString());
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        builder.addPart("file", fileBody);
+        builder.addPart("size", sizeBody);
+
+        return builder.build();
+    }
+
     @Override
     public void onUploadProposalAudio(String data) {
 //        if (msg_type == ProposalMediaType.AUDIO)
 //            this.duration = MediaPlayer.create(this, Uri.parse(data)).getDuration();
         List<String> datum = new ArrayList<>();
         datum.add(data);
-        uploadMultiPartFiles(datum);
+        nativeUploadMultiPartFiles(datum);
     }
 
     /**
@@ -820,7 +851,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
      *
      * @param filenames
      */
-    private void uploadMultiPartFiles(List<String> filenames) {
+    private void nativeUploadMultiPartFiles(List<String> filenames) {
         RequestParams entity = constructMultiPartParams(filenames);
 
         WebService.getInstance().postMultiPartFormDataFile(entity, new JsonHttpResponseHandler() {
@@ -838,6 +869,50 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 ToastUtil.showShort(mContext, "提交失败");
             }
         });
+    }
+
+    private void nativeUploadImageFiles(String params, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+        JSONArray filePaths;
+        JSONArray sizes;
+
+        try {
+            JSONObject object = new JSONObject(params);
+
+            filePaths = object.optJSONArray("imgs");
+            sizes = object.optJSONArray("size");
+
+            for (int i = 0; i < filePaths.length(); i++) {
+                JSONObject param = new JSONObject();
+                param.put("imageName", filePaths.get(i).toString());
+                param.put("imageSize", sizes);
+
+                HttpEntity entity = constructImageEntity(param);
+// TODO: 16/7/15 use queue to upload files
+                WebService.getInstance().postMultiPartFormImageFile(entity, new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        super.onSuccess(statusCode, headers, response);
+
+                        JSONArray ret = new JSONArray();
+                        ret.put(response);
+
+                        jsCallback.callback(ret.toString());
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                        super.onFailure(statusCode, headers, throwable, errorResponse);
+
+                        JSONArray ret = new JSONArray();
+                        ret.put(errorResponse);
+
+                        jsCallback.callback(ret.toString());
+                    }
+                });
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

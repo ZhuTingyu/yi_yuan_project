@@ -10,9 +10,13 @@ import com.yuan.house.activities.MainActivity;
 import com.yuan.house.common.Constants;
 import com.yuan.house.event.NotificationEvent;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Iterator;
+
 import de.greenrobot.event.EventBus;
+import timber.log.Timber;
 
 /**
  * Created by Alsor Zhou on 16/6/30.
@@ -23,25 +27,24 @@ public class PushReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        try {
+            String action = intent.getAction();
+            String channel = intent.getExtras().getString("com.avos.avoscloud.Channel");
+            //获取消息内容
+            JSONObject json = new JSONObject(intent.getExtras().getString("com.avos.avoscloud.Data"));
 
-//        try {
-//            String action = intent.getAction();
-//            String channel = intent.getExtras().getString("com.avos.avoscloud.Channel");
-//            //获取消息内容
-//            JSONObject json = new JSONObject(intent.getExtras().getString("com.avos.avoscloud.Data"));
-//
-//            Timber.d("got action " + action + " on channel " + channel + " with:");
-//            Iterator itr = json.keys();
-//            while (itr.hasNext()) {
-//                String key = (String) itr.next();
-//                Timber.d("..." + key + " => " + json.getString(key));
-//            }
-//
-//            // handle push notification and dispatch
-//            dispatch(json);
-//        } catch (JSONException e) {
-//            Timber.d("JSONException: " + e.getMessage());
-//        }
+            Timber.d("got action " + action + " on channel " + channel + " with:");
+            Iterator itr = json.keys();
+            while (itr.hasNext()) {
+                String key = (String) itr.next();
+                Timber.d("..." + key + " => " + json.getString(key));
+            }
+
+            // handle push notification and dispatch
+            dispatch(json);
+        } catch (JSONException e) {
+            Timber.d("JSONException: " + e.getMessage());
+        }
     }
 
     /**

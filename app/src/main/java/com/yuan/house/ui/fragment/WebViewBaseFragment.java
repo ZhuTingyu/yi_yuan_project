@@ -22,7 +22,6 @@ import android.webkit.WebStorage;
 import android.webkit.WebView;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 import com.avoscloud.chat.ui.chat.ChatRoomActivity;
 import com.baidu.location.BDLocation;
 import com.dimo.utils.StringUtil;
@@ -719,10 +718,8 @@ public class WebViewBaseFragment extends Fragment {
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 mCallback = jsCallback;
 
-                List<String> datum = JSON.parseObject(data, new TypeReference<List<String>>() {
-                });
                 if (mBridgeListener != null) {
-                    mBridgeListener.onBridgeUploadFiles(datum);
+                    mBridgeListener.onBridgeUploadFiles(data, jsCallback);
                 }
             }
         });
@@ -942,10 +939,10 @@ public class WebViewBaseFragment extends Fragment {
                 }
             }
         });
-
     }
 
     public void onEvent(BridgeCallbackEvent event) {
+        // TODO: 16/7/14 加一个参数 result.refreshAll = true | false;
         getBridge().callHandler("onLastMessageChangeByHouse", event.getHolder());
     }
 
@@ -1049,7 +1046,7 @@ public class WebViewBaseFragment extends Fragment {
 
         void onBridgeSetRightItem(String text, View.OnClickListener onRightItemClick);
 
-        void onBridgeUploadFiles(List<String> datum);
+        void onBridgeUploadFiles(String datum, WebViewJavascriptBridge.WVJBResponseCallback jsCallback);
 
         void onBridgeResizeOrCropImage();
 

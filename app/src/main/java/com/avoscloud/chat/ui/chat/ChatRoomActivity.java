@@ -437,7 +437,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                     JSONObject object;
                     JSONObject houseInfo;
                     try {
-                        object = (JSONObject) response.get(0);
+                        object = (JSONObject) response.get(i);
                         houseInfo = object.getJSONObject("house_info");
                         houseInfos.add(houseInfo);
                     } catch (JSONException e) {
@@ -529,7 +529,12 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                 }
                 case kRequestCodeSwitchHouse: {
                     String raw = data.getStringExtra(Constants.kBundleKeyAfterSwitchHouseSelected);
-                    JSONObject object = switchHouse(raw);
+                    JSONObject object = null;
+                    try {
+                        object = switchHouse(raw);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
 
                     getWebViewFragment().getBridge().callHandler("nativeChangeHouse", object.optString("id"));
                     break;
@@ -578,24 +583,29 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
     @Override
     public void onWebChangeHouse(String data) {
-        switchHouse(data);
+        try {
+            switchHouse(data);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
-    private JSONObject switchHouse(String data) {
-        JSONObject object = null;
-        for (int i = 0; i < houseInfos.size(); i++) {
-            object = houseInfos.get(i);
+    private JSONObject switchHouse(String data) throws JSONException {
+//        JSONObject object = null;
+//        for (int i = 0; i < houseInfos.size(); i++) {
+//            object = houseInfos.get(i);
+//
+//            String houseId = null;
+//            if (object.optString("id") != null) {
+//                houseId = object.optString("id");
+//            }
+//
+//            if (data.equals(houseId)) return null;
+//        }
+//
+//        if (object == null) return null;
 
-            String houseId = null;
-            if (object.optString("id") != null) {
-                houseId = object.optString("id");
-            }
-
-            if (data.equals(houseId)) return null;
-        }
-
-        if (object == null) return null;
-
+        JSONObject object = new JSONObject(data);
         cachedHouseIdForCurrentConv = object.optString("id");
 
         JSONArray images = object.optJSONArray("images");
@@ -617,7 +627,6 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         message.setAttrs(attrs);
 
         messageAgent.sendEncapsulatedTypedMessage(message);
-
 
         return object;
     }

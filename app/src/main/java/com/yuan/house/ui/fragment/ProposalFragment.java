@@ -593,7 +593,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
             case 450:
             case 401: {
                 // 重新登录
-                EventBus.getDefault().post(NotificationEvent.fromType(10, null));
+                EventBus.getDefault().post(new NotificationEvent(NotificationEvent.NotificationEventEnum.KICK_OUT, null));
             }
             break;
             default:

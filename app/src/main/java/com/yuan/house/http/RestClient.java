@@ -237,7 +237,7 @@ public class RestClient {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject response) {
                 if (statusCode == kHttpStatusCodeErrorKickOut) {
-                    EventBus.getDefault().post(NotificationEvent.fromType(10, null));
+                    EventBus.getDefault().post(new NotificationEvent(NotificationEvent.NotificationEventEnum.KICK_OUT, null));
                     return;
                 }
 
