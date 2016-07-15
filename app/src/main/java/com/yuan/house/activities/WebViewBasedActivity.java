@@ -380,10 +380,12 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             startActivityForResult(intent, kActivityRequestCodeImageCrop);
         } else if (requestCode == kActivityRequestCodeImageCrop) {
             // handle cropped image
-            String path = data.getStringExtra("data");
-            JSONArray datum = new JSONArray();
-            datum.put(path);
-            mBridgeCallback.callback(datum.toString());
+            if (data != null) {
+                String path = data.getStringExtra("data");
+                JSONArray datum = new JSONArray();
+                datum.put(path);
+                mBridgeCallback.callback(datum.toString());
+            }
         } else if (requestCode == kActivityRequestCodeSelectMapLocation) {
             Timber.v("kActivityRequestCodeSelectMapLocation");
             // reverse callback the selected map location
