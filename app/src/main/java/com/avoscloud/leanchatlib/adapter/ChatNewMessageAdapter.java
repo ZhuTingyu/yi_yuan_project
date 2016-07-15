@@ -109,7 +109,8 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
 
         boolean others = false;
 
-        if (conView == null) {
+        //if (conView == null)
+        {
             Message bean = new Message();
             // FIXME: 16/6/27 date format error
             bean.setDate(String.valueOf(msg.getTimestamp()));
