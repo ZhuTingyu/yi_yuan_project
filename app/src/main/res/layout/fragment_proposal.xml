@@ -106,7 +106,8 @@
             android:dividerHeight="5dp"
             android:listSelector="@android:color/transparent"
             android:scrollbarStyle="outsideOverlay"
-            android:stackFromBottom="true" />
+            android:stackFromBottom="true"
+            android:transcriptMode="alwaysScroll"/>
 
 
         <View

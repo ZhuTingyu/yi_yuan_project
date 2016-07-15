@@ -529,7 +529,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
     }
 
     private void scrollToLast() {
-        if (xListView.getAdapter().getCount() <= 0) {
+        /*if (xListView.getAdapter().getCount() <= 0) {
             return;
         }
 
@@ -538,7 +538,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
             public void run() {
                 xListView.smoothScrollToPosition(xListView.getAdapter().getCount() - 1);
             }
-        });
+        });*/
     }
 
     private void addData2Adapter(ProposalInfo data, boolean order) {
