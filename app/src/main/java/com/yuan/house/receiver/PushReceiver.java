@@ -23,10 +23,11 @@ import timber.log.Timber;
  */
 
 public class PushReceiver extends BroadcastReceiver {
-    Context context;
+    Context mContext;
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        mContext = context;
         try {
             String action = intent.getAction();
             String channel = intent.getExtras().getString("com.avos.avoscloud.Channel");
@@ -54,12 +55,19 @@ public class PushReceiver extends BroadcastReceiver {
      */
     private void dispatch(JSONObject object) {
         int msgType = object.optInt("msg_type");
-        JSONObject holder = object.optJSONObject("holder");
+        String raw = object.optString("holder");
 
-        EventBus.getDefault().post(NotificationEvent.fromType(msgType, holder));
+        JSONObject holder;
+        try {
+            holder = new JSONObject(raw);
+
+            EventBus.getDefault().post(NotificationEvent.fromType(msgType, holder));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         if (msgType == NotificationEvent.NotificationEventEnum.NOTICE_MESSAGE.getValue()) {
-            Utils.notifyMsg(context, MainActivity.class, PackageUtil.getAppLable(context), null, object.optString("alert"), Constants.kNotifyId);
+            Utils.notifyMsg(mContext, MainActivity.class, PackageUtil.getAppLable(mContext), null, object.optString("alert"), Constants.kNotifyId);
         }
     }
 }
