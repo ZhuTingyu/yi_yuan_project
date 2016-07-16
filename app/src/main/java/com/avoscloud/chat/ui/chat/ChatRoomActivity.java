@@ -26,7 +26,6 @@ import android.widget.TextView;
 
 import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.AVIMException;
-import com.avos.avoscloud.im.v2.AVIMReservedMessageType;
 import com.avos.avoscloud.im.v2.AVIMTypedMessage;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
 import com.avos.avoscloud.im.v2.messages.AVIMAudioMessage;
@@ -43,6 +42,7 @@ import com.avoscloud.leanchatlib.model.AVIMHouseMessage;
 import com.dimo.utils.DateUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.yuan.house.HouseMessageType;
 import com.yuan.house.R;
 import com.yuan.house.activities.SwitchHouseActivity;
 import com.yuan.house.common.Constants;
@@ -337,7 +337,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                     return;
 
                 AVIMTypedMessage msg = adapter.getDatas().get(adapter.getDatas().size() - 1);
-                AVIMReservedMessageType type = AVIMReservedMessageType.getAVIMReservedMessageType(msg.getMessageType());
+                HouseMessageType type = HouseMessageType.getMessageType(msg.getMessageType());
 
                 String resultMessage = "";
                 long date = 0;
@@ -362,6 +362,11 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                         date = locMsg.getTimestamp();
                         resultMessage = "[位置]";
                         break;
+                    case HouseMessageType:
+                        AVIMHouseMessage houseMsg = (AVIMHouseMessage) msg;
+                        date = houseMsg.getTimestamp();
+                        resultMessage = "[房源]";
+
                     default:
                         break;
                 }
