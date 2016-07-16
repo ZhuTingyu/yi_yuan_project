@@ -322,6 +322,20 @@ public class WebViewBaseFragment extends Fragment {
             }
         });
 
+        getBridge().registerHandler("showErrorMsg", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
+                Timber.v("showErrorMsg" + data);
+
+                try {
+                    JSONObject object = new JSONObject(data);
+                    mBridgeListener.onBridgeShowErrorMessage(object);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
         getBridge().registerHandler("updatePackage", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
@@ -1078,5 +1092,7 @@ public class WebViewBaseFragment extends Fragment {
         void onBridgeShowActionSheet(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback);
 
         void onBridgeGetRecentChatList(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback);
+
+        void onBridgeShowErrorMessage(JSONObject data);
     }
 }

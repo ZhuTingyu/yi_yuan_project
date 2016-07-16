@@ -445,6 +445,12 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         }
     }
 
+    @Override
+    public void onBridgeShowErrorMessage(JSONObject data) {
+        // TODO: 16/7/17 加上错误样式
+        ToastUtil.showShort(this, data.optString("msg"));
+    }
+
     public void onBridgeSelectImageFromNative(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
         mBridgeCallback = callback;
 
@@ -652,7 +658,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
     public void onBridgeDismissProgressDialog() {
         if (mLoadingDialog != null) {
-            mLoadingDialog.hide();
+            mLoadingDialog.dismiss();
         }
     }
 
