@@ -943,7 +943,14 @@ public class WebViewBaseFragment extends Fragment {
 
     public void onEvent(BridgeCallbackEvent event) {
         // TODO: 16/7/14 加一个参数 result.refreshAll = true | false;
-        getBridge().callHandler("onLastMessageChangeByHouse", event.getHolder());
+        try {
+            JSONObject object = new JSONObject(event.getHolder());
+            object.put("refreshAll", true);
+
+            getBridge().callHandler("onLastMessageChangeByHouse", object.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
