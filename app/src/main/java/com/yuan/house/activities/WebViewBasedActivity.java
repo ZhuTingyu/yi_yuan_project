@@ -488,21 +488,8 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         }
     }
 
-    public void onBridgeShowSearchBar() {
-        EditText searchBar = setTitleSearch();
-        searchBar.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    String content = v.getText().toString();
-                    if (!TextUtils.isEmpty(content)) {
-                        getWebViewFragment().getBridge().callHandler("searchContent", content);
-                    }
-                    return true;
-                }
-                return false;
-            }
-        });
+    public void onBridgeShowSearchBar(String data) {
+        setTitleSearch();
     }
 
     @Override

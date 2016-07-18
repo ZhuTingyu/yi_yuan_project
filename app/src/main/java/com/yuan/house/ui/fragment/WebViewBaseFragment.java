@@ -12,14 +12,18 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebStorage;
 import android.webkit.WebView;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
 import com.avoscloud.chat.ui.chat.ChatRoomActivity;
@@ -910,8 +914,71 @@ public class WebViewBaseFragment extends Fragment {
         getBridge().registerHandler("showSearchBar", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                if (mBridgeListener != null) {
-                    mBridgeListener.onBridgeShowSearchBar();
+                EditText searchBar = ButterKnife.findById(getActivity(), R.id.search_bar);
+                if (searchBar == null) {
+                    searchBar = ButterKnife.findById(getActivity(), R.id.et_search);
+                    if (mBridgeListener != null) {
+                        mBridgeListener.onBridgeShowSearchBar(data);
+                    }
+                }
+
+                searchBar.setSingleLine();
+                searchBar.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
+
+                if (TextUtils.isEmpty(data)) {
+                    searchBar.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                        @Override
+                        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                                String content = v.getText().toString();
+                                if (!TextUtils.isEmpty(content)) {
+                                    getBridge().callHandler("searchContent", content);
+                                }
+                                return true;
+                            }
+                            return false;
+                        }
+                    });
+                } else {
+                    JSONObject object = null;
+                    try {
+                        object = new JSONObject(data);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    String placeholder = object.optString("placeholder");
+                    if (!TextUtils.isEmpty(placeholder)) {
+                        searchBar.setHint(placeholder);
+                    }
+
+                    String type = object.optString("inputOrButton");
+                    if ("button".equals(type)) {
+                        searchBar.setFocusable(false);
+                        searchBar.setClickable(true);
+
+                        searchBar.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                // 如果是 button 类型的, 则直接点击直接回调 searchContent
+                                getBridge().callHandler("searchContent");
+                            }
+                        });
+                    } else {
+                        searchBar.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                            @Override
+                            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                                    String content = v.getText().toString();
+                                    if (!TextUtils.isEmpty(content)) {
+                                        getBridge().callHandler("searchContent", content);
+                                    }
+                                    return true;
+                                }
+                                return false;
+                            }
+                        });
+                    }
                 }
             }
         });
@@ -1053,7 +1120,7 @@ public class WebViewBaseFragment extends Fragment {
 
         void onBridgeReplaceLink(String url, JSONObject object);
 
-        void onBridgeShowSearchBar();
+        void onBridgeShowSearchBar(String object);
 
         void onBridgeLogout();
 

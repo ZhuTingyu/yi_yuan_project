@@ -2,13 +2,9 @@ package com.yuan.house.ui.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.dimo.web.WebViewJavascriptBridge;
@@ -56,25 +52,6 @@ public class AgencyMessageFragment extends WebViewBaseFragment {
         super.onViewCreated(view, savedInstanceState);
 
         registerHandle();
-
-        EditText searchBar = ButterKnife.findById(view, R.id.search_bar);
-        searchBar.setSingleLine();
-        searchBar.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
-
-        searchBar.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    String content = v.getText().toString();
-                    if (!TextUtils.isEmpty(content)) {
-                        getBridge().callHandler("searchContent", content);
-                    }
-                    return true;
-                }
-                return false;
-            }
-        });
-
     }
 
     @Override
