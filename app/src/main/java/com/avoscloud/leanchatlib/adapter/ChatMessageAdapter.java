@@ -40,12 +40,12 @@ import butterknife.ButterKnife;
 /**
  * Created by edwardliu on 16/6/30.
  */
-public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
+public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
 
     protected org.json.JSONObject conversationObject;
     private ConversationType conversationType;
     private int msgViewTypes = 9;
-    private ChatNewMessageAdapter.ClickListener clickListener;
+    private ChatMessageAdapter.ClickListener clickListener;
     private Context context;
 
     private View contentLayout;
@@ -53,7 +53,7 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     private Activity activity;
     String peerAvatar;
 
-    public ChatNewMessageAdapter(Context context, ConversationType conversationType, org.json.JSONObject object) {
+    public ChatMessageAdapter(Context context, ConversationType conversationType, org.json.JSONObject object) {
         super(context);
 
         this.context = context;
@@ -63,8 +63,12 @@ public class ChatNewMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         peerAvatar = object.optString("avatar");
     }
 
-    public void setClickListener(ChatNewMessageAdapter.ClickListener clickListener) {
+    public void setClickListener(ChatMessageAdapter.ClickListener clickListener) {
         this.clickListener = clickListener;
+    }
+
+    public void updatePeerAvatar(String url) {
+        peerAvatar = url;
     }
 
     @Override

@@ -27,7 +27,7 @@ import com.avos.avoscloud.im.v2.messages.AVIMImageMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMLocationMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
 import com.avoscloud.leanchatlib.activity.ImageBrowserActivity;
-import com.avoscloud.leanchatlib.adapter.ChatNewMessageAdapter;
+import com.avoscloud.leanchatlib.adapter.ChatMessageAdapter;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.MessageHelper;
 import com.avoscloud.leanchatlib.model.ConversationType;
@@ -237,7 +237,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
     private void bindAdapterToListView() {
         adapter = new ProposalListAdapter((Context) mBridgeListener, ConversationType.Single, new JSONObject());
         adapter.setCurrentDatas(category);
-        adapter.setClickListener(new ChatNewMessageAdapter.ClickListener() {
+        adapter.setClickListener(new ChatMessageAdapter.ClickListener() {
             @Override
             public void onFailButtonClick(AVIMTypedMessage msg) {
                 // messageAgent.resendMsg(msg, defaultSendCallback);

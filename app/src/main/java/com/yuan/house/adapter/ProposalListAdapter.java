@@ -11,7 +11,7 @@ import com.avos.avoscloud.im.v2.AVIMReservedMessageType;
 import com.avos.avoscloud.im.v2.AVIMTypedMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMAudioMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMImageMessage;
-import com.avoscloud.leanchatlib.adapter.ChatNewMessageAdapter;
+import com.avoscloud.leanchatlib.adapter.ChatMessageAdapter;
 import com.avoscloud.leanchatlib.model.ConversationType;
 import com.avoscloud.leanchatlib.view.PlayButton;
 import com.dimo.utils.DateUtil;
@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * Created by monst on 16/7/3.
  */
-public class ProposalListAdapter extends ChatNewMessageAdapter {
+public class ProposalListAdapter extends ChatMessageAdapter {
 
     protected List<AVIMTypedMessage> datasProposal = new ArrayList<AVIMTypedMessage>();
     protected List<AVIMTypedMessage> datasSuggestion = new ArrayList<AVIMTypedMessage>();

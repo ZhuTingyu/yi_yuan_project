@@ -300,9 +300,17 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                 super.onSuccess(statusCode, headers, response);
 
                 // TODO: 16/7/11 update activity title
-                setTitleItem("");
+                JSONObject to = response.optJSONObject("to");
+                String name = to.optString("name");
+                setTitleItem(name);
 
-                // TODO: 16/7/11 update adapter incoming avatar
+                String avatar = to.optString("avatar");
+
+                // TODO: 16/7/11 update mMessageAdapter incoming avatar
+                if (!TextUtils.isEmpty(avatar)) {
+                    mMessageAdapter.updatePeerAvatar(avatar);
+                    mMessageAdapter.notifyDataSetChanged();
+                }
             }
 
             @Override
@@ -334,15 +342,15 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
     // TODO: 16/6/6 WTF ???
     private void doOtherStuff() {
-        adapter.registerDataSetObserver(new DataSetObserver() {
+        mMessageAdapter.registerDataSetObserver(new DataSetObserver() {
             @Override
             public void onChanged() {
                 super.onChanged();
 
-                if (adapter.getDatas().size() == 0)
+                if (mMessageAdapter.getDatas().size() == 0)
                     return;
 
-                AVIMTypedMessage msg = adapter.getDatas().get(adapter.getDatas().size() - 1);
+                AVIMTypedMessage msg = mMessageAdapter.getDatas().get(mMessageAdapter.getDatas().size() - 1);
                 HouseMessageType type = HouseMessageType.getMessageType(msg.getMessageType());
 
                 String resultMessage = "";

@@ -36,7 +36,7 @@ import com.avos.avoscloud.im.v2.messages.AVIMLocationMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
 import com.avoscloud.leanchatlib.adapter.ChatEmotionGridAdapter;
 import com.avoscloud.leanchatlib.adapter.ChatEmotionPagerAdapter;
-import com.avoscloud.leanchatlib.adapter.ChatNewMessageAdapter;
+import com.avoscloud.leanchatlib.adapter.ChatMessageAdapter;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.ConversationHelper;
 import com.avoscloud.leanchatlib.controller.EmotionHelper;
@@ -93,7 +93,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
     protected MessageAgent.SendCallback defaultSendCallback = new DefaultSendCallback();
     protected EventBus eventBus;
     protected ChatManager chatManager = ChatManager.getInstance();
-    protected ChatNewMessageAdapter adapter;
+    protected ChatMessageAdapter mMessageAdapter;
     protected RoomsTable roomsTable;
     protected View chatTextLayout, chatAddLayout;
     protected LinearLayout chatEmotionLayout;
@@ -256,8 +256,8 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 // TODO: 16/6/27 长按聊天消息显示『转发/复制』的 ContextMenu
-                AVIMTypedMessage message = (AVIMTypedMessage) adapter.getItem(position - 1);
-                int type = adapter.getItemViewType(position - 1);
+                AVIMTypedMessage message = (AVIMTypedMessage) mMessageAdapter.getItem(position - 1);
+                int type = mMessageAdapter.getItemViewType(position - 1);
                 if (type == 0 || type == 1) {
                     AVIMTextMessage textMessage = (AVIMTextMessage) message;
                     mChatMessage = textMessage.getText();
@@ -379,8 +379,8 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
     }
 
     private void bindAdapterToListView(ConversationType conversationType, JSONObject object) {
-        adapter = new ChatNewMessageAdapter(this, conversationType, object);
-        adapter.setClickListener(new ChatNewMessageAdapter.ClickListener() {
+        mMessageAdapter = new ChatMessageAdapter(this, conversationType, object);
+        mMessageAdapter.setClickListener(new ChatMessageAdapter.ClickListener() {
 
             @Override
             public void onFailButtonClick(AVIMTypedMessage msg) {
@@ -439,7 +439,7 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
             }
 
         });
-        xListView.setAdapter(adapter);
+        xListView.setAdapter(mMessageAdapter);
     }
 
     private void putJson2LeanChat(String json, String text) {
@@ -665,16 +665,16 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
             long time;
             if (loadHistory == false) {
                 time = maxTime;
-                int count = adapter.getCount();
+                int count = mMessageAdapter.getCount();
                 if (count > PAGE_SIZE) {
                     limit = count;
                 } else {
                     limit = PAGE_SIZE;
                 }
             } else {
-                if (adapter.getDatas().size() > 0) {
-                    msgId = adapter.getDatas().get(0).getMessageId();
-                    AVIMTypedMessage firstMsg = adapter.getDatas().get(0);
+                if (mMessageAdapter.getDatas().size() > 0) {
+                    msgId = mMessageAdapter.getDatas().get(0).getMessageId();
+                    AVIMTypedMessage firstMsg = mMessageAdapter.getDatas().get(0);
                     time = firstMsg.getTimestamp();
                 } else {
                     time = maxTime;
@@ -693,15 +693,15 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
                     xListView.stopRefresh();
                 }
                 if (loadHistory == false) {
-                    adapter.setDatas(msgs);
-                    adapter.notifyDataSetChanged();
+                    mMessageAdapter.setDatas(msgs);
+                    mMessageAdapter.notifyDataSetChanged();
                     scrollToLast();
                 } else {
                     List<AVIMTypedMessage> newMsgs = new ArrayList<AVIMTypedMessage>();
                     newMsgs.addAll(msgs);
-                    newMsgs.addAll(adapter.getDatas());
-                    adapter.setDatas(newMsgs);
-                    adapter.notifyDataSetChanged();
+                    newMsgs.addAll(mMessageAdapter.getDatas());
+                    mMessageAdapter.setDatas(newMsgs);
+                    mMessageAdapter.notifyDataSetChanged();
                     if (msgs.size() > 0) {
                         xListView.setSelection(msgs.size() - 1);
                     } else {
