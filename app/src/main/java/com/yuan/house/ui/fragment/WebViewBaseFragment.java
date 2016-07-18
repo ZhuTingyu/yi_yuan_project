@@ -79,6 +79,7 @@ public class WebViewBaseFragment extends Fragment {
     HashMap<String, String> additionalHttpHeaders;
     Calendar calendar;
     Unbinder unbinder;
+    private PickerPopWindow pickPopWin;
 
     public HashMap<String, String> getAdditionalHttpHeaders() {
         return additionalHttpHeaders;
@@ -796,6 +797,9 @@ public class WebViewBaseFragment extends Fragment {
         getBridge().registerHandler("showPickerView", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                // ignore if picker already shown
+                if (pickPopWin == null) return;
+
                 ArrayList item1 = new ArrayList();
                 ArrayList item2 = new ArrayList();
                 ArrayList item3 = new ArrayList();
@@ -827,7 +831,8 @@ public class WebViewBaseFragment extends Fragment {
                     e.printStackTrace();
                 }
 
-                PickerPopWindow pickPopWin = new PickerPopWindow(getActivity(), item1, item2, item3, selection, new PickerPopWindow.OnPickCompletedListener() {
+                // ignore if there already has pickers
+                pickPopWin = new PickerPopWindow(getActivity(), item1, item2, item3, selection, new PickerPopWindow.OnPickCompletedListener() {
                     @Override
                     public void onAddressPickCompleted(String item1, String item2, String item3) {
                         JSONArray jsonArray = new JSONArray();
