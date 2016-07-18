@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -282,9 +281,6 @@ public class BaseFragmentActivity extends FragmentActivity {
         if (mTopBar.findViewById(R.id.topbar_title_button).getVisibility() == View.VISIBLE) {
             mTopBar.findViewById(R.id.topbar_title_button).setVisibility(View.GONE);
         }
-
-        searchBar.setSingleLine();
-        searchBar.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
 
         searchBar.setVisibility(View.VISIBLE);
 

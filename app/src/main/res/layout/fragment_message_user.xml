@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <RelativeLayout
         android:id="@+id/topbar"
@@ -13,14 +14,14 @@
             android:id="@+id/contacts"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
             android:layout_marginLeft="15dp"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/btn_addressbook"/>
+                android:src="@drawable/btn_addressbook" />
 
         </LinearLayout>
 
@@ -28,22 +29,23 @@
             android:id="@+id/rl_center"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
             android:layout_centerInParent="true"
-            android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
             android:layout_marginLeft="80dp"
             android:layout_marginRight="80dp"
-            android:gravity="center_vertical">
+            android:layout_marginTop="5dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <EditText
+                android:id="@+id/search_bar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:textSize="16dp"
+                android:background="@drawable/bg_input_box"
                 android:drawableLeft="@drawable/img_search"
                 android:hint="@string/hint_input_search"
-                android:background="@drawable/bg_input_box"
-                android:textColor="@color/white"/>
+                android:textColor="@color/white"
+                android:textSize="16dp" />
 
         </LinearLayout>
 
@@ -51,17 +53,17 @@
             android:id="@+id/sortBy"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
             android:layout_alignParentRight="true"
             android:layout_marginRight="15dp"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/rightItem"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="14dp"
-                android:textColor="@color/white"/>
+                android:textColor="@color/white"
+                android:textSize="14dp" />
 
         </LinearLayout>
     </RelativeLayout>
@@ -70,6 +72,6 @@
         android:id="@+id/webview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/topbar"/>
+        android:layout_below="@id/topbar" />
 
 </LinearLayout>
