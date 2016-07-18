@@ -65,7 +65,7 @@ public class InputMoreAdapter extends BaseAdapter {
         if (!TextUtils.isEmpty(text)) {
             TextView tv = (TextView) convertView;
             int resId = R.drawable.btn_core;
-            if (text.equals("核心合同")) {
+            if (text.equals("中心合同")) {
                 resId = R.drawable.btn_core;
                 tv.setTag("contract");
             } else if (text.equals("买卖合同")) {

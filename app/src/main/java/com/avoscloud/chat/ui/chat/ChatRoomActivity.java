@@ -264,7 +264,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 final String text = (String) mMoreAdapter.getItem(position);
                 int value = mMoreAdapter.getValue(position);
-                if (text.equals("核心合同")) {
+                if (text.equals("中心合同")) {
                     getWebViewFragment().getBridge().callHandler("ClickContractButton", Integer.toString(value));
                 } else if (text.equals("买卖合同")) {
                     getWebViewFragment().getBridge().callHandler("ClickContractButton", Integer.toString(value));
@@ -303,7 +303,6 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                 setTitleItem("");
 
                 // TODO: 16/7/11 update adapter incoming avatar
-
             }
 
             @Override
