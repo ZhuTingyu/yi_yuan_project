@@ -193,6 +193,13 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
         String peerUserName = jsonFormatParams.optString("name");
         if (!TextUtils.isEmpty(peerUserName)) {
+            // 更新显示用户身份
+            if ("agency".equals(jsonFormatParams.optString("type"))) {
+                peerUserName += " " + getString(R.string.user_type_agency);
+            } else {
+                peerUserName += " " + getString(R.string.user_type_user);
+            }
+
             setTitleItem(peerUserName);
         } else {
             requestAnonymousInfo();
