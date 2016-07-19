@@ -28,6 +28,7 @@ import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.MessageAgent;
 import com.avoscloud.leanchatlib.controller.MessageHelper;
+import com.avoscloud.leanchatlib.model.AVIMHouseMessage;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
@@ -597,6 +598,61 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         });
     }
 
+    private void sendHouseInfoMessage(String peerId, final JSONObject info) {
+        ChatManager.getInstance().fetchConversationWithUserId(info, peerId, new AVIMConversationCreatedCallback() {
+            @Override
+            public void done(AVIMConversation avimConversation, AVIMException e) {
+                AVIMHouseMessage message = new AVIMHouseMessage();
+
+                Map<String, Object> attrs = new HashMap<>();
+                attrs.put("houseId", info.optString("house_id"));
+                JSONArray images = info.optJSONArray("images");
+
+                if (images == null || images.length() == 0) {
+                    attrs.put("houseImage", null);
+                } else {
+                    attrs.put("houseImage", images.optString(0));
+                }
+
+                attrs.put("houseName", info.optString("title"));
+                attrs.put("houseAddress", info.optString("location_text"));
+                attrs.put("recommended", true);
+                attrs.put("recommendedId", info.optString("re_id"));
+
+                message.setAttrs(attrs);
+
+                MessageAgent messageAgent = new MessageAgent(avimConversation);
+                messageAgent.sendEncapsulatedTypedMessage(message);
+
+                // 发送成功之后需要缓存该条消息到本地
+                ChatManager.getInstance().storeLastMessage(message);
+            }
+        });
+    }
+
+    @Override
+    public void onBridgeSendRecommendedMessage(String data) {
+        JSONArray userArray = null;
+        JSONObject houseInfo = null;
+
+        JSONObject object;
+        try {
+            object = new JSONObject(data);
+            userArray = object.optJSONArray("data");
+            houseInfo = object.optJSONObject("house_info");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        assert userArray != null;
+
+        // send message to each receipt
+        for (int i = 0; userArray.length() > i; i++) {
+            sendHouseInfoMessage(userArray.optString(i), houseInfo);
+        }
+    }
+
+    @Override
     public void onBridgeSendNoticeMessage(final String data) {
         boolean isAgency = false;
 
