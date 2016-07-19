@@ -1,11 +1,11 @@
 package com.avoscloud.leanchatlib.controller;
 
-import com.avos.avoscloud.im.v2.AVIMReservedMessageType;
 import com.avos.avoscloud.im.v2.AVIMTypedMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMLocationMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
-import com.yuan.house.R;
 import com.avoscloud.leanchatlib.model.UserInfo;
+import com.yuan.house.HouseMessageType;
+import com.yuan.house.R;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class MessageHelper {
   }
 
   public static CharSequence outlineOfMsg(AVIMTypedMessage msg) {
-    AVIMReservedMessageType type = AVIMReservedMessageType.getAVIMReservedMessageType(msg.getMessageType());
+    HouseMessageType type = HouseMessageType.getMessageType(msg.getMessageType());
     switch (type) {
       case TextMessageType:
         return EmotionHelper.replace(ChatManager.getContext(), ((AVIMTextMessage) msg).getText());
@@ -45,6 +45,8 @@ public class MessageHelper {
         return bracket(ChatManager.getContext().getString(R.string.chat_position)) + address;
       case AudioMessageType:
         return bracket(ChatManager.getContext().getString(R.string.chat_audio));
+      case HouseMessageType:
+        return bracket(ChatManager.getContext().getString(R.string.chat_house));
     }
     return null;
   }

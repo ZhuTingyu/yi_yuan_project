@@ -323,8 +323,8 @@ public class ChatManager extends AVIMClientEventHandler {
         String leanId;
 
         String auditType = null;
-        String houseId = null;
-        String text = null;
+        String houseId = "";
+        String text;
 
         if (params != null) {
             auditType = params.optString("audit_type");
@@ -337,18 +337,12 @@ public class ChatManager extends AVIMClientEventHandler {
 
         // FIXME: 16/6/27 handle different message types
         HouseMessageType msgType = HouseMessageType.getMessageType(msg.getMessageType());
+        text = (String) MessageHelper.outlineOfMsg(msg);
+
         if (msgType == HouseMessageType.TextMessageType) {
             houseId = (String) ((AVIMTextMessage) msg).getAttrs().get("houseId");
-            text = ((AVIMTextMessage) msg).getText();
         } else if (msgType == HouseMessageType.HouseMessageType) {
             houseId = (String) ((AVIMHouseMessage) msg).getAttrs().get("houseId");
-            text = "[房源消息]";
-        } else if (msgType == HouseMessageType.ImageMessageType) {
-            houseId = "";
-            text = "[图片消息]";
-        } else if (msgType == HouseMessageType.AudioMessageType) {
-            houseId = "";
-            text = "[语音消息]";
         }
 
         MessageDao dao = DMApplication.getInstance().getMessageDao();
