@@ -139,8 +139,8 @@ public class BaseFragmentActivity extends FragmentActivity {
      * @param view
      */
     public void setRightItem(View view) {
-        mTopBar.findViewById(R.id.topbar_right_btn).setVisibility(View.GONE);
-        mTopBar.findViewById(R.id.topbar_right_textbtn).setVisibility(View.GONE);
+        mTopBar.findViewById(R.id.topbar_right_btn).setVisibility(View.INVISIBLE);
+        mTopBar.findViewById(R.id.topbar_right_textbtn).setVisibility(View.INVISIBLE);
     }
 
     /**
@@ -149,16 +149,13 @@ public class BaseFragmentActivity extends FragmentActivity {
      * @param resId
      */
     public void setRightItem(int resId, View.OnClickListener listener) {
-        mTopBar.findViewById(R.id.topbar_right_textbtn).setVisibility(View.GONE);
+        mTopBar.findViewById(R.id.topbar_right_textbtn).setVisibility(View.INVISIBLE);
 
         ImageButton item = (ImageButton) mTopBar.findViewById(R.id.topbar_right_btn);
         item.setVisibility(View.VISIBLE);
         item.setOnClickListener(listener);
 
         Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), resId);
-//        int h = drawable.getIntrinsicHeight();
-//        int w = drawable.getIntrinsicWidth();
-//        drawable.setBounds(0, 0, w, h);
 
         if (drawable != null) {
             item.setImageDrawable(drawable);
@@ -171,7 +168,7 @@ public class BaseFragmentActivity extends FragmentActivity {
      * @param title
      */
     public void setRightItem(String title, View.OnClickListener listener) {
-        mTopBar.findViewById(R.id.topbar_right_btn).setVisibility(View.GONE);
+        mTopBar.findViewById(R.id.topbar_right_btn).setVisibility(View.INVISIBLE);
 
         Button item = (Button) mTopBar.findViewById(R.id.topbar_right_textbtn);
         item.setOnClickListener(listener);
@@ -189,11 +186,11 @@ public class BaseFragmentActivity extends FragmentActivity {
      * @param view
      */
     protected void setLeftItem(View view) {
-        View item = (View) mTopBar.findViewById(R.id.topbar_left_btn);
-        mTopBar.findViewById(R.id.topbar_left_textbtn).setVisibility(View.GONE);
+        View item = mTopBar.findViewById(R.id.topbar_left_btn);
+        mTopBar.findViewById(R.id.topbar_left_textbtn).setVisibility(View.INVISIBLE);
 
         if (view == null) {
-            item.setVisibility(View.GONE);
+            item.setVisibility(View.INVISIBLE);
         } else {
             item.setVisibility(View.VISIBLE);
         }
@@ -206,7 +203,7 @@ public class BaseFragmentActivity extends FragmentActivity {
      */
     protected void setLeftItem(int resId, View.OnClickListener listener) {
         ImageButton item = (ImageButton) mTopBar.findViewById(R.id.topbar_left_btn);
-        mTopBar.findViewById(R.id.topbar_left_textbtn).setVisibility(View.GONE);
+        mTopBar.findViewById(R.id.topbar_left_textbtn).setVisibility(View.INVISIBLE);
 
         item.setVisibility(View.VISIBLE);
 
@@ -228,7 +225,7 @@ public class BaseFragmentActivity extends FragmentActivity {
      */
     protected void setLeftItem(String text, View.OnClickListener listener) {
         Button item = (Button) mTopBar.findViewById(R.id.topbar_left_textbtn);
-        mTopBar.findViewById(R.id.topbar_left_btn).setVisibility(View.GONE);
+        mTopBar.findViewById(R.id.topbar_left_btn).setVisibility(View.INVISIBLE);
 
         item.setVisibility(View.VISIBLE);
 
@@ -244,7 +241,7 @@ public class BaseFragmentActivity extends FragmentActivity {
      */
     protected void setLeftItem(int resId, String text, View.OnClickListener listener) {
         Button item = (Button) mTopBar.findViewById(R.id.topbar_left_textbtn);
-        mTopBar.findViewById(R.id.topbar_left_btn).setVisibility(View.GONE);
+        mTopBar.findViewById(R.id.topbar_left_btn).setVisibility(View.INVISIBLE);
 
         item.setVisibility(View.VISIBLE);
         item.setText(text);
@@ -270,16 +267,16 @@ public class BaseFragmentActivity extends FragmentActivity {
         textView.setVisibility(View.VISIBLE);
         textView.setText(getString(resId));
 
-        mTopBar.findViewById(R.id.topbar_title_button).setVisibility(View.GONE);
+        mTopBar.findViewById(R.id.topbar_title_button).setVisibility(View.INVISIBLE);
     }
 
     public EditText setTitleSearch() {
         EditText searchBar = (EditText) mTopBar.findViewById(R.id.et_search);
         if (mTopBar.findViewById(R.id.topbar_title_item).getVisibility() == View.VISIBLE) {
-            mTopBar.findViewById(R.id.topbar_title_item).setVisibility(View.GONE);
+            mTopBar.findViewById(R.id.topbar_title_item).setVisibility(View.INVISIBLE);
         }
         if (mTopBar.findViewById(R.id.topbar_title_button).getVisibility() == View.VISIBLE) {
-            mTopBar.findViewById(R.id.topbar_title_button).setVisibility(View.GONE);
+            mTopBar.findViewById(R.id.topbar_title_button).setVisibility(View.INVISIBLE);
         }
 
         searchBar.setVisibility(View.VISIBLE);
@@ -288,7 +285,7 @@ public class BaseFragmentActivity extends FragmentActivity {
     }
 
     public void setTitleItemDrawable(int resId) {
-        mTopBar.findViewById(R.id.topbar_title_item).setVisibility(View.GONE);
+        mTopBar.findViewById(R.id.topbar_title_item).setVisibility(View.INVISIBLE);
 
         TextView textView = (TextView) mTopBar.findViewById(R.id.topbar_title_button);
         textView.setVisibility(View.VISIBLE);
@@ -299,7 +296,7 @@ public class BaseFragmentActivity extends FragmentActivity {
 
         drawable.setBounds(0, 0, w, h);
         if (drawable != null) {
-            textView.setCompoundDrawables(drawable, null, null, null);
+            textView.setCompoundDrawables(null, null, drawable, null);
         }
     }
 
@@ -313,7 +310,7 @@ public class BaseFragmentActivity extends FragmentActivity {
         textView.setVisibility(View.VISIBLE);
         textView.setText(title);
 
-        mTopBar.findViewById(R.id.topbar_title_button).setVisibility(View.GONE);
+        mTopBar.findViewById(R.id.topbar_title_button).setVisibility(View.INVISIBLE);
     }
 
     public void setTitleItem(String title) {
@@ -323,7 +320,7 @@ public class BaseFragmentActivity extends FragmentActivity {
 
     public void setTitleItem(int resId, String title, View.OnClickListener listener) {
         Button item = (Button) mTopBar.findViewById(R.id.topbar_title_button);
-        mTopBar.findViewById(R.id.topbar_title_item).setVisibility(View.GONE);
+        mTopBar.findViewById(R.id.topbar_title_item).setVisibility(View.INVISIBLE);
         item.setVisibility(View.VISIBLE);
         item.setText(title);
 

@@ -165,10 +165,6 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
                     JSONObject object = new JSONObject(params.optString("params"));
 
-                    if (!TextUtils.isEmpty(object.optString("title"))) {
-                        setTitleItem(object.optString("title"));
-                    }
-
                     if (!TextUtils.isEmpty(object.optString("hasBackButton"))) {
                         if (object.optString("hasBackButton").equals("true")) {
                             setLeftItem(R.drawable.btn_back, new View.OnClickListener() {
@@ -179,6 +175,10 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                                 }
                             });
                         }
+                    }
+
+                    if (!TextUtils.isEmpty(object.optString("title"))) {
+                        setTitleItem(object.optString("title"));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
