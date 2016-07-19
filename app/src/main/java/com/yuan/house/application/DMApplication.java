@@ -11,7 +11,6 @@ import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.StrictMode;
-import android.support.v4.BuildConfig;
 
 import com.avos.avoscloud.AVAnalytics;
 import com.avos.avoscloud.AVInstallation;
@@ -21,6 +20,7 @@ import com.avos.avoscloud.AVUser;
 import com.avos.avoscloud.PushService;
 import com.avos.avoscloud.im.v2.AVIMClient;
 import com.avos.avoscloud.im.v2.AVIMException;
+import com.avos.avoscloud.im.v2.AVIMMessageManager;
 import com.avos.avoscloud.im.v2.callback.AVIMClientCallback;
 import com.avoscloud.chat.entity.avobject.AddRequest;
 import com.avoscloud.chat.entity.avobject.UpdateInfo;
@@ -31,11 +31,11 @@ import com.avoscloud.chat.util.Utils;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.UserInfoFactory;
 import com.avoscloud.leanchatlib.db.DBHelper;
+import com.avoscloud.leanchatlib.model.AVIMPresenceMessage;
 import com.avoscloud.leanchatlib.model.UserInfo;
 import com.avoscloud.leanchatlib.utils.Logger;
 import com.baidu.location.BDLocation;
 import com.baidu.mapapi.SDKInitializer;
-import com.bugtags.library.Bugtags;
 import com.dimo.utils.FileUtil;
 import com.dimo.utils.StringUtil;
 import com.dimo.utils.ZipUtil;
@@ -154,11 +154,11 @@ public class DMApplication extends Application {
 
         Utils.fixAsyncTaskBug();
 
-        if (BuildConfig.DEBUG) {
+//        if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
-        } else {
-            Bugtags.start(Constants.kBugTagsKey, this, Bugtags.BTGInvocationEventBubble);
-        }
+//        } else {
+//            Bugtags.start(Constants.kBugTagsKey, this, Bugtags.BTGInvocationEventBubble);
+//        }
 
         PackageInfo pInfo = null;
         try {
@@ -235,6 +235,8 @@ public class DMApplication extends Application {
             openStrictMode();
         }
 
+        registerMessageTypes();
+
         setupChatManager();
 
         if (debug) {
@@ -255,6 +257,10 @@ public class DMApplication extends Application {
         FileUtil.copyAssetFolder(getAssets(), "html", htmlExtractedFolder);
         prefs.edit().putBoolean(Constants.kWebPackageExtracted, true).commit();
 //        }
+    }
+
+    private void registerMessageTypes() {
+        AVIMMessageManager.registerAVIMMessageType(AVIMPresenceMessage.class);
     }
 
     // setup chat related environment

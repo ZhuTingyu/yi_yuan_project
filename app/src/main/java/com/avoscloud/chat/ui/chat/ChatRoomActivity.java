@@ -39,6 +39,8 @@ import com.avoscloud.leanchatlib.activity.ChatActivity;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.ConversationHelper;
 import com.avoscloud.leanchatlib.model.AVIMHouseMessage;
+import com.avoscloud.leanchatlib.model.AVIMPresenceMessage;
+import com.avoscloud.leanchatlib.model.MessageEvent;
 import com.dimo.utils.DateUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -63,6 +65,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import de.greenrobot.event.EventBus;
 
@@ -100,10 +105,17 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                     return false;
                 }
             };
+
     private WebView webView;
     private JSONArray jsonFormatSwitchParams;
     private String cachedHouseTradeTypeForCurrentConv;
     private InputMoreAdapter mMoreAdapter;
+    private ScheduledExecutorService scheduledExecutorServiceForPresence;
+    private ScheduledExecutorService scheduledExecutorServiceForPresenceCheckInSeconds;
+    private int mHeartBeatTimesForRemainLive;
+    private int kTickForLiveCheck = 6;
+    private long kTickForPresenceSending = 5;
+    private long kIntervalForLiveCheck = 1;     // 每秒进行倒计时
 
     public static void chatByConversation(Context from, AVIMConversation conv, JSONObject params) {
         CacheService.registerConv(conv);
@@ -250,6 +262,10 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
             }
         });
 
+        sendPresenceMessage();
+
+        setupPresenceGuardian();
+
         bindAdapter(jsonFormatParams);
 
         cachedHouseIdForCurrentConv = jsonFormatParams.optString("house_id");
@@ -279,6 +295,41 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                 }
             }
         });
+    }
+
+    private void setupPresenceGuardian() {
+        scheduledExecutorServiceForPresence = Executors.newSingleThreadScheduledExecutor();
+
+        scheduledExecutorServiceForPresence.scheduleAtFixedRate
+                (new Runnable() {
+                    public void run() {
+                        // call service
+                        sendPresenceMessage();
+                    }
+                }, 0, kTickForPresenceSending, TimeUnit.SECONDS);
+    }
+
+    private void setupHeartBeatForPresenceCheckInSeconds() {
+        scheduledExecutorServiceForPresenceCheckInSeconds = Executors.newSingleThreadScheduledExecutor();
+
+        scheduledExecutorServiceForPresenceCheckInSeconds.scheduleAtFixedRate
+                (new Runnable() {
+                    public void run() {
+                        // call service
+                        mHeartBeatTimesForRemainLive--;
+                        if (mHeartBeatTimesForRemainLive < 0) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    setTitleItemDrawable(R.drawable.offline);
+                                }
+                            });
+
+                            scheduledExecutorServiceForPresenceCheckInSeconds.shutdown();
+                        }
+                    }
+                }, 0, kIntervalForLiveCheck, TimeUnit.SECONDS);
+
     }
 
     private void requestAnonymousInfo() {
@@ -331,6 +382,9 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
     @Override
     protected void onStop() {
         super.onStop();
+
+        scheduledExecutorServiceForPresence.shutdown();
+        scheduledExecutorServiceForPresenceCheckInSeconds.shutdown();
 
         if (!TextUtils.isEmpty(cachedHouseIdForCurrentConv)) {
             prefs.edit().putString(Constants.kLastActivatedHouseId, cachedHouseIdForCurrentConv).apply();
@@ -476,6 +530,14 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         });
     }
 
+    // TODO: 16/7/19 定期发送在线状态
+    private void sendPresenceMessage() {
+        AVIMPresenceMessage msg = new AVIMPresenceMessage();
+        msg.setOp(getString(R.string.txt_online));
+
+        messageAgent.sendPresence(msg);
+    }
+
     @Override
     protected void sendText() {
         String content = contentEdit.getText().toString();
@@ -502,6 +564,23 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         intent.putExtra(Constants.kHouseSwitchParamsForChatRoom, jsonFormatSwitchParams.toString());
 
         startActivityForResult(intent, kRequestCodeSwitchHouse);
+    }
+
+    public void onEvent(MessageEvent messageEvent) {
+        AVIMTypedMessage msg = messageEvent.getMsg();
+        if (msg.getConversationId().equals(conversation.getConversationId())) {
+            if (messageEvent.getMsg().getClass().equals(AVIMPresenceMessage.class)) {
+                // update presence status
+                setTitleItemDrawable(R.drawable.online);
+
+                mHeartBeatTimesForRemainLive = kTickForLiveCheck;
+
+                setupHeartBeatForPresenceCheckInSeconds();
+            }
+
+            roomsTable.clearUnread(conversation.getConversationId());
+            refreshMsgsFromDB();
+        }
     }
 
     public void onEvent(ConversationChangeEvent conversationChangeEvent) {

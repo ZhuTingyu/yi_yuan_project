@@ -287,6 +287,22 @@ public class BaseFragmentActivity extends FragmentActivity {
         return searchBar;
     }
 
+    public void setTitleItemDrawable(int resId) {
+        mTopBar.findViewById(R.id.topbar_title_item).setVisibility(View.GONE);
+
+        TextView textView = (TextView) mTopBar.findViewById(R.id.topbar_title_button);
+        textView.setVisibility(View.VISIBLE);
+
+        Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), resId);
+        int h = drawable.getIntrinsicHeight();
+        int w = drawable.getIntrinsicWidth();
+
+        drawable.setBounds(0, 0, w, h);
+        if (drawable != null) {
+            textView.setCompoundDrawables(drawable, null, null, null);
+        }
+    }
+
     /**
      * Set top bar center item
      *

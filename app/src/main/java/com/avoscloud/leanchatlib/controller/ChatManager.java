@@ -24,6 +24,7 @@ import com.avoscloud.leanchatlib.activity.ChatActivity;
 import com.avoscloud.leanchatlib.db.MsgsTable;
 import com.avoscloud.leanchatlib.db.RoomsTable;
 import com.avoscloud.leanchatlib.model.AVIMHouseMessage;
+import com.avoscloud.leanchatlib.model.AVIMPresenceMessage;
 import com.avoscloud.leanchatlib.model.ConversationType;
 import com.avoscloud.leanchatlib.model.MessageEvent;
 import com.avoscloud.leanchatlib.model.Room;
@@ -170,11 +171,15 @@ public class ChatManager extends AVIMClientEventHandler {
     }
 
     public void showMessageNotification(Context context, AVIMConversation conv, AVIMTypedMessage msg) {
+        // Dismiss if message is Presence Message
+        if (msg.getClass().equals(AVIMPresenceMessage.class)) return;
+
         if (System.currentTimeMillis() - lastNotifyTime < NOTIFY_PERIOD) {
             return;
         } else {
             lastNotifyTime = System.currentTimeMillis();
         }
+
         int icon = context.getApplicationInfo().icon;
         Intent intent = new Intent(context, ChatActivity.class);
         intent.putExtra(ChatActivity.CONVID, conv.getConversationId());
@@ -286,6 +291,7 @@ public class ChatManager extends AVIMClientEventHandler {
         if (lookUpConversationById(conversation.getConversationId()) == null) {
             registerConversation(conversation);
         }
+
         msgsTable.insertMsg(message);
         roomsTable.insertRoom(message.getConversationId());
         roomsTable.increaseUnreadCount(message.getConversationId());

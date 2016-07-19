@@ -45,7 +45,6 @@ import com.avoscloud.leanchatlib.controller.MessageHelper;
 import com.avoscloud.leanchatlib.db.MsgsTable;
 import com.avoscloud.leanchatlib.db.RoomsTable;
 import com.avoscloud.leanchatlib.model.ConversationType;
-import com.avoscloud.leanchatlib.model.MessageEvent;
 import com.avoscloud.leanchatlib.utils.DownloadUtils;
 import com.avoscloud.leanchatlib.utils.NetAsyncTask;
 import com.avoscloud.leanchatlib.view.EmotionEditText;
@@ -602,14 +601,6 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
         chatInstance = null;
         eventBus.unregister(this);
         super.onDestroy();
-    }
-
-    public void onEvent(MessageEvent messageEvent) {
-        AVIMTypedMessage msg = messageEvent.getMsg();
-        if (msg.getConversationId().equals(conversation.getConversationId())) {
-            roomsTable.clearUnread(conversation.getConversationId());
-            refreshMsgsFromDB();
-        }
     }
 
     @Override

@@ -38,6 +38,10 @@ public class MessageAgent {
         this.sendCallback = sendCallback;
     }
 
+    public void sendPresence(final AVIMTypedMessage msg) {
+        conv.sendMessage(msg, AVIMConversation.TRANSIENT_MESSAGE_FLAG, null);
+    }
+
     private void sendMsg(final AVIMTypedMessage msg, final String originPath, final SendCallback callback) {
         if (!chatManager.isConnect()) {
             Logger.d("im not connect");
