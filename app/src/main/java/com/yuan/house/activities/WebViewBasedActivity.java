@@ -9,15 +9,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.webkit.WebView;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.avos.avoscloud.im.v2.AVIMConversation;
@@ -284,6 +280,23 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     //TODO: 接收 Web 端触发的 Event 事件
     public void onEvent(WebBroadcastEvent event) {
         Toast.makeText(mContext, event.result, Toast.LENGTH_SHORT).show();
+    }
+
+    public void onEvent(PageEvent event) {
+        if (event.getEventType() == PageEvent.PageEventEnum.REDIRECT) {
+            JSONObject object = new JSONObject();
+            try {
+                object.put("hasBackButton", true);
+                object.put("title", "");
+
+                JSONObject params = new JSONObject();
+                params.put("params", object);
+
+                openLinkInNewActivity(event.getHolder(), params);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void onEvent(NotificationEvent event) {

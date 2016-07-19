@@ -713,7 +713,8 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
     @Override
     public void onGetFirstHouseInfo(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
-        // 记录上一次的房源id，如果web没有传house_id进聊天，则告诉web房源id。如果没有上一次，就传可切换房源的第一条。
+        // 记录上一次的房源 id / trade_type，如果 web 没有传 house_id / trade_type 进聊天，则告诉 web 房源 id。
+        // 如果没有上一次，就传可切换房源的第一条。
         JSONObject object = new JSONObject();
 
         String id = cachedHouseIdForCurrentConv, tradeType = cachedHouseTradeTypeForCurrentConv;

@@ -32,10 +32,13 @@ import com.lfy.bean.Message;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.squareup.picasso.Picasso;
 import com.yuan.house.R;
+import com.yuan.house.event.PageEvent;
+import com.yuan.house.helper.AuthHelper;
 
 import java.util.Map;
 
 import butterknife.ButterKnife;
+import de.greenrobot.event.EventBus;
 
 /**
  * Created by edwardliu on 16/6/30.
@@ -43,15 +46,14 @@ import butterknife.ButterKnife;
 public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
 
     protected org.json.JSONObject conversationObject;
+    String peerAvatar;
     private ConversationType conversationType;
     private int msgViewTypes = 9;
     private ChatMessageAdapter.ClickListener clickListener;
     private Context context;
-
     private View contentLayout;
     private View placeView;
     private Activity activity;
-    String peerAvatar;
 
     public ChatMessageAdapter(Context context, ConversationType conversationType, org.json.JSONObject object) {
         super(context);
@@ -128,9 +130,8 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 others = messageSentByOthers(houseInfoMessage);
                 conView = createViewByType(houseInfoMessage.getMessageType(), others);
                 initHouseMessageView(conView, houseInfoMessage, others);
-                bean.setMessage("[房源信息]");
-            }
-            else if (msg instanceof AVIMTypedMessage) {
+                bean.setMessage(context.getString(R.string.chat_house));
+            } else if (msg instanceof AVIMTypedMessage) {
                 AVIMTypedMessage typedMessage = (AVIMTypedMessage) msg;
                 others = messageSentByOthers(typedMessage);
                 conView = createViewByType(AVIMReservedMessageType.getAVIMReservedMessageType(typedMessage.getMessageType()), others);
@@ -145,6 +146,26 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
             Picasso.with(context).load(peerAvatar).placeholder(R.drawable.photo_agent_boy).into(avatar);
         }
 
+        avatar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String param;
+                String userId = conversationObject.optString("user_id");
+                String tradeType = conversationObject.optString("trade_type");
+                if (TextUtils.isEmpty(tradeType)) {
+                    tradeType = "0";
+                }
+
+                if (AuthHelper.iAmUser()) {
+                    param = String.format("user_personal_info.html?%s&%s&%s", "0", userId, tradeType);
+
+                } else {
+                    param = String.format("agency_personal_info.html?%s&%s&%s", "1", userId, tradeType);
+                }
+
+                EventBus.getDefault().post(new PageEvent(PageEvent.PageEventEnum.REDIRECT, param));
+            }
+        });
 //        activity.registerForContextMenu(contentLayout);
 
         return conView;
@@ -199,6 +220,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
 
     /**
      * 设置时间显示栏
+     *
      * @param conView
      * @param position
      * @param msg
