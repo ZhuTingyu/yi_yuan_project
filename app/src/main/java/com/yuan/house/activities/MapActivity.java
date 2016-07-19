@@ -1,5 +1,6 @@
 package com.yuan.house.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -31,6 +32,7 @@ import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.yuan.house.R;
 import com.yuan.house.application.Injector;
+import com.yuan.house.common.Constants;
 import com.yuan.house.event.LocationEvent;
 
 import org.json.JSONException;
@@ -112,7 +114,21 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
             public void onClick(View v) {
                 if (!TextUtils.isEmpty(bdLocation.getAddrStr())) {
                     EventBus.getDefault().post(new LocationEvent(LocationEvent.LocationEventEnum.UPDATED, bdLocation));
-
+                    Intent intent = new Intent();
+                    JSONObject object = new JSONObject();
+                    try {
+                        object.put("addr", bdLocation.getAddrStr());
+                        object.put("city", bdLocation.getCity());
+                        object.put("district", bdLocation.getDistrict());
+                        object.put("lat", bdLocation.getLatitude());
+                        object.put("lng", bdLocation.getLongitude());
+                        object.put("province", bdLocation.getProvince());
+                        object.put("street", bdLocation.getStreet());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    intent.putExtra(Constants.kActivityParamFinishSelectLocationOnMap, object.toString());
+                    setResult(0, intent);
                     finish();
                 }
             }
