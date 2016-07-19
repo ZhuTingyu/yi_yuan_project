@@ -28,9 +28,6 @@ import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.AVIMException;
 import com.avos.avoscloud.im.v2.AVIMTypedMessage;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
-import com.avos.avoscloud.im.v2.messages.AVIMAudioMessage;
-import com.avos.avoscloud.im.v2.messages.AVIMImageMessage;
-import com.avos.avoscloud.im.v2.messages.AVIMLocationMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
 import com.avoscloud.chat.service.CacheService;
 import com.avoscloud.chat.service.ConversationChangeEvent;
@@ -38,13 +35,13 @@ import com.avoscloud.chat.util.Utils;
 import com.avoscloud.leanchatlib.activity.ChatActivity;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.ConversationHelper;
+import com.avoscloud.leanchatlib.controller.MessageHelper;
 import com.avoscloud.leanchatlib.model.AVIMHouseMessage;
 import com.avoscloud.leanchatlib.model.AVIMPresenceMessage;
 import com.avoscloud.leanchatlib.model.MessageEvent;
 import com.dimo.utils.DateUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.yuan.house.HouseMessageType;
 import com.yuan.house.R;
 import com.yuan.house.activities.SwitchHouseActivity;
 import com.yuan.house.common.Constants;
@@ -383,8 +380,13 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
     protected void onStop() {
         super.onStop();
 
-        scheduledExecutorServiceForPresence.shutdown();
-        scheduledExecutorServiceForPresenceCheckInSeconds.shutdown();
+        if (scheduledExecutorServiceForPresence != null) {
+            scheduledExecutorServiceForPresence.shutdown();
+        }
+
+        if (scheduledExecutorServiceForPresenceCheckInSeconds != null) {
+            scheduledExecutorServiceForPresenceCheckInSeconds.shutdown();
+        }
 
         if (!TextUtils.isEmpty(cachedHouseIdForCurrentConv)) {
             prefs.edit().putString(Constants.kLastActivatedHouseId, cachedHouseIdForCurrentConv).apply();
@@ -405,39 +407,9 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
                     return;
 
                 AVIMTypedMessage msg = mMessageAdapter.getDatas().get(mMessageAdapter.getDatas().size() - 1);
-                HouseMessageType type = HouseMessageType.getMessageType(msg.getMessageType());
 
-                String resultMessage = "";
-                long date = 0;
-                switch (type) {
-                    case TextMessageType:
-                        AVIMTextMessage textMsg = (AVIMTextMessage) msg;
-                        date = msg.getTimestamp();
-                        resultMessage = textMsg.getText();
-                        break;
-                    case ImageMessageType:
-                        AVIMImageMessage imageMsg = (AVIMImageMessage) msg;
-                        date = imageMsg.getTimestamp();
-                        resultMessage = "[图片]";
-                        break;
-                    case AudioMessageType:
-                        AVIMAudioMessage audioMessage = (AVIMAudioMessage) msg;
-                        date = audioMessage.getTimestamp();
-                        resultMessage = "[语音]";
-                        break;
-                    case LocationMessageType:
-                        AVIMLocationMessage locMsg = (AVIMLocationMessage) msg;
-                        date = locMsg.getTimestamp();
-                        resultMessage = "[位置]";
-                        break;
-                    case HouseMessageType:
-                        AVIMHouseMessage houseMsg = (AVIMHouseMessage) msg;
-                        date = houseMsg.getTimestamp();
-                        resultMessage = "[房源]";
-
-                    default:
-                        break;
-                }
+                String resultMessage = MessageHelper.outlineOfMsg(msg).toString();
+                long date = msg.getTimestamp();
 
                 String leanId = jsonFormatParams.optString("lean_id");
                 String auditType = jsonFormatParams.optString("audit_type");

@@ -31,6 +31,7 @@ import com.dimo.utils.DateUtil;
 import com.lfy.bean.Message;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.squareup.picasso.Picasso;
+import com.yuan.house.HouseMessageType;
 import com.yuan.house.R;
 import com.yuan.house.event.PageEvent;
 import com.yuan.house.helper.AuthHelper;
@@ -79,7 +80,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         boolean comeMsg = messageSentByOthers(msg);
 
         MsgViewType viewType = null;
-        AVIMReservedMessageType msgType = AVIMReservedMessageType.getAVIMReservedMessageType(msg.getMessageType());
+        HouseMessageType msgType = HouseMessageType.getMessageType(msg.getMessageType());
         switch (msgType) {
             case TextMessageType:
                 viewType = comeMsg ? MsgViewType.ComeText : MsgViewType.ToText;
@@ -93,10 +94,9 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
             case LocationMessageType:
                 viewType = comeMsg ? MsgViewType.ComeLocation : MsgViewType.ToLocation;
                 break;
-            default:
-                if (msg.getMessageType() == 2) {
-                    viewType = comeMsg ? MsgViewType.ChangeHouse : MsgViewType.ChangeHouse;
-                }
+            case HouseMessageType:
+                viewType = comeMsg ? MsgViewType.ChangeHouse : MsgViewType.ChangeHouse;
+                break;
         }
         return viewType.getValue();
     }

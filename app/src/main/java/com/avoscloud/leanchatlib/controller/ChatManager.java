@@ -292,15 +292,16 @@ public class ChatManager extends AVIMClientEventHandler {
             registerConversation(conversation);
         }
 
-        msgsTable.insertMsg(message);
-        roomsTable.insertRoom(message.getConversationId());
-        roomsTable.increaseUnreadCount(message.getConversationId());
+        if (!message.getClass().equals(AVIMPresenceMessage.class)) {
+            msgsTable.insertMsg(message);
+            roomsTable.insertRoom(message.getConversationId());
+            roomsTable.increaseUnreadCount(message.getConversationId());
+
+            storeLastMessage(message);
+        }
 
         MessageEvent messageEvent = new MessageEvent(message);
-
         eventBus.post(messageEvent);
-
-        storeLastMessage(message);
 
         new NetAsyncTask(getContext(), false) {
             @Override
@@ -341,12 +342,12 @@ public class ChatManager extends AVIMClientEventHandler {
 
         if (TextUtils.isEmpty(auditType)) auditType = "0";
 
-        // FIXME: 16/6/27 handle different message types
         HouseMessageType msgType = HouseMessageType.getMessageType(msg.getMessageType());
-        text = (String) MessageHelper.outlineOfMsg(msg);
+        text = MessageHelper.outlineOfMsg(msg).toString();
 
         if (msgType == HouseMessageType.TextMessageType) {
             houseId = (String) ((AVIMTextMessage) msg).getAttrs().get("houseId");
+            text = ((AVIMTextMessage) msg).getText();
         } else if (msgType == HouseMessageType.HouseMessageType) {
             houseId = (String) ((AVIMHouseMessage) msg).getAttrs().get("houseId");
         }
