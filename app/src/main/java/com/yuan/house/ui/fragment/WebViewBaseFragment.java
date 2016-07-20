@@ -1030,7 +1030,7 @@ public class WebViewBaseFragment extends Fragment {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 if (mBridgeListener != null) {
-                    mBridgeListener.onBridgeSelectMapLocation();
+                    mBridgeListener.onBridgeSelectMapLocation(data);
                 }
             }
         });
@@ -1164,7 +1164,7 @@ public class WebViewBaseFragment extends Fragment {
 
         void onBridgeSignIn(String data);
 
-        void onBridgeSelectMapLocation();
+        void onBridgeSelectMapLocation(String data);
 
         void onBridgeShowImageGallery(List<String> data);
 

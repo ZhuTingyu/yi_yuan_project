@@ -829,8 +829,13 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         }
     }
 
-    public void onBridgeSelectMapLocation() {
+    public void onBridgeSelectMapLocation(String data) {
         Intent intent = new Intent(mContext, MapActivity.class);
+
+        if (TextUtils.isEmpty(data)) {
+            intent.putExtra("location", data);
+        }
+
         startActivityForResult(intent, kActivityRequestCodeSelectMapLocation);
     }
 

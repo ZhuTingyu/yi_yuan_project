@@ -33,6 +33,9 @@ import com.yuan.house.R;
 import com.yuan.house.application.Injector;
 import com.yuan.house.event.LocationEvent;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.greenrobot.event.EventBus;
@@ -79,6 +82,22 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
 
         bdLocation = new BDLocation();
 
+        Bundle bundle = getIntent().getExtras();
+
+        if (bundle != null) {
+            String extra = bundle.getString("location");
+            try {
+                JSONObject object = new JSONObject(extra);
+
+                object.optString("lat");
+                object.optString("lng");
+                object.optString("addr");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+
         setLeftItem(R.drawable.btn_back, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -109,6 +128,8 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         baiduMap.setOnMapLoadedCallback(new BaiduMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
+                // TODO: 16/7/20 direct to lat/lng if already has address passin
+
                 locClient.start();
             }
         });
