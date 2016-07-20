@@ -82,7 +82,7 @@ public class UserMainFragment extends WebViewBaseFragment {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.rl_center:
-                mBridgeListener.onBridgeSelectMapLocation(data);
+                mBridgeListener.onBridgeSelectMapLocation(null);
                 break;
             case R.id.position:
                 ((MainActivity) getActivity()).getBottomNavigationBar().selectTab(2);
