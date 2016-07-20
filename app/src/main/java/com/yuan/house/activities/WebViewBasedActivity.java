@@ -330,7 +330,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.KICK_OUT) {
             JSONObject object = event.getHolder();
 
-            if (object == null || (AuthHelper.userAlreadyLogin() && !AuthHelper.userToken().equals(object.optString("exclusive_token")))) {
+            if (object == null || (AuthHelper.getInstance().userAlreadyLogin() && !AuthHelper.getInstance().getUserToken().equals(object.optString("exclusive_token")))) {
                 Toast.makeText(mContext, "您的账号在别处登陆", Toast.LENGTH_SHORT).show();
 
                 DMApplication.getInstance().kickOut();
@@ -568,7 +568,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                                     otherId = "0";
                                 } else {
                                     for (int j = 0; j < ids.size(); j++) {
-                                        if (Integer.parseInt(AuthHelper.userId()) != ids.getInteger(j)) {
+                                        if (Integer.parseInt(AuthHelper.getInstance().getUserId()) != ids.getInteger(j)) {
                                             otherId = ids.getString(j);
                                             break;
                                         }
@@ -1004,7 +1004,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     protected void restGet(String url, AsyncHttpResponseHandler responseHandler) {
-        RestClient.getInstance().get(url, AuthHelper.authTokenJsonHeader(), responseHandler);
+        RestClient.getInstance().get(url, AuthHelper.getInstance().authTokenJsonHeader(), responseHandler);
     }
 
     @Override

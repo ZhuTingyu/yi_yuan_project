@@ -58,6 +58,7 @@ public class MessageAgent {
                     msg.setTimestamp(System.currentTimeMillis());
                 }
 
+                // TODO: 16/7/20 slow operation
                 msgsTable.insertMsg(msg);
 
                 // FIXME: 16/6/24 hack, conv.members 第一个位置是发送者,最后一个位置是接收者
@@ -72,6 +73,7 @@ public class MessageAgent {
                     e1.printStackTrace();
                 }
 
+                // TODO: 16/7/20 slow operation
                 ChatManager.getInstance().storeLastMessage(msg, object);
 
                 if (e == null && originPath != null) {

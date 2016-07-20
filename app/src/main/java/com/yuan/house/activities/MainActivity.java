@@ -84,7 +84,11 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
         setupTabbarAppearance();
 
-        if (AuthHelper.userAlreadyLogin()) {
+        // read user login credential from prefs
+        AuthHelper.getInstance().evaluateUserLogin(prefs.getString(Constants.kWebDataKeyUserLogin, null));
+        AuthHelper.getInstance().evaluateUserType(prefs.getString(Constants.kWebDataKeyLoginType, null));
+
+        if (AuthHelper.getInstance().userAlreadyLogin()) {
             setupTabbarClickListener();
         }
 
@@ -272,6 +276,8 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
         if (Constants.kWebDataKeyUserLogin.equals(key)) {
             try {
+                AuthHelper.getInstance().evaluateUserLogin(value);
+
                 JSONObject holder = new JSONObject(value);
                 JSONObject user;
 
@@ -296,6 +302,8 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        } else if (Constants.kWebDataKeyLoginType.equals(key)) {
+            AuthHelper.getInstance().evaluateUserType(value);
         }
     }
 

@@ -332,11 +332,11 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
     private void requestAnonymousInfo() {
         String userId, agencyId;
 
-        if (AuthHelper.userAlreadyLogin() && AuthHelper.iAmUser()) {
-            userId = AuthHelper.userId();
+        if (AuthHelper.getInstance().userAlreadyLogin() && AuthHelper.getInstance().iAmUser()) {
+            userId = AuthHelper.getInstance().getUserId();
             agencyId = jsonFormatParams.optString("user_id");
         } else {
-            agencyId = AuthHelper.userId();
+            agencyId = AuthHelper.getInstance().getUserId();
             userId = jsonFormatParams.optString("user_id");
         }
 
@@ -465,10 +465,10 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
     private void initSuggestedHouseInfos() {
         String url = Constants.kWebServiceSwitchable;
 
-        if (AuthHelper.userAlreadyLogin() && AuthHelper.iAmUser()) {
-            url += AuthHelper.userId() + "/" + jsonFormatParams.optString("user_id");
+        if (AuthHelper.getInstance().userAlreadyLogin() && AuthHelper.getInstance().iAmUser()) {
+            url += AuthHelper.getInstance().getUserId() + "/" + jsonFormatParams.optString("user_id");
         } else {
-            url += jsonFormatParams.optString("user_id") + "/" + AuthHelper.userId();
+            url += jsonFormatParams.optString("user_id") + "/" + AuthHelper.getInstance().getUserId();
         }
 
         restGet(url, new JsonHttpResponseHandler() {

@@ -6,10 +6,9 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
+import com.yuan.house.helper.AuthHelper;
 
 import org.apache.http.HttpEntity;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 
@@ -45,24 +44,10 @@ public class WebService {
         RestClient.getInstance().post(Constants.kWebServiceImageUpload, authTokenHeader(), entity, responseHandler);
     }
 
-    private String getAuthToken() {
-        String token = null;
-        String json = prefs.getString(Constants.kWebDataKeyUserLogin, null);
-        try {
-            JSONObject object = new JSONObject(json);
-            token = object.optString(kHttpReqKeyToken);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return token;
-    }
-
     private HashMap<String, String> authTokenHeader() {
         HashMap<String, String> hashMap = new HashMap<>();
 
-//        hashMap.put(kHttpReqKeyContentType, "multipart/form-data");
-        hashMap.put(kHttpReqKeyToken, getAuthToken());
+        hashMap.put(kHttpReqKeyToken, AuthHelper.getInstance().getUserToken());
 
         return hashMap;
     }

@@ -16,12 +16,65 @@ import javax.inject.Inject;
  * Created by Alsor Zhou on 16/6/10.
  */
 public class AuthHelper {
+    private static AuthHelper instance = new AuthHelper();
     @Inject
-    static SharedPreferences prefs;
+    SharedPreferences prefs;
+    private String userToken;
+    private String userId;
+    private String userLoginInfo;
+    private UserType userType;
 
-    private static boolean userAlreadyLogin(String data) {
+    public AuthHelper() {
+    }
+
+    public static AuthHelper getInstance() {
+        return instance;
+    }
+
+    private UserType getUserType(String data) {
+        UserType type = UserType.USER;
+
+        if ("agency".equals(data)) {
+            type = UserType.AGENCY;
+        }
+        return type;
+    }
+
+    public boolean iAmUser() {
+        return userType == UserType.USER;
+    }
+
+    private String getToken(String data) {
+        if (TextUtils.isEmpty(data)) return null;
+
+        JSONObject object = null;
+        try {
+            object = new JSONObject(data);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return object.optString("token");
+    }
+
+    public HashMap<String, String> authTokenJsonHeader() {
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put(Constants.kHttpReqKeyAuthToken, getUserToken());
+        hashMap.put(Constants.kHttpReqKeyContentType, "application/json");
+
+        return hashMap;
+    }
+
+    public String getUserToken() {
+        return userToken;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    private boolean userAlreadyLogin(String data) {
         if (TextUtils.isEmpty(data)) return false;
-        
+
         JSONObject object = null;
         try {
             object = new JSONObject(data);
@@ -31,13 +84,15 @@ public class AuthHelper {
         return object.optString("user_info") != null;
     }
 
-    public static boolean userAlreadyLogin() {
-        return userAlreadyLogin(userLoginInfomation());
+    public boolean userAlreadyLogin() {
+        return userAlreadyLogin(userLoginInfo);
     }
 
-    public static String getUserId(String data) {
+    private String getUserId(String data) {
+        if (TextUtils.isEmpty(data)) return null;
+
         JSONObject object = null;
-        JSONObject user = null;
+        JSONObject user;
         try {
             object = new JSONObject(data);
         } catch (JSONException e) {
@@ -52,66 +107,14 @@ public class AuthHelper {
         return user.optString("user_id");
     }
 
-    public static String userId() {
-        return getUserId(userLoginInfomation());
+    public void evaluateUserLogin(String data) {
+        userLoginInfo = data;
+        userToken = getToken(data);
+        userId = getUserId(data);
     }
 
-    private static UserType userType() {
-        UserType type = UserType.USER;
-
-        String raw = prefs.getString(Constants.kWebDataKeyLoginType, null);
-        if ("agency".equals(raw)) {
-            type = UserType.AGENCY;
-        }
-        return type;
-    }
-
-    public static boolean iAmUser() {
-        if (userType() == UserType.USER) return true;
-
-        return false;
-    }
-
-    private static String getToken(String data) {
-        JSONObject object = null;
-        try {
-            object = new JSONObject(data);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return object.optString("token");
-    }
-
-    public static String userToken() {
-        return getToken(userLoginInfomation());
-    }
-
-    public static HashMap<String, String> authTokenJsonHeader() {
-        String token = getToken(userLoginInfomation());
-
-        HashMap<String, String> hashMap = new HashMap<>();
-        hashMap.put(Constants.kHttpReqKeyAuthToken, token);
-        hashMap.put(Constants.kHttpReqKeyContentType, "application/json");
-
-        return hashMap;
-    }
-
-    public static String targetId() {
-        String data = userLoginInfomation();
-
-        JSONObject object = null;
-        try {
-            object = new JSONObject(data);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return object.optString("target_id");
-    }
-
-    private static String userLoginInfomation() {
-        String json = prefs.getString(Constants.kWebDataKeyUserLogin, null);
-
-        return json;
+    public void evaluateUserType(String data) {
+        userType = getUserType(data);
     }
 
     enum UserType {

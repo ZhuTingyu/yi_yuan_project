@@ -3,6 +3,7 @@ package com.yuan.house.receiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 
 import com.avoscloud.chat.util.Utils;
 import com.dimo.utils.PackageUtil;
@@ -30,7 +31,9 @@ public class PushReceiver extends BroadcastReceiver {
         mContext = context;
         try {
             String action = intent.getAction();
-            String channel = intent.getExtras().getString("com.avos.avoscloud.Channel");
+            Bundle extras = intent.getExtras();
+            if (extras == null) return;
+            String channel = extras.getString("com.avos.avoscloud.Channel");
             //获取消息内容
             JSONObject json = new JSONObject(intent.getExtras().getString("com.avos.avoscloud.Data"));
 
