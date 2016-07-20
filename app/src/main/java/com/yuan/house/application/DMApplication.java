@@ -36,6 +36,7 @@ import com.avoscloud.leanchatlib.model.UserInfo;
 import com.avoscloud.leanchatlib.utils.Logger;
 import com.baidu.location.BDLocation;
 import com.baidu.mapapi.SDKInitializer;
+import com.bugtags.library.Bugtags;
 import com.dimo.utils.FileUtil;
 import com.dimo.utils.StringUtil;
 import com.dimo.utils.ZipUtil;
@@ -157,7 +158,7 @@ public class DMApplication extends Application {
 //        if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
 //        } else {
-//            Bugtags.start(Constants.kBugTagsKey, this, Bugtags.BTGInvocationEventBubble);
+            Bugtags.start(Constants.kBugTagsKey, this, Bugtags.BTGInvocationEventBubble);
 //        }
 
         PackageInfo pInfo = null;
@@ -220,7 +221,7 @@ public class DMApplication extends Application {
         Timber.v("Installation id: " + AVInstallation.getCurrentInstallation().getInstallationId());
 
         String avInstallId = AVInstallation.getCurrentInstallation().getInstallationId();
-        prefs.edit().putString("AVInstallationId", avInstallId).apply();
+        prefs.edit().putString("AVInstallationId", avInstallId).commit();
 
         PushService.setDefaultPushCallback(instance, SplashActivity.class);
         AVOSCloud.setDebugLogEnabled(debug);
@@ -332,7 +333,7 @@ public class DMApplication extends Application {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(Constants.kWebDataKeyLoginType, null);
         editor.putString(Constants.kWebDataKeyUserLogin, null);
-        editor.apply();
+        editor.commit();
 
         pruneChatManager();
     }

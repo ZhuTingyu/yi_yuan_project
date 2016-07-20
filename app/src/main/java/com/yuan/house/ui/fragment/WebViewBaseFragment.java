@@ -603,7 +603,7 @@ public class WebViewBaseFragment extends Fragment {
                 } else {
                     editor.putString(key, value);
                 }
-                editor.apply();
+                editor.commit();
             }
         });
         getBridge().registerHandler("getData", new WebViewJavascriptBridge.WVJBHandler() {

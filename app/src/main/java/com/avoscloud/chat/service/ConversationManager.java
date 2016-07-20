@@ -54,7 +54,7 @@ public class ConversationManager {
 
         @Override
         public void onInvited(AVIMClient client, AVIMConversation conversation, String operator) {
-            Utils.toast("you are invited by " + MessageHelper.nameByUserId(operator));
+//            Utils.toast("you are invited by " + MessageHelper.nameByUserId(operator));
         }
     };
     private ChatManager chatManager;
