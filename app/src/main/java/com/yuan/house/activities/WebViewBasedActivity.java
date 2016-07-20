@@ -278,9 +278,9 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         webViewFragment = fragment;
     }
 
-    //TODO: 接收 Web 端触发的 Event 事件
+    // 接收 Web 端触发的 Event 事件
     public void onEvent(WebBroadcastEvent event) {
-        Toast.makeText(mContext, event.result, Toast.LENGTH_SHORT).show();
+        Timber.v(event.result);
     }
 
     public void onEvent(PageEvent event) {

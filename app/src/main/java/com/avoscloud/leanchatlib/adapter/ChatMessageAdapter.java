@@ -142,7 +142,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         setSendTimeView(conView, position, msg);
         ImageView avatar = ButterKnife.findById(conView, R.id.avatar);
 
-        if (others == true && peerAvatar != null) {
+        if (others == true && !TextUtils.isEmpty(peerAvatar)) {
             Picasso.with(context).load(peerAvatar).placeholder(R.drawable.photo_agent_boy).into(avatar);
         }
 
@@ -190,7 +190,11 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         View statusSendStart = ViewHolder.findViewById(conView, R.id.status_send_start);
 
         String imageUrl = object.getString("houseImage");
-        Picasso.with(ctx).load(imageUrl).placeholder(R.drawable.img_placeholder).into(img);
+        if (TextUtils.isEmpty(imageUrl)) {
+            Picasso.with(ctx).load(R.drawable.img_placeholder).fit().into(img);
+        } else {
+            Picasso.with(ctx).load(imageUrl).placeholder(R.drawable.img_placeholder).into(img);
+        }
 
         String houseName = object.getString("houseName");
         if (TextUtils.isEmpty(houseName)) houseName = "需求";

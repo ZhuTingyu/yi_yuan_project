@@ -311,8 +311,7 @@ public class ChatManager extends AVIMClientEventHandler {
 
             @Override
             protected void onPost(Exception exception) {
-                if (selfId != null && ChatActivity.getCurrentChattingConvid() == null
-                        || !ChatActivity.getCurrentChattingConvid().equals(message.getConversationId())) {
+                if (selfId != null && ChatActivity.getCurrentChattingConvid() == null || TextUtils.isEmpty(ChatActivity.getCurrentChattingConvid()) || !ChatActivity.getCurrentChattingConvid().equals(message.getConversationId())) {
                     if (getUserInfoFactory().showNotificationWhenNewMessageCome(selfId)) {
                         showMessageNotification(getContext(), conversation, message);
                     }

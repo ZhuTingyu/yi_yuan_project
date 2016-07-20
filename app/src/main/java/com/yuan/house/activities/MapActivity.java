@@ -197,8 +197,8 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
                     .show();
             return;
         }
-        baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(geoCodeResult
-                .getLocation()));
+
+        baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(geoCodeResult.getLocation()));
     }
 
     @Override

@@ -46,6 +46,9 @@ public class MessageAgent {
         if (!chatManager.isConnect()) {
             Logger.d("im not connect");
         }
+
+        assert conv != null;
+
         conv.sendMessage(msg, AVIMConversation.RECEIPT_MESSAGE_FLAG, new AVIMConversationCallback() {
             @Override
             public void done(AVIMException e) {
