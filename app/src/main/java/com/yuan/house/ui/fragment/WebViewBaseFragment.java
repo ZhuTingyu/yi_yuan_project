@@ -691,9 +691,11 @@ public class WebViewBaseFragment extends Fragment {
                 if (location != null) {
                     JSONObject object = new JSONObject();
                     try {
-                        object.put("addr", location.getAddrStr());
-                        object.put("city", location.getCity());
-                        object.put("district", location.getDistrict());
+                        String city = location.getCity();
+                        String district = location.getDistrict();
+                        object.put("addr", city + district);
+                        object.put("city", city);
+                        object.put("district", district);
                         object.put("lat", location.getLatitude());
                         object.put("lng", location.getLongitude());
                         object.put("province", location.getProvince());

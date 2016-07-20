@@ -118,9 +118,11 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
                     Intent intent = new Intent();
                     JSONObject data = new JSONObject();
                     try {
-                        data.put("addr", bdLocation.getAddrStr());
-                        data.put("city", bdLocation.getCity());
-                        data.put("district", bdLocation.getDistrict());
+                        String city = bdLocation.getCity();
+                        String district = bdLocation.getDistrict();
+                        data.put("addr", city + district);
+                        data.put("city", city);
+                        data.put("district", district);
                         data.put("lat", bdLocation.getLatitude());
                         data.put("lng", bdLocation.getLongitude());
                         data.put("province", bdLocation.getProvince());
