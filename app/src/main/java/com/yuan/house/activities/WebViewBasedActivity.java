@@ -659,45 +659,61 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         String houseId = null;
         JSONArray leanIdList = null;
         String text = null;
-        JSONObject object = null;
-        try {
-            object = new JSONObject(data);
-            houseId = object.optString("house_id");
-            leanIdList = object.optJSONArray("lean_id");
-            text = object.optString("text");
+        JSONObject rawObject = null;
+        JSONArray userIdList = null;
 
-            if ("agency".equals(object.optString("type"))) {
+        try {
+            rawObject = new JSONObject(data);
+            houseId = rawObject.optString("house_id");
+            leanIdList = rawObject.optJSONArray("lean_id");
+            userIdList = rawObject.optJSONArray("user_id");
+            text = rawObject.optString("text");
+
+            if ("agency".equals(rawObject.optString("type"))) {
                 isAgency = true;
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        String leanIdString = leanIdList.optString(leanIdList.length() - 1);
-
         // 创建相应对话, 并发送文本信息到该会话
         final String finalHouseId = houseId;
         final String finalText = text;
 
-        ChatManager.getInstance().fetchConversationWithUserId(object, leanIdString, new AVIMConversationCreatedCallback() {
-            @Override
-            public void done(AVIMConversation avimConversation, AVIMException e) {
-                AVIMTextMessage message = new AVIMTextMessage();
+        for (int i = 0; i < leanIdList.length(); i++) {
+            String leanIdString = leanIdList.optString(i);
 
-                Map<String, Object> attrs = new HashMap<>();
-                attrs.put("houseId", finalHouseId);
-
-                message.setAttrs(attrs);
-
-                message.setText(finalText);
-
-                MessageAgent messageAgent = new MessageAgent(avimConversation);
-                messageAgent.sendEncapsulatedTypedMessage(message);
-
-                // 发送成功之后需要缓存该条消息到本地
-                ChatManager.getInstance().storeLastMessage(message);
+            JSONObject object = new JSONObject();
+            try {
+                object.put("lean_id", leanIdString);
+                object.put("user_id", userIdList.optString(i));
+                object.put("house_id", houseId);
+                object.put("text", text);
+                object.put("type", rawObject.optString("type"));
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        });
+
+            ChatManager.getInstance().fetchConversationWithUserId(object, leanIdString, new AVIMConversationCreatedCallback() {
+                @Override
+                public void done(AVIMConversation avimConversation, AVIMException e) {
+                    AVIMTextMessage message = new AVIMTextMessage();
+
+                    Map<String, Object> attrs = new HashMap<>();
+                    attrs.put("houseId", finalHouseId);
+
+                    message.setAttrs(attrs);
+
+                    message.setText(finalText);
+
+                    MessageAgent messageAgent = new MessageAgent(avimConversation);
+                    messageAgent.sendEncapsulatedTypedMessage(message);
+
+                    // 发送成功之后需要缓存该条消息到本地
+                    ChatManager.getInstance().storeLastMessage(message);
+                }
+            });
+        }
     }
 
     public void onBridgeLogout() {
