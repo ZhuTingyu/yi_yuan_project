@@ -1,5 +1,6 @@
 package com.yuan.house.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -31,6 +32,7 @@ import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.yuan.house.R;
 import com.yuan.house.application.Injector;
+import com.yuan.house.common.Constants;
 import com.yuan.house.event.LocationEvent;
 
 import org.json.JSONException;
@@ -69,6 +71,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
     private double latitude = 0.0;
     private double longitude = 0.0;
     private String city;    //当前城市
+    private JSONObject mLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,11 +90,11 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         if (bundle != null) {
             String extra = bundle.getString("location");
             try {
-                JSONObject object = new JSONObject(extra);
+                mLocation = new JSONObject(extra);
 
-                object.optString("lat");
-                object.optString("lng");
-                object.optString("addr");
+                mLocation.optString("lat");
+                mLocation.optString("lng");
+                mLocation.optString("addr");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -112,7 +115,21 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
             public void onClick(View v) {
                 if (!TextUtils.isEmpty(bdLocation.getAddrStr())) {
                     EventBus.getDefault().post(new LocationEvent(LocationEvent.LocationEventEnum.UPDATED, bdLocation));
-
+                    Intent intent = new Intent();
+                    JSONObject data = new JSONObject();
+                    try {
+                        data.put("addr", bdLocation.getAddrStr());
+                        data.put("city", bdLocation.getCity());
+                        data.put("district", bdLocation.getDistrict());
+                        data.put("lat", bdLocation.getLatitude());
+                        data.put("lng", bdLocation.getLongitude());
+                        data.put("province", bdLocation.getProvince());
+                        data.put("street", bdLocation.getStreet());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    intent.putExtra(Constants.kActivityParamFinishSelectLocationOnMap, data.toString());
+                    setResult(0, intent);
                     finish();
                 }
             }
@@ -137,6 +154,19 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
 
     private void initLocation() {
         baiduMap.setMyLocationEnabled(true);
+        LatLng cenpt = new LatLng(mLocation.optDouble("lat"),mLocation.optDouble("lng"));
+        //定义地图状态
+        MapStatus mMapStatus = new MapStatus.Builder()
+                .target(cenpt)
+                .zoom(18)
+                .build();
+        //定义MapStatusUpdate对象，以便描述地图状态将要发生的变化
+
+
+        MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mMapStatus);
+        //改变地图状态
+        baiduMap.setMapStatus(mMapStatusUpdate);
+
         //获取当前位置
         locClient = new LocationClient(this);
         locClient.registerLocationListener(locationListener);
