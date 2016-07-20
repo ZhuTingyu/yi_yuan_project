@@ -216,7 +216,7 @@ public class WebViewBaseFragment extends Fragment {
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Log.i("reponse.data", data);
 
-                mBridgeListener.onBridgeRequestPurchase(callback);
+                mBridgeListener.onBridgeRequestPurchase(data, callback);
             }
         });
 
@@ -1130,7 +1130,7 @@ public class WebViewBaseFragment extends Fragment {
     }
 
     public interface OnBridgeInteractionListener {
-        void onBridgeRequestPurchase(WebViewJavascriptBridge.WVJBResponseCallback callback);
+        void onBridgeRequestPurchase(String data, WebViewJavascriptBridge.WVJBResponseCallback callback);
 
         void onBridgeSelectImageFromNative(String data, WebViewJavascriptBridge.WVJBResponseCallback callback);
 

@@ -422,40 +422,30 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    public void onBridgeRequestPurchase(WebViewJavascriptBridge.WVJBResponseCallback callback) {
-//        Map<String, Object> params = null;
-//        Map<String, Object> orderMap = null;
-//        Map<String, Object> orderPackagesMap = null;
-//        try {
-//            params = (Map<String, Object>) JsonUtils.newInstance().readJson2List(data);
-//            orderMap = (Map<String, Object>) params.get("order");
-//            List<Object> orderPackagesList = (List<Object>) orderMap.get("order_packages");
-//            orderPackagesMap = (Map<String, Object>) orderPackagesList.get(0);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+    public void onBridgeRequestPurchase(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
+        JSONObject object;
+        try {
+            object = new JSONObject(data);
 
-        String type = "alipay";
-//                String type = (String) params.get("type");
-        pay_type = type;
-        if (type.equals("alipay")) {
-            PayInfo payInfo = new PayInfo();
-//                    payInfo.setOrderNo(orderMap.get("order_no").toString());
-//                    payInfo.setProduct_desc(orderPackagesMap.get("package_name").toString()+ orderPackagesMap.get("total_num").toString() + "张");
-            payInfo.setOrderNo("123332222");
-            payInfo.setProduct_desc("测试测试测试");
-            payInfo.setProduct_name("支付Title");
-            payInfo.setTotal_fee("0.01");
-//                    payInfo.setTotal_fee(String.valueOf(((Integer) orderMap.get("total_fee") / 100)));
-            aliPay = new AliPay(
-                    payInfo,
-                    mContext,
-                    WebViewBasedActivity.this
-            );
-            aliPay.setHandler(mHandler);
-            aliPay.setPayCallback(callback);
+            String type = object.optString("type");
 
-            aliPay.pay();
+            pay_type = type;
+            if (type.equals("alipay")) {
+                PayInfo payInfo = new PayInfo();
+
+                payInfo.setOrderNo(object.optString("order_no"));
+                payInfo.setProduct_name(object.optString("title"));
+                payInfo.setProduct_desc(object.optString("content"));
+                payInfo.setTotal_fee(object.optString("total_fee"));
+
+                aliPay = new AliPay(payInfo, mContext, WebViewBasedActivity.this);
+                aliPay.setHandler(mHandler);
+                aliPay.setPayCallback(callback);
+
+                aliPay.pay();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
