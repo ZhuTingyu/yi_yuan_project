@@ -799,8 +799,10 @@ public class WebViewBaseFragment extends Fragment {
         getBridge().registerHandler("showPickerView", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                Timber.v("showPickerView");
+
                 // ignore if picker already shown
-                if (pickPopWin == null) return;
+                if (pickPopWin != null && pickPopWin.isShowing()) return;
 
                 ArrayList item1 = new ArrayList();
                 ArrayList item2 = new ArrayList();
