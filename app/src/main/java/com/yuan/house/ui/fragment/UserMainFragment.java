@@ -125,7 +125,7 @@ public class UserMainFragment extends WebViewBaseFragment {
         if (event.getEventType() == LocationEvent.LocationEventEnum.UPDATED) {
             BDLocation location = event.getHolder();
 
-            String street = location.getStreet();
+            String street = location.getCity()+location.getDistrict();
             if (TextUtils.isEmpty(street)) {
                 street = getString(R.string.get_location);
             }
