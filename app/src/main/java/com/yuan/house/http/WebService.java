@@ -26,8 +26,6 @@ public class WebService {
     @Inject
     SharedPreferences prefs;
 
-    private String kHttpReqKeyContentType = "Content-Type";
-
     private WebService() {
         Injector.inject(this);
     }

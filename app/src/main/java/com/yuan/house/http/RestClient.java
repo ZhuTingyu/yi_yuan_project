@@ -1,6 +1,5 @@
 package com.yuan.house.http;
 
-import android.app.Application;
 import android.os.Looper;
 
 import com.baidu.location.BDLocation;
@@ -12,7 +11,9 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.SyncHttpClient;
 import com.yuan.house.application.DMApplication;
+import com.yuan.house.common.Constants;
 import com.yuan.house.event.NotificationEvent;
+import com.yuan.house.helper.AuthHelper;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -99,6 +100,8 @@ public class RestClient {
             }
         }
 
+        addHeader(getClient());
+
         getClient().get(rawUrl, params, responseHandler);
     }
 
@@ -109,6 +112,7 @@ public class RestClient {
         } else {
             rawUrl = getAbsoluteUrl(url);
         }
+
         getClient().post(rawUrl, params, responseHandler);
     }
 
@@ -133,6 +137,8 @@ public class RestClient {
             }
         }
 
+        addHeader(getClient());
+
         getClient().post(null, rawUrl, entity, null, responseHandler);
     }
 
@@ -156,6 +162,8 @@ public class RestClient {
                 it.remove(); // avoids a ConcurrentModificationException
             }
         }
+
+        addHeader(httpClient);
 
         httpClient.post(rawUrl, requestParams, responseHandler);
     }
@@ -301,8 +309,12 @@ public class RestClient {
         } else {
             rawUrl = getAbsoluteUrl(url);
         }
+
         if (params != null)
             params.setUseJsonStreamer(true);
+
+        addHeader(getClient());
+
         switch (method) {
             case METHOD_GET:
                 getClient().get(null, rawUrl, headers, params, responseHandler);
@@ -327,5 +339,15 @@ public class RestClient {
 
     private String getAbsoluteUrl(String relativeUrl) {
         return mHostname + relativeUrl;
+    }
+
+    private void addHeader(AsyncHttpClient client) {
+        client.addHeader(Constants.kHttpReqKeyAuthToken, AuthHelper.getInstance().getUserToken());
+
+        BDLocation location = DMApplication.getInstance().getLastActivatedLocation();
+        if (location != null) {
+            client.addHeader(Constants.kHttpReqKeyGeoDistrict, location.getDistrict());
+            client.addHeader(Constants.kHttpReqKeyGeoCity, location.getCity());
+        }
     }
 }
