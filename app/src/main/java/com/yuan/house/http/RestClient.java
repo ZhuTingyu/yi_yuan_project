@@ -22,6 +22,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -346,8 +348,15 @@ public class RestClient {
 
         BDLocation location = DMApplication.getInstance().getLastActivatedLocation();
         if (location != null) {
-            client.addHeader(Constants.kHttpReqKeyGeoDistrict, location.getDistrict());
-            client.addHeader(Constants.kHttpReqKeyGeoCity, location.getCity());
+            try {
+                String district = URLEncoder.encode(location.getDistrict(), "UTF-8");
+                String city = URLEncoder.encode(location.getCity(), "UTF-8");
+
+                client.addHeader(Constants.kHttpReqKeyGeoDistrict, district);
+                client.addHeader(Constants.kHttpReqKeyGeoCity, city);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
