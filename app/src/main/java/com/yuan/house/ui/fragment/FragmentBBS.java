@@ -171,7 +171,7 @@ public class FragmentBBS extends WebViewBaseFragment {
                 } else {
                     editor.putString(key, value);
                 }
-                editor.apply();
+                editor.commit();
 
                 mBridgeListener.onShowSampleMessageBoard();
             }

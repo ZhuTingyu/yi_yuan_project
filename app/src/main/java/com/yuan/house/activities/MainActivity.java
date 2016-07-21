@@ -272,7 +272,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         } else {
             editor.putString(key, value);
         }
-        editor.apply();
+        editor.commit();
 
         if (Constants.kWebDataKeyUserLogin.equals(key)) {
             try {
@@ -316,7 +316,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                             String chatUserId = avUser.getObjectId();
                             prefs.edit().putString("avUserLogin", username)
                                     .putString(Constants.kLeanChatCurrentUserObjectId, chatUserId)
-                                    .apply();
+                                    .commit();
 
                             doAVUserLogin();
 

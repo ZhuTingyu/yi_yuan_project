@@ -51,11 +51,4 @@ public class WebService {
 
         return hashMap;
     }
-
-
-    private HashMap<String, String> authTokenJsonHeader() {
-        HashMap<String, String> hashMap = new HashMap<>();
-        hashMap.put(kHttpReqKeyContentType, "application/json");
-        return hashMap;
-    }
 }
