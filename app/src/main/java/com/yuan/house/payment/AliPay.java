@@ -28,24 +28,25 @@ import java.net.URLEncoder;
 public class AliPay {
 
     // 商户PID
-    public static final String PARTNER = "2088021957520575";
+    public static final String PARTNER = "2088421216214878";
     // 商户收款账号
-    public static final String SELLER = "zhifubao@bigbuschina.com";
+    public static final String SELLER = "17828022209@163.com";
     // 商户私钥，pkcs8格式
     // openssl pkcs8 -topk8 -inform PEM -in rsa_private_key.pem -outform PEM -nocrypt
-    public static final String RSA_PRIVATE = "MIICXQIBAAKBgQDVyeELXPE42ohLgDsjtjuKhlGLH7ktJFQ7HuemLrRQTIx6NJjg" +
-            "w2Py8z5MhXLiSaDd5obNsGryGBhEcE3DTDQbl5B3dZrdMUz6IB9NLYeoXAOcQ5bS" +
-            "Q9ENS0hs6ffpacXad8Y4/s0AJdXDnw1QM1IDomSOA+7NWCDEdnx5mODyxwIDAQAB" +
-            "AoGAAXYf07QO8hSMWffGb7gPMCM663iMC4L0EHNlof0vvlzHmQ5C/UZYqJCBHITN" +
-            "BD78moe45C8QjBceE1mxLmSW9pYdKni485xSA9hKd4A0L8hC/Dq4OB6b68oeZWQg" +
-            "Ovb+wdippqcU/EMb43eeBfP853DHUS6RWpi5QxAsmPrM4gECQQD9p+XgyLKSTXaq" +
-            "CiaLKGHCT7g9fFgWWh3RxPNq0KRKJLTuxAWUR8pW/x1LkWzZZ7BZVioBiCSm5JSj" +
-            "koPiN+3TAkEA18OppSaMLhG0beeOQEPa6mguemsj/XD+Tx8u6afKIzeF3d4FSHED" +
-            "d+UtdzQiM7YUnA1FN88i7we8t63fM09qvQJBAKIK/3zxWbrDB9qq72KY4pLqsK1+" +
-            "4RsuaLxYkJSdQ0cmWfvqeBH5Jtca1REwjxP3/J2lwOIHojqH7jjs4ZnD1wcCQExx" +
-            "WwJTBOkxhp5FoqVsJPxVitn+aZLaXI9FugY4Vypg+oGfrnl66MKqpJAOHWv6v5SG" +
-            "MxbRwUu0jwz4ghKYuXUCQQC64VfeOizPmR7QKNyeBaY7ysymkc04NtfOkmuWoxoX" +
-            "ReYzheiYbhofmeBvYVpdmub5LtVrf/+w3f1HbCDuaRc3";
+    public static final String RSA_PRIVATE = "MIICeQIBADANBgkqhkiG9w0BAQEFAASCAmMwggJfAgEAAoGBAK+" +
+            "dfCPu9yWu7xBSlCCalEb6M7LY3jeVPmDKr80Yh8OZdWIhyVLIVjdIcNyw/brSfb9w" +
+            "YWYLsQKxfPjcx9oUqg4joTYsJmEQd32TgxMQELaW0l4GiE3QtBJ77fHvUkPXhpR4x" +
+            "Uoj0KZtwIl/JlvKH1M27ArsicnTJqMx9iBPvLPBAgMBAAECgYEApb7/UXLStDA81a" +
+            "z6vSLn2219qcjhQpiLPRNPhUUnrcaCcVHuD0GhjZ/DVad+cfsET9CjPIrAUAhwKPl" +
+            "Hbl6eeBSR0nVDnobVmhj9rB75uFH5ArOJXVRwpbjjDXhFI53Az2LnWr3CItsLKqzg" +
+            "b2o9PAtoFLtl34uhEZh2hPI89IECQQDjfXcQnWJ+nwUy0HOIrYPF4IhEq8T8byPOq" +
+            "ooGNQ/WSlZcgJQDdzVYMKH0JozluuEd+g4LVR8Nxm0jPwg4/ZZZAkEAxZ+5N7yIBm" +
+            "KAvm8KY7IA9jRomU83aXStNieCUZ2fIzaChHA6X04Kft5+JQgeHSYdUOjIWB5dCdy" +
+            "eJlKEFT+rqQJBAIg54KvdY1bpyQYl15mYNlmvXEqrBboYn7upWh/fdI1hVJfuEzSE" +
+            "FTirXsBCuYr0PsxhqjlVDtSD52T84OKn0HkCQQCY8BkIt1CVkFmOBqUFrlXsM3bXX" +
+            "mTFqdP6Wu0ReGgVejPbhnbGFsEsmccJpZSYfkyltuCEwUrDPQbvJWCuiQ2xAkEAkn" +
+            "Pc8zIulQLF2PmrkqUfk1XI7SXGoEW/83gxWvQm0UZBoOgeZ1CU0D6FO+f56baBE1S" +
+            "2mCqcCIG5bDALl1CPWw==";
 
     private static final int SDK_PAY_FLAG = 1;
     private static final int SDK_CHECK_FLAG = 2;

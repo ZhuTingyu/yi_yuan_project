@@ -431,12 +431,13 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
             pay_type = type;
             if (type.equals("alipay")) {
+                JSONObject order = object.optJSONObject("order");
                 PayInfo payInfo = new PayInfo();
 
-                payInfo.setOrderNo(object.optString("order_no"));
-                payInfo.setProduct_name(object.optString("title"));
-                payInfo.setProduct_desc(object.optString("content"));
-                payInfo.setTotal_fee(object.optString("total_fee"));
+                payInfo.setOrderNo(order.optString("order_no"));
+                payInfo.setProduct_name(order.optString("title"));
+                payInfo.setProduct_desc(order.optString("content"));
+                payInfo.setTotal_fee(order.optString("total_fee"));
 
                 aliPay = new AliPay(payInfo, mContext, WebViewBasedActivity.this);
                 aliPay.setHandler(mHandler);
