@@ -63,6 +63,10 @@ public class UserMainFragment extends WebViewBaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        BDLocation location = DMApplication.getInstance().getLastActivatedLocation();
+        if (location != null) {
+            address.setText(location.getCity()+location.getDistrict());
+        }
     }
 
     @Override
