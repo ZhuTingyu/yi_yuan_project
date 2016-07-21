@@ -276,13 +276,14 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 final String text = (String) mMoreAdapter.getItem(position);
-                int value = mMoreAdapter.getValue(position);
+
+                // 中心合同一定是0，买卖合同一定是1，补充协议一定是2
                 if (text.equals("中心合同")) {
-                    getWebViewFragment().getBridge().callHandler("ClickContractButton", Integer.toString(value));
+                    getWebViewFragment().getBridge().callHandler("ClickContractButton", 0);
                 } else if (text.equals("买卖合同")) {
-                    getWebViewFragment().getBridge().callHandler("ClickContractButton", Integer.toString(value));
+                    getWebViewFragment().getBridge().callHandler("ClickContractButton", 1);
                 } else if (text.equals("补充协议")) {
-                    getWebViewFragment().getBridge().callHandler("ClickContractButton", Integer.toString(value));
+                    getWebViewFragment().getBridge().callHandler("ClickContractButton", 2);
                 } else if (text.equals("前置留言板")) {
                     getWebViewFragment().getBridge().callHandler("onPreConditionButtonClick");
                 } else if (text.equals("房源")) {
