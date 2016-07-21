@@ -37,6 +37,8 @@ public class UserMainFragment extends WebViewBaseFragment {
     @BindView(R.id.address)
     TextView address;
 
+    private BDLocation location;
+
     public static UserMainFragment newInstance() {
         UserMainFragment fragment = new UserMainFragment();
         Bundle args = new Bundle();
@@ -61,11 +63,6 @@ public class UserMainFragment extends WebViewBaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        BDLocation location = DMApplication.getInstance().getLastActivatedLocation();
-        if (location != null) {
-            address.setText(location.getCity()+location.getDistrict());
-        }
     }
 
     @Override
@@ -82,7 +79,18 @@ public class UserMainFragment extends WebViewBaseFragment {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.rl_center:
-                mBridgeListener.onBridgeSelectMapLocation(null);
+
+                JSONObject data = new JSONObject();
+                try {
+                    if(location != null){
+                        data.put("lat",location.getLatitude());
+                        data.put("lng",location.getLongitude());
+                        data.put("addr",location.getAddress());
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                mBridgeListener.onBridgeSelectMapLocation(data.toString());
                 break;
             case R.id.position:
                 ((MainActivity) getActivity()).getBottomNavigationBar().selectTab(2);
@@ -123,7 +131,7 @@ public class UserMainFragment extends WebViewBaseFragment {
 
     public void onEvent(LocationEvent event) {
         if (event.getEventType() == LocationEvent.LocationEventEnum.UPDATED) {
-            BDLocation location = event.getHolder();
+            location = event.getHolder();
 
             String street = location.getCity()+location.getDistrict();
             if (TextUtils.isEmpty(street)) {
