@@ -183,7 +183,10 @@ dependencies {
 
     /** UI .        */
     compile 'com.tasomaniac:delayed-progress:0.3'
-
+    compile('de.keyboardsurfer.android.widget:crouton:1.8.5@aar') {
+        // exclusion is not necessary, but generally a good idea.
+        exclude group: 'com.google.android', module: 'support-v4'
+    }
     compile 'com.github.flavienlaurent.datetimepicker:library:0.0.2'
     compile 'com.baoyz.actionsheet:library:1.1.5'
     compile 'com.github.citux:datetimepicker:0.2.0'

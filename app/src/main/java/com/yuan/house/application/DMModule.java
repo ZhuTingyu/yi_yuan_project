@@ -59,11 +59,13 @@ import dagger.Module;
                         MapActivity.class,
                         SwitchHouseActivity.class,
                         CropActivity.class,
-                        SegmentalWebActivity.class
+                        SegmentalWebActivity.class,
+
+                        AuthHelper.class
                 },
 
                 staticInjections = {
-                        AuthHelper.class
+//                        AuthHelper.class
                 }
 
         )

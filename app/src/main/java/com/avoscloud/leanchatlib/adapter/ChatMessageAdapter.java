@@ -156,7 +156,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                     tradeType = "0";
                 }
 
-                if (AuthHelper.iAmUser()) {
+                if (AuthHelper.getInstance().iAmUser()) {
                     param = String.format("user_personal_info.html?%s&%s&%s", "0", userId, tradeType);
 
                 } else {

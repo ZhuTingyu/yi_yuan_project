@@ -330,7 +330,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.KICK_OUT) {
             JSONObject object = event.getHolder();
 
-            if (object == null || (AuthHelper.userAlreadyLogin() && !AuthHelper.userToken().equals(object.optString("exclusive_token")))) {
+            if (object == null || (AuthHelper.getInstance().userAlreadyLogin() && !AuthHelper.getInstance().getUserToken().equals(object.optString("exclusive_token")))) {
                 Toast.makeText(mContext, "您的账号在别处登陆", Toast.LENGTH_SHORT).show();
 
                 DMApplication.getInstance().kickOut();
@@ -422,40 +422,30 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    public void onBridgeRequestPurchase(WebViewJavascriptBridge.WVJBResponseCallback callback) {
-//        Map<String, Object> params = null;
-//        Map<String, Object> orderMap = null;
-//        Map<String, Object> orderPackagesMap = null;
-//        try {
-//            params = (Map<String, Object>) JsonUtils.newInstance().readJson2List(data);
-//            orderMap = (Map<String, Object>) params.get("order");
-//            List<Object> orderPackagesList = (List<Object>) orderMap.get("order_packages");
-//            orderPackagesMap = (Map<String, Object>) orderPackagesList.get(0);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+    public void onBridgeRequestPurchase(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
+        JSONObject object;
+        try {
+            object = new JSONObject(data);
 
-        String type = "alipay";
-//                String type = (String) params.get("type");
-        pay_type = type;
-        if (type.equals("alipay")) {
-            PayInfo payInfo = new PayInfo();
-//                    payInfo.setOrderNo(orderMap.get("order_no").toString());
-//                    payInfo.setProduct_desc(orderPackagesMap.get("package_name").toString()+ orderPackagesMap.get("total_num").toString() + "张");
-            payInfo.setOrderNo("123332222");
-            payInfo.setProduct_desc("测试测试测试");
-            payInfo.setProduct_name("支付Title");
-            payInfo.setTotal_fee("0.01");
-//                    payInfo.setTotal_fee(String.valueOf(((Integer) orderMap.get("total_fee") / 100)));
-            aliPay = new AliPay(
-                    payInfo,
-                    mContext,
-                    WebViewBasedActivity.this
-            );
-            aliPay.setHandler(mHandler);
-            aliPay.setPayCallback(callback);
+            String type = object.optString("type");
 
-            aliPay.pay();
+            pay_type = type;
+            if (type.equals("alipay")) {
+                PayInfo payInfo = new PayInfo();
+
+                payInfo.setOrderNo(object.optString("order_no"));
+                payInfo.setProduct_name(object.optString("title"));
+                payInfo.setProduct_desc(object.optString("content"));
+                payInfo.setTotal_fee(object.optString("total_fee"));
+
+                aliPay = new AliPay(payInfo, mContext, WebViewBasedActivity.this);
+                aliPay.setHandler(mHandler);
+                aliPay.setPayCallback(callback);
+
+                aliPay.pay();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
@@ -568,7 +558,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                                     otherId = "0";
                                 } else {
                                     for (int j = 0; j < ids.size(); j++) {
-                                        if (Integer.parseInt(AuthHelper.userId()) != ids.getInteger(j)) {
+                                        if (Integer.parseInt(AuthHelper.getInstance().getUserId()) != ids.getInteger(j)) {
                                             otherId = ids.getString(j);
                                             break;
                                         }
@@ -659,45 +649,61 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         String houseId = null;
         JSONArray leanIdList = null;
         String text = null;
-        JSONObject object = null;
-        try {
-            object = new JSONObject(data);
-            houseId = object.optString("house_id");
-            leanIdList = object.optJSONArray("lean_id");
-            text = object.optString("text");
+        JSONObject rawObject = null;
+        JSONArray userIdList = null;
 
-            if ("agency".equals(object.optString("type"))) {
+        try {
+            rawObject = new JSONObject(data);
+            houseId = rawObject.optString("house_id");
+            leanIdList = rawObject.optJSONArray("lean_id");
+            userIdList = rawObject.optJSONArray("user_id");
+            text = rawObject.optString("text");
+
+            if ("agency".equals(rawObject.optString("type"))) {
                 isAgency = true;
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        String leanIdString = leanIdList.optString(leanIdList.length() - 1);
-
         // 创建相应对话, 并发送文本信息到该会话
         final String finalHouseId = houseId;
         final String finalText = text;
 
-        ChatManager.getInstance().fetchConversationWithUserId(object, leanIdString, new AVIMConversationCreatedCallback() {
-            @Override
-            public void done(AVIMConversation avimConversation, AVIMException e) {
-                AVIMTextMessage message = new AVIMTextMessage();
+        for (int i = 0; i < leanIdList.length(); i++) {
+            String leanIdString = leanIdList.optString(i);
 
-                Map<String, Object> attrs = new HashMap<>();
-                attrs.put("houseId", finalHouseId);
-
-                message.setAttrs(attrs);
-
-                message.setText(finalText);
-
-                MessageAgent messageAgent = new MessageAgent(avimConversation);
-                messageAgent.sendEncapsulatedTypedMessage(message);
-
-                // 发送成功之后需要缓存该条消息到本地
-                ChatManager.getInstance().storeLastMessage(message);
+            JSONObject object = new JSONObject();
+            try {
+                object.put("lean_id", leanIdString);
+                object.put("user_id", userIdList.optString(i));
+                object.put("house_id", houseId);
+                object.put("text", text);
+                object.put("type", rawObject.optString("type"));
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        });
+
+            ChatManager.getInstance().fetchConversationWithUserId(object, leanIdString, new AVIMConversationCreatedCallback() {
+                @Override
+                public void done(AVIMConversation avimConversation, AVIMException e) {
+                    AVIMTextMessage message = new AVIMTextMessage();
+
+                    Map<String, Object> attrs = new HashMap<>();
+                    attrs.put("houseId", finalHouseId);
+
+                    message.setAttrs(attrs);
+
+                    message.setText(finalText);
+
+                    MessageAgent messageAgent = new MessageAgent(avimConversation);
+                    messageAgent.sendEncapsulatedTypedMessage(message);
+
+                    // 发送成功之后需要缓存该条消息到本地
+                    ChatManager.getInstance().storeLastMessage(message);
+                }
+            });
+        }
     }
 
     public void onBridgeLogout() {
@@ -1004,7 +1010,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     protected void restGet(String url, AsyncHttpResponseHandler responseHandler) {
-        RestClient.getInstance().get(url, AuthHelper.authTokenJsonHeader(), responseHandler);
+        RestClient.getInstance().get(url, AuthHelper.getInstance().authTokenJsonHeader(), responseHandler);
     }
 
     @Override

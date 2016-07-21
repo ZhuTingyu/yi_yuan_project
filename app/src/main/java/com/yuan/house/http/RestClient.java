@@ -106,7 +106,7 @@ public class RestClient {
     }
 
     public void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
-        String rawUrl = null;
+        String rawUrl;
         if (url.startsWith("http://") || url.startsWith("https://")) {
             rawUrl = url;
         } else {

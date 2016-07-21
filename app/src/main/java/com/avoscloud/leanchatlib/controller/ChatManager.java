@@ -155,7 +155,7 @@ public class ChatManager extends AVIMClientEventHandler {
                         callback.done(conversations.get(0), null);
                     } else {
                         ArrayList<Integer> ids = new ArrayList<>();
-                        ids.add(Integer.parseInt(AuthHelper.userId()));
+                        ids.add(Integer.parseInt(AuthHelper.getInstance().getUserId()));
                         ids.add(Integer.parseInt(param.optString("user_id")));
 
                         Map<String, Object> attrs = new HashMap<>();

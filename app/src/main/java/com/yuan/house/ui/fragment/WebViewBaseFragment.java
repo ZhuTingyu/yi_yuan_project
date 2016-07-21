@@ -216,7 +216,7 @@ public class WebViewBaseFragment extends Fragment {
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Log.i("reponse.data", data);
 
-                mBridgeListener.onBridgeRequestPurchase(callback);
+                mBridgeListener.onBridgeRequestPurchase(data, callback);
             }
         });
 
@@ -799,8 +799,10 @@ public class WebViewBaseFragment extends Fragment {
         getBridge().registerHandler("showPickerView", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                Timber.v("showPickerView");
+
                 // ignore if picker already shown
-                if (pickPopWin == null) return;
+                if (pickPopWin != null && pickPopWin.isShowing()) return;
 
                 ArrayList item1 = new ArrayList();
                 ArrayList item2 = new ArrayList();
@@ -1128,7 +1130,7 @@ public class WebViewBaseFragment extends Fragment {
     }
 
     public interface OnBridgeInteractionListener {
-        void onBridgeRequestPurchase(WebViewJavascriptBridge.WVJBResponseCallback callback);
+        void onBridgeRequestPurchase(String data, WebViewJavascriptBridge.WVJBResponseCallback callback);
 
         void onBridgeSelectImageFromNative(String data, WebViewJavascriptBridge.WVJBResponseCallback callback);
 
