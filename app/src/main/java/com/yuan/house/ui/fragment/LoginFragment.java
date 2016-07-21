@@ -60,12 +60,10 @@ public class LoginFragment extends WebViewBaseFragment {
         if (event.getEventType() == LocationEvent.LocationEventEnum.UPDATED) {
             BDLocation location = event.getHolder();
 
-            String street = location.getCity()+location.getDistrict();
-            if (TextUtils.isEmpty(street)) {
-                street = getString(R.string.get_location);
-            }
+            String city = TextUtils.isEmpty(location.getCity()) ? "成都市" : location.getCity();
+            String district = TextUtils.isEmpty(location.getDistrict()) ? "" : location.getDistrict();
 
-            address.setText(street);
+            address.setText(city + " " + district);
         }
     }
 

@@ -115,4 +115,6 @@ public class Constants {
     public static int kNotifyId = 1;
     public static String kLastActivatedHouseId = "kLastActivatedHouseId";
     public static String kLastActivatedHouseTradeType = "kLastActivatedHouseTradeType";
+    public static String kHttpReqKeyGeoCity = "city";
+    public static String kHttpReqKeyGeoDistrict = "district";
 }

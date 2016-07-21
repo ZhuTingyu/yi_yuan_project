@@ -63,9 +63,13 @@ public class UserMainFragment extends WebViewBaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         BDLocation location = DMApplication.getInstance().getLastActivatedLocation();
         if (location != null) {
-            address.setText(location.getCity()+location.getDistrict());
+            String city = TextUtils.isEmpty(location.getCity()) ? "成都市" : location.getCity();
+            String district = TextUtils.isEmpty(location.getDistrict()) ? "" : location.getDistrict();
+
+            address.setText(city + " " + district);
         }
     }
 
@@ -86,10 +90,10 @@ public class UserMainFragment extends WebViewBaseFragment {
 
                 JSONObject data = new JSONObject();
                 try {
-                    if(location != null){
-                        data.put("lat",location.getLatitude());
-                        data.put("lng",location.getLongitude());
-                        data.put("addr",location.getAddress());
+                    if (location != null) {
+                        data.put("lat", location.getLatitude());
+                        data.put("lng", location.getLongitude());
+                        data.put("addr", location.getAddress());
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -137,12 +141,10 @@ public class UserMainFragment extends WebViewBaseFragment {
         if (event.getEventType() == LocationEvent.LocationEventEnum.UPDATED) {
             location = event.getHolder();
 
-            String street = location.getCity()+location.getDistrict();
-            if (TextUtils.isEmpty(street)) {
-                street = getString(R.string.get_location);
-            }
+            String city = TextUtils.isEmpty(location.getCity()) ? "成都市" : location.getCity();
+            String district = TextUtils.isEmpty(location.getDistrict()) ? "" : location.getDistrict();
 
-            address.setText(street);
+            address.setText(city + " " + district);
         }
     }
 }

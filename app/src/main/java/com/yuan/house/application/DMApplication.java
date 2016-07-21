@@ -36,11 +36,11 @@ import com.avoscloud.leanchatlib.model.UserInfo;
 import com.avoscloud.leanchatlib.utils.Logger;
 import com.baidu.location.BDLocation;
 import com.baidu.mapapi.SDKInitializer;
-import com.bugtags.library.Bugtags;
 import com.dimo.utils.FileUtil;
 import com.dimo.utils.StringUtil;
 import com.dimo.utils.ZipUtil;
 import com.github.kevinsawicki.http.HttpRequest;
+import com.karumi.dexter.Dexter;
 import com.lfy.dao.DaoMaster;
 import com.lfy.dao.DaoSession;
 import com.lfy.dao.MessageDao;
@@ -149,8 +149,12 @@ public class DMApplication extends Application {
 
         instance = this;
 
+        Dexter.initialize(this);
+
         // Perform injection
         Injector.init(getRootModule(), this);
+
+        // TODO: 16/7/21 move this to heavy operation job.
         initDatabase();
 
         Utils.fixAsyncTaskBug();
@@ -158,7 +162,7 @@ public class DMApplication extends Application {
 //        if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
 //        } else {
-            Bugtags.start(Constants.kBugTagsKey, this, Bugtags.BTGInvocationEventBubble);
+//            Bugtags.start(Constants.kBugTagsKey, this, Bugtags.BTGInvocationEventBubble);
 //        }
 
         PackageInfo pInfo = null;
@@ -174,7 +178,6 @@ public class DMApplication extends Application {
             Timber.i("Register preference defaults when FIRST LAUNCH!!");
 
             editor.putBoolean(Constants.kPrefsFirstLaunch, false);
-
         } else {
             Timber.v("Not First launch");
         }
