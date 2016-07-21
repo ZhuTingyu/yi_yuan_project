@@ -240,7 +240,9 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
             return;
         }
 
-        city = reverseGeoCodeResult.getAddressDetail().city;
+        if (reverseGeoCodeResult.getAddressDetail() != null) {
+            city = reverseGeoCodeResult.getAddressDetail().city;
+        }
 
         tvLocationField.setText(reverseGeoCodeResult.getAddress());
 
