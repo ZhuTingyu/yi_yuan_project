@@ -200,8 +200,8 @@
     <string name="menu_copy">复制</string>
     <string name="menu_more">更多</string>
     <string name="txt_required_house_name">需求%1$d</string>
-    <string name="tabbar_item_txt_order_contract_audit">订房合同审核</string>
-    <string name="tabbar_item_txt_deal_contract_audit">买卖合同审核</string>
+    <string name="tabbar_item_txt_order_contract_audit">买卖合同审核</string>
+    <string name="tabbar_item_txt_deal_contract_audit">补充协议审核</string>
     <string name="user_type_agency">经纪人</string>
     <string name="user_type_user">用户</string>
     <string name="chat_house">房源</string>
