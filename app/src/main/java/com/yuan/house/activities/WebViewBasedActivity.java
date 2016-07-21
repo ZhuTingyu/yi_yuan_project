@@ -644,7 +644,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     @Override
-    public void onBridgeSendNoticeMessage(final String data) {
+    public void onBridgeSendNoticeMessage(final String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
         boolean isAgency = false;
 
         String houseId = null;
@@ -685,6 +685,8 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 e.printStackTrace();
             }
 
+            final int finalI = i;
+            final JSONArray finalLeanIdList = leanIdList;
             ChatManager.getInstance().fetchConversationWithUserId(object, leanIdString, new AVIMConversationCreatedCallback() {
                 @Override
                 public void done(AVIMConversation avimConversation, AVIMException e) {
@@ -692,6 +694,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
                     Map<String, Object> attrs = new HashMap<>();
                     attrs.put("houseId", finalHouseId);
+                    attrs.put("username", "wo");
 
                     message.setAttrs(attrs);
 
@@ -702,6 +705,10 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
                     // 发送成功之后需要缓存该条消息到本地
                     ChatManager.getInstance().storeLastMessage(message);
+
+                    if (finalI == (finalLeanIdList.length() - 1)) {
+                        callback.callback("onBridgeSendNoticeMessage finished");
+                    }
                 }
             });
         }

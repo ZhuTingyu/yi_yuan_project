@@ -19,6 +19,8 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 
+import timber.log.Timber;
+
 /**
  * Created by lzw on 14/11/23.
  */
@@ -47,7 +49,10 @@ public class MessageAgent {
             Logger.d("im not connect");
         }
 
-        assert conv != null;
+        if (conv == null) {
+            Timber.e("converation find null");
+            return;
+        }
 
         conv.sendMessage(msg, AVIMConversation.RECEIPT_MESSAGE_FLAG, new AVIMConversationCallback() {
             @Override

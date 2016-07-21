@@ -1,6 +1,7 @@
 package com.dimo.web;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.webkit.ConsoleMessage;
 import android.webkit.JavascriptInterface;
@@ -34,6 +35,7 @@ import timber.log.Timber;
  * Time: 下午6:08
  */
 public class WebViewJavascriptBridge implements Serializable {
+    protected OnBridgeWebViewListener mBridgeWebViewListener;
 
     WebView mWebView;
     Activity mContext;
@@ -92,12 +94,19 @@ public class WebViewJavascriptBridge implements Serializable {
 
             loadWebViewJavascriptBridgeJs(webView);
         }
+
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            super.onPageStarted(view, url, favicon);
+
+            if (mBridgeWebViewListener != null) mBridgeWebViewListener.OnBridgeWebViewPageStart();
+        }
     }
 
     private class InterestWebChromeClient extends WebChromeClient {
         @Override
         public boolean onConsoleMessage(ConsoleMessage cm) {
-            Timber.v("Web View " + cm.message() + " line:" + cm.lineNumber());
+//            Timber.v("Web View " + cm.message() + " line:" + cm.lineNumber());
             return true;
         }
 
@@ -186,6 +195,9 @@ public class WebViewJavascriptBridge implements Serializable {
                 Timber.e("WebViewJavascriptBridge: WARNING: java handler threw. " + exception.getMessage());
             }
         }
+    }
+    public interface OnBridgeWebViewListener {
+        void OnBridgeWebViewPageStart();
     }
 
     public void send(String data) {

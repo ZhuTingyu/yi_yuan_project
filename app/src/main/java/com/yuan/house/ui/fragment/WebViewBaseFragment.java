@@ -36,6 +36,7 @@ import com.lfy.dao.MessageDao;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.yuan.house.R;
+import com.yuan.house.activities.WebViewBasedActivity;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
@@ -66,7 +67,7 @@ import timber.log.Timber;
 /**
  * Created by Alsor Zhou on 8/13/15.
  */
-public class WebViewBaseFragment extends Fragment {
+public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBridge.OnBridgeWebViewListener {
     protected WebViewJavascriptBridge bridge;
     protected OnFragmentInteractionListener mFragmentListener;
     protected OnBridgeInteractionListener mBridgeListener;
@@ -656,7 +657,7 @@ public class WebViewBaseFragment extends Fragment {
                 Timber.v("sendNoticeMessage" + data);
 
                 if (mBridgeListener != null) {
-                    mBridgeListener.onBridgeSendNoticeMessage(data);
+                    mBridgeListener.onBridgeSendNoticeMessage(data, callback);
                 }
             }
         });
@@ -1115,6 +1116,11 @@ public class WebViewBaseFragment extends Fragment {
         imm.hideSoftInputFromWindow(mWebView.getWindowToken(), 0);
     }
 
+    @Override
+    public void OnBridgeWebViewPageStart() {
+        ((WebViewBasedActivity) getActivity()).onBridgeDismissProgressDialog();
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -1172,7 +1178,7 @@ public class WebViewBaseFragment extends Fragment {
 
         void onBridgeShowImageGallery(List<String> data);
 
-        void onBridgeSendNoticeMessage(String data);
+        void onBridgeSendNoticeMessage(String data, WebViewJavascriptBridge.WVJBResponseCallback callback);
 
         void onBridgeShowActionSheet(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback);
 
