@@ -1,7 +1,9 @@
 package com.yuan.house.http;
 
+import android.app.Application;
 import android.os.Looper;
 
+import com.baidu.location.BDLocation;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.loopj.android.http.AsyncHttpClient;
@@ -9,6 +11,7 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.SyncHttpClient;
+import com.yuan.house.application.DMApplication;
 import com.yuan.house.event.NotificationEvent;
 
 import org.apache.http.Header;
@@ -88,6 +91,9 @@ public class RestClient {
 
         if (headers != null && (headers instanceof HashMap)) {
             Iterator it = headers.entrySet().iterator();
+            BDLocation lastActivatedLocation = DMApplication.getInstance().getLastActivatedLocation();
+            getClient().addHeader("city",lastActivatedLocation.getCity());
+            getClient().addHeader("district",lastActivatedLocation.getDistrict());
             while (it.hasNext()) {
                 Map.Entry pair = (Map.Entry) it.next();
                 Timber.v(pair.getKey() + " = " + pair.getValue());
@@ -122,6 +128,9 @@ public class RestClient {
 
         if (headers != null && (headers instanceof HashMap)) {
             Iterator it = headers.entrySet().iterator();
+            BDLocation lastActivatedLocation = DMApplication.getInstance().getLastActivatedLocation();
+            getClient().addHeader("city",lastActivatedLocation.getCity());
+            getClient().addHeader("district",lastActivatedLocation.getDistrict());
             while (it.hasNext()) {
                 Map.Entry pair = (Map.Entry) it.next();
                 Timber.v(pair.getKey() + " = " + pair.getValue());

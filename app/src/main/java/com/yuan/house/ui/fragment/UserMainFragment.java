@@ -64,7 +64,7 @@ public class UserMainFragment extends WebViewBaseFragment {
 
         BDLocation location = DMApplication.getInstance().getLastActivatedLocation();
         if (location != null) {
-            address.setText(location.getStreet());
+            address.setText(location.getCity()+location.getDistrict());
         }
     }
 
