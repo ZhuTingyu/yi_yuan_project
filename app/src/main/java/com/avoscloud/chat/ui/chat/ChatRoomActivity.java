@@ -586,15 +586,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case LOCATION_REQUEST: {
-                    final double latitude = data.getDoubleExtra(LocationActivity.LATITUDE, 0);
-
-                    final double longitude = data.getDoubleExtra(LocationActivity.LONGITUDE, 0);
-                    final String address = data.getStringExtra(LocationActivity.ADDRESS);
-                    if (!TextUtils.isEmpty(address)) {
-                        messageAgent.sendLocation(latitude, longitude, address);
-                    } else {
-                        ToastUtil.show(mContext, R.string.chat_cannotGetYourAddressInfo);
-                    }
+                    ToastUtil.show(mContext, "暂不支持");
                     hideBottomLayout();
                     break;
                 }
