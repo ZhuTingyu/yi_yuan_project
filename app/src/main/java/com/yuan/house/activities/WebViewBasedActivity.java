@@ -437,7 +437,9 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 payInfo.setOrderNo(order.optString("order_no"));
                 payInfo.setProduct_name(order.optString("title"));
                 payInfo.setProduct_desc(order.optString("content"));
-                payInfo.setTotal_fee(order.optString("total_fee"));
+// FIXME: 测试环境统一为 1 分钱
+//                payInfo.setTotal_fee(order.optString("total_fee"));
+                payInfo.setTotal_fee("0.01");
 
                 aliPay = new AliPay(payInfo, mContext, WebViewBasedActivity.this);
                 aliPay.setHandler(mHandler);
