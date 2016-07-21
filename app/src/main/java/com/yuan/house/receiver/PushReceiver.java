@@ -35,7 +35,7 @@ public class PushReceiver extends BroadcastReceiver {
             if (extras == null) return;
             String channel = extras.getString("com.avos.avoscloud.Channel");
             //获取消息内容
-            JSONObject json = new JSONObject(intent.getExtras().getString("com.avos.avoscloud.Data"));
+            JSONObject json = new JSONObject(extras.getString("com.avos.avoscloud.Data"));
 
             Timber.d("got action " + action + " on channel " + channel + " with:");
             Iterator itr = json.keys();
