@@ -345,10 +345,10 @@ public class ChatManager extends AVIMClientEventHandler {
         text = MessageHelper.outlineOfMsg(msg).toString();
 
         if (msgType == HouseMessageType.TextMessageType) {
-            houseId = (String) ((AVIMTextMessage) msg).getAttrs().get("houseId");
+            houseId = ((AVIMTextMessage) msg).getAttrs().get("houseId").toString();
             text = ((AVIMTextMessage) msg).getText();
         } else if (msgType == HouseMessageType.HouseMessageType) {
-            houseId = (String) ((AVIMHouseMessage) msg).getAttrs().get("houseId");
+            houseId = ((AVIMHouseMessage) msg).getAttrs().get("houseId").toString();
         }
 
         MessageDao dao = DMApplication.getInstance().getMessageDao();
