@@ -120,7 +120,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
                     try {
                         String city = bdLocation.getCity();
                         String district = bdLocation.getDistrict();
-                        data.put("addr", city + district);
+                        data.put("addr", city + district + bdLocation.getStreet());
                         data.put("city", city);
                         data.put("district", district);
                         data.put("lat", bdLocation.getLatitude());

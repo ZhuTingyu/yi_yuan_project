@@ -693,7 +693,7 @@ public class WebViewBaseFragment extends Fragment {
                     try {
                         String city = location.getCity();
                         String district = location.getDistrict();
-                        object.put("addr", city + district);
+                        object.put("addr", city + district + location.getStreet());
                         object.put("city", city);
                         object.put("district", district);
                         object.put("lat", location.getLatitude());
