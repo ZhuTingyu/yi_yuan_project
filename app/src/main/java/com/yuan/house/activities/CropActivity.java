@@ -89,11 +89,11 @@ public class CropActivity extends BaseFragmentActivity {
         }
         cropImageView.setAspectRatio(width, height);
     }
-
     private void readyToCrop() {
-        Bitmap bm = cropImageView.getCroppedImage();
 
-        BitmapUtil.saveBitmap(this, bm, imagePath);
+        Bitmap bm = cropImageView.getCroppedImage();
+        Bitmap newBitmap = BitmapUtil.zoomImg(bm, 0.8f);
+        BitmapUtil.saveBitmap(this, newBitmap, imagePath);
     }
 
     private String imageClippedPath() {

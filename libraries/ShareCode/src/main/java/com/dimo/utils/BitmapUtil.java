@@ -2,12 +2,15 @@ package com.dimo.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.provider.MediaStore;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
@@ -17,8 +20,10 @@ public class BitmapUtil {
     public static void saveBitmap(Context context, Bitmap bm, String path) {
         OutputStream fOut = null;
         File file = new File(path); // the File to save to
+
         try {
             fOut = new FileOutputStream(file);
+
             bm.compress(Bitmap.CompressFormat.JPEG, 85, fOut); // saving the Bitmap to a file compressed as a JPEG with 85% compression rate
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -40,4 +45,17 @@ public class BitmapUtil {
             e.printStackTrace();
         }
     }
+
+    public static Bitmap zoomImg(Bitmap bm, float scale){
+        // 获得图片的宽高
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+        // 取得想要缩放的matrix参数
+        Matrix matrix = new Matrix();
+        matrix.postScale(scale, scale);
+        // 得到新的图片
+        Bitmap newbm = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
+        return newbm;
+    }
+
 }
