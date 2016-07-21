@@ -40,9 +40,9 @@
                 android:src="@drawable/img_position"/>
 
             <TextView
+                android:id="@+id/fragment_login_address"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="新世纪环球中心"
                 android:textSize="16dp"
                 android:textColor="@color/white"/>
 
