@@ -520,6 +520,10 @@ public class DMApplication extends Application {
     }
 
     public void stopSelf() {
-        DBHelper.getCurrentUserInstance().closeHelper();
+        try {
+            DBHelper.getCurrentUserInstance().closeHelper();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
