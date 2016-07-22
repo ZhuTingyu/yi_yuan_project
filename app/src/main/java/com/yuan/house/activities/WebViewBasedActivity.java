@@ -362,7 +362,11 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 List<String> path = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
                 // /storage/emulated/0/DCIM/IMG_-646584368.jpg
 
-                mBridgeCallback.callback(path);
+                JSONArray objects = new JSONArray();
+                for (int i = 0; i < path.size(); i++) {
+                    objects.put(path.get(i));
+                }
+                mBridgeCallback.callback(objects.toString());
             }
         } else if (requestCode == kActivityRequestCodeImagePickThenUpload) {
             // TODO: 16/6/9 upload files directly
@@ -475,7 +479,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 selector = selector.single(); // single mode
                 requestCode = Constants.kActivityRequestCodeImagePickThenCropSquare;
             } else if (Constants.kImageCropTypeNone.equals(type)) {
-                selector = selector.multi(); // single mode
+                selector = selector.multi(); // multi image mode
             }
 
             selector.start(this, requestCode);
