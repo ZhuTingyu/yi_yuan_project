@@ -19,7 +19,6 @@ import javax.inject.Inject;
  * Created by Alsor Zhou on 10/16/15.
  */
 public class WebService {
-    public static String kHttpReqKeyToken = "token";
 
     private static WebService ourInstance = new WebService();
 
@@ -45,7 +44,7 @@ public class WebService {
     private HashMap<String, String> authTokenHeader() {
         HashMap<String, String> hashMap = new HashMap<>();
 
-        hashMap.put(kHttpReqKeyToken, AuthHelper.getInstance().getUserToken());
+        hashMap.put(Constants.kHttpReqKeyAuthToken, AuthHelper.getInstance().getUserToken());
 
         return hashMap;
     }

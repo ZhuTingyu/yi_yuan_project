@@ -1,6 +1,7 @@
 package com.yuan.house.http;
 
 import android.os.Looper;
+import android.text.TextUtils;
 
 import com.baidu.location.BDLocation;
 import com.dimo.utils.StringUtil;
@@ -134,14 +135,15 @@ public class RestClient {
             while (it.hasNext()) {
                 Map.Entry pair = (Map.Entry) it.next();
                 Timber.v(pair.getKey() + " = " + pair.getValue());
-                getClient().addHeader(pair.getKey().toString(), pair.getValue().toString());
+                httpClient.addHeader(pair.getKey().toString(), pair.getValue().toString());
                 it.remove(); // avoids a ConcurrentModificationException
             }
         }
 
-        addHeader(getClient());
+//        httpClient.addHeader(Constants.kHttpReqKeyContentType, entity.getContentType().getValue());
+        addHeader(httpClient);
 
-        getClient().post(null, rawUrl, entity, null, responseHandler);
+        httpClient.post(null, rawUrl, entity, null, responseHandler);
     }
 
     public void post(String url, HashMap<String, String> headers, RequestParams requestParams, AsyncHttpResponseHandler responseHandler) {
@@ -347,7 +349,7 @@ public class RestClient {
         client.addHeader(Constants.kHttpReqKeyAuthToken, AuthHelper.getInstance().getUserToken());
 
         BDLocation location = DMApplication.getInstance().getLastActivatedLocation();
-        if (location != null) {
+        if (location != null && !TextUtils.isEmpty(location.getDistrict()) && !TextUtils.isEmpty(location.getCity())) {
             try {
                 String district = URLEncoder.encode(location.getDistrict(), "UTF-8");
                 String city = URLEncoder.encode(location.getCity(), "UTF-8");
