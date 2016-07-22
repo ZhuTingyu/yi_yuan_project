@@ -24,7 +24,8 @@
         android:name="com.yuan.house.ui.fragment.BBSFragment"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:layout_marginTop="@dimen/topbar_height" />
+        android:layout_marginTop="@dimen/topbar_height"
+        android:visibility="gone"/>
 
     <!--<FrameLayout-->
         <!--android:id="@+id/fr"-->

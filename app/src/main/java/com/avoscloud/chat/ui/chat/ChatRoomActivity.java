@@ -728,7 +728,9 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
 
     @Override
     public void onShowBBSView(boolean data) {
-        if (!data) {
+        if (data) {
+            findViewById(R.id.fragmentBBS).setVisibility(View.VISIBLE);
+        } else {
             findViewById(R.id.fragmentBBS).setVisibility(View.GONE);
         }
     }
