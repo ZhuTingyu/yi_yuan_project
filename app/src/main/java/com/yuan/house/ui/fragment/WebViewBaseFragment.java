@@ -938,6 +938,10 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                 EditText searchBar = ButterKnife.findById(getActivity(), R.id.search_bar);
                 if (searchBar == null) {
                     searchBar = ButterKnife.findById(getActivity(), R.id.et_search);
+
+                    // 如果找不到搜索框, 退出
+                    if (searchBar == null) return;
+
                     if (mBridgeListener != null) {
                         mBridgeListener.onBridgeShowSearchBar(data);
                     }
