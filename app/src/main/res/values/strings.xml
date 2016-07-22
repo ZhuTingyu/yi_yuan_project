@@ -208,5 +208,7 @@
     <string name="txt_online">在线</string>
     <string name="permission_location_title">定位权限</string>
     <string name="permission_location_description">我们需要您打开定位权限用于定位附近的房屋</string>
+    <string name="permission_image_title">图片权限</string>
+    <string name="permission_image_description">我们需要您允许查看图库,用于选择拍照/发送的图片</string>
 
 </resources>
