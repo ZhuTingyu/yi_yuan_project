@@ -3,8 +3,10 @@ package com.yuan.house.activities;
 import android.Manifest;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
@@ -62,6 +64,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
     String cachedNotificationPayload;
     private BottomNavigationBar bottomNavigationBar;
+    private boolean doubleBackToExitPressedOnce = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,6 +148,25 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         }
     }
 
+    @Override
+    public void onBackPressed() {
+//        Fragment fragment = getVisibleFragment();
+
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed();
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, getString(R.string.msg_quit_app_press_twice_back), Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce = false;
+            }
+        }, 2000);
+    }
 
     public void onEvent(PageEvent event) {
         if (event.getEventType() == PageEvent.PageEventEnum.FINISHED) {
