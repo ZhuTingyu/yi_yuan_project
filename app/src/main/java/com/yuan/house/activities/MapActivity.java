@@ -72,6 +72,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
     private double longitude = 0.0;
     private String city;    //当前城市
     private JSONObject mLocation;
+    private MyLocationConfiguration.LocationMode mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,7 +157,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
 
     private void initLocation() {
         baiduMap.setMyLocationEnabled(true);
-        LatLng cenpt = new LatLng(mLocation.optDouble("lat"),mLocation.optDouble("lng"));
+        LatLng cenpt = new LatLng(mLocation.optDouble("lat"), mLocation.optDouble("lng"));
         //定义地图状态
         MapStatus mMapStatus = new MapStatus.Builder()
                 .target(cenpt)
@@ -276,8 +277,6 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         locClient.stop();
     }
 
-    private MyLocationConfiguration.LocationMode mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
-
     public class TCLocationListener implements BDLocationListener {
         @Override
         public void onReceiveLocation(BDLocation location) {
@@ -296,11 +295,13 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
                         .latitude(location.getLatitude())
                         .longitude(location.getLongitude()).build();
                 baiduMap.setMyLocationData(locData);
+
                 MyLocationConfiguration config = new MyLocationConfiguration(
                         mCurrentMode, true, null);
                 baiduMap.setMyLocationConfigeration(config);
-                LatLng ll = new LatLng(location.getLatitude(),
-                        location.getLongitude());
+
+                LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
+
                 if (isFirstLoc) {
                     isFirstLoc = false;
                     MapStatusUpdate u = MapStatusUpdateFactory.newLatLngZoom(ll, 17);
