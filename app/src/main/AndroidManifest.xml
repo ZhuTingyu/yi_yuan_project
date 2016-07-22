@@ -128,7 +128,8 @@
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.USER_PRESENT" />
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <!--FIXME: 为何要注册网络变更事件?-->
+                <!--<action android:name="android.net.conn.CONNECTIVITY_CHANGE" />-->
                 <action android:name="com.yuan.house.UPDATE_STATUS" />
             </intent-filter>
         </receiver>

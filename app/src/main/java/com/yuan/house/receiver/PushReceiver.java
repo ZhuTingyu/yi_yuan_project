@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 
 import com.avoscloud.chat.util.Utils;
 import com.dimo.utils.PackageUtil;
@@ -35,7 +36,10 @@ public class PushReceiver extends BroadcastReceiver {
             if (extras == null) return;
             String channel = extras.getString("com.avos.avoscloud.Channel");
             //获取消息内容
-            JSONObject json = new JSONObject(extras.getString("com.avos.avoscloud.Data"));
+            String data = extras.getString("com.avos.avoscloud.Data");
+            if (TextUtils.isEmpty(data)) return;
+
+            JSONObject json = new JSONObject(data);
 
             Timber.d("got action " + action + " on channel " + channel + " with:");
             Iterator itr = json.keys();
