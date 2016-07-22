@@ -14,7 +14,6 @@ import com.alipay.pay.SignUtils;
 import com.alipay.sdk.app.PayTask;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.yuan.house.bean.PayInfo;
-import com.yuan.house.common.Constants;
 
 import org.json.JSONObject;
 
@@ -160,7 +159,8 @@ public class AliPay {
         orderInfo += "&total_fee=" + "\"" + price + "\"";
 
         // 服务器异步通知页面路径
-        orderInfo += "&notify_url=" + "\"" + Constants.kWebServiceAPIEndpoint + "/orders/alipay_callback"
+//        orderInfo += "&notify_url=" + "\"" + Constants.kWebServiceAPIEndpoint + "/orders/alipay_callback"
+        orderInfo += "&notify_url=" + "\"" + "test.house.ieyuan.com/payment/alipay_callback"
                 + "\"";
 
         // 服务接口名称， 固定值
