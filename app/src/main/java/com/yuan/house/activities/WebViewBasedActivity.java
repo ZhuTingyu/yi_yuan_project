@@ -1,6 +1,7 @@
 package com.yuan.house.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -92,6 +93,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -872,6 +874,21 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         throw new NotImplementedException("NOT IMPLEMENTED");
     }
 
+    @Override
+    public void onBridgeUpdateUserMessage(String data) {
+        SharedPreferences.Editor editor = prefs.edit();
+        try {
+            JSONObject object = new JSONObject(data);
+            String key = object.optString("key");
+            String value = object.getString("value");
+            editor.putString(key, value);
+            editor.apply();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     private RequestParams constructMultiPartParams(List<String> filePaths) {
         // TODO: 16/6/14 failed to upload files
         RequestParams params = new RequestParams();
@@ -965,43 +982,61 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         JSONArray sizes;
 
         try {
-            JSONObject object = new JSONObject(params);
 
-            filePaths = object.optJSONArray("imgs");
-            sizes = object.optJSONArray("size");
-
-            for (int i = 0; i < filePaths.length(); i++) {
+            if (!params.contains("imgs")) {
+                JSONArray size = new JSONArray();
+                JSONArray array = new JSONArray(params);
                 JSONObject param = new JSONObject();
-                param.put("imageName", filePaths.get(i).toString());
-                param.put("imageSize", sizes);
-
+                param.put("imageName",array.getString(0));
+                param.put("imageSize",size);
                 HttpEntity entity = constructImageEntity(param);
-// TODO: 16/7/15 use queue to upload files
-                WebService.getInstance().postMultiPartFormImageFile(entity, new JsonHttpResponseHandler() {
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                        super.onSuccess(statusCode, headers, response);
+                uploadFile(entity,jsCallback);
 
-                        JSONArray ret = new JSONArray();
-                        ret.put(response);
+            } else {
 
-                        jsCallback.callback(ret.toString());
-                    }
+                JSONObject object = new JSONObject(params);
 
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                        super.onFailure(statusCode, headers, throwable, errorResponse);
+                filePaths = object.optJSONArray("imgs");
+                sizes = object.optJSONArray("size");
 
-                        JSONArray ret = new JSONArray();
-                        ret.put(errorResponse);
+                for (int i = 0; i < filePaths.length(); i++) {
+                    JSONObject param = new JSONObject();
+                    param.put("imageName", filePaths.get(i).toString());
+                    param.put("imageSize", sizes);
 
-                        jsCallback.callback(ret.toString());
-                    }
-                });
+                    HttpEntity entity = constructImageEntity(param);
+                    // TODO: 16/7/15 use queue to upload files
+                    uploadFile(entity, jsCallback);
+
+                }
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private void uploadFile(HttpEntity entity, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+        WebService.getInstance().postMultiPartFormImageFile(entity, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+
+                JSONArray ret = new JSONArray();
+                ret.put(response);
+
+                jsCallback.callback(ret.toString());
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+
+                JSONArray ret = new JSONArray();
+                ret.put(errorResponse);
+
+                jsCallback.callback(ret.toString());
+            }
+        });
     }
 
     @Override
