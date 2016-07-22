@@ -134,21 +134,6 @@
             </intent-filter>
         </receiver>
 
-        <meta-data
-            android:name="UMENG_APPKEY"
-            android:value="558bab2e67e58ee449003198" />
-        <meta-data
-            android:name="UMENG_CHANNEL"
-            android:value="Website" />
-
-        <service
-            android:name="com.umeng.update.net.DownloadingService"
-            android:process=":DownloadingService" />
-
-        <activity
-            android:name="com.umeng.update.UpdateDialogActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-
         <!-- baidu location service -->
         <!-- http://lbsyun.baidu.com/apiconsole/key/update?app-id=8228474 -->
         <meta-data

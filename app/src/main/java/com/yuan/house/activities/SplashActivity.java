@@ -11,7 +11,6 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-import com.umeng.update.UmengUpdateAgent;
 import com.yuan.house.HeartbeatService;
 import com.yuan.house.R;
 import com.yuan.house.application.Injector;
@@ -42,8 +41,6 @@ public class SplashActivity extends FragmentActivity implements Handler.Callback
         ButterKnife.bind(this);
 
         updateSplashImage();
-
-        UmengUpdateAgent.update(this);
 
         startService(new Intent(getBaseContext(), HeartbeatService.class));
     }

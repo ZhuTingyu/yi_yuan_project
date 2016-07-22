@@ -27,7 +27,6 @@ import com.baidu.location.LocationClientOption;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.listener.single.DialogOnDeniedPermissionListener;
 import com.karumi.dexter.listener.single.PermissionListener;
-import com.umeng.update.UmengUpdateAgent;
 import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
@@ -80,8 +79,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
         // Register event bus to receive events
         EventBus.getDefault().register(this);
-
-        UmengUpdateAgent.update(this);
 
         setContentView(R.layout.activity_main, false, true);
 

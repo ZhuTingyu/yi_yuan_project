@@ -52,7 +52,6 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     private int msgViewTypes = 9;
     private ChatMessageAdapter.ClickListener clickListener;
     private Context context;
-    private View contentLayout;
     private View placeView;
     private Activity activity;
 
@@ -241,9 +240,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     }
 
     protected void initReservedMessageView(View conView, int position, AVIMTypedMessage msg, boolean isComMsg, Message message) {
-
         TextView contentView = ViewHolder.findViewById(conView, R.id.textContent);
-        contentLayout = ViewHolder.findViewById(conView, R.id.contentLayout);
         ImageView imageView = ViewHolder.findViewById(conView, R.id.imageView);
         ImageView avatarView = ViewHolder.findViewById(conView, R.id.avatar);
         final PlayButton playBtn = ViewHolder.findViewById(conView, R.id.playBtn);
