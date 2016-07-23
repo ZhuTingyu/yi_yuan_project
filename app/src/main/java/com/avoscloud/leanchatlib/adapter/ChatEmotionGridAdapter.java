@@ -6,30 +6,32 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import com.yuan.house.R;
+
 import com.avoscloud.leanchatlib.controller.EmotionHelper;
 import com.avoscloud.leanchatlib.view.ViewHolder;
+import com.yuan.house.R;
 
 /**
  * Created by lzw on 14-9-25.
  */
 public class ChatEmotionGridAdapter extends BaseListAdapter<String> {
 
-  public ChatEmotionGridAdapter(Context ctx) {
-    super(ctx);
-  }
-
-  @Override
-  public View getView(int position, View conView, ViewGroup parent) {
-    if (conView == null) {
-      LayoutInflater inflater = LayoutInflater.from(ctx);
-      conView = inflater.inflate(R.layout.chat_emotion_item, null);
+    public ChatEmotionGridAdapter(Context ctx) {
+        super(ctx);
     }
-    ImageView emotionImageView = ViewHolder.findViewById(conView, R.id.emotionImageView);
-    String emotion = (String) getItem(position);
-    emotion = emotion.substring(1, emotion.length() - 1);
-    Bitmap bitmap = EmotionHelper.getEmojiDrawable(ctx, emotion);
-    emotionImageView.setImageBitmap(bitmap);
-    return conView;
-  }
+
+    @Override
+    public View getView(int position, View conView, ViewGroup parent) {
+        if (conView == null) {
+            LayoutInflater inflater = LayoutInflater.from(ctx);
+            conView = inflater.inflate(R.layout.chat_emotion_item, null);
+        }
+
+        ImageView emotionImageView = ViewHolder.findViewById(conView, R.id.emotionImageView);
+        String emotion = (String) getItem(position);
+        emotion = emotion.substring(1, emotion.length() - 1);
+        Bitmap bitmap = EmotionHelper.getEmojiDrawable(ctx, emotion);
+        emotionImageView.setImageBitmap(bitmap);
+        return conView;
+    }
 }

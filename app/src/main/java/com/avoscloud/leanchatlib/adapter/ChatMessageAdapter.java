@@ -284,7 +284,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 break;
             case ImageMessageType:
                 AVIMImageMessage imageMsg = (AVIMImageMessage) msg;
-                /*PhotoUtils.displayImageCacheElseNetwork(imageView, MessageHelper.getFilePath(imageMsg),
+                /*ImageUtil.displayImageCacheElseNetwork(imageView, MessageHelper.getFilePath(imageMsg),
                         imageMsg.getFileUrl());
                 setImageOnClickListener(imageView, imageMsg);*/
                 initImageView(imageView, imageMsg);

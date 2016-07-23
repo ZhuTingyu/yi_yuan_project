@@ -90,8 +90,6 @@ public class WebViewJavascriptBridge implements Serializable {
     private class InterestWebViewClient extends WebViewClient {
         @Override
         public void onPageFinished(WebView webView, String url) {
-            Timber.v("Web View onPageFinished");
-
             loadWebViewJavascriptBridgeJs(webView);
         }
 
@@ -106,7 +104,6 @@ public class WebViewJavascriptBridge implements Serializable {
     private class InterestWebChromeClient extends WebChromeClient {
         @Override
         public boolean onConsoleMessage(ConsoleMessage cm) {
-//            Timber.v("Web View " + cm.message() + " line:" + cm.lineNumber());
             return true;
         }
 
@@ -224,7 +221,6 @@ public class WebViewJavascriptBridge implements Serializable {
 
     private void _dispatchMessage(Map<String, Object> message) {
         String messageJSON = new JSONObject(message).toString();
-        Timber.v("Web View sending:" + messageJSON);
         final String javascriptCommand =
                 String.format("javascript:WebViewJavascriptBridge._handleMessageFromJava('%s');", doubleEscapeString(messageJSON));
         mContext.runOnUiThread(new Runnable() {

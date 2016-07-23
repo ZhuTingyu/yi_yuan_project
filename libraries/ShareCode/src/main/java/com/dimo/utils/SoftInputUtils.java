@@ -1,4 +1,4 @@
-package com.avoscloud.leanchatlib.utils;
+package com.dimo.utils;
 
 import android.content.Context;
 import android.view.View;

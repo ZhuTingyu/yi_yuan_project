@@ -1,4 +1,4 @@
-package com.avoscloud.chat.util;
+package com.dimo.network;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

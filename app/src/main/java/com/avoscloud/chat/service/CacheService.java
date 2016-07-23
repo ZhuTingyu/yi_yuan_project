@@ -132,10 +132,4 @@ public class CacheService {
       }
     });
   }
-
-  public static void cacheUserIfNone(String userId) throws AVException {
-    if (lookupUser(userId) == null) {
-      registerUser(UserService.findUser(userId));
-    }
-  }
 }

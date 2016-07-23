@@ -3,12 +3,10 @@ package com.yuan.house.application;
 
 import android.app.Application;
 import android.app.Instrumentation;
-import android.app.Notification;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.StrictMode;
 
@@ -16,23 +14,16 @@ import com.avos.avoscloud.AVAnalytics;
 import com.avos.avoscloud.AVInstallation;
 import com.avos.avoscloud.AVOSCloud;
 import com.avos.avoscloud.AVObject;
-import com.avos.avoscloud.AVUser;
 import com.avos.avoscloud.PushService;
 import com.avos.avoscloud.im.v2.AVIMClient;
 import com.avos.avoscloud.im.v2.AVIMException;
 import com.avos.avoscloud.im.v2.AVIMMessageManager;
 import com.avos.avoscloud.im.v2.callback.AVIMClientCallback;
-import com.avoscloud.chat.entity.avobject.AddRequest;
 import com.avoscloud.chat.entity.avobject.UpdateInfo;
-import com.avoscloud.chat.service.CacheService;
-import com.avoscloud.chat.service.ConversationManager;
-import com.avoscloud.chat.service.PreferenceMap;
 import com.avoscloud.chat.util.Utils;
 import com.avoscloud.leanchatlib.controller.ChatManager;
-import com.avoscloud.leanchatlib.controller.UserInfoFactory;
 import com.avoscloud.leanchatlib.db.DBHelper;
 import com.avoscloud.leanchatlib.model.AVIMPresenceMessage;
-import com.avoscloud.leanchatlib.model.UserInfo;
 import com.avoscloud.leanchatlib.utils.Logger;
 import com.baidu.location.BDLocation;
 import com.baidu.mapapi.SDKInitializer;
@@ -41,8 +32,6 @@ import com.dimo.utils.StringUtil;
 import com.dimo.utils.ZipUtil;
 import com.github.kevinsawicki.http.HttpRequest;
 import com.karumi.dexter.Dexter;
-import com.lfy.dao.DaoMaster;
-import com.lfy.dao.DaoSession;
 import com.lfy.dao.MessageDao;
 import com.loopj.android.http.FileAsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -64,7 +53,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -84,12 +72,14 @@ public class DMApplication extends Application {
     Context mContext;
     String mLatestVersion;
     private ThinDownloadManager downloadManager;
-    private DaoSession daoSession;
-    private String htmlExtractedFolder;
+
     private String rootDataFolder;
     private String rootPagesFolder;
+    private String htmlExtractedFolder;
 
     private BDLocation lastActivatedLocation;
+
+    private MessageDao messageDao;
 
     /**
      * Create main application
@@ -154,13 +144,10 @@ public class DMApplication extends Application {
         // Perform injection
         Injector.init(getRootModule(), this);
 
-        // TODO: 16/7/21 move this to heavy operation job.
-        initDatabase();
-
         Utils.fixAsyncTaskBug();
 
 //        if (BuildConfig.DEBUG) {
-            Timber.plant(new Timber.DebugTree());
+        Timber.plant(new Timber.DebugTree());
 //        } else {
 //            Bugtags.start(Constants.kBugTagsKey, this, Bugtags.BTGInvocationEventBubble);
 //        }
@@ -217,7 +204,6 @@ public class DMApplication extends Application {
         AVAnalytics.enableCrashReport(mContext, true);
         //AVOSCloud.setDebugLogEnabled(true);
 
-        AVObject.registerSubclass(AddRequest.class);
         AVObject.registerSubclass(UpdateInfo.class);
 
         AVInstallation.getCurrentInstallation().saveInBackground();
@@ -233,15 +219,9 @@ public class DMApplication extends Application {
 
         initImageLoader(instance);
 
-        initBaiduMapSDK();
-
-        if (debug) {
-            openStrictMode();
-        }
-
-        registerMessageTypes();
-
-        setupChatManager();
+//        if (debug) {
+        openStrictMode();
+//        }
 
         if (debug) {
             Logger.level = Logger.VERBOSE;
@@ -249,64 +229,14 @@ public class DMApplication extends Application {
             Logger.level = Logger.NONE;
         }
 
-        // 使用 assets 目录中的文件
-        rootDataFolder = FileUtil.getDataDirectory(getApplicationContext());
-        htmlExtractedFolder = String.format("%s/%s", FileUtil.getDataDirectory(getApplicationContext()), "html");
+        registerMessageTypes();
 
-        rootPagesFolder = htmlExtractedFolder + "/pages";
-
-//        if (!prefs.getBoolean(Constants.kWebPackageExtracted, false)) {
-        Timber.v("Copy HTML asset to folder : " + htmlExtractedFolder);
-
-        FileUtil.copyAssetFolder(getAssets(), "html", htmlExtractedFolder);
-        prefs.edit().putBoolean(Constants.kWebPackageExtracted, true).commit();
-//        }
+        SDKInitializer.initialize(getApplicationContext());
     }
+
 
     private void registerMessageTypes() {
         AVIMMessageManager.registerAVIMMessageType(AVIMPresenceMessage.class);
-    }
-
-    // setup chat related environment
-    private void setupChatManager() {
-        final ChatManager chatManager = ChatManager.getInstance();
-        chatManager.init(this);
-
-        if (AVUser.getCurrentUser() != null) {
-            chatManager.setupDatabaseWithSelfId(AVUser.getCurrentUser().getObjectId());
-        }
-        chatManager.setConversationEventHandler(ConversationManager.getConversationHandler());
-
-        chatManager.setUserInfoFactory(new UserInfoFactory() {
-            PreferenceMap preferenceMap = PreferenceMap.getCurUserPrefDao(DMApplication.this);
-
-            @Override
-            public UserInfo getUserInfoById(String userId) {
-                AVUser user = CacheService.lookupUser(userId);
-                UserInfo userInfo = new UserInfo();
-                return userInfo;
-            }
-
-            @Override
-            public void cacheUserInfoByIdsInBackground(List<String> userIds) throws Exception {
-                CacheService.cacheUsers(userIds);
-            }
-
-            @Override
-            public boolean showNotificationWhenNewMessageCome(String selfId) {
-                return preferenceMap.isNotifyWhenNews();
-            }
-
-            @Override
-            public void configureNotification(Notification notification) {
-                if (preferenceMap.isVoiceNotify()) {
-                    notification.defaults |= Notification.DEFAULT_SOUND;
-                }
-                if (preferenceMap.isVibrateNotify()) {
-                    notification.defaults |= Notification.DEFAULT_VIBRATE;
-                }
-            }
-        });
     }
 
     /**
@@ -345,17 +275,12 @@ public class DMApplication extends Application {
         logout();
     }
 
-    private void initDatabase() {
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "chat-db", null);
-        SQLiteDatabase db = helper.getWritableDatabase();
-        // 注意：该数据库连接属于 DaoMaster，所以多个 Session 指的是相同的数据库连接。
-
-        DaoMaster daoMaster = new DaoMaster(db);
-        daoSession = daoMaster.newSession();
+    public MessageDao getMessageDao() {
+        return messageDao;
     }
 
-    public MessageDao getMessageDao() {
-        return daoSession.getMessageDao();
+    public void setMessageDao(MessageDao messageDao) {
+        this.messageDao = messageDao;
     }
 
     public void openStrictMode() {
@@ -363,17 +288,15 @@ public class DMApplication extends Application {
                 .detectDiskReads()
                 .detectDiskWrites()
                 .detectNetwork()   // or .detectAll() for all detectable problems
+                .detectAll()
                 .penaltyLog()
                 .build());
         StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
                 .detectLeakedSqlLiteObjects()
+                .detectAll()
                 .penaltyLog()
                 //.penaltyDeath()
                 .build());
-    }
-
-    private void initBaiduMapSDK() {
-        SDKInitializer.initialize(getApplicationContext());
     }
 
     private Object getRootModule() {
@@ -390,6 +313,10 @@ public class DMApplication extends Application {
 
     public String getRootDataFolder() {
         return rootDataFolder;
+    }
+
+    public void setRootDataFolder(String rootDataFolder) {
+        this.rootDataFolder = rootDataFolder;
     }
 
     /**

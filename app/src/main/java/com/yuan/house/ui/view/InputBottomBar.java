@@ -18,7 +18,7 @@ import android.widget.TextView;
 import com.avoscloud.leanchatlib.adapter.ChatEmotionGridAdapter;
 import com.avoscloud.leanchatlib.adapter.ChatEmotionPagerAdapter;
 import com.avoscloud.leanchatlib.controller.EmotionHelper;
-import com.avoscloud.leanchatlib.utils.SoftInputUtils;
+import com.dimo.utils.SoftInputUtils;
 import com.avoscloud.leanchatlib.view.EmotionEditText;
 import com.avoscloud.leanchatlib.view.RecordButton;
 import com.yuan.house.R;

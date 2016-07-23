@@ -1,4 +1,4 @@
-package com.avoscloud.chat.util;
+package com.dimo.utils;
 
 import android.content.res.Resources;
 
