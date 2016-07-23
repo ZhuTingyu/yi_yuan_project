@@ -41,4 +41,5 @@
     <color name="chat_common_white">#fff</color>
     <color name="chat_base_color_text_white">#fff</color>
     <color name="chat_edit_text_underline_color">#45c01a</color>
+    <color name="bg_color_primary">#FF6537</color>
 </resources>
