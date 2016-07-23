@@ -133,6 +133,11 @@ public class BaseFragmentActivity extends FragmentActivity {
         ButterKnife.bind(this, viewGroup);
     }
 
+    public void hideRightItem() {
+        mTopBar.findViewById(R.id.topbar_right_btn).setVisibility(View.INVISIBLE);
+        mTopBar.findViewById(R.id.topbar_right_textbtn).setVisibility(View.INVISIBLE);
+    }
+
     /**
      * Set top bar right button
      *

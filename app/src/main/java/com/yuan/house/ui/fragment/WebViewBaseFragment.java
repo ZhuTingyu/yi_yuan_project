@@ -381,6 +381,14 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                 mBridgeListener.onBridgeSetTitle(title);
             }
         });
+        getBridge().registerHandler("hideRightItem", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                Timber.v("hideRightItem");
+
+                mBridgeListener.onBridgeHideRightItem();
+            }
+        });
 
         getBridge().registerHandler("setRightItem", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
@@ -1205,5 +1213,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
         void onBridgeSendRecommendedMessage(String data);
 
         void onBridgeUpdateUserMessage(String data);
+
+        void onBridgeHideRightItem();
     }
 }

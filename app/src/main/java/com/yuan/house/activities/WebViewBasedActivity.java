@@ -744,6 +744,10 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         setTitleItem(title);
     }
 
+    public void onBridgeHideRightItem() {
+        hideRightItem();
+    }
+
     public void onBridgeSetRightItem(int resourceId, View.OnClickListener onRightItemClick) {
         setRightItem(resourceId, onRightItemClick);
     }
