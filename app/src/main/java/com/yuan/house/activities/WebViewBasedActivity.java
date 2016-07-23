@@ -1,5 +1,6 @@
 package com.yuan.house.activities;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -45,6 +46,8 @@ import com.etiennelawlor.imagegallery.library.activities.ImageGalleryActivity;
 import com.etiennelawlor.imagegallery.library.adapters.FullScreenImageGalleryAdapter;
 import com.etiennelawlor.imagegallery.library.adapters.ImageGalleryAdapter;
 import com.fourmob.datetimepicker.date.DatePickerDialog;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.listener.multi.EmptyMultiplePermissionsListener;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -93,7 +96,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -991,10 +993,10 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 JSONArray size = new JSONArray();
                 JSONArray array = new JSONArray(params);
                 JSONObject param = new JSONObject();
-                param.put("imageName",array.getString(0));
-                param.put("imageSize",size);
+                param.put("imageName", array.getString(0));
+                param.put("imageSize", size);
                 HttpEntity entity = constructImageEntity(param);
-                uploadFile(entity,jsCallback);
+                uploadFile(entity, jsCallback);
 
             } else {
 

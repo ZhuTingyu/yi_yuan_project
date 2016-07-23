@@ -1,6 +1,5 @@
 package com.avoscloud.leanchatlib.activity;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -51,9 +50,6 @@ import com.avoscloud.leanchatlib.utils.NetAsyncTask;
 import com.avoscloud.leanchatlib.view.EmotionEditText;
 import com.avoscloud.leanchatlib.view.RecordButton;
 import com.avoscloud.leanchatlib.view.xlist.XListView;
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.listener.multi.EmptyMultiplePermissionsListener;
-import com.karumi.dexter.listener.single.EmptyPermissionListener;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.PauseOnScrollListener;
 import com.yuan.house.R;
@@ -496,32 +492,9 @@ public class ChatActivity extends WebViewBasedActivity implements OnClickListene
             //R.id.btnImageFromGallery
             selectImage();
         } else if (v.getId() == R.id.btnModeSwitch) {
-            EmptyPermissionListener dialogPermissionListener = new EmptyPermissionListener();
-
-            Dexter.checkPermission(dialogPermissionListener,
-                    Manifest.permission.RECORD_AUDIO
-            );
-
             switchInputMode();
         } else if (v.getId() == R.id.btnMoreInput) {
             toggleBottomAddLayout();
-
-//            MultiplePermissionsListener dialogPermissionListener = DialogOnAnyDeniedMultiplePermissionsListener.Builder
-//                    .withContext(this)
-//                    .withTitle(R.string.permission_image_title)
-//                    .withMessage(R.string.permission_image_description)
-//                    .withButtonText(android.R.string.ok)
-//                    .withIcon(R.mipmap.ic_launcher)
-//                    .build();
-
-            EmptyMultiplePermissionsListener dialogPermissionListener = new EmptyMultiplePermissionsListener();
-
-            Dexter.checkPermissions(dialogPermissionListener,
-                    Manifest.permission.CAMERA,
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-            );
-
         } else if (v.getId() == R.id.btnEmotionInput) {
             toggleEmotionLayout();
         } else if (v.getId() == R.id.editChatField) {
