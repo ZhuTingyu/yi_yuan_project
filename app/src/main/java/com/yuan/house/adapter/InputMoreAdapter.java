@@ -1,4 +1,4 @@
-package com.avoscloud.chat.ui.chat;
+package com.yuan.house.adapter;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;

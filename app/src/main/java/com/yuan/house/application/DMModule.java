@@ -1,7 +1,7 @@
 package com.yuan.house.application;
 
 
-import com.avoscloud.chat.ui.chat.ChatRoomActivity;
+import com.avoscloud.chat.ui.chat.SingleChatActivity;
 import com.yuan.house.activities.CropActivity;
 import com.yuan.house.activities.IPSettingActivity;
 import com.yuan.house.activities.MainActivity;
@@ -55,7 +55,7 @@ import dagger.Module;
                         MainActivity.class,
                         WebViewBasedActivity.class,
                         WebViewActivity.class,
-                        ChatRoomActivity.class,
+                        SingleChatActivity.class,
                         MapActivity.class,
                         SwitchHouseActivity.class,
                         CropActivity.class,

@@ -76,6 +76,7 @@ import me.nereo.multi_image_selector.MultiImageSelectorActivity;
 import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import timber.log.Timber;
 
 public class ChatActivity extends WebViewBasedActivity implements OnClickListener,
         XListView.IXListViewListener {

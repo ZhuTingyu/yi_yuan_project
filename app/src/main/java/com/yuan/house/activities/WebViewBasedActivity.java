@@ -1,6 +1,5 @@
 package com.yuan.house.activities;
 
-import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -27,6 +26,7 @@ import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationQueryCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMSingleMessageQueryCallback;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
+import com.avoscloud.chat.ui.chat.GroupChatActivity;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.MessageAgent;
 import com.avoscloud.leanchatlib.controller.MessageHelper;
@@ -46,8 +46,6 @@ import com.etiennelawlor.imagegallery.library.activities.ImageGalleryActivity;
 import com.etiennelawlor.imagegallery.library.adapters.FullScreenImageGalleryAdapter;
 import com.etiennelawlor.imagegallery.library.adapters.ImageGalleryAdapter;
 import com.fourmob.datetimepicker.date.DatePickerDialog;
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.listener.multi.EmptyMultiplePermissionsListener;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -428,6 +426,15 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             Timber.e("onActivityResult SHOULD NEVER REACH");
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void onBridgeStartGroupChat() {
+        Timber.v("onBridgeStartGroupChat");
+
+        Intent intent = new Intent(this, GroupChatActivity.class);
+        intent.putExtra("extra", "");
+
+        startActivity(intent);
     }
 
     public void onBridgeRequestPurchase(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {

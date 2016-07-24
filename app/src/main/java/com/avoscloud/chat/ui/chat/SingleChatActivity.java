@@ -44,6 +44,7 @@ import com.dimo.web.WebViewJavascriptBridge;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yuan.house.R;
 import com.yuan.house.activities.SwitchHouseActivity;
+import com.yuan.house.adapter.InputMoreAdapter;
 import com.yuan.house.common.Constants;
 import com.yuan.house.event.BridgeCallbackEvent;
 import com.yuan.house.event.NotificationEvent;
@@ -71,7 +72,7 @@ import de.greenrobot.event.EventBus;
 /**
  * Created by lzw on 15/4/24.
  */
-public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSInteractionListener {
+public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBBSInteractionListener {
     public static final int LOCATION_REQUEST = 100;
     public static final int kRequestCodeSwitchHouse = 101;
 
@@ -118,7 +119,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         CacheService.registerConv(conv);
 
         ChatManager.getInstance().registerConversation(conv);
-        Intent intent = new Intent(from, ChatRoomActivity.class);
+        Intent intent = new Intent(from, SingleChatActivity.class);
         intent.putExtra(CONVID, conv.getConversationId());
         intent.putExtra(Constants.kHouseParamsForChatRoom, params.toString());
 
@@ -129,7 +130,7 @@ public class ChatRoomActivity extends ChatActivity implements FragmentBBS.OnBBSI
         CacheService.registerConv(conv);
 
         ChatManager.getInstance().registerConversation(conv);
-        Intent intent = new Intent(from, ChatRoomActivity.class);
+        Intent intent = new Intent(from, SingleChatActivity.class);
         intent.putExtra(CONVID, conv.getConversationId());
         from.startActivity(intent);
     }

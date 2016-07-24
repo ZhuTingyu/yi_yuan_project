@@ -26,7 +26,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
-import com.avoscloud.chat.ui.chat.ChatRoomActivity;
+import com.avoscloud.chat.ui.chat.SingleChatActivity;
 import com.baidu.location.BDLocation;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
@@ -682,7 +682,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                     object = new JSONObject(data);
 
                     /** Start Chat **/
-                    ChatRoomActivity.chatByUserId(getActivity(), object);
+                    SingleChatActivity.chatByUserId(getActivity(), object);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -692,6 +692,23 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                 }
             }
         });
+
+        getBridge().registerHandler("chatByUserId", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
+                Timber.v("chatByUserId" + data);
+
+                JSONObject object;
+                try {
+                    object = new JSONObject(data);
+
+                    mBridgeListener.onBridgeStartGroupChat();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
 
         getBridge().registerHandler("getRecentLocation", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
@@ -781,7 +798,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                     object = new JSONObject(data);
 
                     /** Start Chat **/
-                    ChatRoomActivity.chatByUserId(getActivity(), object);
+                    SingleChatActivity.chatByUserId(getActivity(), object);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -1215,5 +1232,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
         void onBridgeUpdateUserMessage(String data);
 
         void onBridgeHideRightItem();
+
+        void onBridgeStartGroupChat();
     }
 }

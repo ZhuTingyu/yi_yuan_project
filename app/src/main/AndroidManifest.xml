@@ -84,7 +84,7 @@
             android:name=".activities.SwitchHouseActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.avoscloud.chat.ui.chat.ChatRoomActivity"
+            android:name="com.avoscloud.chat.ui.chat.SingleChatActivity"
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
