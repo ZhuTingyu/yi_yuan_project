@@ -62,13 +62,15 @@ public class SplashActivity extends FragmentActivity {
     private void runHeavyLoadTaskInBackground() {
         configLocalWebPackageSettings();
 
-        if (!prefs.getBoolean(Constants.kWebPackageExtracted, false)) {
+// FIXME: 16/7/25 uncomment when in production mode
+//        if (!prefs.getBoolean(Constants.kWebPackageExtracted, false)) {
             Timber.v("Copy HTML asset to folder");
 
             FileUtil.copyAssetFolder(getAssets(), "html", DMApplication.getInstance().getHtmlExtractedFolder());
 
             prefs.edit().putBoolean(Constants.kWebPackageExtracted, true).apply();
-        }
+//        }
+
         // TODO: 16/7/21 move this to heavy operation job.
         initDatabase();
 
