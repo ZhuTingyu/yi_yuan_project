@@ -282,7 +282,9 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
     // 接收 Web 端触发的 Event 事件
     public void onEvent(WebBroadcastEvent event) {
-        Timber.v(event.result);
+        if (this.getClass() == event.getSource().getClass()) {
+            getWebViewFragment().getBridge().callHandler("onBroadcast", event.getPayload());
+        }
     }
 
     public void onEvent(PageEvent event) {
