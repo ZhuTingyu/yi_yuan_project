@@ -12,21 +12,20 @@ public class Constants {
 //    public static String kWebServiceAPIEndpoint = "http://house.ieyuan.com/api";
 
     // Test Server
-    public static String kWebServiceAPIEndpoint = "http://test.house.ieyuan.com/api";
+    public static String kWebServiceEndpoint = "http://test.house.ieyuan.com";
+    public static String kWebServiceAPIEndpoint = kWebServiceEndpoint + "/api";
 
     /**
      * Web Service Url
      */
     public static String kWebServiceFileUpload = kWebServiceAPIEndpoint + "/file-upload/feedback";
     public static String kWebServiceImageUpload = kWebServiceAPIEndpoint + "/image-upload";
-    public static String kWebServiceUploadCommon = kWebServiceAPIEndpoint + "/file-upload/common";
     public static String kWebServiceSendFeedback = kWebServiceAPIEndpoint + "/feedback";
     public static String kWebServiceGetFeedback = kWebServiceAPIEndpoint + "/feedback?page=";
     public static String kWebServiceGetBrokers = kWebServiceAPIEndpoint + "/agency/complain";
     public static String kWebServiceSwitchable = kWebServiceAPIEndpoint + "/house/switchable/";
 
     public static String kPrefsFirstLaunch = "kPrefsFirstLaunch";
-    public static int kSplashTimeInterval = 20;
 
     public static String kWebPageEntry = "nearby.html";
     public static String kWebPageLogin = "login.html";
@@ -43,6 +42,7 @@ public class Constants {
      */
     public static String kAVApplicationId = "IwzlUusBdjf4bEGlypaqNRIx-gzGzoHsz";
     public static String kAVClientKey = "KLhHUoBqw5G1uMjrTsEqbaVR";
+
     public static String kCheckTypeHtml = "KidsParentHtmlPackage";
     public static String kCheckTypeLaunchImage = "KidsParentLaunchImage";
 
@@ -52,27 +52,18 @@ public class Constants {
     public static String kFragmentTagConversation = "kFragmentTagConversation";
     public static String kFragmentTagContacts = "kFragmentTagContacts";
     public static String kFragmentTagWebView = "kFragmentTagWebView";
-    public static String kFragmentTagPopUpSelection = "kFragmentTagPopUpSelection";
 
-    public static String kServiceHost = "http://3c.ieyuan.com";
-    public static String kServiceUploadImage = "/upload-image";
     public static String kFragmentTagMain = "kFragmentTagMain";
     public static String kFragmentTagLogin = "kFragmentTagLogin";
     public static String kFragmentTagProposal = "kFragmentTagProposal";
     public static String kFragmentTagMessage = "kFragmentTagMessage";
-    public static String kFragmentTagSocial = "kFragmentTagSocial";
-    public static String kFragmentTagProfile = "kFragmentTagProfile";
 
-    // dev
     public static String kBugTagsKey = "c0a589a1390e94a20f24ce42885311b7";
-    // release
-//    public static String kBugTagsKey = "f5cfd36a5c5edcda25fab391dc947289";
 
     public static String kLeanChatCurrentUserObjectId = "kLeanChatCurrentUserObjectId";
 
     public static String kWebDataKeyUserLogin = "userLogin";
     public static String kWebDataKeyLoginType = "LoginType";
-    public static String kWebDataKeyTags = "Tags";
 
     public static String  kHttpReqKeyContentType = "Content-Type";
     public static String  kHttpReqKeyAuthToken = "token";
@@ -112,9 +103,11 @@ public class Constants {
     public static int kActivityRequestCodeImagePickThenCropRectangle = 12;
     public static int kActivityRequestCodeImagePickThenCropSquare = 13;
     public static String kDateFormatStyleShort = "MM-dd mm:ss";
-    public static int kNotifyId = 1;
     public static String kLastActivatedHouseId = "kLastActivatedHouseId";
     public static String kLastActivatedHouseTradeType = "kLastActivatedHouseTradeType";
     public static String kHttpReqKeyGeoCity = "city";
     public static String kHttpReqKeyGeoDistrict = "district";
+
+    
+    public static int kNotifyId = 1;
 }
