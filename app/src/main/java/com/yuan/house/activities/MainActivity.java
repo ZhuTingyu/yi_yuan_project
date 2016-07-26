@@ -128,6 +128,9 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         } else {
             switchToFragment(Constants.kFragmentTagLogin);
         }
+
+        executeAppVersionCheck();
+
     }
 
     private void doAVUserLogin() {

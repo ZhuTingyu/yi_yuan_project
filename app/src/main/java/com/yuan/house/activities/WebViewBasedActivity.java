@@ -1,5 +1,8 @@
 package com.yuan.house.activities;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -10,6 +13,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebView;
@@ -48,6 +52,7 @@ import com.etiennelawlor.imagegallery.library.adapters.FullScreenImageGalleryAda
 import com.etiennelawlor.imagegallery.library.adapters.ImageGalleryAdapter;
 import com.fourmob.datetimepicker.date.DatePickerDialog;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.FileAsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.sleepbot.datetimepicker.time.RadialPickerLayout;
@@ -1147,6 +1152,74 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         }
     }
     // endregion
+
+    protected void executeAppVersionCheck() {
+        boolean hasNewVersion = prefs.getString(Constants.kAppHasNewVersion, "0").equals("1");
+
+        if (hasNewVersion) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(WebViewBasedActivity.this);
+            builder.setTitle("新版本");
+            builder.setMessage("检测到有新版本, 是否立即更新?");
+
+            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    downloadFileAndPrepareInstallation();
+                }
+            });
+            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+            if (!isFinishing()){
+                builder.create().show();
+            }
+        }
+    }
+
+    private void downloadFileAndPrepareInstallation() {
+        String url = prefs.getString(Constants.kNewAppDownloadUrl, null);
+        //String url = "http://apk.hiapk.com/appdown/com.hiapk.live?planid=2879546";
+        if (TextUtils.isEmpty(url)) {
+            Toast.makeText(mContext, "升级程序异常,请稍后重试", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        final ProgressDialog dailog = new ProgressDialog(mContext);
+        dailog.setTitle(R.string.txt_downloading);
+        dailog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        dailog.setMax(100);
+        if (!isFinishing()){
+            dailog.show();
+        }
+
+        RestClient.getInstance().get(url, null, new FileAsyncHttpResponseHandler(getApplicationContext()) {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, File file) {
+                Log.e("down", throwable.toString());
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, File file) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                file.setReadable(true, false);
+                intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+                mContext.startActivity(intent);
+            }
+
+            @Override
+            public void onProgress(int bytesWritten, int totalSize) {
+                double por = (bytesWritten * 1.0 / totalSize) * 100;
+                dailog.setProgress((int) por);
+                if (bytesWritten == totalSize) {
+                    dailog.dismiss();
+                }
+                super.onProgress(bytesWritten, totalSize);
+            }
+        });
+
+    }
 
 
 }

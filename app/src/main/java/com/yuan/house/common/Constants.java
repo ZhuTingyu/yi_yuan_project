@@ -14,6 +14,7 @@ public class Constants {
     // Test Server
     public static String kWebServiceEndpoint = "http://test.house.ieyuan.com";
     public static String kWebServiceAPIEndpoint = kWebServiceEndpoint + "/api";
+    public static String kWebServiceUpdata = "http://192.168.1.20:8095/api/";
 
     /**
      * Web Service Url
@@ -36,6 +37,9 @@ public class Constants {
     public static String kWebPackageExtracted = "kWebPackageExtracted";
     // Native app version
     public static String kApplicationPackageVersion = "0.0.1";
+    public static String kAppHasNewVersion = "hasNewVersionAvailable";
+    public static String kAppVersionCode = "versionCode";
+    public static String kNewAppDownloadUrl = "kNewAppDownloadUrl";
     /**
      * LeanCloud Application Settings.
      * https://leancloud.cn/app.html?appid=9hk99pr7gknwj83tdmfbbccqar1x2myge00ulspafnpcbab8#/key

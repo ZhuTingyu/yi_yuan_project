@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.text.TextUtils;
 import android.widget.ImageView;
 
 import com.avos.avoscloud.AVUser;
@@ -20,6 +21,7 @@ import com.avoscloud.leanchatlib.model.UserInfo;
 import com.dimo.utils.FileUtil;
 import com.lfy.dao.DaoMaster;
 import com.lfy.dao.DaoSession;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.yuan.house.HeartbeatService;
@@ -27,7 +29,14 @@ import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
+import com.yuan.house.http.RestClient;
 
+import org.apache.http.Header;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -169,7 +178,7 @@ public class SplashActivity extends FragmentActivity {
         @Override
         protected Void doInBackground(Void... params) {
             runHeavyLoadTaskInBackground();
-
+            onlineCheckIfHasNewAppToDownload();
             return null;
         }
 
@@ -185,4 +194,55 @@ public class SplashActivity extends FragmentActivity {
             enterMainScreen();
         }
     }
+
+    private void onlineCheckIfHasNewAppToDownload() {
+        final SharedPreferences.Editor editor = prefs.edit();
+
+        String url = Constants.kWebServiceUpdata + "app/v";
+        RestClient.getInstance().get(url, null, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    JSONObject obj = new JSONObject(new String(responseBody));
+
+                    Iterator<String> keys = obj.keys();
+                    ArrayList<String> data = new ArrayList<String>();
+                    while (keys.hasNext()){
+                        data.add(obj.getString(keys.next()));
+                    }
+
+                    //服务端版本
+                    String hasNewVersion;
+
+                    String version = data.get(0);
+                    String url = data.get(1);
+
+                    if (TextUtils.isEmpty(version)) {
+                        hasNewVersion = "0";
+                    } else {
+                        int onlineVersionCode = Integer.parseInt(version);
+
+                        int packageVersion = Integer.parseInt(prefs.getString(Constants.kAppVersionCode, "0"));
+                        if (packageVersion < onlineVersionCode) {
+                            hasNewVersion = "1";
+                        } else {
+                            hasNewVersion = "0";
+                        }
+                    }
+
+                    editor.putString(Constants.kAppHasNewVersion, hasNewVersion);
+                    editor.putString(Constants.kNewAppDownloadUrl, url);
+                    editor.apply();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Timber.e("APP Check Version Error");
+            }
+        });
+    }
+
 }

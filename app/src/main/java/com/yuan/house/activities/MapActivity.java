@@ -3,10 +3,18 @@ package com.yuan.house.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +30,7 @@ import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
+import com.baidu.mapapi.map.Text;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.search.core.SearchResult;
 import com.baidu.mapapi.search.geocode.GeoCodeOption;
@@ -30,6 +39,10 @@ import com.baidu.mapapi.search.geocode.GeoCoder;
 import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
+import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
+import com.baidu.mapapi.search.sug.SuggestionResult;
+import com.baidu.mapapi.search.sug.SuggestionSearch;
+import com.baidu.mapapi.search.sug.SuggestionSearchOption;
 import com.yuan.house.R;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
@@ -37,6 +50,9 @@ import com.yuan.house.event.LocationEvent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -46,13 +62,14 @@ import timber.log.Timber;
 /**
  * Created by KevinLee on 2016/5/2.
  */
-public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderResultListener {
+public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderResultListener, OnGetSuggestionResultListener {
     public TCLocationListener locationListener = new TCLocationListener();
     protected MapView mMapView;
     protected BaiduMap baiduMap;
     protected LocationClient locClient;
     boolean isFirstLoc = true;// 是否首次定位
     BDLocation bdLocation;
+    private ArrayList<String> keys;
 
     @Nullable
     @BindView(R.id.tv_location_field)
@@ -66,6 +83,9 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
     @BindView(R.id.search_edit)
     EditText searchText;
 
+    private ListView mListView;
+
+    private SuggestionSearch mSuggestSearch;
     private GeoCoder mSearch;
     private LatLng center;
     private double latitude = 0.0;
@@ -73,6 +93,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
     private String city;    //当前城市
     private JSONObject mLocation;
     private MyLocationConfiguration.LocationMode mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
+    private InputMethodManager imm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +104,8 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         ButterKnife.bind(this);
 
         this.mContext = this;
+
+        imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 
         bdLocation = new BDLocation();
 
@@ -186,6 +209,10 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         // 初始化搜索模块，注册事件监听
         mSearch = GeoCoder.newInstance();
         mSearch.setOnGetGeoCodeResultListener(this);
+        //初始化模糊搜索模块
+        mSuggestSearch = SuggestionSearch.newInstance();
+        mSuggestSearch.setOnGetSuggestionResultListener(this);
+
         //监听地图状态,完成时获取中心点经纬度
         baiduMap.setOnMapStatusChangeListener(new BaiduMap.OnMapStatusChangeListener() {
             @Override
@@ -214,11 +241,50 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
 
     }
 
+    private void dissmissSoft(){
+        imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+    }
+
     private void initViewConfig() {
+        mListView = (ListView) findViewById(R.id.map_activity_listview);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mSearch.geocode(new GeoCodeOption().city(city).address(keys.get(position)));
+                mListView.setVisibility(View.GONE);
+                searchText.setText("");
+                dissmissSoft();
+            }
+        });
+
+        searchText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(TextUtils.isEmpty(s)){
+                    mListView.setVisibility(View.GONE);
+                    dissmissSoft();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(!TextUtils.isEmpty(s)){
+                    mSuggestSearch.requestSuggestion(new SuggestionSearchOption().city(city).keyword(s.toString()));
+                }
+            }
+        });
+
         search_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mSearch.geocode(new GeoCodeOption().city(city).address(searchText.getText().toString()));
+                mListView.setVisibility(View.GONE);
+                dissmissSoft();
             }
         });
     }
@@ -230,7 +296,6 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
                     .show();
             return;
         }
-
         baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(geoCodeResult.getLocation()));
     }
 
@@ -256,6 +321,22 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
                 .build();
         bdLocation.setAddr(address);
         bdLocation.setAddrStr(reverseGeoCodeResult.getAddress());
+    }
+    //模糊查询返回结果
+    @Override
+    public void onGetSuggestionResult(SuggestionResult suggestionResult) {
+        List<SuggestionResult.SuggestionInfo> suggestions = suggestionResult.getAllSuggestions();
+        if(!suggestions.isEmpty()){
+            keys = new ArrayList<>();
+            for(SuggestionResult.SuggestionInfo result : suggestions){
+                keys.add(result.key);
+            }
+            ArrayAdapter adapter = new ArrayAdapter(mContext,android.R.layout.simple_expandable_list_item_1,keys);
+            mListView.setAdapter(adapter);
+            mListView.setVisibility(View.VISIBLE);
+        }else {
+            Toast.makeText(mContext,"没搜索到结果",Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

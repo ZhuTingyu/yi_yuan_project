@@ -90,4 +90,6 @@
     <string name="msg_quit_app_press_twice_back">再按一次退出程序</string>
     <string name="title_group_chat">群聊</string>
 
+    <string name="txt_downloading">下载中, 请稍候...</string>
+
 </resources>
