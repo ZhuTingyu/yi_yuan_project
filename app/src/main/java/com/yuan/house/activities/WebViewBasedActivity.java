@@ -719,15 +719,19 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
                     message.setText(finalText);
 
+                    if (avimConversation != null) {
                     MessageAgent messageAgent = new MessageAgent(avimConversation);
                     messageAgent.sendEncapsulatedTypedMessage(message);
 
                     // 发送成功之后需要缓存该条消息到本地
                     ChatManager.getInstance().storeLastMessage(message);
+                    }
 
                     if (finalI == (finalLeanIdList.length() - 1)) {
+                        if (callback != null) {
                         callback.callback("onBridgeSendNoticeMessage finished");
                     }
+                }
                 }
             });
         }
