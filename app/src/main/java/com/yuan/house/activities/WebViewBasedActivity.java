@@ -542,7 +542,9 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
                     @Override
                     public void onOtherButtonClick(ActionSheet actionSheet, int index) {
+                        if (jsCallback != null) {
                         jsCallback.callback(index);
+                        }
 
                         actionSheet.dismiss();
                     }
@@ -602,8 +604,10 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                         });
                     }
 
+                    if (jsCallback != null) {
                     jsCallback.callback(array.toString());
                 }
+            }
             }
         });
     }
@@ -1043,7 +1047,9 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 JSONArray ret = new JSONArray();
                 ret.put(response);
 
+                if (jsCallback != null) {
                 jsCallback.callback(ret.toString());
+            }
             }
 
             @Override
@@ -1053,7 +1059,9 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 JSONArray ret = new JSONArray();
                 ret.put(errorResponse);
 
+                if (jsCallback != null) {
                 jsCallback.callback(ret.toString());
+            }
             }
         });
     }
