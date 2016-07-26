@@ -28,12 +28,16 @@
             android:text="@string/map_search_loc_button_text" />
     </RelativeLayout>
 
+
+
     <com.baidu.mapapi.map.MapView
+        android:visibility="visible"
         android:id="@+id/bmap"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/map_topbar"
         android:clickable="true" />
+
 
     <!--<WebView-->
     <!--android:id="@+id/webview"-->
@@ -67,4 +71,13 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:src="@drawable/pin" />
+
+    <ListView
+        android:id="@+id/map_activity_listview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/map_topbar"
+        android:clickable="true"
+        android:visibility="gone"
+        android:background="@color/white"/>
 </RelativeLayout>
