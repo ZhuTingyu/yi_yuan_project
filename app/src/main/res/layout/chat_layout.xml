@@ -5,19 +5,39 @@
     android:layout_height="fill_parent"
     android:background="#fff">
 
-    <com.avoscloud.leanchatlib.view.xlist.XListView
-        android:id="@+id/listview"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_above="@+id/bottomLayout"
-        android:layout_below="@+id/fragmentBBS"
-        android:background="#ebebeb"
-        android:cacheColorHint="@android:color/transparent"
-        android:divider="@null"
-        android:dividerHeight="5dp"
-        android:listSelector="@android:color/transparent"
-        android:scrollbarStyle="outsideOverlay"
-        android:stackFromBottom="true" />
+        android:layout_below="@+id/fragmentBBS">
+
+        <com.avoscloud.leanchatlib.view.xlist.XListView
+            android:id="@+id/lvMessages"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="#ebebeb"
+            android:cacheColorHint="@android:color/transparent"
+            android:divider="@null"
+            android:dividerHeight="5dp"
+            android:listSelector="@android:color/transparent"
+            android:scrollbarStyle="outsideOverlay"
+            android:stackFromBottom="true" />
+
+        <!--Hide Groups by default-->
+        <ListView
+            android:id="@+id/lvGroups"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/topbar_height"
+            android:background="#ebebeb"
+            android:cacheColorHint="@android:color/transparent"
+            android:divider="@null"
+            android:dividerHeight="1dp"
+            android:listSelector="@android:color/transparent"
+            android:scrollbarStyle="outsideOverlay"
+            android:visibility="gone"/>
+    </RelativeLayout>
+
 
     <FrameLayout
         android:id="@id/fragmentBBS"
@@ -25,14 +45,7 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_marginTop="@dimen/topbar_height"
-        android:visibility="gone"/>
-
-    <!--<FrameLayout-->
-        <!--android:id="@+id/fr"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent">-->
-
-    <!--</FrameLayout>-->
+        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/bottomLayout"
@@ -58,8 +71,8 @@
                 android:layout_width="@dimen/chat_BottomBtnSize"
                 android:layout_height="@dimen/chat_BottomBtnSize"
                 android:layout_alignBottom="@+id/rl_bottom_parent"
-                android:layout_margin="@dimen/chat_BottomBtnMargin"
                 android:layout_centerVertical="true"
+                android:layout_margin="@dimen/chat_BottomBtnMargin"
                 android:background="@drawable/chat_btn_voice_selector"
                 android:textColor="@color/chat_base_color_text_black"
                 android:visibility="visible" />
@@ -84,6 +97,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
+                        android:layout_toLeftOf="@+id/btnEmotionInput"
+                        android:layout_toStartOf="@+id/btnEmotionInput"
                         android:imeOptions="actionSend"
                         android:maxLines="3"
                         android:minHeight="@dimen/chat_BottomHeight"
@@ -92,8 +107,6 @@
                         android:paddingRight="5dp"
                         android:paddingTop="5dp"
                         android:textCursorDrawable="@drawable/edittext_cursor_shape"
-                        android:layout_toLeftOf="@+id/btnEmotionInput"
-                        android:layout_toStartOf="@+id/btnEmotionInput"
                         android:textSize="16sp" />
 
                     <Button
@@ -135,13 +148,13 @@
                     android:id="@+id/btnMoreSend"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
                     android:layout_margin="@dimen/chat_SendMargin"
                     android:background="@drawable/chat_send_normal_shape"
                     android:paddingBottom="6dip"
                     android:paddingLeft="8dip"
                     android:paddingRight="8dip"
                     android:paddingTop="6dip"
-                    android:layout_centerVertical="true"
                     android:text="@string/chat_send_text"
                     android:textColor="@color/white"
                     android:textSize="13.5sp"
@@ -151,8 +164,8 @@
                     android:id="@+id/btnMoreInput"
                     android:layout_width="@dimen/chat_BottomBtnSize"
                     android:layout_height="@dimen/chat_BottomBtnSize"
-                    android:layout_margin="@dimen/chat_BottomBtnMargin"
                     android:layout_centerVertical="true"
+                    android:layout_margin="@dimen/chat_BottomBtnMargin"
                     android:background="@drawable/btn_other" />
             </RelativeLayout>
 

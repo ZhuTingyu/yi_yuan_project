@@ -92,37 +92,6 @@ public class ChatManager extends AVIMClientEventHandler {
         return context;
     }
 
-    /**
-     * Deprecated .
-     */
-    public void fetchConversationWithUserId(final String param, String userId, final AVIMConversationCreatedCallback callback) {
-        final List<String> members = new ArrayList<>();
-        members.add(userId);
-        members.add(selfId);
-        AVIMConversationQuery query = imClient.getQuery();
-        query.withMembers(members);
-        query.whereEqualTo(ConversationType.ATTR_TYPE_KEY, ConversationType.Single.getValue());
-        query.orderByDescending(KEY_UPDATED_AT);
-
-        query.findInBackground(new AVIMConversationQueryCallback() {
-            @Override
-            public void done(List<AVIMConversation> conversations, AVIMException e) {
-                if (e != null) {
-                    callback.done(null, e);
-                } else {
-                    if (conversations.size() > 0) {
-                        callback.done(conversations.get(0), null);
-                    } else {
-                        Map<String, Object> attrs = new HashMap<>();
-                        attrs.put(ConversationType.TYPE_KEY, ConversationType.Single.getValue());
-                        attrs.put("houseId", param);
-                        imClient.createConversation(members, attrs, callback);
-                    }
-                }
-            }
-        });
-    }
-
     public void fetchConversationWithUserId(final JSONObject param, final String userId, final AVIMConversationCreatedCallback callback) {
         String houseId = param.optString("house_id");
         int auditType = param.optInt("audit_type");
@@ -280,6 +249,12 @@ public class ChatManager extends AVIMClientEventHandler {
         eventBus.post(messageEvent);
     }
 
+    /**
+     * 收到 LM 消息的处理函数
+     *
+     * @param message      收到的消息
+     * @param conversation 对应的会话
+     */
     private void onMessage(final AVIMTypedMessage message, final AVIMConversation conversation) {
         Logger.d("receive message=" + message.getContent());
         if (message.getMessageId() == null) {
@@ -311,11 +286,12 @@ public class ChatManager extends AVIMClientEventHandler {
 
             @Override
             protected void onPost(Exception exception) {
-                if (selfId != null && ChatActivity.getCurrentChattingConvid() == null || TextUtils.isEmpty(ChatActivity.getCurrentChattingConvid()) || !ChatActivity.getCurrentChattingConvid().equals(message.getConversationId())) {
-                    if (getUserInfoFactory().showNotificationWhenNewMessageCome(selfId)) {
-                        showMessageNotification(getContext(), conversation, message);
-                    }
-                }
+                // TODO: 16/7/26 处理单聊和群聊的情况
+//                if (selfId != null && ChatActivity.getCurrentChattingConvid() == null || TextUtils.isEmpty(ChatActivity.getCurrentChattingConvid()) || !ChatActivity.getCurrentChattingConvid().equals(message.getConversationId())) {
+//                    if (getUserInfoFactory().showNotificationWhenNewMessageCome(selfId)) {
+//                        showMessageNotification(getContext(), conversation, message);
+//                    }
+//                }
             }
         }.execute();
     }

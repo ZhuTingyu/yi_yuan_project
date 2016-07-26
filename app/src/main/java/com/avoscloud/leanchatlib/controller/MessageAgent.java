@@ -152,11 +152,8 @@ public class MessageAgent {
         }
     }
 
-    public static interface SendCallback {
-
+    public interface SendCallback {
         void onError(Exception e);
-
         void onSuccess(AVIMTypedMessage msg);
-
     }
 }

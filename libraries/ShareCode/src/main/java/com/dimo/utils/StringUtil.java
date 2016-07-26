@@ -161,6 +161,13 @@ public class StringUtil {
             return false;
     }
 
+    public static Boolean isValidPath(String url) {
+        if (url.contains("/") || url.contains(".."))
+            return true;
+        else
+            return false;
+    }
+
     public static String prependZero(String str, int bits) {
         return String.format("%0"+bits+"d", str);
     }

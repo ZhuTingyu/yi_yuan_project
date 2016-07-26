@@ -97,7 +97,7 @@
         </android.support.v4.widget.SwipeRefreshLayout>
 -->
         <com.avoscloud.leanchatlib.view.xlist.XListView
-            android:id="@+id/listview"
+            android:id="@+id/lvMessages"
             android:layout_width="fill_parent"
             android:layout_height="135dp"
             android:background="#ebebeb"

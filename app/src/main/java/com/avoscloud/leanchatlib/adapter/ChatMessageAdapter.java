@@ -179,7 +179,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         if (object.size() == 0) return;
 
         View houseView = ViewHolder.findViewById(conView, R.id.houseRL);
-        ImageView img = ViewHolder.findViewById(conView, R.id.img);
+        ImageView img = ViewHolder.findViewById(conView, R.id.image);
         TextView title = ViewHolder.findViewById(conView, R.id.title);
         TextView area = ViewHolder.findViewById(conView, R.id.area);
 //        TextView house_params = ViewHolder.findViewById(conView, R.id.house_params);

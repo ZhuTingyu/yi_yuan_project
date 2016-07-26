@@ -102,7 +102,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
     Button bug;
     @BindView(R.id.chat_inputbottombar)
     InputBottomBar inputBottomBar;
-    @BindView(R.id.listview)
+    @BindView(R.id.lvMessages)
     XListView xListView;
     @BindView(R.id.proposal_scrollView)
     ScrollView scrollView;
@@ -529,14 +529,14 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
     }
 
     private void scrollToLast() {
-        /*if (xListView.getAdapter().getCount() <= 0) {
+        /*if (lvMessages.getAdapter().getCount() <= 0) {
             return;
         }
 
-        xListView.post(new Runnable() {
+        lvMessages.post(new Runnable() {
             @Override
             public void run() {
-                xListView.smoothScrollToPosition(xListView.getAdapter().getCount() - 1);
+                lvMessages.smoothScrollToPosition(lvMessages.getAdapter().getCount() - 1);
             }
         });*/
     }

@@ -46,6 +46,7 @@ import com.yuan.house.http.RestClient;
 import com.yuan.house.ui.view.PickerPopWindow;
 import com.yuan.house.utils.ToastUtil;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -268,7 +269,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
         getBridge().registerHandler("showToast", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
-                ((WebViewBasedActivity)getActivity()).onBridgeDismissProgressDialog();
+                ((WebViewBasedActivity) getActivity()).onBridgeDismissProgressDialog();
 
                 com.alibaba.fastjson.JSONObject object = JSON.parseObject(data);
                 ToastUtil.showShort(getActivity(), object.getString("msg"));
@@ -681,8 +682,15 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                 try {
                     object = new JSONObject(data);
 
-                    /** Start Chat **/
-                    SingleChatActivity.chatByUserId(getActivity(), object);
+                    String leanIds = object.optString("lean_id");
+                    String[] ids = leanIds.split(",");
+                    if (ids == null) {
+                        Timber.e("Peer IDs can not be empty");
+                    } else if (ids.length == 1) {
+                        mBridgeListener.onBridgeStartSingleChat(object);
+                    } else {
+                        mBridgeListener.onBridgeStartGroupChat(object);
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -693,22 +701,17 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
             }
         });
 
-        getBridge().registerHandler("chatByUserId", new WebViewJavascriptBridge.WVJBHandler() {
+        /**
+         * Web 调用这个方法，Native 返回给 Web 中介的定位信息和用户首页选择的地址，只要城市就可以
+         */
+        getBridge().registerHandler("getChosenLocation", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
-            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
-                Timber.v("chatByUserId" + data);
+            public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
+                Timber.v("getChosenLocation");
 
-                JSONObject object;
-                try {
-                    object = new JSONObject(data);
-
-                    mBridgeListener.onBridgeStartGroupChat();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                throw new NotImplementedException("NOT IMPLEMENTED");
             }
         });
-
 
         getBridge().registerHandler("getRecentLocation", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
@@ -1074,7 +1077,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
         getBridge().registerHandler("updateData", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                if(mBridgeListener != null){
+                if (mBridgeListener != null) {
                     mBridgeListener.onBridgeUpdateUserMessage(data);
                 }
             }
@@ -1233,6 +1236,8 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
 
         void onBridgeHideRightItem();
 
-        void onBridgeStartGroupChat();
+        void onBridgeStartGroupChat(JSONObject object);
+
+        void onBridgeStartSingleChat(JSONObject object);
     }
 }

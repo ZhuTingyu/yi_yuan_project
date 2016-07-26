@@ -680,13 +680,13 @@ public class Utils {
         return byteArray;
     }
 
-    public static ProgressDialog showSpinnerDialog(Activity activity) {
+    public static ProgressDialog showSpinnerDialog(Context context) {
         //activity = modifyDialogContext(activity);
-        ProgressDialog dialog = new ProgressDialog(activity);
+        ProgressDialog dialog = new ProgressDialog(context);
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setCancelable(true);
         dialog.setMessage(DMApplication.getInstance().getString(R.string.chat_utils_hardLoading));
-        if (!activity.isFinishing()) {
+        if (!((Activity)context).isFinishing()) {
             dialog.show();
         }
         return dialog;

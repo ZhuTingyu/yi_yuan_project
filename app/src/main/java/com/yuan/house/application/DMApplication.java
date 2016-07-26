@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.StrictMode;
 
 import com.avos.avoscloud.AVAnalytics;
@@ -27,6 +28,7 @@ import com.avoscloud.leanchatlib.model.AVIMPresenceMessage;
 import com.avoscloud.leanchatlib.utils.Logger;
 import com.baidu.location.BDLocation;
 import com.baidu.mapapi.SDKInitializer;
+import com.bugtags.library.Bugtags;
 import com.dimo.utils.FileUtil;
 import com.dimo.utils.StringUtil;
 import com.dimo.utils.ZipUtil;
@@ -139,7 +141,9 @@ public class DMApplication extends Application {
 
         instance = this;
 
-        Dexter.initialize(this);
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Dexter.initialize(this);
+        }
 
         // Perform injection
         Injector.init(getRootModule(), this);
@@ -149,7 +153,7 @@ public class DMApplication extends Application {
 //        if (BuildConfig.DEBUG) {
         Timber.plant(new Timber.DebugTree());
 //        } else {
-//            Bugtags.start(Constants.kBugTagsKey, this, Bugtags.BTGInvocationEventBubble);
+            Bugtags.start(Constants.kBugTagsKey, this, Bugtags.BTGInvocationEventBubble);
 //        }
 
         PackageInfo pInfo = null;

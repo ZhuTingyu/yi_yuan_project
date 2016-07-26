@@ -27,6 +27,7 @@ import com.avos.avoscloud.im.v2.callback.AVIMConversationQueryCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMSingleMessageQueryCallback;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
 import com.avoscloud.chat.ui.chat.GroupChatActivity;
+import com.avoscloud.chat.ui.chat.SingleChatActivity;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.MessageAgent;
 import com.avoscloud.leanchatlib.controller.MessageHelper;
@@ -430,13 +431,14 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    public void onBridgeStartGroupChat() {
+    public void onBridgeStartSingleChat(JSONObject object) {
+        SingleChatActivity.chatByUserId(this, object);
+    }
+
+    public void onBridgeStartGroupChat(JSONObject object) {
         Timber.v("onBridgeStartGroupChat");
 
-        Intent intent = new Intent(this, GroupChatActivity.class);
-        intent.putExtra("extra", "");
-
-        startActivity(intent);
+        GroupChatActivity.chatByUserIds(this, object);
     }
 
     public void onBridgeRequestPurchase(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
@@ -543,7 +545,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                     @Override
                     public void onOtherButtonClick(ActionSheet actionSheet, int index) {
                         if (jsCallback != null) {
-                        jsCallback.callback(index);
+                            jsCallback.callback(index);
                         }
 
                         actionSheet.dismiss();
@@ -605,9 +607,9 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                     }
 
                     if (jsCallback != null) {
-                    jsCallback.callback(array.toString());
+                        jsCallback.callback(array.toString());
+                    }
                 }
-            }
             }
         });
     }
@@ -724,18 +726,18 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                     message.setText(finalText);
 
                     if (avimConversation != null) {
-                    MessageAgent messageAgent = new MessageAgent(avimConversation);
-                    messageAgent.sendEncapsulatedTypedMessage(message);
+                        MessageAgent messageAgent = new MessageAgent(avimConversation);
+                        messageAgent.sendEncapsulatedTypedMessage(message);
 
-                    // 发送成功之后需要缓存该条消息到本地
-                    ChatManager.getInstance().storeLastMessage(message);
+                        // 发送成功之后需要缓存该条消息到本地
+                        ChatManager.getInstance().storeLastMessage(message);
                     }
 
                     if (finalI == (finalLeanIdList.length() - 1)) {
                         if (callback != null) {
-                        callback.callback("onBridgeSendNoticeMessage finished");
+                            callback.callback("onBridgeSendNoticeMessage finished");
+                        }
                     }
-                }
                 }
             });
         }
@@ -1048,8 +1050,8 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 ret.put(response);
 
                 if (jsCallback != null) {
-                jsCallback.callback(ret.toString());
-            }
+                    jsCallback.callback(ret.toString());
+                }
             }
 
             @Override
@@ -1060,8 +1062,8 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 ret.put(errorResponse);
 
                 if (jsCallback != null) {
-                jsCallback.callback(ret.toString());
-            }
+                    jsCallback.callback(ret.toString());
+                }
             }
         });
     }
