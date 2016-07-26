@@ -85,13 +85,13 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
         mContext = this;
 
-        Dexter.checkPermissions(new EmptyMultiplePermissionsListener(),
+        /*Dexter.checkPermissions(new EmptyMultiplePermissionsListener(),
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.RECORD_AUDIO,
                 Manifest.permission.CAMERA,
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
-        );
+        );*/
 
         setupTabbarAppearance();
 
@@ -125,6 +125,9 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         } else {
             switchToFragment(Constants.kFragmentTagLogin);
         }
+
+        executeAppVersionCheck();
+
     }
 
     private void doAVUserLogin() {
