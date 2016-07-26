@@ -2,6 +2,7 @@ package com.yuan.house.activities;
 
 import android.Manifest;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -85,13 +86,15 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
         mContext = this;
 
-        Dexter.checkPermissions(new EmptyMultiplePermissionsListener(),
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.RECORD_AUDIO,
-                Manifest.permission.CAMERA,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-        );
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Dexter.checkPermissions(new EmptyMultiplePermissionsListener(),
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+            );
+        }
 
         setupTabbarAppearance();
 
