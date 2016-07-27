@@ -447,8 +447,8 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
      */
     public void uploadFile(String filePath) {
         OkHttpUtils.post().url(Constants.kWebServiceFileUpload)
-                .addHeader("Content-Type", "multipart/form-data")
-                .addHeader("token", AuthHelper.getInstance().getUserToken())
+                .addHeader(Constants.kHttpReqKeyContentType, "multipart/form-data")
+                .addHeader(Constants.kHttpReqKeyAuthToken, AuthHelper.getInstance().getUserToken())
                 //.file(new File(filePath))
                 .addFile("file[]", filePath, new File(filePath))
                 .build()
@@ -493,8 +493,8 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         params.put("category", category.ordinal());
         params.put("duration", duration);
         OkHttpUtils.postString().url(Constants.kWebServiceSendFeedback)
-                .addHeader("Content-Type", "application/json")
-                .addHeader("token", AuthHelper.getInstance().getUserToken())
+                .addHeader(Constants.kHttpReqKeyContentType, "application/json")
+                .addHeader(Constants.kHttpReqKeyAuthToken, AuthHelper.getInstance().getUserToken())
                 .content(com.alibaba.fastjson.JSONObject.toJSONString(params))
                 .mediaType(okhttp3.MediaType.parse("application/json"))
                 .build()
@@ -607,8 +607,8 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
      */
     private void getHistoryMessages(int page) {
         OkHttpUtils.get().url(Constants.kWebServiceGetFeedback + page)
-                .addHeader("Content-Type", "application/json")
-                .addHeader("token", AuthHelper.getInstance().getUserToken())
+                .addHeader(Constants.kHttpReqKeyContentType, "application/json")
+                .addHeader(Constants.kHttpReqKeyAuthToken, AuthHelper.getInstance().getUserToken())
                 .build()
                 .execute(new StringCallback() {
 
@@ -680,8 +680,8 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
      */
     private void getBrokers() {
         OkHttpUtils.get().url(Constants.kWebServiceGetBrokers)
-                .addHeader("Content-Type", "application/json")
-                .addHeader("token", AuthHelper.getInstance().getUserToken())
+                .addHeader(Constants.kHttpReqKeyContentType, "application/json")
+                .addHeader(Constants.kHttpReqKeyAuthToken, AuthHelper.getInstance().getUserToken())
                 .build()
                 .execute(new StringCallback() {
                     @Override
