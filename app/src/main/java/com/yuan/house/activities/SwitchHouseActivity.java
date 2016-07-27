@@ -68,7 +68,7 @@ public class SwitchHouseActivity extends FragmentActivity {
             }
         }
 
-        listView = (ListView) findViewById(R.id.listview);
+        listView = (ListView) findViewById(R.id.lvMessages);
 
         back = (LinearLayout) findViewById(R.id.back);
         back.setOnClickListener(new View.OnClickListener() {
@@ -171,7 +171,7 @@ public class SwitchHouseActivity extends FragmentActivity {
     }
 
     final class ViewHolder {
-        @BindView(R.id.img)
+        @BindView(R.id.image)
         public ImageView imageView;
 
         @BindView(R.id.title)

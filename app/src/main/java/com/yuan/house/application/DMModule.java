@@ -1,6 +1,7 @@
 package com.yuan.house.application;
 
 
+import com.avoscloud.chat.ui.chat.GroupChatActivity;
 import com.avoscloud.chat.ui.chat.SingleChatActivity;
 import com.yuan.house.activities.CropActivity;
 import com.yuan.house.activities.IPSettingActivity;
@@ -60,6 +61,7 @@ import dagger.Module;
                         SwitchHouseActivity.class,
                         CropActivity.class,
                         SegmentalWebActivity.class,
+                        GroupChatActivity.class,
 
                         AuthHelper.class
                 },

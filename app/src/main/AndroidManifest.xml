@@ -88,6 +88,10 @@
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
+            android:name="com.avoscloud.chat.ui.chat.GroupChatActivity"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity
             android:name="com.avoscloud.leanchatlib.activity.ImageBrowserActivity"
             android:launchMode="singleTask" />
         <activity
@@ -118,8 +122,7 @@
             android:configChanges="orientation|keyboardHidden|navigation"
             android:exported="false"
             android:screenOrientation="behind"
-            android:windowSoftInputMode="adjustResize|stateHidden" >
-        </activity>
+            android:windowSoftInputMode="adjustResize|stateHidden"></activity>
 
         <service android:name="com.avos.avoscloud.PushService" />
 
@@ -144,7 +147,9 @@
             android:enabled="true"
             android:process=":remote" />
 
-        <service android:name=".HeartbeatService" android:stopWithTask="false" />
+        <service
+            android:name=".HeartbeatService"
+            android:stopWithTask="false" />
     </application>
 
 </manifest>

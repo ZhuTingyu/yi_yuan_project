@@ -141,6 +141,12 @@ public class ConversationManager {
         q.findInBackground(callback);
     }
 
+    /**
+     * 根据 CONV ID 查找会话列表
+     *
+     * @param ids
+     * @param callback
+     */
     public void findConversationsByConversationIds(List<String> ids, AVIMConversationQueryCallback callback) {
         if (ids.size() > 0) {
             AVIMConversationQuery q = chatManager.getQuery();

@@ -1,47 +1,64 @@
 package com.avoscloud.chat.ui.chat;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.DataSetObserver;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.ContextMenu;
 import android.view.GestureDetector;
-import android.view.KeyEvent;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.webkit.WebView;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.AVIMException;
+import com.avos.avoscloud.im.v2.AVIMReservedMessageType;
 import com.avos.avoscloud.im.v2.AVIMTypedMessage;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
+import com.avos.avoscloud.im.v2.messages.AVIMAudioMessage;
+import com.avos.avoscloud.im.v2.messages.AVIMImageMessage;
+import com.avos.avoscloud.im.v2.messages.AVIMLocationMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
 import com.avoscloud.chat.service.CacheService;
 import com.avoscloud.chat.service.ConversationChangeEvent;
 import com.avoscloud.chat.util.Utils;
 import com.avoscloud.leanchatlib.activity.ChatActivity;
+import com.avoscloud.leanchatlib.activity.ImageBrowserActivity;
+import com.avoscloud.leanchatlib.adapter.ChatMessageAdapter;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.ConversationHelper;
+import com.avoscloud.leanchatlib.controller.MessageAgent;
 import com.avoscloud.leanchatlib.controller.MessageHelper;
 import com.avoscloud.leanchatlib.model.AVIMHouseMessage;
 import com.avoscloud.leanchatlib.model.AVIMPresenceMessage;
+import com.avoscloud.leanchatlib.model.ConversationType;
 import com.avoscloud.leanchatlib.model.MessageEvent;
+import com.avoscloud.leanchatlib.utils.DownloadUtils;
+import com.avoscloud.leanchatlib.utils.NetAsyncTask;
+import com.avoscloud.leanchatlib.view.xlist.XListView;
 import com.dimo.utils.DateUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.listener.PauseOnScrollListener;
 import com.yuan.house.R;
 import com.yuan.house.activities.SwitchHouseActivity;
 import com.yuan.house.adapter.InputMoreAdapter;
@@ -52,38 +69,53 @@ import com.yuan.house.helper.AuthHelper;
 import com.yuan.house.ui.fragment.FragmentBBS;
 import com.yuan.house.ui.fragment.WebViewBaseFragment;
 import com.yuan.house.utils.ToastUtil;
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.StringCallback;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import de.greenrobot.event.EventBus;
+import okhttp3.Call;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 
 /**
  * Created by lzw on 15/4/24.
  */
-public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBBSInteractionListener {
+public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBBSInteractionListener,
+        XListView.IXListViewListener {
     public static final int LOCATION_REQUEST = 100;
     public static final int kRequestCodeSwitchHouse = 101;
-
+    private static final int PAGE_SIZE = 20;
     private static SharedPreferences prefs;
     private static String leanId = "";
+    private static String currentChattingConvid;
+    protected ChatMessageAdapter mMessageAdapter;
+    protected MessageAgent.SendCallback defaultSendCallback = new DefaultSendCallback();
     String cachedHouseIdForCurrentConv;
-
+    private MessageAgent messageAgent;
+    private String mChatMessage;            //需要转发或复制的信息
     private FragmentBBS mFragmentBBS;
     private LinearLayout bottomLayout;
     private String value;
     private List<JSONObject> houseInfos;
+    private AVIMConversation conversation;
+    private ConversationType conversationType;
     private JSONObject jsonFormatParams;
     private GestureDetector gestureDetector;
     private int mLastY = 0;
@@ -103,7 +135,6 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                     return false;
                 }
             };
-
     private WebView webView;
     private JSONArray jsonFormatSwitchParams;
     private String cachedHouseTradeTypeForCurrentConv;
@@ -114,6 +145,14 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     private int kTickForLiveCheck = 6;
     private long kTickForPresenceSending = 5;
     private long kIntervalForLiveCheck = 1;     // 每秒进行倒计时
+
+    public static String getCurrentChattingConvid() {
+        return currentChattingConvid;
+    }
+
+    public static void setCurrentChattingConvid(String currentChattingConvid) {
+        SingleChatActivity.currentChattingConvid = currentChattingConvid;
+    }
 
     public static void chatByConversation(Context from, AVIMConversation conv, JSONObject params) {
         CacheService.registerConv(conv);
@@ -126,48 +165,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
         from.startActivity(intent);
     }
 
-    public static void chatByConversation(Context from, AVIMConversation conv) {
-        CacheService.registerConv(conv);
-
-        ChatManager.getInstance().registerConversation(conv);
-        Intent intent = new Intent(from, SingleChatActivity.class);
-        intent.putExtra(CONVID, conv.getConversationId());
-        from.startActivity(intent);
-    }
-
-    /**
-     * Deprecated
-     */
-    public static void chatByUserId(final Activity from, String userId) {
-        leanId = userId;
-
-        final ProgressDialog dialog = Utils.showSpinnerDialog(from);
-        if (prefs == null) prefs = PreferenceManager.getDefaultSharedPreferences(from);
-
-        String houseId = prefs.getString("houseId", null);
-        String auditType = prefs.getString("auditType", null);
-
-        StringBuffer sb = new StringBuffer();
-        if (auditType == null) {
-            sb.append(houseId);
-        } else {
-            sb.append("000");
-            sb.append(auditType);
-            sb.append(houseId);
-        }
-
-        ChatManager.getInstance().fetchConversationWithUserId(sb.toString(), leanId, new AVIMConversationCreatedCallback() {
-            @Override
-            public void done(AVIMConversation conversation, AVIMException e) {
-                dialog.dismiss();
-                if (Utils.filterException(e)) {
-                    chatByConversation(from, conversation);
-                }
-            }
-        });
-    }
-
-    public static void chatByUserId(final Activity from, final JSONObject params) {
+    public static void chatByUserId(final Context from, final JSONObject params) {
         leanId = params.optString("lean_id");
 
         final ProgressDialog dialog = Utils.showSpinnerDialog(from);
@@ -238,6 +236,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
             }
         });
 
+
         gestureDetector = new GestureDetector(this, onGestureListener);
 
         mFragmentBBS = FragmentBBS.newInstance();
@@ -246,19 +245,11 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
         mFragmentTransaction.add(R.id.fragmentBBS, mFragmentBBS, Constants.kFragmentTagBBS);
         mFragmentTransaction.commit();
 
+        initListView();
+
+        initByIntent(getIntent());
+
         initSuggestedHouseInfos();
-
-        contentEdit.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEND) {
-                    sendText();
-
-                    return true;
-                }
-                return false;
-            }
-        });
 
         sendPresenceMessage();
 
@@ -296,6 +287,91 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
         });
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        setCurrentChattingConvid(null);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.chat_item_longclick_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.menu_retransmission:
+                ToastUtil.showShort(mContext, "转发" + mChatMessage);
+                return true;
+            case R.id.menu_copy:
+                ToastUtil.showShort(mContext, "复制" + mChatMessage);
+                return true;
+            case R.id.menu_more:
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
+    @Override
+    protected void sendAudio(String audioPath) {
+        super.sendAudio(audioPath);
+
+        messageAgent.sendAudio(audioPath);
+    }
+
+    @Override
+    protected void sendImage(String s) {
+        super.sendImage(s);
+
+        messageAgent.sendImage(s);
+    }
+
+    public void refreshMsgsFromDB() {
+        new GetDataTask(mContext, false).execute();
+    }
+
+    @Override
+    public void onRefresh() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                new GetDataTask(mContext, true).execute();
+            }
+        }, 1000);
+    }
+
+    @Override
+    public void onLoadMore() {
+    }
+
+    private void initListView() {
+        lvMessages.setPullRefreshEnable(true);
+        lvMessages.setPullLoadEnable(false);
+        lvMessages.setXListViewListener(this);
+        lvMessages.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(), true, true));
+        lvMessages.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                // TODO: 16/6/27 长按聊天消息显示『转发/复制』的 ContextMenu
+                AVIMTypedMessage message = (AVIMTypedMessage) mMessageAdapter.getItem(position - 1);
+                int type = mMessageAdapter.getItemViewType(position - 1);
+                if (type == 0 || type == 1) {
+                    AVIMTextMessage textMessage = (AVIMTextMessage) message;
+                    mChatMessage = textMessage.getText();
+                } else
+                    mChatMessage = MessageHelper.getFilePath(message);
+
+                return false;
+            }
+        });
+    }
+
     private void setupPresenceGuardian() {
         scheduledExecutorServiceForPresence = Executors.newSingleThreadScheduledExecutor();
 
@@ -306,6 +382,76 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                         sendPresenceMessage();
                     }
                 }, 0, kTickForPresenceSending, TimeUnit.SECONDS);
+    }
+
+    protected void bindAdapter(JSONObject object) {
+        bindAdapterToListView(conversationType, object);
+
+        refreshMsgsFromDB();
+    }
+
+    private void bindAdapterToListView(ConversationType conversationType, JSONObject object) {
+        mMessageAdapter = new ChatMessageAdapter(this, conversationType, object);
+        mMessageAdapter.setClickListener(new ChatMessageAdapter.ClickListener() {
+
+            @Override
+            public void onFailButtonClick(AVIMTypedMessage msg) {
+                messageAgent.resendMsg(msg, defaultSendCallback);
+            }
+
+            @Override
+            public void onLocationViewClick(AVIMLocationMessage locMsg) {
+
+            }
+
+            @Override
+            public void onImageViewClick(AVIMImageMessage imageMsg) {
+                ImageBrowserActivity.go(mContext,
+                        MessageHelper.getFilePath(imageMsg),
+                        imageMsg.getFileUrl());
+            }
+
+            @Override
+            public void onAudioLongClick(final AVIMAudioMessage audioMessage) {
+                //弹出编辑文本(语音附加消息)，确认后上传。
+                final EditText inputServer = new EditText(mContext);
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.AlertDialogCustom);
+                builder.setTitle("附加消息").setIcon(android.R.drawable.ic_dialog_info).setView(inputServer)
+                        .setNegativeButton("取消", null);
+                builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int which) {
+                        //封装成MAP对象后转换为json
+                        OkHttpUtils.get().url("https://leancloud.cn/1.1/rtm/messages/logs?convid=" + audioMessage.getConversationId())
+                                .addHeader("X-LC-Id", "IwzlUusBdjf4bEGlypaqNRIx-gzGzoHsz")
+                                .addHeader("X-LC-Key", "4iGQy4Mg1Q8o3AyvtUTGiFQl,master")
+                                .build()
+                                .execute(new StringCallback() {
+                                    @Override
+                                    public void onError(Call call, Exception e) {
+
+                                    }
+
+                                    @Override
+                                    public void onResponse(String response) {
+                                        Log.i("云端返回的JSON", response);
+                                        com.alibaba.fastjson.JSONArray jsonArray = com.alibaba.fastjson.JSONArray.parseArray(response);
+                                        for (int i = 0; i < jsonArray.size(); i++) {
+                                            if (jsonArray.getJSONObject(i).get("msg-id").toString().equals(audioMessage.getMessageId())) {
+                                                putJson2LeanChat(jsonArray.get(i).toString(), inputServer.getText().toString());
+                                                return;
+                                            }
+                                        }
+                                    }
+                                });
+
+                    }
+                });
+                builder.show();
+            }
+
+        });
+        lvMessages.setAdapter(mMessageAdapter);
     }
 
     private void setupHeartBeatForPresenceCheckInSeconds() {
@@ -329,6 +475,32 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                     }
                 }, 0, kIntervalForLiveCheck, TimeUnit.SECONDS);
 
+    }
+
+    private void putJson2LeanChat(String json, String text) {
+        StringBuffer stringBuffer = new StringBuffer(json);
+        stringBuffer.insert(stringBuffer.indexOf(":-3") + 3, ",\\\"_lctext\\\":" + "\\\"" + text + "\\\"");
+        Log.i("new json ", stringBuffer.toString());
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("X-LC-Id", "IwzlUusBdjf4bEGlypaqNRIx-gzGzoHsz");
+        headers.put("X-LC-Key", "4iGQy4Mg1Q8o3AyvtUTGiFQl,master");
+
+        OkHttpUtils.put().url("https://leancloud.cn/1.1/rtm/messages/logs")
+                .headers(headers)
+                .requestBody(RequestBody.create(MediaType.parse("application/json"), stringBuffer.toString()))
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onResponse(String response) {
+                        Log.i("修改聊天记录 : ", response);
+                    }
+                });
     }
 
     private void requestAnonymousInfo() {
@@ -607,11 +779,27 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
         }
     }
 
+    private void initByIntent(Intent intent) {
+        initData(intent);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        initByIntent(intent);
+    }
+
     @Override
     protected void onResume() {
         CacheService.setCurConv(conversation);
 
         super.onResume();
+
+        if (conversation == null) {
+            throw new IllegalStateException("conv is null");
+        }
+        setCurrentChattingConvid(conversation.getConversationId());
     }
 
     @Override
@@ -619,6 +807,20 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
         CacheService.setCurConv(null);
 
         super.onDestroy();
+    }
+
+    public void initData(Intent intent) {
+        String convid = intent.getStringExtra(CONVID);
+        conversation = chatManager.lookUpConversationById(convid);
+        if (conversation == null) {
+            throw new NullPointerException("conv is null");
+        }
+
+        messageAgent = new MessageAgent(conversation);
+        messageAgent.setSendCallback(defaultSendCallback);
+        roomsTable.insertRoom(convid);
+        roomsTable.clearUnread(conversation.getConversationId());
+        conversationType = ConversationHelper.typeOfConv(conversation);
     }
 
     @Override
@@ -655,20 +857,6 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     }
 
     private JSONObject switchHouse(String data) throws JSONException {
-//        JSONObject object = null;
-//        for (int i = 0; i < houseInfos.size(); i++) {
-//            object = houseInfos.get(i);
-//
-//            String houseId = null;
-//            if (object.optString("id") != null) {
-//                houseId = object.optString("id");
-//            }
-//
-//            if (data.equals(houseId)) return null;
-//        }
-//
-//        if (object == null) return null;
-
         JSONObject object = new JSONObject(data);
         cachedHouseIdForCurrentConv = object.optString("id");
 
@@ -797,5 +985,118 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
         layoutParams.height = height;
 
         frameLayout.setLayoutParams(layoutParams);
+    }
+
+    @Override
+    protected void hideBottomLayoutAndScrollToLast() {
+        scrollToLast();
+    }
+
+    public void scrollToLast() {
+        lvMessages.post(new Runnable() {
+            @Override
+            public void run() {
+                lvMessages.smoothScrollToPosition(lvMessages.getAdapter().getCount() - 1);
+            }
+        });
+    }
+
+    class GetDataTask extends NetAsyncTask {
+        private List<AVIMTypedMessage> msgs;
+        private boolean loadHistory;
+
+        GetDataTask(Context ctx, boolean loadHistory) {
+            super(ctx, false);
+            this.loadHistory = loadHistory;
+        }
+
+        @Override
+        protected void doInBack() throws Exception {
+            String msgId = null;
+            long maxTime = System.currentTimeMillis() + 10 * 1000;
+            int limit;
+            long time;
+            if (loadHistory == false) {
+                time = maxTime;
+                int count = mMessageAdapter.getCount();
+                if (count > PAGE_SIZE) {
+                    limit = count;
+                } else {
+                    limit = PAGE_SIZE;
+                }
+            } else {
+                if (mMessageAdapter.getDatas().size() > 0) {
+                    msgId = mMessageAdapter.getDatas().get(0).getMessageId();
+                    AVIMTypedMessage firstMsg = mMessageAdapter.getDatas().get(0);
+                    time = firstMsg.getTimestamp();
+                } else {
+                    time = maxTime;
+                }
+                limit = PAGE_SIZE;
+            }
+
+            msgs = msgsTable.selectMsgs(conversation.getConversationId(), time, limit);
+
+            cacheMsgs(msgs);
+        }
+
+        @Override
+        protected void onPost(Exception e) {
+            if (filterException(e)) {
+                if (lvMessages.getPullRefreshing()) {
+                    lvMessages.stopRefresh();
+                }
+                if (loadHistory == false) {
+                    mMessageAdapter.setDatas(msgs);
+                    mMessageAdapter.notifyDataSetChanged();
+                    scrollToLast();
+                } else {
+                    List<AVIMTypedMessage> newMsgs = new ArrayList<AVIMTypedMessage>();
+                    newMsgs.addAll(msgs);
+                    newMsgs.addAll(mMessageAdapter.getDatas());
+                    mMessageAdapter.setDatas(newMsgs);
+                    mMessageAdapter.notifyDataSetChanged();
+                    if (msgs.size() > 0) {
+                        lvMessages.setSelection(msgs.size() - 1);
+                    } else {
+                        ToastUtil.show(mContext, R.string.chat_activity_loadMessagesFinish);
+                    }
+                }
+            }
+        }
+
+        void cacheMsgs(List<AVIMTypedMessage> msgs) throws Exception {
+            Set<String> userIds = new HashSet<String>();
+            for (AVIMTypedMessage msg : msgs) {
+                AVIMReservedMessageType type = AVIMReservedMessageType.getAVIMReservedMessageType(msg.getMessageType());
+                if (type == AVIMReservedMessageType.AudioMessageType) {
+                    File file = new File(MessageHelper.getFilePath(msg));
+                    if (!file.exists()) {
+                        AVIMAudioMessage audioMsg = (AVIMAudioMessage) msg;
+                        String url = audioMsg.getFileUrl();
+                        DownloadUtils.downloadFileIfNotExists(url, file);
+                    }
+                }
+                userIds.add(msg.getFrom());
+            }
+            if (chatManager.getUserInfoFactory() == null) {
+                throw new NullPointerException("chat user factory is null");
+            }
+            chatManager.getUserInfoFactory().cacheUserInfoByIdsInBackground(new ArrayList<>(userIds));
+        }
+
+    }
+
+    class DefaultSendCallback implements MessageAgent.SendCallback {
+
+        @Override
+        public void onError(Exception e) {
+            refreshMsgsFromDB();
+        }
+
+        @Override
+        public void onSuccess(AVIMTypedMessage msg) {
+            refreshMsgsFromDB();
+        }
     }
 }

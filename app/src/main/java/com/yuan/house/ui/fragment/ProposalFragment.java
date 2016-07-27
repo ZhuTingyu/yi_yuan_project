@@ -102,7 +102,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
     Button bug;
     @BindView(R.id.chat_inputbottombar)
     InputBottomBar inputBottomBar;
-    @BindView(R.id.listview)
+    @BindView(R.id.lvMessages)
     XListView xListView;
     @BindView(R.id.proposal_scrollView)
     ScrollView scrollView;
@@ -447,8 +447,8 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
      */
     public void uploadFile(String filePath) {
         OkHttpUtils.post().url(Constants.kWebServiceFileUpload)
-                .addHeader("Content-Type", "multipart/form-data")
-                .addHeader("token", AuthHelper.getInstance().getUserToken())
+                .addHeader(Constants.kHttpReqKeyContentType, "multipart/form-data")
+                .addHeader(Constants.kHttpReqKeyAuthToken, AuthHelper.getInstance().getUserToken())
                 //.file(new File(filePath))
                 .addFile("file[]", filePath, new File(filePath))
                 .build()
@@ -493,8 +493,8 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         params.put("category", category.ordinal());
         params.put("duration", duration);
         OkHttpUtils.postString().url(Constants.kWebServiceSendFeedback)
-                .addHeader("Content-Type", "application/json")
-                .addHeader("token", AuthHelper.getInstance().getUserToken())
+                .addHeader(Constants.kHttpReqKeyContentType, "application/json")
+                .addHeader(Constants.kHttpReqKeyAuthToken, AuthHelper.getInstance().getUserToken())
                 .content(com.alibaba.fastjson.JSONObject.toJSONString(params))
                 .mediaType(okhttp3.MediaType.parse("application/json"))
                 .build()
@@ -529,14 +529,14 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
     }
 
     private void scrollToLast() {
-        /*if (xListView.getAdapter().getCount() <= 0) {
+        /*if (lvMessages.getAdapter().getCount() <= 0) {
             return;
         }
 
-        xListView.post(new Runnable() {
+        lvMessages.post(new Runnable() {
             @Override
             public void run() {
-                xListView.smoothScrollToPosition(xListView.getAdapter().getCount() - 1);
+                lvMessages.smoothScrollToPosition(lvMessages.getAdapter().getCount() - 1);
             }
         });*/
     }
@@ -607,8 +607,8 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
      */
     private void getHistoryMessages(int page) {
         OkHttpUtils.get().url(Constants.kWebServiceGetFeedback + page)
-                .addHeader("Content-Type", "application/json")
-                .addHeader("token", AuthHelper.getInstance().getUserToken())
+                .addHeader(Constants.kHttpReqKeyContentType, "application/json")
+                .addHeader(Constants.kHttpReqKeyAuthToken, AuthHelper.getInstance().getUserToken())
                 .build()
                 .execute(new StringCallback() {
 
@@ -680,8 +680,8 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
      */
     private void getBrokers() {
         OkHttpUtils.get().url(Constants.kWebServiceGetBrokers)
-                .addHeader("Content-Type", "application/json")
-                .addHeader("token", AuthHelper.getInstance().getUserToken())
+                .addHeader(Constants.kHttpReqKeyContentType, "application/json")
+                .addHeader(Constants.kHttpReqKeyAuthToken, AuthHelper.getInstance().getUserToken())
                 .build()
                 .execute(new StringCallback() {
                     @Override

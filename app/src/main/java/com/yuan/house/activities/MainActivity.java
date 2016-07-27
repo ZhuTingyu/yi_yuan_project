@@ -2,6 +2,7 @@ package com.yuan.house.activities;
 
 import android.Manifest;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -85,13 +86,15 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
         mContext = this;
 
-        /*Dexter.checkPermissions(new EmptyMultiplePermissionsListener(),
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.RECORD_AUDIO,
-                Manifest.permission.CAMERA,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-        );*/
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Dexter.checkPermissions(new EmptyMultiplePermissionsListener(),
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+            );
+        }
 
         setupTabbarAppearance();
 
@@ -345,9 +348,17 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                 new LogInCallback<AVUser>() {
                     @Override
                     public void done(AVUser avUser, AVException e) {
-                        if (avUser != null) {
+                        if (e != null) {
+                            // com.avos.avoscloud.AVException: javax.net.ssl.SSLHandshakeException:
+                            //      com.android.org.bouncycastle.jce.exception.ExtCertPathValidatorException:
+                            //      Could not validate certificate: Certificate not valid until Wed Nov
+                            //      06 05:36:50 GMT+08:00 2013 (compared to Wed Jul 27 12:00:57 GMT+08:00 2011)
+                            e.printStackTrace();
+                            ToastUtil.showShort(mContext, "消息服务器登陆失败, 请检查手机的时间设置是否正确");
+                        } else if (avUser != null) {
                             String chatUserId = avUser.getObjectId();
-                            prefs.edit().putString("avUserLogin", username)
+                            prefs.edit()
+                                    .putString("avUserLogin", username)
                                     .putString(Constants.kLeanChatCurrentUserObjectId, chatUserId)
                                     .commit();
 
@@ -357,8 +368,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
                             getBottomNavigationBar().clearAll();
                             setupTabbarAppearance();
-                        } else {
-                            ToastUtil.showShort(mContext, "leancould登陆失败");
                         }
                     }
                 });
