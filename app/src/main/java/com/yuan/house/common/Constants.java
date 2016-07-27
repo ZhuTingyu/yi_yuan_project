@@ -114,4 +114,6 @@ public class Constants {
 
     
     public static int kNotifyId = 1;
+    public static String kPrefsLastSelectedCity = "lastCity";
+    public static String kPrefsLastSelectedDistrict = "lastDistrict";
 }

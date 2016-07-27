@@ -46,7 +46,6 @@ import com.yuan.house.http.RestClient;
 import com.yuan.house.ui.view.PickerPopWindow;
 import com.yuan.house.utils.ToastUtil;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -709,7 +708,17 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("getChosenLocation");
 
-                throw new NotImplementedException("NOT IMPLEMENTED");
+                JSONObject object = new JSONObject();
+                try {
+                    object.put("city", prefs.getString(Constants.kPrefsLastSelectedCity, ""));
+                    object.put("district", prefs.getString(Constants.kPrefsLastSelectedDistrict, ""));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                if (callback != null) {
+                    callback.callback(object.toString());
+                }
             }
         });
 

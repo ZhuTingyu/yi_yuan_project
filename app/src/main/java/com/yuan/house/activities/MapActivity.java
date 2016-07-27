@@ -12,9 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,7 +28,6 @@ import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
-import com.baidu.mapapi.map.Text;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.search.core.SearchResult;
 import com.baidu.mapapi.search.geocode.GeoCodeOption;
@@ -151,9 +148,15 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
                         data.put("lng", bdLocation.getLongitude());
                         data.put("province", bdLocation.getProvince());
                         data.put("street", bdLocation.getStreet());
+
+                        // save selected city + district
+                        prefs.edit().putString(Constants.kPrefsLastSelectedCity, city).apply();
+                        prefs.edit().putString(Constants.kPrefsLastSelectedDistrict, district).apply();
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+
                     intent.putExtra(Constants.kActivityParamFinishSelectLocationOnMap, data.toString());
                     setResult(0, intent);
                     finish();
