@@ -960,15 +960,20 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
 
+        // File Body
         ByteArrayBody fileBody = new ByteArrayBody(data, "abc.jpg");
-        StringBody sizeBody = null;
-        try {
-            sizeBody = new StringBody(sizes.toString());
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
         builder.addPart("file", fileBody);
-        builder.addPart("size", sizeBody);
+
+        // Size Body
+        if (sizes != null) {
+            StringBody sizeBody = null;
+            try {
+                sizeBody = new StringBody(sizes.toString());
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            builder.addPart("size", sizeBody);
+        }
 
         return builder.build();
     }
@@ -1012,18 +1017,18 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         JSONArray sizes;
 
         try {
-
             if (!params.contains("imgs")) {
                 JSONArray size = new JSONArray();
                 JSONArray array = new JSONArray(params);
+
                 JSONObject param = new JSONObject();
                 param.put("imageName", array.getString(0));
                 param.put("imageSize", size);
+
                 HttpEntity entity = constructImageEntity(param);
+
                 uploadFile(entity, jsCallback);
-
             } else {
-
                 JSONObject object = new JSONObject(params);
 
                 filePaths = object.optJSONArray("imgs");
@@ -1032,12 +1037,13 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 for (int i = 0; i < filePaths.length(); i++) {
                     JSONObject param = new JSONObject();
                     param.put("imageName", filePaths.get(i).toString());
-                    param.put("imageSize", sizes);
+                    if (sizes != null) {
+                        param.put("imageSize", sizes);
+                    }
 
                     HttpEntity entity = constructImageEntity(param);
                     // TODO: 16/7/15 use queue to upload files
                     uploadFile(entity, jsCallback);
-
                 }
             }
         } catch (JSONException e) {
@@ -1131,28 +1137,6 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         ImageUtil.loadFullScreenImage(iv, imageUrl, width, bgLinearLayout);
     }
 
-    private class DataPickerOnClickListener implements DatePickerDialog.OnDateSetListener {
-        @Override
-        public void onDateSet(DatePickerDialog datePickerDialog, int year, int month, int day) {
-            StringBuffer sb = new StringBuffer();
-            sb.append(year);
-            sb.append("-");
-            sb.append(month);
-            sb.append("-");
-            sb.append(day);
-//            mCallback.callback(sb.toString());
-        }
-    }
-    // endregion
-
-    private class TimePickerOnClickListener implements TimePickerDialog.OnTimeSetListener {
-        @Override
-        public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute) {
-
-        }
-    }
-    // endregion
-
     protected void executeAppVersionCheck() {
         boolean hasNewVersion = prefs.getString(Constants.kAppHasNewVersion, "0").equals("1");
 
@@ -1172,11 +1156,12 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 public void onClick(DialogInterface dialog, int which) {
                 }
             });
-            if (!isFinishing()){
+            if (!isFinishing()) {
                 builder.create().show();
             }
         }
     }
+    // endregion
 
     private void downloadFileAndPrepareInstallation() {
         String url = prefs.getString(Constants.kNewAppDownloadUrl, null);
@@ -1190,7 +1175,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         dailog.setTitle(R.string.txt_downloading);
         dailog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         dailog.setMax(100);
-        if (!isFinishing()){
+        if (!isFinishing()) {
             dailog.show();
         }
 
@@ -1219,6 +1204,27 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             }
         });
 
+    }
+    // endregion
+
+    private class DataPickerOnClickListener implements DatePickerDialog.OnDateSetListener {
+        @Override
+        public void onDateSet(DatePickerDialog datePickerDialog, int year, int month, int day) {
+            StringBuffer sb = new StringBuffer();
+            sb.append(year);
+            sb.append("-");
+            sb.append(month);
+            sb.append("-");
+            sb.append(day);
+//            mCallback.callback(sb.toString());
+        }
+    }
+
+    private class TimePickerOnClickListener implements TimePickerDialog.OnTimeSetListener {
+        @Override
+        public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute) {
+
+        }
     }
 
 
