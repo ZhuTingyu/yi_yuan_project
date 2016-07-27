@@ -1,11 +1,13 @@
 package com.yuan.house.activities;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationManagerCompat;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -129,8 +131,20 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
             switchToFragment(Constants.kFragmentTagLogin);
         }
 
+        checkNotification();
+
         executeAppVersionCheck();
 
+    }
+
+    private void checkNotification() {
+        if (!NotificationManagerCompat.from(mContext).areNotificationsEnabled()) {
+            new AlertDialog.Builder(mContext)
+                    .setTitle("提醒")
+                    .setMessage("请打开应用的通知")
+                    .setPositiveButton("确定", null)
+                    .show();
+        }
     }
 
     private void doAVUserLogin() {
