@@ -198,7 +198,7 @@ public class SplashActivity extends FragmentActivity {
     private void onlineCheckIfHasNewAppToDownload() {
         final SharedPreferences.Editor editor = prefs.edit();
 
-        String url = Constants.kWebServiceUpdata + "app/v";
+        String url = Constants.kWebServiceAPIEndpoint + "/app/v";
         RestClient.getInstance().get(url, null, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
@@ -206,7 +206,7 @@ public class SplashActivity extends FragmentActivity {
                     JSONObject obj = new JSONObject(new String(responseBody));
 
                     Iterator<String> keys = obj.keys();
-                    ArrayList<String> data = new ArrayList<String>();
+                    ArrayList<String> data = new ArrayList<>();
                     while (keys.hasNext()){
                         data.add(obj.getString(keys.next()));
                     }
