@@ -42,6 +42,7 @@ import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.thin.downloadmanager.DownloadRequest;
 import com.thin.downloadmanager.DownloadStatusListener;
 import com.thin.downloadmanager.ThinDownloadManager;
+import com.yuan.house.BuildConfig;
 import com.yuan.house.activities.SplashActivity;
 import com.yuan.house.common.Constants;
 import com.yuan.house.event.AuthEvent;
@@ -170,6 +171,7 @@ public class DMApplication extends Application {
         }
 
         editor.putString(Constants.kApplicationPackageVersion, version);
+        editor.putString(Constants.kAppVersionCode, Integer.toString(BuildConfig.VERSION_CODE));
 
         editor.commit();
 
