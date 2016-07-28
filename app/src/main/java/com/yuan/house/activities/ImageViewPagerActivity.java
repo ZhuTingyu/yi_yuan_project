@@ -90,7 +90,7 @@ public class ImageViewPagerActivity extends AppCompatActivity implements ViewPag
 
             if(i == 0){
                 //tips[i].setBackgroundResource(R.drawable.page_indicator_focused);
-                tips[i].setBackgroundResource(R.color.red);
+                tips[i].setBackgroundResource(R.color.white);
             }else{
                 //tips[i].setBackgroundResource(R.drawable.page_indicator_unfocused);
                 tips[i].setBackgroundResource(R.color.white);
@@ -182,7 +182,7 @@ public class ImageViewPagerActivity extends AppCompatActivity implements ViewPag
         for(int i=0; i<tips.length; i++){
             if(i == selectItems){
                 //tips[i].setBackgroundResource(R.drawable.page_indicator_focused);
-                tips[i].setBackgroundResource(R.color.red);
+                tips[i].setBackgroundResource(R.color.black);
             }else{
                 //tips[i].setBackgroundResource(R.drawable.page_indicator_unfocused);
                 tips[i].setBackgroundResource(R.color.white);

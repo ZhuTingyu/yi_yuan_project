@@ -188,9 +188,9 @@ dependencies {
 //        // exclusion is not necessary, but generally a good idea.
 //        exclude group: 'com.google.android', module: 'support-v4'
 //    }
-    compile 'com.github.flavienlaurent.datetimepicker:library:0.0.2'
+//    compile 'com.github.flavienlaurent.datetimepicker:library:0.0.2'
     compile 'com.baoyz.actionsheet:library:1.1.5'
-    compile 'com.github.citux:datetimepicker:0.2.0'
+//    compile 'com.github.citux:datetimepicker:0.2.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.wx.wheelview:wheelview:1.3.4'
     compile 'com.github.lovetuzitong:MultiImageSelector:1.1'

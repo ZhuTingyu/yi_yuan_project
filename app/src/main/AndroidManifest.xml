@@ -46,16 +46,15 @@
         android:theme="@style/MainTheme"
         tools:replace="android:label, android:icon, android:theme">
 
-        <!--<activity-->
-        <!--android:name=".activities.IPSettingActivity"-->
-        <!--android:icon="@mipmap/ic_launcher_dev"-->
-        <!--android:screenOrientation="portrait">-->
+        <activity
+            android:name=".activities.IPSettingActivity"
+            android:screenOrientation="portrait">
 
-        <!--<intent-filter>-->
-        <!--<action android:name="android.intent.action.MAIN" />-->
-        <!--<category android:name="android.intent.category.LAUNCHER" />-->
-        <!--</intent-filter>-->
-        <!--</activity>-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
+        </activity>
 
         <activity
             android:name=".activities.SplashActivity"

@@ -26,7 +26,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
-import com.avoscloud.chat.ui.chat.SingleChatActivity;
 import com.baidu.location.BDLocation;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
@@ -46,6 +45,7 @@ import com.yuan.house.http.RestClient;
 import com.yuan.house.ui.view.PickerPopWindow;
 import com.yuan.house.utils.ToastUtil;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -700,6 +700,15 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
             }
         });
 
+        getBridge().registerHandler("chatWithCustomerService", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
+                Timber.v("chatWithCustomerService" + data);
+
+                mBridgeListener.onBridgeStartServiceChat();
+            }
+        });
+
         /**
          * Web 调用这个方法，Native 返回给 Web 中介的定位信息和用户首页选择的地址，只要城市就可以
          */
@@ -804,26 +813,8 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 Log.i("showDateTimePicker", data);
-                mCallback = jsCallback;
-                JSONObject object = null;
-                try {
-                    object = new JSONObject(data);
 
-                    /** Start Chat **/
-                    SingleChatActivity.chatByUserId(getActivity(), object);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                String date = object.optString("pick_date");
-                calendar = Calendar.getInstance();
-                if (date.equals("true")) {
-                    //选择日期
-//                        DatePickerDialog.newInstance(new WebViewBasedActivity.DataPickerOnClickListener(), calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show(mFragmentManager, "datePicker");
-                } else {
-                    //选择时间
-//                        TimePickerDialog.newInstance(new WebViewBasedActivity.TimePickerOnClickListener(), calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show(mFragmentManager, "timePicker");
-                }
+                throw new NotImplementedException("NOT IMPLEMENTED");
             }
         });
 
@@ -1248,5 +1239,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
         void onBridgeStartGroupChat(JSONObject object);
 
         void onBridgeStartSingleChat(JSONObject object);
+
+        void onBridgeStartServiceChat();
     }
 }

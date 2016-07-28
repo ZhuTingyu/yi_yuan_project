@@ -91,5 +91,7 @@
     <string name="title_group_chat">群聊</string>
 
     <string name="txt_downloading">下载中, 请稍候...</string>
+    <string name="title_service_chat">客服中心</string>
+    <string name="wait">排队</string>
 
 </resources>

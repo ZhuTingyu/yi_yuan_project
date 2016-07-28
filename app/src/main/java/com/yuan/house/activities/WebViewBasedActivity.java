@@ -31,6 +31,7 @@ import com.avos.avoscloud.im.v2.callback.AVIMConversationQueryCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMSingleMessageQueryCallback;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
 import com.avoscloud.chat.ui.chat.GroupChatActivity;
+import com.avoscloud.chat.ui.chat.ServiceChatActivity;
 import com.avoscloud.chat.ui.chat.SingleChatActivity;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.MessageAgent;
@@ -50,13 +51,10 @@ import com.etiennelawlor.imagegallery.library.activities.FullScreenImageGalleryA
 import com.etiennelawlor.imagegallery.library.activities.ImageGalleryActivity;
 import com.etiennelawlor.imagegallery.library.adapters.FullScreenImageGalleryAdapter;
 import com.etiennelawlor.imagegallery.library.adapters.ImageGalleryAdapter;
-import com.fourmob.datetimepicker.date.DatePickerDialog;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.FileAsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.sleepbot.datetimepicker.time.RadialPickerLayout;
-import com.sleepbot.datetimepicker.time.TimePickerDialog;
 import com.tasomaniac.android.widget.DelayedProgressDialog;
 import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
@@ -1051,6 +1049,27 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         }
     }
 
+    @Override
+    public void onBridgeStartServiceChat() {
+        RestClient.getInstance().get("/service-conversation", null, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+
+                JSONObject data = response.optJSONObject("data");
+                boolean isOpen = Integer.parseInt(data.optString("session_id")) != 0;
+                ServiceChatActivity.chatByConversation(mContext, data.optString("conversation_id"), isOpen);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+
+            }
+        });
+    }
+
+
     private void uploadFile(HttpEntity entity, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
         WebService.getInstance().postMultiPartFormImageFile(entity, new JsonHttpResponseHandler() {
             @Override
@@ -1206,26 +1225,4 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
     }
     // endregion
-
-    private class DataPickerOnClickListener implements DatePickerDialog.OnDateSetListener {
-        @Override
-        public void onDateSet(DatePickerDialog datePickerDialog, int year, int month, int day) {
-            StringBuffer sb = new StringBuffer();
-            sb.append(year);
-            sb.append("-");
-            sb.append(month);
-            sb.append("-");
-            sb.append(day);
-//            mCallback.callback(sb.toString());
-        }
-    }
-
-    private class TimePickerOnClickListener implements TimePickerDialog.OnTimeSetListener {
-        @Override
-        public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute) {
-
-        }
-    }
-
-
 }
