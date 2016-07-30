@@ -238,6 +238,9 @@ public class DMApplication extends Application {
         registerMessageTypes();
 
         SDKInitializer.initialize(getApplicationContext());
+
+        configLocalWebPackageSettings();
+
     }
 
 
@@ -459,4 +462,15 @@ public class DMApplication extends Application {
             e.printStackTrace();
         }
     }
+
+    private void configLocalWebPackageSettings() {
+        String rootDataFolder = FileUtil.getDataDirectory(getApplicationContext());
+        String htmlExtractedFolder = String.format("%s/%s", FileUtil.getDataDirectory(getApplicationContext()), "html");
+        String rootPagesFolder = htmlExtractedFolder + "/pages";
+
+        DMApplication.getInstance().setRootDataFolder(rootDataFolder);
+        DMApplication.getInstance().setHtmlExtractedFolder(htmlExtractedFolder);
+        DMApplication.getInstance().setRootPagesFolder(rootPagesFolder);
+    }
+
 }
