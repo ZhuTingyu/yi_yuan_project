@@ -28,7 +28,7 @@ public class IPSettingActivity extends Activity {
     @BindView(R.id.et_dummy_ip_setting)
     EditText editText;
 
-    String ip;
+    String ip = "http://html.house.ieyuan.com";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

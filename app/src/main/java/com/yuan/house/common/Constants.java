@@ -13,14 +13,15 @@ public class Constants {
 
     // Test Server
     public static String kWebServiceEndpoint = "http://test.house.ieyuan.com";
+    public static String kFileServerEndpoint = "http://static.eye5250.com/api";
     public static String kWebServiceAPIEndpoint = kWebServiceEndpoint + "/api";
     public static String kWebServiceUpdata = "http://192.168.1.20:8095/api/";
 
     /**
      * Web Service Url
      */
-    public static String kWebServiceFileUpload = kWebServiceAPIEndpoint + "/file-upload/feedback";
-    public static String kWebServiceImageUpload = kWebServiceAPIEndpoint + "/image-upload";
+    public static String kWebServiceFileUpload = kFileServerEndpoint + "/file-upload/feedback";
+    public static String kWebServiceImageUpload = kFileServerEndpoint + "/image-upload";
     public static String kWebServiceSendFeedback = kWebServiceAPIEndpoint + "/feedback";
     public static String kWebServiceGetFeedback = kWebServiceAPIEndpoint + "/feedback?page=";
     public static String kWebServiceGetBrokers = kWebServiceAPIEndpoint + "/agency/complain";

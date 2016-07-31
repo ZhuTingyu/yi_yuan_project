@@ -69,7 +69,6 @@ public class SplashActivity extends FragmentActivity {
     }
 
     private void runHeavyLoadTaskInBackground() {
-        configLocalWebPackageSettings();
 
 // FIXME: 16/7/25 uncomment when in production mode
 //        if (!prefs.getBoolean(Constants.kWebPackageExtracted, false)) {
@@ -84,16 +83,6 @@ public class SplashActivity extends FragmentActivity {
         initDatabase();
 
         setupChatManager();
-    }
-
-    private void configLocalWebPackageSettings() {
-        String rootDataFolder = FileUtil.getDataDirectory(getApplicationContext());
-        String htmlExtractedFolder = String.format("%s/%s", FileUtil.getDataDirectory(getApplicationContext()), "html");
-        String rootPagesFolder = htmlExtractedFolder + "/pages";
-
-        DMApplication.getInstance().setRootDataFolder(rootDataFolder);
-        DMApplication.getInstance().setHtmlExtractedFolder(htmlExtractedFolder);
-        DMApplication.getInstance().setRootPagesFolder(rootPagesFolder);
     }
 
     private void initDatabase() {
