@@ -2,6 +2,7 @@ package com.yuan.house.activities;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -66,6 +67,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
     String cachedNotificationPayload;
     private BottomNavigationBar bottomNavigationBar;
     private boolean doubleBackToExitPressedOnce = false;
+    private int kActivityRequestCodeDropToMessage = 20;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -189,7 +191,10 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         } else if (event.getEventType() == PageEvent.PageEventEnum.FRIENDSHIP_UPDATE) {
             bottomNavigationBar.selectTab(0);
         } else if (event.getEventType() == PageEvent.PageEventEnum.DROP_TO_MESSAGE) {
-            bottomNavigationBar.selectTab(1);
+            // TODO: 16/7/30 kill other child pages
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivityForResult(intent, kActivityRequestCodeDropToMessage );
         }
     }
 
@@ -201,6 +206,17 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                 recreate();
             }
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == kActivityRequestCodeDropToMessage) {
+            if (resultCode == RESULT_OK) {
+                bottomNavigationBar.selectTab(1);
+            }
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     /**
