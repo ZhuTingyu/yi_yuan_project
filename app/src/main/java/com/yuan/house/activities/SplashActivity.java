@@ -200,10 +200,10 @@ public class SplashActivity extends FragmentActivity {
                         data.add(obj.getString(keys.next()));
                     }
 
+                    if (data.size() == 0) return;
+
                     //服务端版本
                     String hasNewVersion;
-
-                    if (data.size() == 0) return;
 
                     String version = data.get(0);
                     String url = data.get(1);

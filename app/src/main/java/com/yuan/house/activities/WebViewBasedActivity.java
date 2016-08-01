@@ -76,6 +76,9 @@ import com.yuan.house.utils.FileUtil;
 import com.yuan.house.utils.ImageUtil;
 import com.yuan.house.utils.SystemServiceUtil;
 import com.yuan.house.utils.ToastUtil;
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.builder.PostFormBuilder;
+import com.zhy.http.okhttp.callback.StringCallback;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
@@ -105,6 +108,7 @@ import butterknife.ButterKnife;
 import de.greenrobot.event.EventBus;
 import me.nereo.multi_image_selector.MultiImageSelector;
 import me.nereo.multi_image_selector.MultiImageSelectorActivity;
+import okhttp3.Call;
 import timber.log.Timber;
 
 /**
@@ -136,6 +140,8 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         }
     };
     private WebViewJavascriptBridge.WVJBResponseCallback mBridgeCallback;
+    private int indexOfImageInUploadQueue = 0;
+    private JSONArray responseOfImageUploadTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -781,7 +787,9 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     public void onBridgeUploadFiles(String datum, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-        // TODO: 16/7/14 parse datum
+        // upload from first image
+        indexOfImageInUploadQueue = 0;
+        responseOfImageUploadTask = new JSONArray();
 
         nativeUploadImageFiles(datum, jsCallback);
     }
@@ -1012,41 +1020,69 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
     private void nativeUploadImageFiles(String params, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
         JSONArray filePaths;
-        JSONArray sizes;
+        JSONArray sizes = new JSONArray();
 
         try {
             if (!params.contains("imgs")) {
-                JSONArray size = new JSONArray();
-                JSONArray array = new JSONArray(params);
-
-                JSONObject param = new JSONObject();
-                param.put("imageName", array.getString(0));
-                param.put("imageSize", size);
-
-                HttpEntity entity = constructImageEntity(param);
-
-                uploadFile(entity, jsCallback);
+                filePaths = new JSONArray(params);
             } else {
+                // 上传其他图片
                 JSONObject object = new JSONObject(params);
 
                 filePaths = object.optJSONArray("imgs");
                 sizes = object.optJSONArray("size");
-
-                for (int i = 0; i < filePaths.length(); i++) {
-                    JSONObject param = new JSONObject();
-                    param.put("imageName", filePaths.get(i).toString());
-                    if (sizes != null) {
-                        param.put("imageSize", sizes);
-                    }
-
-                    HttpEntity entity = constructImageEntity(param);
-                    // TODO: 16/7/15 use queue to upload files
-                    uploadFile(entity, jsCallback);
-                }
             }
+
+            uploadFiles(filePaths, sizes.toString(), jsCallback);
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    // upload multi images one by one, halt and prompt if any file failed to upload
+    private void uploadFiles(final JSONArray filePaths, final String size, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+        String path = filePaths.optString(indexOfImageInUploadQueue);
+
+        PostFormBuilder builder = OkHttpUtils.post().url(Constants.kWebServiceImageUpload)
+                .addHeader(Constants.kHttpReqKeyContentType, "multipart/form-data")
+                .addHeader(Constants.kHttpReqKeyAuthToken, AuthHelper.getInstance().getUserToken())
+                .addFile("file", path, new File(path));
+
+        if (!TextUtils.isEmpty(size)) {
+            builder.addParams("size", size);
+        }
+
+        builder.build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        e.printStackTrace();
+
+                        ToastUtil.showShort(mContext, R.string.error_failed_to_upload_image);
+                    }
+
+                    @Override
+                    public void onResponse(String response, int id) {
+                        Timber.v("Upload Image : " + response);
+
+                        try {
+                            JSONObject object = new JSONObject(response);
+                            responseOfImageUploadTask.put(object);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        if (indexOfImageInUploadQueue < filePaths.length() - 1) {
+                            indexOfImageInUploadQueue++;
+
+                            uploadFiles(filePaths, size, jsCallback);
+                        } else {
+                            if (jsCallback != null) {
+                                jsCallback.callback(responseOfImageUploadTask.toString());
+                            }
+                        }
+                    }
+                });
     }
 
     @Override
@@ -1064,36 +1100,6 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-
-            }
-        });
-    }
-
-
-    private void uploadFile(HttpEntity entity, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-        WebService.getInstance().postMultiPartFormImageFile(entity, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                super.onSuccess(statusCode, headers, response);
-
-                JSONArray ret = new JSONArray();
-                ret.put(response);
-
-                if (jsCallback != null) {
-                    jsCallback.callback(ret.toString());
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-
-                JSONArray ret = new JSONArray();
-                ret.put(errorResponse);
-
-                if (jsCallback != null) {
-                    jsCallback.callback(ret.toString());
-                }
             }
         });
     }
