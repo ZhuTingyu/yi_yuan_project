@@ -124,10 +124,11 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         if (prefs.getString(Constants.kWebDataKeyUserLogin, null) != null) {
             switchToFragment(Constants.kFragmentTagMain);
 
-            // configure chat service
-            if (AVUser.getCurrentUser() != null) {
+// configure chat service
+// 每次进入主界面都连接一下聊天服务器
+//            if (AVUser.getCurrentUser() != null) {
                 doAVUserLogin();
-            }
+//            }
         } else {
             switchToFragment(Constants.kFragmentTagLogin);
         }
