@@ -1,9 +1,10 @@
 package com.avoscloud.chat.ui.chat;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 
 import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.AVIMException;
@@ -13,8 +14,7 @@ import com.avoscloud.chat.service.ConversationManager;
 import com.avoscloud.leanchatlib.activity.ChatActivity;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.baidu.location.BDLocation;
-import com.gitonway.lee.niftymodaldialogeffects.lib.Effectstype;
-import com.gitonway.lee.niftymodaldialogeffects.lib.NiftyDialogBuilder;
+import com.dimo.helper.ViewHelper;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.yuan.house.R;
@@ -36,22 +36,34 @@ import java.util.concurrent.TimeUnit;
 
 public class ServiceChatActivity extends ChatActivity {
 
+    private static final String ENABLED = "ENABLED";
     private ScheduledExecutorService scheduledExecutor;
 
-    public static void chatByConversation(final Context from, String conversation_id, boolean isOpen) {
+    public static void chatByConversation(final Context from, String conversation_id, final boolean isOpen) {
         List<String> convIds = new ArrayList<>();
         convIds.add(conversation_id);
 
         ConversationManager.getInstance().findConversationsByConversationIds(convIds, new AVIMConversationQueryCallback() {
             @Override
             public void done(List<AVIMConversation> list, AVIMException e) {
+                if (e != null) {
+                    e.printStackTrace();
+                    return;
+                }
+
+                if (list == null) {
+                    return;
+                }
+
                 AVIMConversation conv = list.get(0);
 
                 CacheService.registerConv(conv);
 
                 ChatManager.getInstance().registerConversation(conv);
-                Intent intent = new Intent(from, SingleChatActivity.class);
+
+                Intent intent = new Intent(from, ServiceChatActivity.class);
                 intent.putExtra(CONVID, conv.getConversationId());
+                intent.putExtra(ENABLED, isOpen);
 
                 from.startActivity(intent);
             }
@@ -63,6 +75,12 @@ public class ServiceChatActivity extends ChatActivity {
         super.onCreate(savedInstanceState);
 
         setTitleItem(R.string.title_service_chat);
+
+        Bundle bundle = getIntent().getExtras();
+
+        boolean isOpen = bundle.getBoolean(ENABLED);
+
+        ViewHelper.setViewAndChildrenEnabled(findViewById(R.id.bottomLayout), isOpen);
 
         getServiceQueueLength();
     }
@@ -88,8 +106,7 @@ public class ServiceChatActivity extends ChatActivity {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
 
-                JSONObject data = response.optJSONObject("data");
-                String count = data.optString("waiting_count");
+                String count = response.optString("waiting_count");
                 promptTheWaitingQueue(Integer.parseInt(count));
             }
 
@@ -101,32 +118,22 @@ public class ServiceChatActivity extends ChatActivity {
     }
 
     private void promptTheWaitingQueue(int i) {
-        final NiftyDialogBuilder dialogBuilder = NiftyDialogBuilder.getInstance(this);
-
-        String msg = String.format("当前有 %d 位用户在排队，你是否等待？", i);
-
-        dialogBuilder.withMessage(msg)
-                .withDialogColor("#FFE74C3C")
-                .withEffect(Effectstype.SlideBottom)
-                .withButton1Text(getString(R.string.wait))
-                .withButton2Text(getString(R.string.cancel))
-                .withDuration(300)
-                .setButton1Click(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialogBuilder.dismiss();
-
-                        startEnterQueue();
-                    }
-                })
-                .setButton2Click(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialogBuilder.dismiss();
-                    }
-                })
-                .show();
-
+        if (i == 0) {
+            enterQueue();
+        } else {
+            String msg = String.format("当前有 %d 位用户在排队，你是否等待？", i);
+            new AlertDialog.Builder(this)
+                    .setMessage(msg)
+                    .setPositiveButton(R.string.wait, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            startEnterQueue();
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, null)
+                    .create()
+                    .show();
+        }
     }
 
     private void startEnterQueue() {
@@ -153,13 +160,11 @@ public class ServiceChatActivity extends ChatActivity {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
 
-                JSONObject data = response.optJSONObject("data");
-                int count = data.optInt("waiting_count");
-                int status = response.optInt("status");
+                int count = response.optInt("waiting_count");
 
-                if (status == 200) {
+                if (statusCode == 200) {
                     setupWaitNumberView(count);
-                } else if (status == 400) {
+                } else if (statusCode == 400) {
                     customerServiceIsReady();
                 }
             }
@@ -181,6 +186,7 @@ public class ServiceChatActivity extends ChatActivity {
         if (scheduledExecutor != null) {
             scheduledExecutor.shutdown();
         }
-        // TODO: 16/7/28 okay to input
+
+        ViewHelper.setViewAndChildrenEnabled(findViewById(R.id.bottomLayout), true);
     }
 }

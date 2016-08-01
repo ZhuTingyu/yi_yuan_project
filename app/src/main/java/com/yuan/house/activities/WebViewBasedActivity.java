@@ -1092,9 +1092,8 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
 
-                JSONObject data = response.optJSONObject("data");
-                boolean isOpen = Integer.parseInt(data.optString("session_id")) != 0;
-                ServiceChatActivity.chatByConversation(mContext, data.optString("conversation_id"), isOpen);
+                boolean isOpen = Integer.parseInt(response.optString("session_id")) != 0;
+                ServiceChatActivity.chatByConversation(mContext, response.optString("conversation_id"), isOpen);
             }
 
             @Override
