@@ -428,12 +428,12 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                                 .build()
                                 .execute(new StringCallback() {
                                     @Override
-                                    public void onError(Call call, Exception e) {
+                                    public void onError(Call call, Exception e, int id) {
 
                                     }
 
                                     @Override
-                                    public void onResponse(String response) {
+                                    public void onResponse(String response, int id) {
                                         Log.i("云端返回的JSON", response);
                                         com.alibaba.fastjson.JSONArray jsonArray = com.alibaba.fastjson.JSONArray.parseArray(response);
                                         for (int i = 0; i < jsonArray.size(); i++) {
@@ -492,12 +492,12 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                 .build()
                 .execute(new StringCallback() {
                     @Override
-                    public void onError(Call call, Exception e) {
+                    public void onError(Call call, Exception e, int id) {
                         e.printStackTrace();
                     }
 
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(String response, int id) {
                         Log.i("修改聊天记录 : ", response);
                     }
                 });

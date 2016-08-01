@@ -51,22 +51,21 @@ public class FileUtil {
     }
 
     public static void downloadFile(String url, String path, String name) {
-
         OkHttpUtils.get().url(url)
                 .build()
                 .execute(new FileCallBack(path, name) {
                     @Override
-                    public void inProgress(float progress, long total) {
+                    public void inProgress(float progress, long total, int id) {
 
                     }
 
                     @Override
-                    public void onError(Call call, Exception e) {
+                    public void onError(Call call, Exception e, int id) {
                         e.printStackTrace();
                     }
 
                     @Override
-                    public void onResponse(File response) {
+                    public void onResponse(File response, int id) {
                         boolean b = response.exists();
                         Log.d("Proposal", response.getName());
                     }

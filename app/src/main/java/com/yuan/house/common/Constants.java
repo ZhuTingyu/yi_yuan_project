@@ -15,7 +15,6 @@ public class Constants {
     public static String kWebServiceEndpoint = "http://test.house.ieyuan.com";
     public static String kFileServerEndpoint = "http://static.eye5250.com/api";
     public static String kWebServiceAPIEndpoint = kWebServiceEndpoint + "/api";
-    public static String kWebServiceUpdata = "http://192.168.1.20:8095/api/";
 
     /**
      * Web Service Url

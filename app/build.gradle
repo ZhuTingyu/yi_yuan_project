@@ -133,7 +133,6 @@ dependencies {
     /** Android .           */
     compile 'com.android.support:support-v4:24.1.1'
     compile 'com.android.support:appcompat-v7:24.1.1'
-    compile 'com.android.support:gridlayout-v7:24.1.1'
 
     //app:transformClassesWithDexForDebug error
     compile 'com.android.support:multidex:1.0.1'
@@ -168,7 +167,7 @@ dependencies {
     compile 'com.github.kevinsawicki:http-request:6.0'
     compile 'com.loopj.android:android-async-http:1.4.6'
     compile 'com.mani:thindownloadmanager:1.0.0'
-    compile 'com.zhy:okhttputils:2.4.1'
+    compile 'com.zhy:okhttputils:2.6.2'
 
     // http://stackoverflow.com/a/30725203/2619161
     compile('org.apache.httpcomponents:httpmime:4.3') {

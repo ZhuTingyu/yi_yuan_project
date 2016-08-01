@@ -1,66 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<GridView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<GridView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/chatAddLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_centerHorizontal="true"
-    android:numColumns="4"
     android:layout_marginTop="10dp"
+    android:numColumns="4"
     android:paddingBottom="20dip"
-    android:paddingTop="20dip"/>
-<!--<android.support.v7.widget.GridLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--xmlns:grid="http://schemas.android.com/apk/res-auto"-->
-    <!--android:id="@+id/chatAddLayout"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_centerHorizontal="true"-->
-    <!--android:layout_marginTop="10dp"-->
-    <!--android:paddingBottom="20dip"-->
-    <!--android:paddingTop="20dip"-->
-    <!--grid:alignmentMode="alignBounds"-->
-    <!--grid:columnCount="4">-->
-
-    <!--<TextView-->
-        <!--android:id="@+id/btnImageFromGallery"-->
-        <!--style="@style/chat_bottom_add_item"-->
-        <!--android:drawableTop="@drawable/chat_bottom_add_picture_selector"-->
-        <!--android:text="@string/chat_bottom_picture"-->
-        <!--grid:layout_columnWeight="1" />-->
-
-    <!--&lt;!&ndash;<TextView&ndash;&gt;-->
-        <!--&lt;!&ndash;android:id="@+id/btnChooseFile"&ndash;&gt;-->
-        <!--&lt;!&ndash;style="@style/chat_bottom_add_item"&ndash;&gt;-->
-        <!--&lt;!&ndash;android:drawableTop="@drawable/btn_docment"&ndash;&gt;-->
-        <!--&lt;!&ndash;android:text="@string/chat_bottom_file"&ndash;&gt;-->
-        <!--&lt;!&ndash;grid:layout_columnWeight="1" />&ndash;&gt;-->
-
-    <!--<TextView-->
-        <!--android:id="@+id/btnSwitchHouse"-->
-        <!--style="@style/chat_bottom_add_item"-->
-        <!--android:drawableTop="@drawable/btn_need"-->
-        <!--android:text="@string/chat_bottom_change"-->
-        <!--grid:layout_columnWeight="1" />-->
-
-    <!--<TextView-->
-        <!--android:id="@+id/btnPrecondition"-->
-        <!--style="@style/chat_bottom_add_item"-->
-        <!--android:drawableTop="@drawable/btn_leave_message"-->
-        <!--android:text="@string/chat_bottom_precondition"-->
-        <!--android:visibility="gone"-->
-        <!--grid:layout_columnWeight="1" />-->
-
-    <!--&lt;!&ndash;<TextView&ndash;&gt;-->
-    <!--&lt;!&ndash;android:id="@+id/btnContract"&ndash;&gt;-->
-    <!--&lt;!&ndash;android:layout_width="0dp"&ndash;&gt;-->
-    <!--&lt;!&ndash;android:layout_height="0dp"&ndash;&gt;-->
-    <!--&lt;!&ndash;grid:layout_columnWeight="1"&ndash;&gt;-->
-    <!--&lt;!&ndash;grid:layout_rowWeight="1"&ndash;&gt;-->
-    <!--&lt;!&ndash;android:drawableTop="@drawable/btn_house"&ndash;&gt;-->
-    <!--&lt;!&ndash;android:gravity="center"&ndash;&gt;-->
-    <!--&lt;!&ndash;android:text="@string/chat_bottom_contract"&ndash;&gt;-->
-    <!--&lt;!&ndash;grid:layout_gravity="fill"&ndash;&gt;-->
-    <!--&lt;!&ndash;android:visibility="gone"/>&ndash;&gt;-->
-
-<!--</android.support.v7.widget.GridLayout>-->
-
+    android:paddingTop="20dip" />
