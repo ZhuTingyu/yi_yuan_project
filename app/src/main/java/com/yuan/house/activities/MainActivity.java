@@ -60,14 +60,13 @@ import timber.log.Timber;
  */
 
 public class MainActivity extends WebViewBasedActivity implements WebViewFragment.OnFragmentInteractionListener {
-    public static MainActivity instance;
+//    public static MainActivity instance;
     public LocationClient locClient;
     public HouseLocationListener locationListener;
 
     String cachedNotificationPayload;
     private BottomNavigationBar bottomNavigationBar;
     private boolean doubleBackToExitPressedOnce = false;
-    private int kActivityRequestCodeDropToMessage = 20;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +78,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
             cachedNotificationPayload = bundle.getString("payload");
         }
 
-        instance = this;
+//        instance = this;
 
         // Register event bus to receive events
         EventBus.getDefault().register(this);
@@ -137,6 +136,12 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
         executeAppVersionCheck();
 
+        if (bundle != null) {
+            boolean dtm = bundle.getBoolean("dropToMessage");
+            if (dtm) {
+                bottomNavigationBar.selectTab(1);
+            }
+        }
     }
 
     private void checkNotification() {
@@ -194,7 +199,8 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
             // TODO: 16/7/30 kill other child pages
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivityForResult(intent, kActivityRequestCodeDropToMessage );
+            intent.putExtra("dropToMessage", true);
+            startActivity(intent);
         }
     }
 
@@ -206,17 +212,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                 recreate();
             }
         }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == kActivityRequestCodeDropToMessage) {
-            if (resultCode == RESULT_OK) {
-                bottomNavigationBar.selectTab(1);
-            }
-        }
-
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     /**
