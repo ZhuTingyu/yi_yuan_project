@@ -3,6 +3,7 @@ package com.dimo.web;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Build;
+import android.view.View;
 import android.webkit.ConsoleMessage;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsResult;
@@ -56,6 +57,14 @@ public class WebViewJavascriptBridge implements Serializable {
         mWebView.addJavascriptInterface(this, "_WebViewJavascriptBridge");
         mWebView.setWebViewClient(new InterestWebViewClient());
         mWebView.setWebChromeClient(new InterestWebChromeClient());     //optional, for show console and alert
+
+        // http://stackoverflow.com/a/11872686
+        mWebView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return true;
+            }
+        });
     }
 
 
