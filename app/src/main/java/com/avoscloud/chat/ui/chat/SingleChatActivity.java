@@ -320,16 +320,16 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
 
     @Override
     protected void sendAudio(String audioPath) {
-        super.sendAudio(audioPath);
-
-        messageAgent.sendAudio(audioPath);
+        if (messageAgent != null) {
+            messageAgent.sendAudio(audioPath);
+        }
     }
 
     @Override
     protected void sendImage(String s) {
-        super.sendImage(s);
-
-        messageAgent.sendImage(s);
+        if (messageAgent != null) {
+            messageAgent.sendImage(s);
+        }
     }
 
     public void refreshMsgsFromDB() {

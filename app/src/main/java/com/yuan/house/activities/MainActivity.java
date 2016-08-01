@@ -2,6 +2,7 @@ package com.yuan.house.activities;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -59,7 +60,7 @@ import timber.log.Timber;
  */
 
 public class MainActivity extends WebViewBasedActivity implements WebViewFragment.OnFragmentInteractionListener {
-    public static MainActivity instance;
+//    public static MainActivity instance;
     public LocationClient locClient;
     public HouseLocationListener locationListener;
 
@@ -77,7 +78,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
             cachedNotificationPayload = bundle.getString("payload");
         }
 
-        instance = this;
+//        instance = this;
 
         // Register event bus to receive events
         EventBus.getDefault().register(this);
@@ -123,10 +124,11 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         if (prefs.getString(Constants.kWebDataKeyUserLogin, null) != null) {
             switchToFragment(Constants.kFragmentTagMain);
 
-            // configure chat service
-            if (AVUser.getCurrentUser() != null) {
+// configure chat service
+// 每次进入主界面都连接一下聊天服务器
+//            if (AVUser.getCurrentUser() != null) {
                 doAVUserLogin();
-            }
+//            }
         } else {
             switchToFragment(Constants.kFragmentTagLogin);
         }
@@ -135,6 +137,12 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
         executeAppVersionCheck();
 
+        if (bundle != null) {
+            boolean dtm = bundle.getBoolean("dropToMessage");
+            if (dtm) {
+                bottomNavigationBar.selectTab(1);
+            }
+        }
     }
 
     private void checkNotification() {
@@ -189,7 +197,11 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         } else if (event.getEventType() == PageEvent.PageEventEnum.FRIENDSHIP_UPDATE) {
             bottomNavigationBar.selectTab(0);
         } else if (event.getEventType() == PageEvent.PageEventEnum.DROP_TO_MESSAGE) {
-            bottomNavigationBar.selectTab(1);
+            // TODO: 16/7/30 kill other child pages
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.putExtra("dropToMessage", true);
+            startActivity(intent);
         }
     }
 
@@ -223,13 +235,14 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
     }
 
     protected Fragment getFragment(String tag) {
+// FIXME: 16/7/30 每次都重新刷新页面, 不使用之前创建的页面
         Fragment f = mFragmentManager.findFragmentByTag(tag);
 
-        if (f != null) {
-            Timber.i("Found Fragment : " + tag);
-
-            return f;
-        }
+//        if (f != null) {
+//            Timber.i("Found Fragment : " + tag);
+//
+//            return f;
+//        }
 
         if (tag.equals(Constants.kFragmentTagMain)) {
             if (DMApplication.getInstance().iAmUser()) {
