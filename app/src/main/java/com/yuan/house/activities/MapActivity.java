@@ -1,6 +1,7 @@
 package com.yuan.house.activities;
 
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.Editable;
@@ -91,6 +92,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
     private JSONObject mLocation;
     private MyLocationConfiguration.LocationMode mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
     private InputMethodManager imm;
+    private ConnectivityManager conn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +105,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         this.mContext = this;
 
         imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        conn = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 
         bdLocation = new BDLocation();
 
@@ -134,6 +137,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         setRightItem("选定", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                checkConnec();
                 if (!TextUtils.isEmpty(bdLocation.getAddrStr())) {
                     EventBus.getDefault().post(new LocationEvent(LocationEvent.LocationEventEnum.UPDATED, bdLocation));
                     Intent intent = new Intent();
@@ -179,6 +183,9 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
                 locClient.start();
             }
         });
+
+        checkConnec();
+
     }
 
     private void initLocation() {
@@ -248,6 +255,12 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
+    private void checkConnec(){
+        if(conn.getActiveNetworkInfo() == null){
+            Toast.makeText(mContext,"网路错误,请检查网络",Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void initViewConfig() {
         mListView = (ListView) findViewById(R.id.map_activity_listview);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -276,7 +289,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(!TextUtils.isEmpty(s)){
+                if(!TextUtils.isEmpty(s) && !TextUtils.isEmpty(city)){
                     mSuggestSearch.requestSuggestion(new SuggestionSearchOption().city(city).keyword(s.toString()));
                 }
             }
@@ -285,9 +298,12 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         search_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mSearch.geocode(new GeoCodeOption().city(city).address(searchText.getText().toString()));
-                mListView.setVisibility(View.GONE);
-                dissmissSoft();
+                checkConnec();
+                if(!TextUtils.isEmpty(city)){
+                    mSearch.geocode(new GeoCodeOption().city(city).address(searchText.getText().toString()));
+                    mListView.setVisibility(View.GONE);
+                    dissmissSoft();
+                }
             }
         });
     }
