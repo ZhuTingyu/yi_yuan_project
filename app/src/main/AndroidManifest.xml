@@ -50,11 +50,10 @@
             android:label="@string/app_name_debug"
             android:name=".activities.IPSettingActivity"
             android:screenOrientation="portrait">
-
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
         </activity>
 
         <activity
@@ -89,6 +88,10 @@
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
             android:name="com.avoscloud.chat.ui.chat.GroupChatActivity"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity
+            android:name="com.avoscloud.chat.ui.chat.ServiceChatActivity"
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity

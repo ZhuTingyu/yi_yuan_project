@@ -1,7 +1,9 @@
 package com.yuan.house.ui.fragment;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -29,8 +31,6 @@ import com.alibaba.fastjson.JSON;
 import com.baidu.location.BDLocation;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
-import com.gitonway.lee.niftymodaldialogeffects.lib.Effectstype;
-import com.gitonway.lee.niftymodaldialogeffects.lib.NiftyDialogBuilder;
 import com.lfy.dao.MessageDao;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -289,27 +289,18 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                final NiftyDialogBuilder dialogBuilder = NiftyDialogBuilder.getInstance(getActivity());
-                dialogBuilder.withMessage(msg)
-                        .withDialogColor("#FFE74C3C")
-                        .withEffect(Effectstype.SlideBottom)
-                        .withButton1Text(getString(R.string.confirm))
-                        .withButton2Text(getString(R.string.cancel))
-                        .withDuration(300)
-                        .setButton1Click(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialogBuilder.dismiss();
-                            }
-                        })
-                        .setButton2Click(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialogBuilder.dismiss();
-                            }
-                        })
-                        .show();
 
+                new AlertDialog.Builder(getActivity())
+                        .setMessage(msg)
+                        .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, null)
+                        .create()
+                        .show();
             }
         });
 

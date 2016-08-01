@@ -38,8 +38,8 @@ android {
 
         versionProps.load(new FileInputStream(versionPropsFile))
 
-//        def code = versionProps['VERSION_CODE'].toInteger() + 1
-        def code = 1
+        def code = versionProps['VERSION_CODE'].toInteger() + 1
+//        def code = 1
 
         versionProps['VERSION_CODE'] = code.toString()
         versionProps.store(versionPropsFile.newWriter(), null)
@@ -53,6 +53,8 @@ android {
             minSdkVersion Integer.parseInt(project.ANDROID_MIN_SDK)
             targetSdkVersion Integer.parseInt(project.ANDROID_TARGET_SDK_VERSION)
             multiDexEnabled true
+
+            setProperty("archivesBaseName", "Yuan-House-$versionName")
         }
     } else {
         throw new GradleException("Could not read version.properties!")
@@ -183,18 +185,11 @@ dependencies {
 
     /** UI .        */
     compile 'com.tasomaniac:delayed-progress:0.3'
-//    compile('de.keyboardsurfer.android.widget:crouton:1.8.5@aar') {
-//        // exclusion is not necessary, but generally a good idea.
-//        exclude group: 'com.google.android', module: 'support-v4'
-//    }
-//    compile 'com.github.flavienlaurent.datetimepicker:library:0.0.2'
     compile 'com.baoyz.actionsheet:library:1.1.5'
-//    compile 'com.github.citux:datetimepicker:0.2.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.wx.wheelview:wheelview:1.3.4'
     compile 'com.github.lovetuzitong:MultiImageSelector:1.1'
     compile 'com.nineoldandroids:library:2.4.0'
-    compile 'com.github.sd6352051.niftydialogeffects:niftydialogeffects:1.0.0@aar'
     compile 'com.ashokvarma.android:bottom-navigation-bar:1.3.0'
     compile 'com.github.lawloretienne:imagegallery:0.0.15'
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
@@ -224,6 +219,12 @@ android.applicationVariants.all { variant ->
 
     variant.javaCompile.source = variant.javaCompile.source.filter { p ->
         return !p.getPath().startsWith(aptOutput.getPath())
+    }
+
+    variant.outputs.each { output ->
+        def apk = output.outputFile;
+        def newName = apk.name.replace("-debug.apk", ".apk");
+        output.outputFile = new File(apk.parentFile, newName);
     }
 }
 
