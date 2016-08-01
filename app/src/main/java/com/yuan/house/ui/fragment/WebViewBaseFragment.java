@@ -724,8 +724,10 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                 if (!AuthHelper.getInstance().iAmUser()) {
                     // 中介返回定位的位置
                     BDLocation location = DMApplication.getInstance().getLastActivatedLocation();
-                    city = location.getCity();
-                    district = location.getDistrict();
+                    if (location != null) {
+                        city = location.getCity();
+                        district = location.getDistrict();
+                    }
                 }
 
                 JSONObject object = new JSONObject();
