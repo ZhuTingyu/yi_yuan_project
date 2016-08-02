@@ -36,6 +36,15 @@
             android:listSelector="@android:color/transparent"
             android:scrollbarStyle="outsideOverlay"
             android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/placeholder_service_wait"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/placeholder_service_queue"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:visibility="gone"/>
     </RelativeLayout>
 
 

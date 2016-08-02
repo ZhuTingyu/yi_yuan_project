@@ -48,7 +48,7 @@ android {
             applicationId "com.yuan.house"
 
             versionCode code
-            versionName "0.1." + code
+            versionName "0.9." + code
 
             minSdkVersion Integer.parseInt(project.ANDROID_MIN_SDK)
             targetSdkVersion Integer.parseInt(project.ANDROID_TARGET_SDK_VERSION)
@@ -121,7 +121,6 @@ android {
         abortOnError false
     }
     dexOptions {
-        incremental true
         javaMaxHeapSize "4g" //specify the heap size for the dex process
     }
 }
@@ -156,10 +155,7 @@ dependencies {
     compile 'com.jakewharton:butterknife:8.2.1'
     apt 'com.jakewharton:butterknife-compiler:8.2.1'
 
-    // otto is dead, long live eventbus
     compile 'de.greenrobot:eventbus:2.3.0'
-    compile 'com.squareup.okhttp3:okhttp:2.7.5'
-    compile 'com.squareup.okhttp:okhttp-urlconnection:2.7.5'
     compile 'com.squareup.picasso:picasso:2.5.2'
 
     /** Logging .        */
@@ -172,12 +168,12 @@ dependencies {
     compile 'com.zhy:okhttputils:2.6.2'
 
     // http://stackoverflow.com/a/30725203/2619161
-    compile('org.apache.httpcomponents:httpmime:4.3') {
-        exclude group: 'org.apache.httpcomponents', module: 'httpclient'
-    }
-    compile('org.apache.httpcomponents:httpcore:4.4.1') {
-        exclude group: 'org.apache.httpcomponents', module: 'httpclient'
-    }
+//    compile('org.apache.httpcomponents:httpmime:4.3') {
+//        exclude group: 'org.apache.httpcomponents', module: 'httpclient'
+//    }
+//    compile('org.apache.httpcomponents:httpcore:4.4.1') {
+//        exclude group: 'org.apache.httpcomponents', module: 'httpclient'
+//    }
 
     /** MISC .        */
     compile 'com.bugtags.library:bugtags-lib:latest.integration'
