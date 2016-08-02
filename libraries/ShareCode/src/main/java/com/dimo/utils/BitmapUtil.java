@@ -17,6 +17,9 @@ import java.io.OutputStream;
  * Created by Alsor Zhou on 4/29/15.
  */
 public class BitmapUtil {
+
+    private static float FIT_LENGTH = 260f;
+
     public static void saveBitmap(Context context, Bitmap bm, String path) {
         OutputStream fOut = null;
         File file = new File(path); // the File to save to
@@ -56,6 +59,18 @@ public class BitmapUtil {
         // 得到新的图片
         Bitmap newbm = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
         return newbm;
+    }
+
+    public static Bitmap getFitCropImg(Bitmap bm){
+        // 获得图片的宽高
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+        int least = Math.min(width,height);
+        if(least < FIT_LENGTH){
+            float sclae = FIT_LENGTH / least;
+            return zoomImg(bm,sclae);
+        }else
+            return bm;
     }
 
 }

@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.widget.Toast;
 
 import com.dimo.utils.BitmapUtil;
 import com.dimo.utils.StringUtil;
@@ -50,13 +51,18 @@ public class CropActivity extends BaseFragmentActivity {
         setRightItem("保存", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                readyToCrop();
+                try {
+                    readyToCrop();
 
-                Intent intent = new Intent();
-                intent.putExtra("data", imagePath);
-                setResult(RESULT_OK, intent);
+                    Intent intent = new Intent();
+                    intent.putExtra("data", imagePath);
+                    setResult(RESULT_OK, intent);
 
-                finish();
+                    finish();
+
+                } catch (Exception e) {
+                    Toast.makeText(mContext, "选择的图片太小,请选择大一点的图片", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -74,7 +80,7 @@ public class CropActivity extends BaseFragmentActivity {
 
     private void configureCropImageView(int imageType, String imageName) {
         Bitmap bm = BitmapFactory.decodeFile(imageName);
-        cropImageView.setImageBitmap(bm);
+        cropImageView.setImageBitmap(BitmapUtil.getFitCropImg(bm));
 
         imagePath = imageClippedPath();
         cropImageView.setFixedAspectRatio(true);
@@ -89,8 +95,8 @@ public class CropActivity extends BaseFragmentActivity {
         }
         cropImageView.setAspectRatio(width, height);
     }
-    private void readyToCrop() {
 
+    private void readyToCrop() {
         Bitmap bm = cropImageView.getCroppedImage();
         Bitmap newBitmap = BitmapUtil.zoomImg(bm, 0.8f);
         BitmapUtil.saveBitmap(this, newBitmap, imagePath);
