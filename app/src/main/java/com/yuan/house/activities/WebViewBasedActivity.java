@@ -376,23 +376,19 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 mBridgeCallback.callback(objects.toString());
             }
         } else if (requestCode == kActivityRequestCodeImagePickThenUpload) {
-            // TODO: 16/6/9 upload files directly
             Timber.v("kActivityRequestCodeImagePickThenUpload");
-            List<String> path = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
-
-            // TODO: 16/6/10 invoke upload process
-            //nativeUploadMultiPartFiles(path);
+            List<String> files = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
 
             Fragment fragment = getFragment(Constants.kFragmentTagProposal);
             if (fragment != null) {
                 ProposalFragment pfragment = (ProposalFragment) fragment;
-                String fileName = path.get(0);
-                pfragment.uploadFile(fileName);
+                for (String fileName : files) {
+                    pfragment.uploadFile(fileName);
+                }
             }
-
         } else if (requestCode == Constants.kActivityRequestCodeImagePickThenCropRectangle
                 || requestCode == Constants.kActivityRequestCodeImagePickThenCropSquare) {
-            Timber.v("kActivityRequestCodeImagePickThenUpload");
+            Timber.v("kActivityRequestCodeImagePickThenCropRectangle");
             if (data == null) return;
 
             List<String> path = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
@@ -947,46 +943,6 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         }
 
         return params;
-    }
-
-    @Override
-    public void onUploadProposalAudio(String data) {
-//        if (msg_type == ProposalMediaType.AUDIO)
-//            this.duration = MediaPlayer.create(this, Uri.parse(data)).getDuration();
-
-        List<String> datum = new ArrayList<>();
-        datum.add(data);
-        nativeUploadMultiPartFiles(datum);
-    }
-
-    /**
-     * 上传文件列表
-     *
-     * @param filenames
-     */
-    private void nativeUploadMultiPartFiles(List<String> filenames) {
-        PostFormBuilder builder = OkHttpUtils.post().url(Constants.kWebServiceFileUpload)
-                .addHeader(Constants.kHttpReqKeyContentType, "multipart/form-data")
-                .addHeader(Constants.kHttpReqKeyAuthToken, AuthHelper.getInstance().getUserToken());
-
-        for (String file : filenames) {
-            builder.addFile("file", file, new File(file));
-        }
-
-        builder.build()
-                .execute(new StringCallback() {
-                    @Override
-                    public void onError(Call call, Exception e, int id) {
-                        e.printStackTrace();
-
-                        ToastUtil.showShort(mContext, "提交失败");
-                    }
-
-                    @Override
-                    public void onResponse(String response, int id) {
-                        ToastUtil.showShort(mContext, "提交成功");
-                    }
-                });
     }
 
     private void nativeUploadImageFiles(String params, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {

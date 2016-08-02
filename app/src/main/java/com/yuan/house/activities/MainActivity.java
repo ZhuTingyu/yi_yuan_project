@@ -238,11 +238,11 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 // FIXME: 16/7/30 每次都重新刷新页面, 不使用之前创建的页面
         Fragment f = mFragmentManager.findFragmentByTag(tag);
 
-//        if (f != null) {
-//            Timber.i("Found Fragment : " + tag);
-//
-//            return f;
-//        }
+        if (f != null && f.getClass() == ProposalFragment.class) {
+            Timber.i("Found Fragment : " + tag);
+
+            return f;
+        }
 
         if (tag.equals(Constants.kFragmentTagMain)) {
             if (DMApplication.getInstance().iAmUser()) {

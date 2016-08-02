@@ -1,11 +1,6 @@
 package com.yuan.house.ui.fragment;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -14,11 +9,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.PopupWindow;
 import android.widget.ScrollView;
-import android.widget.TextView;
 
 import com.avos.avoscloud.im.v2.AVIMMessage;
 import com.avos.avoscloud.im.v2.AVIMTypedMessage;
@@ -31,8 +23,6 @@ import com.avoscloud.leanchatlib.adapter.ChatMessageAdapter;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.MessageHelper;
 import com.avoscloud.leanchatlib.model.ConversationType;
-import com.avoscloud.leanchatlib.utils.PathUtils;
-import com.avoscloud.leanchatlib.utils.ProviderPathUtils;
 import com.avoscloud.leanchatlib.view.xlist.XListView;
 import com.baoyz.actionsheet.ActionSheet;
 import com.dimo.utils.StringUtil;
@@ -83,15 +73,10 @@ import timber.log.Timber;
  * Created by KevinLee on 2016/4/24.
  */
 public class ProposalFragment extends WebViewBaseFragment implements XListView.IXListViewListener {
-
-    private static final int TAKE_CAMERA_REQUEST = 2;
-    private static final int GALLERY_REQUEST = 0;
-    private static final int GALLERY_KITKAT_REQUEST = 3;
     private static final String TAG = "ProposalFragment";
     public static ProposalSourceType sourceType = ProposalSourceType.UNKNOWN;
     public static ProposalMediaType msg_type = ProposalMediaType.TEXT;                            //1:文本，2：语音，3：图片
     public static ProposalMessageCategory category = ProposalMessageCategory.SUGGESTION;          //0：投诉；1：建议；2：BUG
-    protected String localCameraPath;
     protected OnProposalInteractionListener mBridgeListener;
     protected ProposalListAdapter adapter;
     @BindView(R.id.proposal)
@@ -106,26 +91,17 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
     XListView xListView;
     @BindView(R.id.proposal_scrollView)
     ScrollView scrollView;
-    TextView app_upload_image, app_complaint, app_cancle;
-
-    //private int mCurrentPage = 1;
 
     private int currentPageNumOfProposal = 1;
     private int currentPageNumOfSuggestion = 1;
     private int currentPageNumOfBug = 1;
 
-
     private String content;
     private int duration = 0;       //录音时长
 
-
-    private View mPopView;
-    private PopupWindow mPopupWindow;
-    private WindowManager.LayoutParams params;
-
     private PickerPopWindow mBrokerPicker = null;
     private ArrayList mBrokerList = new ArrayList();
-    ;
+
     private String currentAudioPath = null;
 
     public static ProposalFragment newInstance() {
@@ -152,9 +128,6 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
             sourceType = ProposalSourceType.FROM_AGENCY;
         }
 
-        localCameraPath = PathUtils.getPicturePathByCurrentTime(getContext());
-        //   EventBus.getDefault().register(this);
-
         return view;
     }
 
@@ -163,8 +136,6 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         super.onViewCreated(view, savedInstanceState);
 
         proposal.performClick();
-
-        this.params = getActivity().getWindow().getAttributes();
 
         inputBottomBar.setShowDefaultActionLayout(false);
 
@@ -231,11 +202,11 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
             }
         });
         bindAdapterToListView();
-        getHistoryMessages(getCurrentPageNum()/*mCurrentPage*/);
+        getHistoryMessages(getCurrentPageNum());
     }
 
     private void bindAdapterToListView() {
-        adapter = new ProposalListAdapter((Context) mBridgeListener, ConversationType.Single, new JSONObject());
+        adapter = new ProposalListAdapter(getActivity(), ConversationType.Single, new JSONObject());
         adapter.setCurrentDatas(category);
         adapter.setClickListener(new ChatMessageAdapter.ClickListener() {
             @Override
@@ -250,9 +221,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
 
             @Override
             public void onImageViewClick(AVIMImageMessage imageMsg) {
-                ImageBrowserActivity.go((Context) mBridgeListener,
-                        MessageHelper.getFilePath(imageMsg),
-                        imageMsg.getFileUrl());
+                ImageBrowserActivity.go(getActivity(), MessageHelper.getFilePath(imageMsg), imageMsg.getFileUrl());
             }
 
             @Override
@@ -355,12 +324,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
 
     @Override
     public void onRefresh() {
-        /*new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                new GetDataTask(mContext, true).execute();
-            }
-        }, 1000);*/
+
     }
 
     @Override
@@ -425,20 +389,10 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
      * 发送图片等事件处理
      */
     public void onEvent(InputBottomBarEvent event) {
-        if (null != event) {
-            switch (event.eventAction) {
-                case InputBottomBarEvent.INPUTBOTTOMBAR_ACTION:
-                    showOptionSheet();
-                    break;
-                case InputBottomBarEvent.INPUTBOTTOMBAR_IMAGE_ACTION:
-                    msg_type = ProposalMediaType.IMAGE;
-                    selectImageFromLocal();
-                    break;
-                case InputBottomBarEvent.INPUTBOTTOMBAR_CAMERA_ACTION:
-                    msg_type = ProposalMediaType.IMAGE;
-                    selectImageFromCamera();
-                    break;
-            }
+        switch (event.eventAction) {
+            case InputBottomBarEvent.INPUTBOTTOMBAR_ACTION:
+                showOptionSheet();
+                break;
         }
     }
 
@@ -453,10 +407,10 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                 .addFile("file[]", filePath, new File(filePath))
                 .build()
                 .execute(new StringCallback() {
-
                     @Override
                     public void onError(Call call, Exception e, int id) {
-
+                        Timber.e("uploadfile failed");
+                        e.printStackTrace();
                     }
 
                     @Override
@@ -492,6 +446,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         params.put("complain_agency_id", 0);
         params.put("category", category.ordinal());
         params.put("duration", duration);
+
         OkHttpUtils.postString().url(Constants.kWebServiceSendFeedback)
                 .addHeader(Constants.kHttpReqKeyContentType, "application/json")
                 .addHeader(Constants.kHttpReqKeyAuthToken, AuthHelper.getInstance().getUserToken())
@@ -501,7 +456,8 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                 .execute(new StringCallback() {
                     @Override
                     public void onError(Call call, Exception e, int id) {
-
+                        Timber.e("Feedback error");
+                        e.printStackTrace();
                     }
 
                     @Override
@@ -516,7 +472,9 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                                     getAudioFile(data);
                                 }
                                 addData2Adapter(data, true);
-                                adapter.notifyDataSetChanged();
+                                if (adapter != null) {
+                                    adapter.notifyDataSetChanged();
+                                }
                                 scrollToLast();
                             }
                         } catch (JSONException e) {
@@ -542,7 +500,6 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
     }
 
     private void addData2Adapter(ProposalInfo data, boolean order) {
-
         if (data.category != category.ordinal()) {
             return;
         }
@@ -555,7 +512,8 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
             msg = message;
         } else if (data.msg_type == ProposalMediaType.IMAGE.ordinal()) {
             AVIMImageMessage imageMsg = new AVIMImageMessage();
-            imageMsg.setText(data.content);
+            String url = data.content.replace("\\", "");
+            imageMsg.setText(url);
             setAVIMessage(imageMsg, data);
             msg = imageMsg;
         } else if (data.msg_type == ProposalMediaType.AUDIO.ordinal()) {
@@ -568,7 +526,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
             }
         }
 
-        if (msg != null) {
+        if (msg != null && adapter != null) {
             if (order) {
                 adapter.add(msg, category);
             } else {
@@ -638,8 +596,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 handleErrorCode(jsonObject);
-                            }
-                            catch (JSONException ex) {
+                            } catch (JSONException ex) {
                                 ex.printStackTrace();
                             }
                         } finally {
@@ -724,67 +681,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         return brokerInfo;
     }
 
-    public void selectImageFromLocal() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            Intent intent = new Intent();
-            intent.setType("image/*");
-            intent.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(Intent.createChooser(intent, getResources().getString(R.string.chat_activity_select_picture)),
-                    GALLERY_REQUEST);
-        } else {
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType("image/*");
-            startActivityForResult(intent, GALLERY_KITKAT_REQUEST);
-        }
-    }
-
-    public void selectImageFromCamera() {
-        Intent takePictureIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        Uri imageUri = Uri.fromFile(new File(localCameraPath));
-        takePictureIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, imageUri);
-        if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, TAKE_CAMERA_REQUEST);
-        }
-    }
-
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK) {
-            switch (requestCode) {
-                case GALLERY_REQUEST:
-                case GALLERY_KITKAT_REQUEST:
-                    if (data == null) {
-                        //toast("return intent is null");
-                        return;
-                    }
-                    Uri uri;
-                    if (requestCode == GALLERY_REQUEST) {
-                        uri = data.getData();
-                    } else {
-                        //for Android 4.4
-                        uri = data.getData();
-                        final int takeFlags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION
-                                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                        //                 getActivity().getContentResolver().takePersistableUriPermission(uri, takeFlags);
-                    }
-                    String localSelectPath = ProviderPathUtils.getPath(getActivity(), uri);
-                    inputBottomBar.hideMoreLayout();
-                    uploadFile(localSelectPath);
-                    break;
-                case TAKE_CAMERA_REQUEST:
-                    inputBottomBar.hideMoreLayout();
-                    uploadFile(localCameraPath);
-                    break;
-            }
-        }
-    }
-
     public interface OnProposalInteractionListener extends WebViewBaseFragment.OnBridgeInteractionListener {
-        void onUploadProposalAudio(String data);
-
         void onSelectImageForProposal();
     }
 }

@@ -183,4 +183,24 @@ public class StringUtil {
     public static String formatString(Context cxt, int id, Object... args) {
         return String.format(cxt.getString(id), args);
     }
+
+    /*
+  * you must escape the char \ and  char ", or you will not recevie a correct json object in
+  * your javascript which will cause a exception in chrome.
+  *
+  * please check this and you will know why.
+  * http://stackoverflow.com/questions/5569794/escape-nsstring-for-javascript-input
+  * http://www.json.org/
+*/
+    private String doubleEscapeString(String javascript) {
+        String result;
+        result = javascript.replace("\\", "\\\\");
+        result = result.replace("\"", "\\\"");
+        result = result.replace("\'", "\\\'");
+        result = result.replace("\n", "\\n");
+        result = result.replace("\r", "\\r");
+        result = result.replace("\f", "\\f");
+        return result;
+    }
+
 }
