@@ -67,7 +67,6 @@ import com.yuan.house.event.PageEvent;
 import com.yuan.house.event.WebBroadcastEvent;
 import com.yuan.house.helper.AuthHelper;
 import com.yuan.house.http.RestClient;
-import com.yuan.house.http.WebService;
 import com.yuan.house.payment.AliPay;
 import com.yuan.house.ui.fragment.ProposalFragment;
 import com.yuan.house.ui.fragment.WebViewBaseFragment;
@@ -86,11 +85,6 @@ import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventList
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.ByteArrayBody;
-import org.apache.http.entity.mime.content.StringBody;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -98,7 +92,6 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -956,38 +949,11 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         return params;
     }
 
-    private HttpEntity constructImageEntity(JSONObject datum) {
-        String path = datum.optString("imageName");
-        JSONArray sizes = datum.optJSONArray("imageSize");
-
-        // loopj android async http support add byte[] as RequestParam item to submit multipart data
-        byte[] data = ImageUtil.compressToByteArray(path);
-
-        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-
-        // File Body
-        ByteArrayBody fileBody = new ByteArrayBody(data, "abc.jpg");
-        builder.addPart("file", fileBody);
-
-        // Size Body
-        if (sizes != null) {
-            StringBody sizeBody = null;
-            try {
-                sizeBody = new StringBody(sizes.toString());
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-            builder.addPart("size", sizeBody);
-        }
-
-        return builder.build();
-    }
-
     @Override
     public void onUploadProposalAudio(String data) {
 //        if (msg_type == ProposalMediaType.AUDIO)
 //            this.duration = MediaPlayer.create(this, Uri.parse(data)).getDuration();
+
         List<String> datum = new ArrayList<>();
         datum.add(data);
         nativeUploadMultiPartFiles(datum);
@@ -999,23 +965,28 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
      * @param filenames
      */
     private void nativeUploadMultiPartFiles(List<String> filenames) {
-        RequestParams entity = constructMultiPartParams(filenames);
+        PostFormBuilder builder = OkHttpUtils.post().url(Constants.kWebServiceFileUpload)
+                .addHeader(Constants.kHttpReqKeyContentType, "multipart/form-data")
+                .addHeader(Constants.kHttpReqKeyAuthToken, AuthHelper.getInstance().getUserToken());
 
-        WebService.getInstance().postMultiPartFormDataFile(entity, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                super.onSuccess(statusCode, headers, response);
+        for (String file : filenames) {
+            builder.addFile("file", file, new File(file));
+        }
 
-                ToastUtil.showShort(mContext, "提交成功");
-            }
+        builder.build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        e.printStackTrace();
 
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
+                        ToastUtil.showShort(mContext, "提交失败");
+                    }
 
-                ToastUtil.showShort(mContext, "提交失败");
-            }
-        });
+                    @Override
+                    public void onResponse(String response, int id) {
+                        ToastUtil.showShort(mContext, "提交成功");
+                    }
+                });
     }
 
     private void nativeUploadImageFiles(String params, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {

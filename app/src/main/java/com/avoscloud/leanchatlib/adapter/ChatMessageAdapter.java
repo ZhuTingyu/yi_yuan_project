@@ -272,6 +272,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 throw new NullPointerException("conv type is null");
             }
         }
+
         ImageLoader.getInstance().displayImage(user.getAvatarUrl(), avatarView, PhotoUtils.avatarImageOptions);
 
         AVIMReservedMessageType type = AVIMReservedMessageType.getAVIMReservedMessageType(msg.getMessageType());

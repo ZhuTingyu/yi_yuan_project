@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
 
 import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.AVIMException;
@@ -106,8 +108,10 @@ public class ServiceChatActivity extends ChatActivity {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
 
-                String count = response.optString("waiting_count");
-                promptTheWaitingQueue(Integer.parseInt(count));
+                if (statusCode == 200) {
+                    String count = response.optString("waiting_count");
+                    promptTheWaitingQueue(Integer.parseInt(count));
+                }
             }
 
             @Override
@@ -119,21 +123,26 @@ public class ServiceChatActivity extends ChatActivity {
 
     private void promptTheWaitingQueue(int i) {
         if (i == 0) {
-            enterQueue();
-        } else {
-            String msg = String.format("当前有 %d 位用户在排队，你是否等待？", i);
-            new AlertDialog.Builder(this)
-                    .setMessage(msg)
-                    .setPositiveButton(R.string.wait, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            startEnterQueue();
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel, null)
-                    .create()
-                    .show();
+            i++;
         }
+
+        String msg = String.format("当前有 %d 位用户在排队，你是否等待？", i);
+        new AlertDialog.Builder(this)
+                .setMessage(msg)
+                .setPositiveButton(R.string.wait, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        startEnterQueue();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })
+                .create()
+                .show();
     }
 
     private void startEnterQueue() {
@@ -155,7 +164,7 @@ public class ServiceChatActivity extends ChatActivity {
         requestParams.put("city", location.getCity());
         requestParams.put("district", location.getDistrict());
 
-        RestClient.getInstance().post("/service-conversation/queue", requestParams, new JsonHttpResponseHandler() {
+        RestClient.getInstance().post("/service-conversation/queue", null, requestParams, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
@@ -177,9 +186,13 @@ public class ServiceChatActivity extends ChatActivity {
     }
 
     private void setupWaitNumberView(int count) {
-        String msg = String.format("当前有 %d 位用户在排队，你是否等待？", count);
+        String msg = String.format("当前排队人数是 %d 位", count);
 
-        // TODO: 16/7/28
+        findViewById(R.id.lvMessages).setVisibility(View.GONE);
+
+        TextView placeholder = (TextView) findViewById(R.id.placeholder_service_wait);
+        placeholder.setVisibility(View.VISIBLE);
+        placeholder.setText(msg);
     }
 
     private void customerServiceIsReady() {
@@ -188,5 +201,10 @@ public class ServiceChatActivity extends ChatActivity {
         }
 
         ViewHelper.setViewAndChildrenEnabled(findViewById(R.id.bottomLayout), true);
+
+        findViewById(R.id.lvMessages).setVisibility(View.VISIBLE);
+
+        TextView placeholder = (TextView) findViewById(R.id.placeholder_service_wait);
+        placeholder.setVisibility(View.GONE);
     }
 }
