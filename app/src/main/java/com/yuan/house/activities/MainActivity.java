@@ -245,13 +245,13 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         }
 
         if (tag.equals(Constants.kFragmentTagMain)) {
-            if (DMApplication.getInstance().iAmUser()) {
+            if (AuthHelper.getInstance().iAmUser()) {
                 f = UserMainFragment.newInstance();
             } else {
                 f = AgencyMainFragment.newInstance();
             }
         } else if (tag.equals(Constants.kFragmentTagMessage)) {
-            if (DMApplication.getInstance().iAmUser()) {
+            if (AuthHelper.getInstance().iAmUser()) {
                 f = UserMessageFragment.newInstance();
             } else {
                 f = AgencyMessageFragment.newInstance();

@@ -30,7 +30,6 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.PauseOnScrollListener;
 import com.yuan.house.R;
 import com.yuan.house.adapter.ProposalListAdapter;
-import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.bean.BrokerInfo;
 import com.yuan.house.bean.ProposalInfo;
@@ -120,7 +119,7 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
 
         ButterKnife.bind(this, view);
 
-        if (DMApplication.getInstance().iAmUser()) {
+        if (AuthHelper.getInstance().iAmUser()) {
             redirectToLoadUrl(Constants.kWebpageUserCenter);
             sourceType = ProposalSourceType.FROM_USER;
         } else {
