@@ -76,6 +76,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     @Override
     public int getItemViewType(int position) {
         AVIMTypedMessage msg = datas.get(position);
+
         boolean comeMsg = messageSentByOthers(msg);
 
         MsgViewType viewType = null;

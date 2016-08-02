@@ -44,7 +44,6 @@ public class MsgsTable {
         byte[] msgBytes = c.getBlob(c.getColumnIndex(OBJECT));
         if (msgBytes != null) {
             try {
-                // FIXME: 16/6/4 com.avos.avoscloud.im.v2.AVIMMessage cannot be cast to com.avos.avoscloud.im.v2.AVIMTypedMessage
                 AVIMTypedMessage msg = (AVIMTypedMessage) ParcelableUtil.unmarshall(msgBytes, AVIMTypedMessage.CREATOR);
                 return msg;
             }

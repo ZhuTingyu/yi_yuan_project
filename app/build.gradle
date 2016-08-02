@@ -191,6 +191,8 @@ dependencies {
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
     compile 'com.edmodo:cropper:2.0.0'
 
+//    compile 'com.cleveroad:splittransformation:0.9.0'
+
     /** Permissions .    */
     compile 'com.karumi:dexter:2.3.0'
 }
