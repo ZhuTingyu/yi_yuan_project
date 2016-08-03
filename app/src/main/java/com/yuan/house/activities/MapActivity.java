@@ -91,7 +91,6 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
     private String city;    //当前城市
     private JSONObject mLocation;
     private MyLocationConfiguration.LocationMode mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
-    private InputMethodManager imm;
     private ConnectivityManager conn;
 
     @Override
@@ -104,7 +103,6 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
 
         this.mContext = this;
 
-        imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         conn = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 
         bdLocation = new BDLocation();
@@ -251,10 +249,6 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
 
     }
 
-    private void dissmissSoft(){
-        imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
-    }
-
     private void checkConnec(){
         if(conn.getActiveNetworkInfo() == null){
             Toast.makeText(mContext,"网路错误,请检查网络",Toast.LENGTH_SHORT).show();
@@ -269,7 +263,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
                 mSearch.geocode(new GeoCodeOption().city(city).address(keys.get(position)));
                 mListView.setVisibility(View.GONE);
                 searchText.setText("");
-                dissmissSoft();
+                hideSoftInputView();
             }
         });
 
@@ -283,7 +277,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if(TextUtils.isEmpty(s)){
                     mListView.setVisibility(View.GONE);
-                    dissmissSoft();
+                    hideSoftInputView();
                 }
             }
 
@@ -302,7 +296,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
                 if(!TextUtils.isEmpty(city)){
                     mSearch.geocode(new GeoCodeOption().city(city).address(searchText.getText().toString()));
                     mListView.setVisibility(View.GONE);
-                    dissmissSoft();
+                    hideSoftInputView();
                 }
             }
         });

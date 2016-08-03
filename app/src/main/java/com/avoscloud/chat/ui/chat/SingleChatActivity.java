@@ -26,6 +26,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 
 import com.avos.avoscloud.im.v2.AVIMConversation;
@@ -1049,7 +1050,13 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                 if (loadHistory == false) {
                     mMessageAdapter.setDatas(msgs);
                     mMessageAdapter.notifyDataSetChanged();
-                    scrollToLast();
+                    lvMessages.setSelection(ListView.FOCUS_DOWN);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            scrollToLast();
+                        }
+                    },200);
                 } else {
                     List<AVIMTypedMessage> newMsgs = new ArrayList<AVIMTypedMessage>();
                     newMsgs.addAll(msgs);
