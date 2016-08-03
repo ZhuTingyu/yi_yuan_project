@@ -10,9 +10,9 @@ import android.view.ViewGroup;
 
 import com.dimo.web.WebViewJavascriptBridge;
 import com.yuan.house.R;
-import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
+import com.yuan.house.helper.AuthHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,7 +55,7 @@ public class FragmentBBS extends WebViewBaseFragment {
 
         Timber.v("onCreateView");
 
-        if (DMApplication.getInstance().iAmUser()) {
+        if (AuthHelper.getInstance().iAmUser()) {
             redirectToLoadUrl(Constants.kWebPageUserBBS);
         } else {
             redirectToLoadUrl(Constants.kWebPageAgencyBBS);

@@ -947,8 +947,6 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                 JSONObject objectList = new JSONObject();
 
                 for (int i = 0; i < list.size(); i++) {
-                    StringBuilder sb = new StringBuilder();
-
                     com.lfy.bean.Message message = list.get(i);
 
                     JSONObject object = new JSONObject();

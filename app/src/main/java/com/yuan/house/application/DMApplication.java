@@ -205,10 +205,6 @@ public class DMApplication extends Application {
         // https://leancloud.cn/app.html?appid=9hk99pr7gknwj83tdmfbbccqar1x2myge00ulspafnpcbab8#/key
         AVOSCloud.initialize(this, Constants.kAVApplicationId, Constants.kAVClientKey);
 
-        // 启用崩溃错误统计
-        AVAnalytics.enableCrashReport(mContext, true);
-        //AVOSCloud.setDebugLogEnabled(true);
-
         AVObject.registerSubclass(UpdateInfo.class);
 
         AVInstallation.getCurrentInstallation().saveInBackground();
@@ -224,11 +220,8 @@ public class DMApplication extends Application {
 
         initImageLoader(instance);
 
-//        if (debug) {
-        openStrictMode();
-//        }
-
         if (debug) {
+            openStrictMode();
             Logger.level = Logger.VERBOSE;
         } else {
             Logger.level = Logger.NONE;
@@ -239,7 +232,6 @@ public class DMApplication extends Application {
         SDKInitializer.initialize(getApplicationContext());
 
         configLocalWebPackageSettings();
-
     }
 
 
@@ -425,7 +417,6 @@ public class DMApplication extends Application {
 
                     @Override
                     public void onProgress(int i, long l, int i1) {
-//                        Timber.v("onProgress " + l);
                     }
                 });
 
@@ -450,10 +441,6 @@ public class DMApplication extends Application {
         this.rootPagesFolder = rootPagesFolder;
     }
 
-    public boolean iAmUser() {
-        return "user".equals(prefs.getString(Constants.kWebDataKeyLoginType, ""));
-    }
-
     public void stopSelf() {
         try {
             DBHelper.getCurrentUserInstance().closeHelper();
@@ -471,5 +458,4 @@ public class DMApplication extends Application {
         DMApplication.getInstance().setHtmlExtractedFolder(htmlExtractedFolder);
         DMApplication.getInstance().setRootPagesFolder(rootPagesFolder);
     }
-
 }

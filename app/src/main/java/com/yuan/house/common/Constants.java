@@ -9,10 +9,10 @@ public class Constants {
     public static final String kServiceLogin = "login";
 
     // Development Server
-//    public static String kWebServiceAPIEndpoint = "http://house.ieyuan.com/api";
+    public static String kWebServiceEndpoint = "http://house.ieyuan.com";
 
     // Test Server
-    public static String kWebServiceEndpoint = "http://test.house.ieyuan.com";
+//    public static String kWebServiceEndpoint = "http://test.house.ieyuan.com";
     public static String kFileServerEndpoint = "http://static.eye5250.com/api";
     public static String kWebServiceAPIEndpoint = kWebServiceEndpoint + "/api";
 

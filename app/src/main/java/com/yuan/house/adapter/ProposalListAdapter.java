@@ -28,11 +28,9 @@ import java.util.List;
  * Created by monst on 16/7/3.
  */
 public class ProposalListAdapter extends ChatMessageAdapter {
-
-    protected List<AVIMTypedMessage> datasProposal = new ArrayList<AVIMTypedMessage>();
-    protected List<AVIMTypedMessage> datasSuggestion = new ArrayList<AVIMTypedMessage>();
-    protected List<AVIMTypedMessage> datasBug = new ArrayList<AVIMTypedMessage>();
-
+    protected List<AVIMTypedMessage> datasProposal = new ArrayList<>();
+    protected List<AVIMTypedMessage> datasSuggestion = new ArrayList<>();
+    protected List<AVIMTypedMessage> datasBug = new ArrayList<>();
 
     public ProposalListAdapter(Context context, ConversationType conversationType, JSONObject object) {
         super(context, conversationType, object);
@@ -70,7 +68,8 @@ public class ProposalListAdapter extends ChatMessageAdapter {
 
     @Override
     protected void initImageView(ImageView imageView, AVIMImageMessage imageMsg) {
-        ImageUtil.loadImageThumbnail(imageView, imageMsg.getText(), 200);
+        String url = imageMsg.getText();
+        ImageUtil.loadImageThumbnail(imageView, url, 200);
         setImageOnClickListener(imageView, imageMsg);
     }
 
