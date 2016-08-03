@@ -345,7 +345,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
     @Override
     public void onGetSuggestionResult(SuggestionResult suggestionResult) {
         List<SuggestionResult.SuggestionInfo> suggestions = suggestionResult.getAllSuggestions();
-        if(!suggestions.isEmpty()){
+        if(suggestions != null){
             keys = new ArrayList<>();
             for(SuggestionResult.SuggestionInfo result : suggestions){
                 keys.add(result.key);
