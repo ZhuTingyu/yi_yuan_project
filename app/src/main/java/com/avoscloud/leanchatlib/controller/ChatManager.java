@@ -94,6 +94,9 @@ public class ChatManager extends AVIMClientEventHandler {
 
     public void fetchConversationWithUserId(final JSONObject param, final String userId, final AVIMConversationCreatedCallback callback) {
         String houseId = param.optString("house_id");
+        if (TextUtils.isEmpty(houseId)) {
+            houseId = param.optString("id");
+        }
         int auditType = param.optInt("audit_type");
         if (auditType != 0) {
             houseId = String.format("000%d%s", auditType, houseId);
@@ -129,7 +132,9 @@ public class ChatManager extends AVIMClientEventHandler {
 
                         Map<String, Object> attrs = new HashMap<>();
                         attrs.put(ConversationType.TYPE_KEY, ConversationType.Single.getValue());
-                        attrs.put("houseId", finalHouseId);
+                        if (!TextUtils.isEmpty(finalHouseId)) {
+                            attrs.put("houseId", finalHouseId);
+                        }
                         attrs.put("userIds", ids);
 
                         imClient.createConversation(members, attrs, callback);

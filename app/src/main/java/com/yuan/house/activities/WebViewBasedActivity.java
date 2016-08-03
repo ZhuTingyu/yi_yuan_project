@@ -285,9 +285,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
     // 接收 Web 端触发的 Event 事件
     public void onEvent(WebBroadcastEvent event) {
-        if (this.getClass() == event.getSource().getClass()) {
-            getWebViewFragment().getBridge().callHandler("onBroadcast", event.getPayload());
-        }
+        getWebViewFragment().getBridge().callHandler("onBroadcast", event.getPayload());
     }
 
     public void onEvent(PageEvent event) {
@@ -616,6 +614,11 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         ChatManager.getInstance().fetchConversationWithUserId(info, peerId, new AVIMConversationCreatedCallback() {
             @Override
             public void done(AVIMConversation avimConversation, AVIMException e) {
+                if (e != null) {
+                    e.printStackTrace();
+                    return;
+                }
+
                 AVIMHouseMessage message = new AVIMHouseMessage();
 
                 Map<String, Object> attrs = new HashMap<>();
@@ -662,7 +665,8 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
         // send message to each receipt
         for (int i = 0; userArray.length() > i; i++) {
-            sendHouseInfoMessage(userArray.optString(i), houseInfo);
+            JSONObject user = userArray.optJSONObject(i);
+            sendHouseInfoMessage(user.optString("lean_id"), houseInfo);
         }
     }
 
