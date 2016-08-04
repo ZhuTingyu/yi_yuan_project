@@ -143,8 +143,12 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                 bottomNavigationBar.selectTab(1);
             }
         }
-    }
 
+        if(!isGpsOpen()){
+            setGps("GPS关闭是否打开!");
+        }
+
+    }
     private void checkNotification() {
         if (!NotificationManagerCompat.from(mContext).areNotificationsEnabled()) {
             new AlertDialog.Builder(mContext)
