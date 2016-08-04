@@ -139,6 +139,12 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".receiver.ConnectionReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+
         <!-- baidu location service -->
         <!-- http://lbsyun.baidu.com/apiconsole/key/update?app-id=8228474 -->
         <meta-data
