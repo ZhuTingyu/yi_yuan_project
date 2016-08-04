@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationManagerCompat;
-import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
@@ -44,7 +43,6 @@ import com.yuan.house.ui.fragment.LoginFragment;
 import com.yuan.house.ui.fragment.ProposalFragment;
 import com.yuan.house.ui.fragment.UserMainFragment;
 import com.yuan.house.ui.fragment.UserMessageFragment;
-import com.yuan.house.ui.fragment.WebViewBaseFragment;
 import com.yuan.house.ui.fragment.WebViewFragment;
 import com.yuan.house.utils.ToastUtil;
 
@@ -60,25 +58,15 @@ import timber.log.Timber;
  */
 
 public class MainActivity extends WebViewBasedActivity implements WebViewFragment.OnFragmentInteractionListener {
-//    public static MainActivity instance;
     public LocationClient locClient;
     public HouseLocationListener locationListener;
 
-    String cachedNotificationPayload;
     private BottomNavigationBar bottomNavigationBar;
     private boolean doubleBackToExitPressedOnce = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Bundle bundle = getIntent().getExtras();
-
-        if (bundle != null) {
-            cachedNotificationPayload = bundle.getString("payload");
-        }
-
-//        instance = this;
 
         // Register event bus to receive events
         EventBus.getDefault().register(this);
@@ -127,7 +115,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 // configure chat service
 // 每次进入主界面都连接一下聊天服务器
 //            if (AVUser.getCurrentUser() != null) {
-                doAVUserLogin();
+            doAVUserLogin();
 //            }
         } else {
             switchToFragment(Constants.kFragmentTagLogin);
@@ -137,6 +125,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
         executeAppVersionCheck();
 
+        Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             boolean dtm = bundle.getBoolean("dropToMessage");
             if (dtm) {
@@ -160,15 +149,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         chatManager.setupDatabaseWithSelfId(AVUser.getCurrentUser().getObjectId());
         chatManager.openClientWithSelfId(AVUser.getCurrentUser().getObjectId(), null);
         CacheService.registerUser(AVUser.getCurrentUser());
-    }
-
-    @Override
-    public void onFragmentInteraction(WebViewBaseFragment fragment) {
-        super.onFragmentInteraction(fragment);
-
-        if (!TextUtils.isEmpty(cachedNotificationPayload)) {
-            callbackWhenGetNotification(cachedNotificationPayload);
-        }
     }
 
     @Override
@@ -213,14 +193,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                 recreate();
             }
         }
-    }
-
-    /**
-     * Notify JS that APP get a remote notification
-     *
-     * @param notif notification body
-     */
-    private void callbackWhenGetNotification(String notif) {
     }
 
     @Override
@@ -302,12 +274,10 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
             @Override
             public void onTabUnselected(int position) {
-
             }
 
             @Override
             public void onTabReselected(int position) {
-
             }
         });
 
