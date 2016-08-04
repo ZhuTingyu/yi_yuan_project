@@ -52,7 +52,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -78,7 +77,6 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
     @BindView(R.id.webview)
     WebView mWebView;
     HashMap<String, String> additionalHttpHeaders;
-    Calendar calendar;
     Unbinder unbinder;
     private PickerPopWindow pickPopWin;
 
@@ -99,15 +97,14 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
         dispatchHardCodeUrl();
     }
 
-    // TODO: 16/7/1 do stuff
     private void dispatchHardCodeUrl() {
         if (mUrl == null || getBridge() == null) return;
 
-        if (mUrl.indexOf("agency_check_contractTwo") >= 0) {
+        if (mUrl.contains("agency_check_contractTwo")) {
             getBridge().callHandler("AuditorNotification", null);
-        } else if (mUrl.indexOf("agency_check_house") >= 0) {
+        } else if (mUrl.contains("agency_check_house")) {
             getBridge().callHandler("AuditorNotification", null);
-        } else if (mUrl.indexOf("agency_check_contract") >= 0) {
+        } else if (mUrl.contains("agency_check_contract")) {
             getBridge().callHandler("AuditorNotification", null);
         }
     }
@@ -424,16 +421,6 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                             }
                         });
                     }
-                }
-            }
-        });
-
-        getBridge().registerHandler("getAOSPVersion", new WebViewJavascriptBridge.WVJBHandler() {
-            @Override
-            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
-                Timber.v("getAOSPVersion got:" + data);
-                if (null != callback) {
-                    callback.callback(Build.VERSION.RELEASE);
                 }
             }
         });
