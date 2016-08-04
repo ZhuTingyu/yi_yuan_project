@@ -402,16 +402,18 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                 final String text = object.optString("type");
                 final String content = object.optString("content");
                 if (!TextUtils.isEmpty(text) && text.equals("icon")) {
-                    Resources resources = getResources();
-                    String icon = content.substring(0, object.optString("content").indexOf("."));
-                    int resourceId = resources.getIdentifier(icon, "drawable", getActivity().getPackageName());
-                    if (mBridgeListener != null) {
-                        mBridgeListener.onBridgeSetRightItem(resourceId, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                getBridge().callHandler("onRightItemClick");
-                            }
-                        });
+                    if(isAdded()){
+                        Resources resources = getResources();
+                        String icon = content.substring(0, object.optString("content").indexOf("."));
+                        int resourceId = resources.getIdentifier(icon, "drawable", getActivity().getPackageName());
+                        if (mBridgeListener != null) {
+                            mBridgeListener.onBridgeSetRightItem(resourceId, new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    getBridge().callHandler("onRightItemClick");
+                                }
+                            });
+                        }
                     }
                 } else {
                     // show a text button

@@ -63,7 +63,7 @@ public class UserMessageFragment extends WebViewBaseFragment {
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 try {
                     JSONObject object = new JSONObject(data);
-                    if ("text".equals(object.getString("type"))) {
+                    if ("text".equals(object.getString("type")) && tvRightItem != null) {
                         tvRightItem.setText(object.getString("content"));
                     }
                 } catch (JSONException e) {
