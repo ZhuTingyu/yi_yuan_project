@@ -98,5 +98,6 @@
     <string name="placeholder_service_queue">当前排队人数是 X 位</string>
     <string name="error_connection_failed">网络连接出现问题, 请检查您的手机网络设置</string>
     <string name="error_connection_okay">网络连接恢复, 您可以正常使用本程序</string>
+    <string name="error_leancloud_login_failed">消息服务器登陆失败, 请检查手机的时间设置是否正确</string>
 
 </resources>

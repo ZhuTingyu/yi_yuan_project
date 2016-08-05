@@ -264,7 +264,6 @@ public class DMApplication extends Application {
      */
     public void logout() {
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(Constants.kWebDataKeyLoginType, null);
         editor.putString(Constants.kWebDataKeyUserLogin, null);
         editor.commit();
 
