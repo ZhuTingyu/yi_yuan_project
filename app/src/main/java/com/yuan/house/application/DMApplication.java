@@ -176,7 +176,7 @@ public class DMApplication extends Application {
         editor.putString(Constants.kApplicationPackageVersion, version);
         editor.putString(Constants.kAppVersionCode, Integer.toString(BuildConfig.VERSION_CODE));
 
-        editor.commit();
+        editor.apply();
 
 
 //        try {
@@ -211,7 +211,7 @@ public class DMApplication extends Application {
         Timber.v("Installation id: " + AVInstallation.getCurrentInstallation().getInstallationId());
 
         String avInstallId = AVInstallation.getCurrentInstallation().getInstallationId();
-        prefs.edit().putString("AVInstallationId", avInstallId).commit();
+        prefs.edit().putString("AVInstallationId", avInstallId).apply();
 
         PushService.setDefaultPushCallback(instance, SplashActivity.class);
         AVOSCloud.setDebugLogEnabled(debug);
@@ -265,7 +265,7 @@ public class DMApplication extends Application {
     public void logout() {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(Constants.kWebDataKeyUserLogin, null);
-        editor.commit();
+        editor.apply();
 
         pruneChatManager();
     }
@@ -429,7 +429,7 @@ public class DMApplication extends Application {
 
         ZipUtil.unzip(destUri, targetFolder);
 
-        prefs.edit().putString(Constants.kApplicationPackageVersion, mLatestVersion).commit();
+        prefs.edit().putString(Constants.kApplicationPackageVersion, mLatestVersion).apply();
     }
 
     public String getRootPagesFolder() {

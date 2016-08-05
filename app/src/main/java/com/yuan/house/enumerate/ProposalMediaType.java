@@ -6,9 +6,7 @@ package com.yuan.house.enumerate;
 public enum ProposalMediaType {
     TEXT(1), AUDIO(2), IMAGE(3);
 
-    private int value;
-
     ProposalMediaType(int value) {
-        this.value = value;
+        int value1 = value;
     }
 }

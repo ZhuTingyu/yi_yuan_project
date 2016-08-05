@@ -30,7 +30,7 @@
                 android:textStyle="bold"
                 android:layout_height="wrap_content"
                 android:text="城南名著"
-                android:singleLine="true"/>
+                android:maxLines="1" />
 
             <LinearLayout
                 android:layout_marginTop="15dp"

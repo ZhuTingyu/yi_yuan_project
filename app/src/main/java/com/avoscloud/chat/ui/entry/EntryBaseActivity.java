@@ -8,7 +8,7 @@ import de.greenrobot.event.EventBus;
 /**
  * Created by lzw on 14/11/20.
  */
-public class EntryBaseActivity extends BaseActivity {
+public abstract class EntryBaseActivity extends BaseActivity {
   private EventBus eventBus = EventBus.getDefault();
 
   public void onEvent(LoginFinishEvent loginFinishEvent) {

@@ -1,11 +1,11 @@
 package com.yuan.house.activities;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,7 +23,6 @@ public class ImageViewPagerActivity extends AppCompatActivity implements ViewPag
     public static final String KEY_IMAGES = "KEY_IMAGES";
     public static final String KEY_TITLE = "KEY_TITLE";
 
-    private ViewPager viewPager;
     private Toolbar toolbar;
 
     /**
@@ -38,7 +37,6 @@ public class ImageViewPagerActivity extends AppCompatActivity implements ViewPag
 
     private ArrayList<String> images;
     private String title;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,10 +53,8 @@ public class ImageViewPagerActivity extends AppCompatActivity implements ViewPag
 
         setContentView(R.layout.activity_image_view_pager);
 
-        viewPager = (ViewPager) findViewById(R.id.viewPager);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-
-    //    initIndictor();
 
         initToolbar();
 
@@ -75,10 +71,10 @@ public class ImageViewPagerActivity extends AppCompatActivity implements ViewPag
     }
 
     private void initIndictor() {
-        ViewGroup group = (ViewGroup)findViewById(R.id.viewGroup);
+        ViewGroup group = (ViewGroup) findViewById(R.id.viewGroup);
         tips = new ImageView[images.size()];
 
-        for(int i=0; i<tips.length; i++){
+        for (int i = 0; i < tips.length; i++) {
             ImageView imageView = new ImageView(this);
             imageView.setLayoutParams(new ViewPager.LayoutParams(this, null));
             ViewGroup.LayoutParams lp = imageView.getLayoutParams();
@@ -88,17 +84,17 @@ public class ImageViewPagerActivity extends AppCompatActivity implements ViewPag
 
             tips[i] = imageView;
 
-            if(i == 0){
+            if (i == 0) {
                 //tips[i].setBackgroundResource(R.drawable.page_indicator_focused);
                 tips[i].setBackgroundResource(R.color.white);
-            }else{
+            } else {
                 //tips[i].setBackgroundResource(R.drawable.page_indicator_unfocused);
                 tips[i].setBackgroundResource(R.color.white);
             }
 
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                     new ViewGroup.LayoutParams(ViewPager.LayoutParams.WRAP_CONTENT,
-                    ViewPager.LayoutParams.WRAP_CONTENT));
+                            ViewPager.LayoutParams.WRAP_CONTENT));
             layoutParams.leftMargin = 5;
             layoutParams.rightMargin = 5;
             group.addView(imageView, layoutParams);
@@ -116,7 +112,7 @@ public class ImageViewPagerActivity extends AppCompatActivity implements ViewPag
 
     private void loadImages() {
         mImageViews = new ImageView[images.size()];
-        for(int i=0; i<mImageViews.length; i++){
+        for (int i = 0; i < mImageViews.length; i++) {
             ImageView imageView = new ImageView(this);
             mImageViews[i] = imageView;
             ImageUtil.loadImageThumbnail(imageView, images.get(i), 0);
@@ -134,6 +130,38 @@ public class ImageViewPagerActivity extends AppCompatActivity implements ViewPag
         }
     }
 
+    @Override
+    public void onPageScrollStateChanged(int arg0) {
+
+    }
+
+    @Override
+    public void onPageScrolled(int arg0, float arg1, int arg2) {
+
+    }
+
+    @Override
+    public void onPageSelected(int arg0) {
+        //       setImageBackground(arg0 % mImageViews.length);
+    }
+
+    /**
+     * 设置选中的tip的背景
+     *
+     * @param selectItems
+     */
+    private void setImageBackground(int selectItems) {
+        for (int i = 0; i < tips.length; i++) {
+            if (i == selectItems) {
+                //tips[i].setBackgroundResource(R.drawable.page_indicator_focused);
+                tips[i].setBackgroundResource(R.color.black);
+            } else {
+                //tips[i].setBackgroundResource(R.drawable.page_indicator_unfocused);
+                tips[i].setBackgroundResource(R.color.white);
+            }
+        }
+    }
+
     public class MyAdapter extends PagerAdapter {
 
         @Override
@@ -148,45 +176,14 @@ public class ImageViewPagerActivity extends AppCompatActivity implements ViewPag
 
         @Override
         public void destroyItem(View container, int position, Object object) {
-           // ((ViewPager)container).removeView(mImageViews[position % mImageViews.length]);
-            ((ViewPager)container).removeView(mImageViews[position]);
+            // ((ViewPager)container).removeView(mImageViews[position % mImageViews.length]);
+            ((ViewPager) container).removeView(mImageViews[position]);
         }
 
         @Override
         public Object instantiateItem(View container, int position) {
             ((ViewPager) container).addView(mImageViews[position]);
             return mImageViews[position];
-        }
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int arg0) {
-
-    }
-
-    @Override
-    public void onPageScrolled(int arg0, float arg1, int arg2) {
-
-    }
-
-    @Override
-    public void onPageSelected(int arg0) {
- //       setImageBackground(arg0 % mImageViews.length);
-    }
-
-    /**
-     * 设置选中的tip的背景
-     * @param selectItems
-     */
-    private void setImageBackground(int selectItems){
-        for(int i=0; i<tips.length; i++){
-            if(i == selectItems){
-                //tips[i].setBackgroundResource(R.drawable.page_indicator_focused);
-                tips[i].setBackgroundResource(R.color.black);
-            }else{
-                //tips[i].setBackgroundResource(R.drawable.page_indicator_unfocused);
-                tips[i].setBackgroundResource(R.color.white);
-            }
         }
     }
 

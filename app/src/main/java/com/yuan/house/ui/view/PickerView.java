@@ -32,7 +32,6 @@ public class PickerView extends View{
 
     private boolean isInit = false; // 是否已初始化
     private int requestCode = 0; // 请求码-标志位
-    private int txtColor = 0x333333;// 字体颜色
     private int height; // 选择器高度
     private int width;// 选择器宽度
     private int curSelectedPos;// 选中的位置，这个位置是mDataList的中心位置，一直不变
@@ -100,6 +99,7 @@ public class PickerView extends View{
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setTextAlign(Paint.Align.CENTER);
+        int txtColor = 0x333333;
         mPaint.setColor(txtColor);
     }
 

@@ -17,7 +17,6 @@ public class XListViewHeader extends LinearLayout {
   private int mState = STATE_NORMAL;
   public final static int STATE_READY = 1;
   public final static int STATE_REFRESHING = 2;
-  private final int ROTATE_ANIM_DURATION = 180;
   private LinearLayout mContainer;
   private ImageView mArrowImageView;
   private ProgressBar mProgressBar;
@@ -49,6 +48,7 @@ public class XListViewHeader extends LinearLayout {
     mRotateUpAnim = new RotateAnimation(0.0f, -180.0f,
         Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,
         0.5f);
+    int ROTATE_ANIM_DURATION = 180;
     mRotateUpAnim.setDuration(ROTATE_ANIM_DURATION);
     mRotateUpAnim.setFillAfter(true);
     mRotateDownAnim = new RotateAnimation(-180.0f, 0.0f,

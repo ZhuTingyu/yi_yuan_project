@@ -1,6 +1,5 @@
 package com.yuan.house.activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
@@ -8,9 +7,7 @@ import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.AttributeSet;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -63,7 +60,7 @@ import timber.log.Timber;
  * Created by KevinLee on 2016/5/2.
  */
 public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderResultListener, OnGetSuggestionResultListener {
-    public TCLocationListener locationListener = new TCLocationListener();
+    public MapLocationListener locationListener = new MapLocationListener();
     protected MapView mMapView;
     protected BaiduMap baiduMap;
     protected LocationClient locClient;
@@ -179,9 +176,6 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
             @Override
             public void onMapLoaded() {
                 // TODO: 16/7/20 direct to lat/lng if already has address passin
-                if(!isGpsOpen()){
-                    setGps("是否要打开GPS!");
-                }
                 locClient.start();
             }
         });
@@ -371,11 +365,12 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         baiduMap.setMyLocationEnabled(false);
         locClient.stop();
     }
 
-    public class TCLocationListener implements BDLocationListener {
+    public class MapLocationListener implements BDLocationListener {
         @Override
         public void onReceiveLocation(BDLocation location) {
             latitude = location.getLatitude();

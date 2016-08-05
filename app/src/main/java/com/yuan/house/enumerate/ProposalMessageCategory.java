@@ -6,9 +6,7 @@ package com.yuan.house.enumerate;
 public enum ProposalMessageCategory {
     COMPLAINT(1), SUGGESTION(2), BUG(3);
 
-    private int value;
-
     ProposalMessageCategory(int value) {
-        this.value = value;
+        int value1 = value;
     }
 }

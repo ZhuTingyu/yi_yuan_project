@@ -18,7 +18,7 @@ public class TutorialActivity extends BaseFragmentActivity {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             SharedPreferences mPrefs = getPreferences(MODE_PRIVATE);
             SharedPreferences.Editor editor = mPrefs.edit();
-            editor.commit();
+            editor.apply();
 
             new Thread(new Runnable() {
                 @Override

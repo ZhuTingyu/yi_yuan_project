@@ -1,6 +1,8 @@
 package com.yuan.house.common;
 
 
+import java.util.Locale;
+
 /**
  * Created by Alsor Zhou on 2/13/15.
  */
@@ -115,4 +117,6 @@ public class Constants {
     public static int kNotifyId = 1;
     public static String kPrefsLastSelectedCity = "lastCity";
     public static String kPrefsLastSelectedDistrict = "lastDistrict";
+
+    public static final Locale kForceLocale = Locale.US;
 }

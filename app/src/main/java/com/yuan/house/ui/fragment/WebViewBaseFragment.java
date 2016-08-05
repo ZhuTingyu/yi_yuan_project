@@ -596,7 +596,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                 } else {
                     editor.putString(key, value);
                 }
-                editor.commit();
+                editor.apply();
 
                 // 如果是设置 userLogin, 则为登陆
                 if (Constants.kWebDataKeyUserLogin.equals(key)) {

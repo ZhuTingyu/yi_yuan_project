@@ -38,7 +38,6 @@ public class RecordButton extends Button {
     private RecordEventListener recordEventListener;
     private long startTime;
     private Dialog recordIndicator;
-    private View view;
     private MediaRecorder recorder;
     private ObtainDecibelThread thread;
     private Handler volumeHandler;
@@ -142,7 +141,7 @@ public class RecordButton extends Button {
         recordIndicator = new Dialog(getContext(),
                 R.style.chat_record_button_toast_dialog_style);
 
-        view = inflate(getContext(), R.layout.chat_record_layout, null);
+        View view = inflate(getContext(), R.layout.chat_record_layout, null);
         imageView = (ImageView) view.findViewById(R.id.imageView);
         textView = (TextView) view.findViewById(R.id.textView);
         recordIndicator.setContentView(view, new LayoutParams(

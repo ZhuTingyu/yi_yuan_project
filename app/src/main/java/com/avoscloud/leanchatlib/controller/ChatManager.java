@@ -19,8 +19,8 @@ import com.avos.avoscloud.im.v2.callback.AVIMClientCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationQueryCallback;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
+import com.avoscloud.chat.ui.chat.SingleChatActivity;
 import com.avoscloud.chat.util.Utils;
-import com.avoscloud.leanchatlib.activity.ChatActivity;
 import com.avoscloud.leanchatlib.db.MsgsTable;
 import com.avoscloud.leanchatlib.db.RoomsTable;
 import com.avoscloud.leanchatlib.model.AVIMHouseMessage;
@@ -72,7 +72,6 @@ public class ChatManager extends AVIMClientEventHandler {
     private AVIMClient imClient;
     private String selfId;
     private boolean connect = false;
-    private MsgHandler msgHandler;
     private MsgsTable msgsTable;
     private RoomsTable roomsTable;
     private EventBus eventBus = EventBus.getDefault();
@@ -99,7 +98,7 @@ public class ChatManager extends AVIMClientEventHandler {
         }
         int auditType = param.optInt("audit_type");
         if (auditType != 0) {
-            houseId = String.format("000%d%s", auditType, houseId);
+            houseId = String.format(Constants.kForceLocale, "000%d%s", auditType, houseId);
         }
 
         final List<String> members = new ArrayList<>();
@@ -154,9 +153,9 @@ public class ChatManager extends AVIMClientEventHandler {
             lastNotifyTime = System.currentTimeMillis();
         }
 
-        int icon = context.getApplicationInfo().icon;
-        Intent intent = new Intent(context, ChatActivity.class);
-        intent.putExtra(ChatActivity.CONVID, conv.getConversationId());
+//        int icon = context.getApplicationInfo().icon;
+        Intent intent = new Intent(context, SingleChatActivity.class);
+        intent.putExtra(SingleChatActivity.CONVID, conv.getConversationId());
 
         CharSequence notifyContent = MessageHelper.outlineOfMsg(msg);
         CharSequence username = "username";
@@ -165,7 +164,7 @@ public class ChatManager extends AVIMClientEventHandler {
             username = from.getUsername();
         }
 
-        Notification notification = Utils.notifyMsg(context, ChatActivity.class, PackageUtil.getAppLable(context), username + "\n" + notifyContent, notifyContent.toString(), Constants.kNotifyId);
+        Notification notification = Utils.notifyMsg(context, SingleChatActivity.class, PackageUtil.getAppLable(context), username + "\n" + notifyContent, notifyContent.toString(), Constants.kNotifyId);
         getUserInfoFactory().configureNotification(notification);
     }
 
@@ -174,7 +173,7 @@ public class ChatManager extends AVIMClientEventHandler {
 
         AVIMHouseMessage.registerMessageType();
 
-        msgHandler = new MsgHandler();
+        MsgHandler msgHandler = new MsgHandler();
         AVIMMessageManager.registerMessageHandler(AVIMTypedMessage.class, msgHandler);
 
 //    try {
@@ -291,12 +290,12 @@ public class ChatManager extends AVIMClientEventHandler {
 
             @Override
             protected void onPost(Exception exception) {
-                // TODO: 16/7/26 处理单聊和群聊的情况
-//                if (selfId != null && ChatActivity.getCurrentChattingConvid() == null || TextUtils.isEmpty(ChatActivity.getCurrentChattingConvid()) || !ChatActivity.getCurrentChattingConvid().equals(message.getConversationId())) {
-//                    if (getUserInfoFactory().showNotificationWhenNewMessageCome(selfId)) {
-//                        showMessageNotification(getContext(), conversation, message);
-//                    }
-//                }
+                // 接收消息永远只会是单聊
+                if (selfId != null && SingleChatActivity.getCurrentChattingConvid() == null || TextUtils.isEmpty(SingleChatActivity.getCurrentChattingConvid()) || !SingleChatActivity.getCurrentChattingConvid().equals(message.getConversationId())) {
+                    if (getUserInfoFactory().showNotificationWhenNewMessageCome(selfId)) {
+                        showMessageNotification(getContext(), conversation, message);
+                    }
+                }
             }
         }.execute();
     }

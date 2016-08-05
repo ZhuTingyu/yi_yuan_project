@@ -104,7 +104,6 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     public static final int kRequestCodeSwitchHouse = 101;
     private static final int PAGE_SIZE = 20;
     private static SharedPreferences prefs;
-    private static String leanId = "";
     private static String currentChattingConvid;
     protected ChatMessageAdapter mMessageAdapter;
     protected MessageAgent.SendCallback defaultSendCallback = new DefaultSendCallback();
@@ -118,7 +117,6 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     private AVIMConversation conversation;
     private ConversationType conversationType;
     private JSONObject jsonFormatParams;
-    private GestureDetector gestureDetector;
     private int mLastY = 0;
     private GestureDetector.OnGestureListener onGestureListener =
             new GestureDetector.SimpleOnGestureListener() {
@@ -136,16 +134,12 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                     return false;
                 }
             };
-    private WebView webView;
     private JSONArray jsonFormatSwitchParams;
     private String cachedHouseTradeTypeForCurrentConv;
     private InputMoreAdapter mMoreAdapter;
     private ScheduledExecutorService scheduledExecutorServiceForPresence;
     private ScheduledExecutorService scheduledExecutorServiceForPresenceCheckInSeconds;
     private int mHeartBeatTimesForRemainLive;
-    private int kTickForLiveCheck = 6;
-    private long kTickForPresenceSending = 5;
-    private long kIntervalForLiveCheck = 1;     // 每秒进行倒计时
 
     public static String getCurrentChattingConvid() {
         return currentChattingConvid;
@@ -167,7 +161,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     }
 
     public static void chatByUserId(final Context from, final JSONObject params) {
-        leanId = params.optString("lean_id");
+        String leanId = params.optString("lean_id");
 
         final ProgressDialog dialog = Utils.showSpinnerDialog(from);
         if (prefs == null) prefs = PreferenceManager.getDefaultSharedPreferences(from);
@@ -238,7 +232,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
         });
 
 
-        gestureDetector = new GestureDetector(this, onGestureListener);
+        GestureDetector gestureDetector = new GestureDetector(this, onGestureListener);
 
         mFragmentBBS = FragmentBBS.newInstance();
 
@@ -376,6 +370,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     private void setupPresenceGuardian() {
         scheduledExecutorServiceForPresence = Executors.newSingleThreadScheduledExecutor();
 
+        long kTickForPresenceSending = 5;
         scheduledExecutorServiceForPresence.scheduleAtFixedRate
                 (new Runnable() {
                     public void run() {
@@ -458,6 +453,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     private void setupHeartBeatForPresenceCheckInSeconds() {
         scheduledExecutorServiceForPresenceCheckInSeconds = Executors.newSingleThreadScheduledExecutor();
 
+        long kIntervalForLiveCheck = 1;
         scheduledExecutorServiceForPresenceCheckInSeconds.scheduleAtFixedRate
                 (new Runnable() {
                     public void run() {
@@ -615,7 +611,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     }
 
     private void updateWebViewSettings() {
-        webView = mFragmentBBS.getWebView();
+        WebView webView = mFragmentBBS.getWebView();
         webView.setHorizontalScrollBarEnabled(false);
         webView.setVerticalScrollBarEnabled(false);
         webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
@@ -720,6 +716,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                 // update presence status
                 setTitleItemDrawable(R.drawable.online);
 
+                int kTickForLiveCheck = 6;
                 mHeartBeatTimesForRemainLive = kTickForLiveCheck;
 
                 setupHeartBeatForPresenceCheckInSeconds();

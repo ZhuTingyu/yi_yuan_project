@@ -119,7 +119,7 @@
                         android:paddingTop="5dp"
                         android:textCursorDrawable="@drawable/edittext_cursor_shape"
                         android:textSize="16sp"
-                        android:hint="发送新消息"
+                        android:hint="@string/placeholder_send_msg"
                         android:ellipsize="start"/>
 
                     <Button

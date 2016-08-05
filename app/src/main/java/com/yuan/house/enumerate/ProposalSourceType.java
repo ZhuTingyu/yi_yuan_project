@@ -6,9 +6,7 @@ package com.yuan.house.enumerate;
 public enum ProposalSourceType {
     UNKNOWN(0), FROM_USER(1), FROM_AGENCY(2);
 
-    private int value;
-
     ProposalSourceType(int value) {
-        this.value = value;
+        int value1 = value;
     }
 }

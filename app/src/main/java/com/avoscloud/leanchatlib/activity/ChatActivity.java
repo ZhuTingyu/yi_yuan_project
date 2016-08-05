@@ -51,7 +51,7 @@ import de.greenrobot.event.EventBus;
 import me.nereo.multi_image_selector.MultiImageSelector;
 import me.nereo.multi_image_selector.MultiImageSelectorActivity;
 
-public class ChatActivity extends WebViewBasedActivity implements OnClickListener {
+public abstract class ChatActivity extends WebViewBasedActivity implements OnClickListener {
     public static final String CONVID = "convid";
 
     //用来判断是否弹出通知
