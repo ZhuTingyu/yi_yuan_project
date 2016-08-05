@@ -1,4 +1,4 @@
-<RelativeLayout
+<RelativeLayout xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/pull_to_refresh_head"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
@@ -20,7 +20,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:src="@drawable/chat_xlistview_arrow" />
+                android:src="@drawable/chat_xlistview_arrow"
+                tools:ignore="ContentDescription" />
 
             <ProgressBar
                 android:id="@+id/progressBar"

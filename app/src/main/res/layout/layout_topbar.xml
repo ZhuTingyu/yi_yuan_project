@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/topbar_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -22,7 +23,8 @@
                 android:layout_height="match_parent"
                 android:layout_centerVertical="true"
                 android:background="@android:color/transparent"
-                android:src="@drawable/btn_back" />
+                android:src="@drawable/btn_back"
+                tools:ignore="ContentDescription" />
 
             <Button
                 android:id="@+id/topbar_left_textbtn"
@@ -89,7 +91,8 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:background="@android:color/transparent"
-                android:visibility="visible" />
+                android:visibility="visible"
+                tools:ignore="ContentDescription" />
 
             <Button
                 android:id="@+id/topbar_right_textbtn"
