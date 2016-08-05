@@ -590,14 +590,6 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                 String value = object.optString("value");
 
                 SharedPreferences.Editor editor = prefs.edit();
-                // 如果是设置 userLogin, 则为登陆
-                if (Constants.kWebDataKeyUserLogin.equals(key)) {
-                    if (mBridgeListener != null) {
-                        mBridgeListener.onBridgeSignIn(data);
-                    }
-
-                    return;
-                }
 
                 if (value == null || value.equals("null")) {
                     editor.remove(key);
@@ -605,6 +597,13 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                     editor.putString(key, value);
                 }
                 editor.commit();
+
+                // 如果是设置 userLogin, 则为登陆
+                if (Constants.kWebDataKeyUserLogin.equals(key)) {
+                    if (mBridgeListener != null) {
+                        mBridgeListener.onBridgeSignIn(data);
+                    }
+                }
             }
         });
         getBridge().registerHandler("getData", new WebViewJavascriptBridge.WVJBHandler() {

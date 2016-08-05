@@ -32,11 +32,21 @@ public class AuthHelper {
     }
 
     private UserType getUserType(String data) {
+        if (TextUtils.isEmpty(data)) return UserType.USER;
+
         UserType type = UserType.USER;
 
-        if ("agency".equals(data)) {
-            type = UserType.AGENCY;
+        JSONObject object;
+        try {
+            object = new JSONObject(data);
+
+            if (object.optJSONObject("user_info") == null) {
+                type = UserType.AGENCY;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+
         return type;
     }
 
@@ -109,11 +119,9 @@ public class AuthHelper {
 
     public void evaluateUserLogin(String data) {
         userLoginInfo = data;
+
         userToken = getToken(data);
         userId = getUserId(data);
-    }
-
-    public void evaluateUserType(String data) {
         userType = getUserType(data);
     }
 

@@ -91,7 +91,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
         // read user login credential from prefs
         AuthHelper.getInstance().evaluateUserLogin(prefs.getString(Constants.kWebDataKeyUserLogin, null));
-        AuthHelper.getInstance().evaluateUserType(prefs.getString(Constants.kWebDataKeyLoginType, null));
 
         if (AuthHelper.getInstance().userAlreadyLogin()) {
             setupTabbarClickListener();
@@ -335,8 +334,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        } else if (Constants.kWebDataKeyLoginType.equals(key)) {
-            AuthHelper.getInstance().evaluateUserType(value);
         }
     }
 
@@ -351,7 +348,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                             //      Could not validate certificate: Certificate not valid until Wed Nov
                             //      06 05:36:50 GMT+08:00 2013 (compared to Wed Jul 27 12:00:57 GMT+08:00 2011)
                             e.printStackTrace();
-                            ToastUtil.showShort(mContext, "消息服务器登陆失败, 请检查手机的时间设置是否正确");
+                            ToastUtil.showShort(mContext, R.string.error_leancloud_login_failed);
                         } else if (avUser != null) {
                             String chatUserId = avUser.getObjectId();
                             prefs.edit()
@@ -416,10 +413,10 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                     preferenceMap.setLocation(newGeoPoint);
                 }
             }
-
-            if(isGpsOpen()){
-                setGps("定位结束,是否关闭GPS!");
-            }
+// FIXME: 8/5/16 comment
+//            if(isGpsOpen()){
+//                setGps("定位结束,是否关闭GPS!");
+//            }
 
         }
     }
