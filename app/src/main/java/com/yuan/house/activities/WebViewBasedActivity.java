@@ -1186,6 +1186,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                         intent.setAction(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         try {
+                            dialog.dismiss();
                             startActivity(intent);
                         } catch (ActivityNotFoundException ex) {
                             intent.setAction(Settings.ACTION_SETTINGS);

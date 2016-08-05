@@ -132,11 +132,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                 bottomNavigationBar.selectTab(1);
             }
         }
-
-        if(!isGpsOpen()){
-            setGps("GPS关闭是否打开!");
-        }
-
     }
 
     private void checkIfNotificationEnabledInSettings() {
@@ -421,6 +416,11 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                     preferenceMap.setLocation(newGeoPoint);
                 }
             }
+
+            if(isGpsOpen()){
+                setGps("定位结束,是否关闭GPS!");
+            }
+
         }
     }
 }
