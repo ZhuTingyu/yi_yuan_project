@@ -965,7 +965,8 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 sizes = object.optJSONArray("size");
             }
 
-            uploadFiles(filePaths, sizes.toString(), jsCallback);
+            String pack = sizes == null ? null : sizes.toString();
+            uploadFiles(filePaths, pack, jsCallback);
         } catch (JSONException e) {
             e.printStackTrace();
         }

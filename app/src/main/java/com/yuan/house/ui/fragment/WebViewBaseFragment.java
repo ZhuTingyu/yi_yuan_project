@@ -398,7 +398,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                 final String text = object.optString("type");
                 final String content = object.optString("content");
                 if (!TextUtils.isEmpty(text) && text.equals("icon")) {
-                    if(isAdded()){
+                    if (isAdded()) {
                         Resources resources = getResources();
                         String icon = content.substring(0, object.optString("content").indexOf("."));
                         int resourceId = resources.getIdentifier(icon, "drawable", getActivity().getPackageName());
@@ -620,6 +620,37 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
 
                 String key = object.optString("key");
                 String value = prefs.getString(key, null);
+
+                if (null != callback) {
+                    callback.callback(value);
+                }
+            }
+        });
+
+        getBridge().registerHandler("updateData", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
+                Timber.v("updateData got:" + data);
+
+                JSONObject object = null;
+                try {
+                    object = new JSONObject(data);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                String key = object.optString("key");
+                String value = object.optString("value");
+
+                SharedPreferences.Editor editor = prefs.edit();
+
+                if (value == null || value.equals("null")) {
+                    editor.remove(key);
+                } else {
+                    editor.putString(key, value);
+                }
+
+                editor.apply();
 
                 if (null != callback) {
                     callback.callback(value);
