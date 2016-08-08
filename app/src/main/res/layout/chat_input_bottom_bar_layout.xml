@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottomLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -17,7 +18,8 @@
             android:layout_height="30dp"
             android:layout_marginLeft="10dp"
             android:layout_centerVertical="true"
-            android:background="@drawable/chat_btn_voice_selector" />
+            android:background="@drawable/chat_btn_voice_selector"
+            tools:ignore="ContentDescription" />
 
         <ImageView
             android:id="@+id/btn_more"
@@ -27,7 +29,8 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="@dimen/chat_BottomBtnMargin"
             android:scaleType="fitXY"
-            android:background="@drawable/btn_other" />
+            android:background="@drawable/btn_other"
+            tools:ignore="ContentDescription" />
 
         <RelativeLayout
             android:id="@+id/action_layout"

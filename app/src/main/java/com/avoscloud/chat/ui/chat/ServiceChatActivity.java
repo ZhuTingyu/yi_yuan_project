@@ -21,6 +21,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
+import com.yuan.house.common.Constants;
 import com.yuan.house.http.RestClient;
 
 import org.apache.http.Header;
@@ -126,7 +127,7 @@ public class ServiceChatActivity extends ChatActivity {
             i++;
         }
 
-        String msg = String.format("当前有 %d 位用户在排队，你是否等待？", i);
+        String msg = String.format(Constants.kForceLocale, "当前有 %d 位用户在排队，你是否等待？", i);
         new AlertDialog.Builder(this)
                 .setMessage(msg)
                 .setPositiveButton(R.string.wait, new DialogInterface.OnClickListener() {
@@ -186,7 +187,7 @@ public class ServiceChatActivity extends ChatActivity {
     }
 
     private void setupWaitNumberView(int count) {
-        String msg = String.format("当前排队人数是 %d 位", count);
+        String msg = String.format(Constants.kForceLocale, "当前排队人数是 %d 位", count);
 
         findViewById(R.id.lvMessages).setVisibility(View.GONE);
 

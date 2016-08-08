@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <RelativeLayout
         android:id="@+id/map_topbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/topbar_layout">
+        android:layout_height="wrap_content">
 
         <EditText
             android:id="@+id/search_edit"
@@ -18,7 +18,7 @@
             android:layout_toLeftOf="@+id/search_button"
             android:hint="@string/map_search_placeholder"
             android:imeOptions="actionSearch"
-            android:singleLine="true" />
+            android:maxLines="1" />
 
         <Button
             android:id="@+id/search_button"
@@ -28,8 +28,6 @@
             android:text="@string/map_search_loc_button_text" />
     </RelativeLayout>
 
-
-
     <com.baidu.mapapi.map.MapView
         android:visibility="visible"
         android:id="@+id/bmap"
@@ -37,13 +35,6 @@
         android:layout_height="match_parent"
         android:layout_below="@+id/map_topbar"
         android:clickable="true" />
-
-
-    <!--<WebView-->
-    <!--android:id="@+id/webview"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:visibility="gone" />-->
 
     <LinearLayout
         android:id="@+id/map_control"
@@ -70,7 +61,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:src="@drawable/pin" />
+        android:src="@drawable/pin"
+        tools:ignore="ContentDescription" />
 
     <ListView
         android:id="@+id/map_activity_listview"

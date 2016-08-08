@@ -1,19 +1,14 @@
 package com.yuan.house.activities;
 
 import android.app.AlertDialog;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -119,7 +114,6 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     private final int kActivityRequestCodeImagePickOnly = 10;
     private final int kActivityRequestCodeImagePickThenUpload = 11;
 
-    private final int kActivityRequestCodeImageCrop = 14;
     private final int kActivityRequestCodeSelectMapLocation = 20;
     protected FragmentManager mFragmentManager;
     protected FragmentTransaction mFragmentTransaction;
@@ -350,6 +344,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        int kActivityRequestCodeImageCrop = 14;
         if (requestCode == kActivityRequestCodeWebActivity) {
             Timber.v("kActivityRequestCodeWebActivity");
 
@@ -423,9 +418,6 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                     getWebViewFragment().getBridge().callHandler("selectedMapLocation", object);
                 } catch (JSONException e) {
                     e.printStackTrace();
-                }
-                if(isGpsOpen()){
-                    setGps("选点结束是否关闭GPS");
                 }
             }
         } else {
@@ -844,7 +836,6 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             @Override
             public void onReceiveLocation(BDLocation location) {
                 JSONObject obj;
-                locationClient.stop();
 
                 try {
                     obj = new JSONObject();
@@ -867,6 +858,8 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                         callback.callback(obj.toString());
                     }
                 }
+
+                locationClient.stop();
             }
         };
         locationClient.registerLocationListener(listener);
@@ -972,7 +965,8 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 sizes = object.optJSONArray("size");
             }
 
-            uploadFiles(filePaths, sizes.toString(), jsCallback);
+            String pack = sizes == null ? null : sizes.toString();
+            uploadFiles(filePaths, pack, jsCallback);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -1169,37 +1163,4 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
     }
     // endregion
-
-    protected boolean isGpsOpen() {
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-    }
-
-    protected void setGps(String message) {
-        new AlertDialog.Builder(mContext)
-                .setTitle("提醒")
-                .setMessage(message)
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent();
-                        intent.setAction(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        try {
-                            dialog.dismiss();
-                            startActivity(intent);
-                        } catch (ActivityNotFoundException ex) {
-                            intent.setAction(Settings.ACTION_SETTINGS);
-                            try {
-                                startActivity(intent);
-                            } catch (Exception e) {
-
-                            }
-                        }
-                    }
-                })
-                .setNegativeButton("取消",null)
-                .show();
-    }
-
 }

@@ -15,13 +15,11 @@ import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.avos.avoscloud.AVAnalytics;
 import com.avos.avoscloud.AVException;
-import com.avos.avoscloud.AVGeoPoint;
 import com.avos.avoscloud.AVInstallation;
 import com.avos.avoscloud.AVUser;
 import com.avos.avoscloud.LogInCallback;
 import com.avos.avoscloud.PushService;
 import com.avoscloud.chat.service.CacheService;
-import com.avoscloud.chat.service.PreferenceMap;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -304,7 +302,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         } else {
             editor.putString(key, value);
         }
-        editor.commit();
+        editor.apply();
 
         if (Constants.kWebDataKeyUserLogin.equals(key)) {
             try {
@@ -354,7 +352,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                             prefs.edit()
                                     .putString("avUserLogin", username)
                                     .putString(Constants.kLeanChatCurrentUserObjectId, chatUserId)
-                                    .commit();
+                                    .apply();
 
                             doAVUserLogin();
 
@@ -399,25 +397,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
             // tell subscriber to update location
             EventBus.getDefault().post(new LocationEvent(LocationEvent.LocationEventEnum.UPDATED, location));
 
-            AVUser user = AVUser.getCurrentUser();
-            if (user != null) {
-                PreferenceMap preferenceMap = new PreferenceMap(DMApplication.getInstance(), user.getObjectId());
-
-                AVGeoPoint avGeoPoint = preferenceMap.getLocation();
-                if (avGeoPoint != null && avGeoPoint.getLatitude() == location.getLatitude()
-                        && avGeoPoint.getLongitude() == location.getLongitude()) {
-                    locClient.stop();
-                } else {
-                    AVGeoPoint newGeoPoint = new AVGeoPoint(location.getLatitude(),
-                            location.getLongitude());
-                    preferenceMap.setLocation(newGeoPoint);
-                }
-            }
-// FIXME: 8/5/16 comment
-//            if(isGpsOpen()){
-//                setGps("定位结束,是否关闭GPS!");
-//            }
-
+            locClient.stop();
         }
     }
 }

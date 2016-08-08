@@ -30,6 +30,5 @@
         android:layout_margin="50dp"
         android:layout_centerHorizontal="true"
         android:text="@string/btn_dummy_ip_setting"
-        android:textAppearance="@android:style/TextAppearance.Holo.Large"
-        android:elevation="0dp" />
+        android:textAppearance="@android:style/TextAppearance.Holo.Large" />
 </RelativeLayout>

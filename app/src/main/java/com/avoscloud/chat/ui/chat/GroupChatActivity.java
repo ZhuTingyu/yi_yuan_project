@@ -53,7 +53,6 @@ public class GroupChatActivity extends ChatActivity {
     ArrayList<AVIMConversation> conversations;
     ArrayList<GroupChatRowInfo> groupChatRowInfos;
     private JSONObject jsonFormatParams;
-    private ChatGroupAdapter mGroupAdapter;
     private String[] leanIds;
     private String[] userIds;
     private ArrayList<String> convIds;
@@ -210,7 +209,7 @@ public class GroupChatActivity extends ChatActivity {
     }
 
     private void bindAdapterToListView(ArrayList<GroupChatRowInfo> datum) {
-        mGroupAdapter = new ChatGroupAdapter(this, datum);
+        ChatGroupAdapter mGroupAdapter = new ChatGroupAdapter(this, datum);
         lvGroups.setAdapter(mGroupAdapter);
     }
 

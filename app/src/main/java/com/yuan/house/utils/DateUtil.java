@@ -1,5 +1,7 @@
 package com.yuan.house.utils;
 
+import com.yuan.house.common.Constants;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.ParseException;
@@ -27,7 +29,7 @@ public class DateUtil {
      */
     public static String utc2Local(String utcTime, String utcTimePatten,
                                    String localTimePatten) {
-        SimpleDateFormat utcFormater = new SimpleDateFormat(utcTimePatten);
+        SimpleDateFormat utcFormater = new SimpleDateFormat(utcTimePatten, Constants.kForceLocale);
         utcFormater.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date gpsUTCDate = null;
         try {
@@ -35,7 +37,7 @@ public class DateUtil {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        SimpleDateFormat localFormater = new SimpleDateFormat(localTimePatten);
+        SimpleDateFormat localFormater = new SimpleDateFormat(localTimePatten, Constants.kForceLocale);
         localFormater.setTimeZone(TimeZone.getDefault());
         String localTime = localFormater.format(gpsUTCDate.getTime());
         return localTime;
@@ -53,7 +55,7 @@ public class DateUtil {
             if (StringUtils.isNotBlank(date)) {
                 if (StringUtils.isBlank(format))
                     format = DateUtil.TIME_FORMAT;
-                SimpleDateFormat sf = new SimpleDateFormat(format);
+                SimpleDateFormat sf = new SimpleDateFormat(format, Constants.kForceLocale);
                 return sf.parse(date).getTime();
             }
         } catch (ParseException e) {
@@ -73,7 +75,7 @@ public class DateUtil {
         if (time > 0l) {
             if (StringUtils.isBlank(format))
                 format = DateUtil.TIME_FORMAT;
-            SimpleDateFormat sf = new SimpleDateFormat(format);
+            SimpleDateFormat sf = new SimpleDateFormat(format, Constants.kForceLocale);
             Date date = new Date(time);
             return sf.format(date);
         }

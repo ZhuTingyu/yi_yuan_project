@@ -16,8 +16,6 @@ import com.yuan.house.R;
  */
 public class DialogManager {
 
-    private AlertDialog.Builder builder;
-
     private TextView info;
     private Context mContext;
 
@@ -32,7 +30,7 @@ public class DialogManager {
     // 显示录音的对话框
     public void showRecordingDialog() {
 
-        builder = new AlertDialog.Builder(mContext, R.style.AudioDialog);
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.AudioDialog);
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View view = inflater.inflate(R.layout.dialog_recorder,null);
 

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -19,7 +20,8 @@
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/ic_user"/>
+                android:src="@drawable/ic_user"
+                tools:ignore="ContentDescription" />
 
         </LinearLayout>
 
@@ -37,7 +39,8 @@
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:layout_marginRight="2dp"
-                android:src="@drawable/img_position"/>
+                android:src="@drawable/img_position"
+                tools:ignore="ContentDescription" />
 
             <TextView
                 android:id="@+id/fragment_login_address"
@@ -49,7 +52,8 @@
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/btn_arrow_down"/>
+                android:src="@drawable/btn_arrow_down"
+                tools:ignore="ContentDescription" />
         </LinearLayout>
 
         <LinearLayout
@@ -63,7 +67,8 @@
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/btn_search"/>
+                android:src="@drawable/btn_search"
+                tools:ignore="ContentDescription" />
 
         </LinearLayout>
     </RelativeLayout>

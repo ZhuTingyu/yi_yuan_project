@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rl_chatroom"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -84,7 +85,8 @@
                 android:layout_margin="@dimen/chat_BottomBtnMargin"
                 android:background="@drawable/chat_btn_voice_selector"
                 android:textColor="@color/chat_base_color_text_black"
-                android:visibility="visible" />
+                android:visibility="visible"
+                tools:ignore="ContentDescription" />
 
             <RelativeLayout
                 android:id="@id/rl_bottom_parent"
@@ -117,7 +119,7 @@
                         android:paddingTop="5dp"
                         android:textCursorDrawable="@drawable/edittext_cursor_shape"
                         android:textSize="16sp"
-                        android:hint="发送新消息"
+                        android:hint="@string/placeholder_send_msg"
                         android:ellipsize="start"/>
 
                     <Button
@@ -177,7 +179,8 @@
                     android:layout_height="@dimen/chat_BottomBtnSize"
                     android:layout_centerVertical="true"
                     android:layout_margin="@dimen/chat_BottomBtnMargin"
-                    android:background="@drawable/btn_other" />
+                    android:background="@drawable/btn_other"
+                    tools:ignore="ContentDescription" />
             </RelativeLayout>
 
 

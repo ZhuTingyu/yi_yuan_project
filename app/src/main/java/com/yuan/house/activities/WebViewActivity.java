@@ -14,13 +14,12 @@ import com.yuan.house.R;
 public class WebViewActivity extends WebViewBasedActivity {
     private static final int REQUEST_MAP_CODE = 0XFF01;
     public static WebViewActivity instance;
-    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         instance = this;
-        mContext = this;
+        Context mContext = this;
         WebViewFragment fragment = new WebViewFragment();
         Bundle arguments = new Bundle();
         arguments.putString("url", mUrl);

@@ -49,7 +49,6 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     protected org.json.JSONObject conversationObject;
     String peerAvatar;
     private ConversationType conversationType;
-    private int msgViewTypes = 9;
     private ChatMessageAdapter.ClickListener clickListener;
     private Context context;
     private View placeView;
@@ -103,7 +102,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
 
     @Override
     public int getViewTypeCount() {
-        return msgViewTypes;
+        return 9;
     }
 
     protected boolean messageSentByOthers(AVIMTypedMessage msg) {

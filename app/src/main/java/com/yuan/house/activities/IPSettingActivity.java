@@ -54,7 +54,7 @@ public class IPSettingActivity extends Activity {
             input = "http://" + inputRaw;
             DMApplication.getInstance().setHtmlExtractedFolder(input);
             DMApplication.getInstance().setRootPagesFolder(input + "/html/pages");
-            preferences.edit().putString("ip_settings", inputRaw).commit();
+            preferences.edit().putString("ip_settings", inputRaw).apply();
         }
 
         Intent intent = new Intent(this, SplashActivity.class);

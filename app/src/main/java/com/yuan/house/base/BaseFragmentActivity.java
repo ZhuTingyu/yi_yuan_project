@@ -29,8 +29,7 @@ import timber.log.Timber;
 /**
  * Created by alsor on 2/13/15.
  */
-public class BaseFragmentActivity extends FragmentActivity {
-
+public abstract class BaseFragmentActivity extends FragmentActivity {
     private static final java.lang.String TAG = BaseFragmentActivity.class.getSimpleName();
 
     @Inject

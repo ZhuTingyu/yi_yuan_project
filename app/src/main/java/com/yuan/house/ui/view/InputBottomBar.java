@@ -60,10 +60,6 @@ public class InputBottomBar extends LinearLayout {
      */
     private EmotionEditText contentEditText;
     /**
-     * 表情 Button
-     */
-    private View emotionBtn;
-    /**
      * 录音按钮
      */
     private RecordButton recordBtn;
@@ -71,10 +67,6 @@ public class InputBottomBar extends LinearLayout {
     private View textLayout;
     private View recordLayout;
 
-    /**
-     * 加号(more) Button
-     */
-    private View actionBtn;
     /**
      * 发送文本的Button
      */
@@ -132,9 +124,15 @@ public class InputBottomBar extends LinearLayout {
 
         switchModeBtn = findViewById(R.id.btn_mode_switch);
         contentEditText = (EmotionEditText) findViewById(R.id.editChatField);
-        emotionBtn = findViewById(R.id.btnEmotionInput);
+        /*
+      表情 Button
+     */
+        View emotionBtn = findViewById(R.id.btnEmotionInput);
         recordBtn = (RecordButton) findViewById(R.id.recordBtn);
-        actionBtn = findViewById(R.id.btn_more);
+        /*
+      加号(more) Button
+     */
+        View actionBtn = findViewById(R.id.btn_more);
 
         textLayout = findViewById(R.id.rl_field_textmode);
         recordLayout = findViewById(R.id.rl_field_voicemode);
