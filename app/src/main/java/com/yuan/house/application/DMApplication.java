@@ -1,7 +1,6 @@
 package com.yuan.house.application;
 
 
-import android.app.Application;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.StrictMode;
+import android.support.multidex.MultiDexApplication;
 
 import com.avos.avoscloud.AVAnalytics;
 import com.avos.avoscloud.AVInstallation;
@@ -65,7 +65,7 @@ import timber.log.Timber;
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.FROYO;
 
-public class DMApplication extends Application {
+public class DMApplication extends MultiDexApplication {
     private static final int DOWNLOAD_THREAD_POOL_SIZE = 2;
     public static boolean debug = true;
     private static DMApplication instance;
