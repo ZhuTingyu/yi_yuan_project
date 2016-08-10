@@ -85,17 +85,21 @@
         <activity
             android:name="com.avoscloud.chat.ui.chat.SingleChatActivity"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
             android:name="com.avoscloud.chat.ui.chat.GroupChatActivity"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
             android:name="com.avoscloud.chat.ui.chat.ServiceChatActivity"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
             android:name="com.avoscloud.leanchatlib.activity.ImageBrowserActivity"
+            android:screenOrientation="portrait"
             android:launchMode="singleTask" />
         <activity
             android:name=".activities.CropActivity"
@@ -104,6 +108,7 @@
         <activity
             android:name="com.etiennelawlor.imagegallery.library.activities.ImageGalleryActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="portrait"
             android:label=""
             android:theme="@style/ImageGalleryTheme" />
 
@@ -111,9 +116,11 @@
             android:name=".activities.ImageViewPagerActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label=""
+            android:screenOrientation="portrait"
             android:theme="@style/ImageGalleryTheme" />
 
-        <activity android:name=".activities.SegmentalWebActivity" />
+        <activity android:name=".activities.SegmentalWebActivity"
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name="me.nereo.multi_image_selector.MultiImageSelectorActivity"
