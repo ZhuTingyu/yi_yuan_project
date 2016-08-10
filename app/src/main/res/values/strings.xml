@@ -38,7 +38,8 @@
     <string name="dummy_ip_setting">在此输入你的页面包服务器地址</string>
     <string name="btn_dummy_ip_setting">确定</string>
     <!--<string name="dummy_ip">192.168.1.119:8000</string>-->
-    <string name="dummy_ip">192.168.31.230:8000</string>
+    <!--<string name="dummy_ip">192.168.31.230:8000</string>-->
+    <string name="dummy_ip">html.house.ieyuan.com</string>
 
     <string name="chat_base_list_view_listEmptyHint">无数据</string>
     <string name="chat_base_list_view_noMore">已无更多</string>
