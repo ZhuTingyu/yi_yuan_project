@@ -137,7 +137,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
         Timber.v("onCreateView");
 
         if (mFragmentListener != null) {
-            bridge = new WebViewJavascriptBridge(getActivity(), mWebView, null);
+            bridge = new WebViewJavascriptBridge(this, mWebView, null);
 
             mFragmentListener.onFragmentInteraction(this);
 

@@ -754,6 +754,12 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         }
     }
 
+    private void dismissProgressDialog() {
+        if (mLoadingDialog != null) {
+            mLoadingDialog.dismiss();
+        }
+    }
+
     public void onBridgeLogout() {
         DMApplication.getInstance().logout();
     }
@@ -767,9 +773,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     public void onBridgeDismissProgressDialog() {
-        if (mLoadingDialog != null) {
-            mLoadingDialog.dismiss();
-        }
+        dismissProgressDialog();
     }
 
     public void onBridgeSetTitle(String title) {
@@ -1073,6 +1077,13 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         super.onResume();
 
         Bugtags.onResume(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        dismissProgressDialog();
     }
 
     @Override

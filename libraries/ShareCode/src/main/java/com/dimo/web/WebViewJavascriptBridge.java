@@ -3,6 +3,7 @@ package com.dimo.web;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Build;
+import android.support.v4.app.Fragment;
 import android.view.View;
 import android.webkit.ConsoleMessage;
 import android.webkit.JavascriptInterface;
@@ -45,13 +46,14 @@ public class WebViewJavascriptBridge implements Serializable {
     Map<String, WVJBResponseCallback> _responseCallbacks;
     long _uniqueId;
 
-    public WebViewJavascriptBridge(Activity context, WebView webview, WVJBHandler handler) {
-        this.mContext = context;
+    public WebViewJavascriptBridge(Fragment fragment, WebView webview, WVJBHandler handler) {
+        this.mContext = fragment.getActivity();
         this.mWebView = webview;
         this._messageHandler = handler;
         _messageHandlers = new HashMap<>();
         _responseCallbacks = new HashMap<>();
         _uniqueId = 0;
+        mBridgeWebViewListener = (OnBridgeWebViewListener) fragment;
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         mWebView.addJavascriptInterface(this, "_WebViewJavascriptBridge");
@@ -66,7 +68,6 @@ public class WebViewJavascriptBridge implements Serializable {
             }
         });
     }
-
 
     private void loadWebViewJavascriptBridgeJs(WebView webView) {
         InputStream is = mContext.getResources().openRawResource(R.raw.webviewjavascriptbridge);
@@ -83,7 +84,7 @@ public class WebViewJavascriptBridge implements Serializable {
             webView.loadUrl("javascript:" + script);
         }
     }
-    ;
+
     public static String convertStreamToString(InputStream is) {
         String s = "";
         try {
