@@ -351,16 +351,17 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         int kActivityRequestCodeImageCrop = 14;
+        if (data == null) {
+            Timber.w("No data found when onActivityResult");
+            return;
+        }
+
         if (requestCode == kActivityRequestCodeWebActivity) {
             Timber.v("kActivityRequestCodeWebActivity");
 
-            String result = null;
-            if (data != null) {
-                // handle the case if activity is terminated by JS code
-                Bundle res = data.getExtras();
-                result = res.getString("param_result_after_activity_finished");
-            }
-
+            // handle the case if activity is terminated by JS code
+            Bundle res = data.getExtras();
+            String result = res.getString("param_result_after_activity_finished");
             Timber.v("Got finished result:" + result);
 
             // send back the result to original webview
@@ -381,6 +382,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             }
         } else if (requestCode == kActivityRequestCodeImagePickThenUpload) {
             Timber.v("kActivityRequestCodeImagePickThenUpload");
+
             List<String> files = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
 
             Fragment fragment = getFragment(Constants.kFragmentTagProposal);
@@ -393,7 +395,6 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         } else if (requestCode == Constants.kActivityRequestCodeImagePickThenCropRectangle
                 || requestCode == Constants.kActivityRequestCodeImagePickThenCropSquare) {
             Timber.v("kActivityRequestCodeImagePickThenCropRectangle");
-            if (data == null) return;
 
             List<String> path = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
 
@@ -405,26 +406,22 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             startActivityForResult(intent, kActivityRequestCodeImageCrop);
         } else if (requestCode == kActivityRequestCodeImageCrop) {
             // handle cropped image
-            if (data != null) {
-                String path = data.getStringExtra("data");
-                JSONArray datum = new JSONArray();
-                datum.put(path);
-                mBridgeCallback.callback(datum.toString());
-            }
+            String path = data.getStringExtra("data");
+            JSONArray datum = new JSONArray();
+            datum.put(path);
+            mBridgeCallback.callback(datum.toString());
         } else if (requestCode == kActivityRequestCodeSelectMapLocation) {
             Timber.v("kActivityRequestCodeSelectMapLocation");
             // reverse callback the selected map location
             String result;
-            if (data != null) {
-                // handle the case if activity is terminated by JS code
-                Bundle res = data.getExtras();
-                result = res.getString(Constants.kActivityParamFinishSelectLocationOnMap);
-                try {
-                    JSONObject object = new JSONObject(result);
-                    getWebViewFragment().getBridge().callHandler("selectedMapLocation", object);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+            // handle the case if activity is terminated by JS code
+            Bundle res = data.getExtras();
+            result = res.getString(Constants.kActivityParamFinishSelectLocationOnMap);
+            try {
+                JSONObject object = new JSONObject(result);
+                getWebViewFragment().getBridge().callHandler("selectedMapLocation", object);
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
         } else {
             // never reach
@@ -619,7 +616,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     /**
      * 发送推荐房源的消息
      *
-     * @param peerId 接收方 LeanCloud Id
+     * @param peerId    接收方 LeanCloud Id
      * @param houseInfo 房源信息
      */
     private void sendRecommendHouseInfoMessage(String peerId, final JSONObject houseInfo) {
