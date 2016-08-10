@@ -334,7 +334,13 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.KICK_OUT) {
             JSONObject object = event.getHolder();
 
-            if (object == null || (AuthHelper.getInstance().userAlreadyLogin() && !AuthHelper.getInstance().getUserToken().equals(object.optString("exclusive_token")))) {
+            Timber.w("KICK_OUT : Online token - %s ; Local token - %s", object.optString("exclusive_token"), AuthHelper.getInstance().getUserToken());
+
+            if (object == null ||
+                    (AuthHelper.getInstance().userAlreadyLogin() &&
+                            AuthHelper.getInstance().getUserId().equals(object.optString("user_id"))
+                            && !AuthHelper.getInstance().getUserToken().equals(object.optString("exclusive_token"))
+                    )) {
                 Toast.makeText(mContext, "您的账号在别处登陆", Toast.LENGTH_SHORT).show();
 
                 DMApplication.getInstance().kickOut();
