@@ -4,7 +4,7 @@ import android.content.Context;
 import android.os.Environment;
 import android.text.TextUtils;
 
-import com.avoscloud.leanchatlib.controller.ChatManager;
+import com.yuan.house.application.DMApplication;
 
 import java.io.File;
 
@@ -21,7 +21,21 @@ public class PathUtils {
   }
 
   public static String getCacheDir() {
-    return ChatManager.getContext().getCacheDir().getAbsolutePath() + "/";
+    String baseDir;
+
+    String state = Environment.getExternalStorageState();
+    if (Environment.MEDIA_MOUNTED.equals(state)) {
+      File baseDirFile = DMApplication.getInstance().getExternalCacheDir();
+      if (baseDirFile == null) {
+        baseDir = DMApplication.getInstance().getCacheDir().getAbsolutePath();
+      } else {
+        baseDir = baseDirFile.getAbsolutePath();
+      }
+    } else {
+      baseDir = DMApplication.getInstance().getCacheDir().getAbsolutePath();
+    }
+
+    return baseDir;
   }
 
   public static String getChatFileDir() {
