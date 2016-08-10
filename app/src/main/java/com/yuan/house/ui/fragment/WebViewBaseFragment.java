@@ -31,8 +31,6 @@ import com.baidu.location.BDLocation;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.lfy.dao.MessageDao;
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 import com.yuan.house.R;
 import com.yuan.house.activities.WebViewBasedActivity;
 import com.yuan.house.application.DMApplication;
@@ -46,7 +44,6 @@ import com.yuan.house.ui.view.PickerPopWindow;
 import com.yuan.house.utils.ToastUtil;
 
 import org.apache.commons.lang3.NotImplementedException;
-import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -508,67 +505,6 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                     e.printStackTrace();
                 }
                 RestClient.getInstance().bridgeRequest(params, RestClient.MEHOTD_DELETE, callback);
-            }
-        });
-
-        getBridge().registerHandler("login", new WebViewJavascriptBridge.WVJBHandler() {
-            @Override
-            public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
-                Timber.v("login got:" + data);
-
-                JSONObject object = null;
-                try {
-                    object = new JSONObject(data);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                String avId = prefs.getString("AVInstallationId", "");
-
-                // convert HashMap to RequestParams
-                RequestParams requestParams = new RequestParams();
-                requestParams.put("product", "KidsParentAPK");
-                requestParams.put("username", object.optString("username"));
-                requestParams.put("password", object.optString("password"));
-                requestParams.put("installationid", avId);
-
-                if (null != callback) {
-                    RestClient.getInstance().get(Constants.kServiceLogin, null, new JsonHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                            super.onSuccess(statusCode, headers, response);
-
-                            if (response != null) {
-                                try {
-                                    response.put("statusCode", statusCode);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            if (callback != null) {
-                                callback.callback(response.toString());
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                            super.onFailure(statusCode, headers, throwable, errorResponse);
-
-                            if (errorResponse != null) {
-                                try {
-                                    errorResponse.put("statusCode", statusCode);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            if (callback != null) {
-                                callback.callback(errorResponse.toString());
-                            }
-                        }
-                    });
-                }
-
-                hideIME();
             }
         });
 
