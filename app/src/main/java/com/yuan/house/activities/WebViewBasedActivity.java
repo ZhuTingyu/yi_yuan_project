@@ -616,8 +616,14 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         });
     }
 
-    private void sendHouseInfoMessage(String peerId, final JSONObject info) {
-        ChatManager.getInstance().fetchConversationWithUserId(info, peerId, new AVIMConversationCreatedCallback() {
+    /**
+     * 发送推荐房源的消息
+     *
+     * @param peerId 接收方 LeanCloud Id
+     * @param houseInfo 房源信息
+     */
+    private void sendRecommendHouseInfoMessage(String peerId, final JSONObject houseInfo) {
+        ChatManager.getInstance().fetchConversationWithUserId(houseInfo, peerId, new AVIMConversationCreatedCallback() {
             @Override
             public void done(AVIMConversation avimConversation, AVIMException e) {
                 if (e != null) {
@@ -628,8 +634,8 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 AVIMHouseMessage message = new AVIMHouseMessage();
 
                 Map<String, Object> attrs = new HashMap<>();
-                attrs.put("houseId", info.optString("house_id"));
-                JSONArray images = info.optJSONArray("images");
+                attrs.put("houseId", houseInfo.optString("house_id"));
+                JSONArray images = houseInfo.optJSONArray("images");
 
                 if (images == null || images.length() == 0) {
                     attrs.put("houseImage", null);
@@ -637,10 +643,10 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                     attrs.put("houseImage", images.optString(0));
                 }
 
-                attrs.put("houseName", info.optString("title"));
-                attrs.put("houseAddress", info.optString("location_text"));
+                attrs.put("houseName", houseInfo.optString("title"));
+                attrs.put("houseAddress", houseInfo.optString("location_text"));
                 attrs.put("recommended", true);
-                attrs.put("recommendedId", info.optString("re_id"));
+                attrs.put("recommendedId", houseInfo.optString("re_id"));
 
                 message.setAttrs(attrs);
 
@@ -672,7 +678,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         // send message to each receipt
         for (int i = 0; userArray.length() > i; i++) {
             JSONObject user = userArray.optJSONObject(i);
-            sendHouseInfoMessage(user.optString("lean_id"), houseInfo);
+            sendRecommendHouseInfoMessage(user.optString("lean_id"), houseInfo);
         }
     }
 

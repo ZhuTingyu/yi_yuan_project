@@ -94,6 +94,7 @@ import de.greenrobot.event.EventBus;
 import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import timber.log.Timber;
 
 /**
  * Created by lzw on 15/4/24.
@@ -298,7 +299,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+//        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         switch (item.getItemId()) {
             case R.id.menu_retransmission:
                 ToastUtil.showShort(mContext, "转发" + mChatMessage);
@@ -350,6 +351,13 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
         lvMessages.setPullLoadEnable(false);
         lvMessages.setXListViewListener(this);
         lvMessages.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(), true, true));
+        lvMessages.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Timber.v("onClick");
+            }
+        });
+
         lvMessages.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -664,6 +672,9 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                     mMoreAdapter.addItem("房源", -1);
                     mMoreAdapter.notifyDataSetChanged();
                 }
+
+                JSONObject object = constructFirstHouseInfo();
+                getWebViewFragment().getBridge().callHandler("getFirstHouseInfo", object.toString());
             }
 
             @Override
@@ -673,7 +684,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
         });
     }
 
-    // TODO: 16/7/19 定期发送在线状态
+    // 定期发送在线状态
     private void sendPresenceMessage() {
         AVIMPresenceMessage msg = new AVIMPresenceMessage();
         msg.setOp(getString(R.string.txt_online));
@@ -944,8 +955,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
         resizeBBSBoard(dm.heightPixels);
     }
 
-    @Override
-    public void onGetFirstHouseInfo(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
+    private JSONObject constructFirstHouseInfo() {
         // 记录上一次的房源 id / trade_type，如果 web 没有传 house_id / trade_type 进聊天，则告诉 web 房源 id。
         // 如果没有上一次，就传可切换房源的第一条。
         JSONObject object = new JSONObject();
@@ -968,6 +978,14 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        return object;
+    }
+
+    @Override
+    public void onGetFirstHouseInfo(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
+        JSONObject object = constructFirstHouseInfo();
+
         if (null != callback) {
             callback.callback(object);
         }

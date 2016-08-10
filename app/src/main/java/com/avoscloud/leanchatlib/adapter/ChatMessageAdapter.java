@@ -117,7 +117,6 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         //if (conView == null)
         {
             Message bean = new Message();
-            // FIXME: 16/6/27 date format error
             bean.setDate(String.valueOf(msg.getTimestamp()));
             bean.setLeanId(conversationObject.optString("lean_id"));
             bean.setAuditType(conversationObject.optString("audit_type"));
@@ -182,8 +181,29 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         ImageView img = ViewHolder.findViewById(conView, R.id.image);
         TextView title = ViewHolder.findViewById(conView, R.id.title);
         TextView area = ViewHolder.findViewById(conView, R.id.area);
-//        TextView house_params = ViewHolder.findViewById(conView, R.id.house_params);
-//        house_params.setVisibility(View.GONE);
+        TextView hint = ViewHolder.findViewById(conView, R.id.hint_recommend);
+
+        if (object.getBoolean("recommended")) {
+            hint.setVisibility(View.VISIBLE);
+        }
+
+        houseView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String param;
+                String houseId = conversationObject.optString("house_id");
+
+                if (AuthHelper.getInstance().iAmUser()) {
+                    param = String.format("details.html?history&%s", houseId);
+
+                } else {
+                    param = String.format("details.html?agency&%s", houseId);
+                }
+
+                EventBus.getDefault().post(new PageEvent(PageEvent.PageEventEnum.REDIRECT, param));
+            }
+        });
+
 
         View statusSendFailed = ViewHolder.findViewById(conView, R.id.status_send_failed);
         View statusSendStart = ViewHolder.findViewById(conView, R.id.status_send_start);
