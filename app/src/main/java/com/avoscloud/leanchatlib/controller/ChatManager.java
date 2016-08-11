@@ -144,18 +144,18 @@ public class ChatManager extends AVIMClientEventHandler {
     }
 
     public void showMessageNotification(Context context, AVIMConversation conv, AVIMTypedMessage msg) {
-        // Dismiss if message is Presence Message
-        if (msg.getClass().equals(AVIMPresenceMessage.class)) return;
-
         if (System.currentTimeMillis() - lastNotifyTime < NOTIFY_PERIOD) {
             return;
         } else {
             lastNotifyTime = System.currentTimeMillis();
         }
 
-//        int icon = context.getApplicationInfo().icon;
         Intent intent = new Intent(context, SingleChatActivity.class);
         intent.putExtra(SingleChatActivity.CONVID, conv.getConversationId());
+// TODO: 8/11/16 add additional for chat intent
+//        intent.putExtra();
+
+        PendingIntent pend = PendingIntent.getActivity(context, new Random().nextInt(), intent, 0);
 
         CharSequence notifyContent = MessageHelper.outlineOfMsg(msg);
         CharSequence username = "username";
@@ -291,7 +291,14 @@ public class ChatManager extends AVIMClientEventHandler {
             @Override
             protected void onPost(Exception exception) {
                 // 接收消息永远只会是单聊
-                if (selfId != null && SingleChatActivity.getCurrentChattingConvid() == null || TextUtils.isEmpty(SingleChatActivity.getCurrentChattingConvid()) || !SingleChatActivity.getCurrentChattingConvid().equals(message.getConversationId())) {
+                if (selfId != null && (
+                        SingleChatActivity.getCurrentChattingConvid() == null ||
+                                TextUtils.isEmpty(SingleChatActivity.getCurrentChattingConvid()) ||
+                                !SingleChatActivity.getCurrentChattingConvid().equals(message.getConversationId()))
+                        ) {
+                    // Dismiss if message is Presence Message
+                    if (message.getClass().equals(AVIMPresenceMessage.class)) return;
+
                     if (getUserInfoFactory().showNotificationWhenNewMessageCome(selfId)) {
                         showMessageNotification(getContext(), conversation, message);
                     }
