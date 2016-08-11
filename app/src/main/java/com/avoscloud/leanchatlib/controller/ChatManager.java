@@ -3,7 +3,6 @@ package com.avoscloud.leanchatlib.controller;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.Intent;
 import android.text.TextUtils;
 
 import com.avos.avoscloud.im.v2.AVIMClient;
@@ -150,13 +149,6 @@ public class ChatManager extends AVIMClientEventHandler {
             lastNotifyTime = System.currentTimeMillis();
         }
 
-        Intent intent = new Intent(context, SingleChatActivity.class);
-        intent.putExtra(SingleChatActivity.CONVID, conv.getConversationId());
-// TODO: 8/11/16 add additional for chat intent
-//        intent.putExtra();
-
-        PendingIntent pend = PendingIntent.getActivity(context, new Random().nextInt(), intent, 0);
-
         CharSequence notifyContent = MessageHelper.outlineOfMsg(msg);
         CharSequence username = "username";
         UserInfo from = getUserInfoFactory().getUserInfoById(msg.getFrom());
@@ -164,7 +156,7 @@ public class ChatManager extends AVIMClientEventHandler {
             username = from.getUsername();
         }
 
-        Notification notification = Utils.notifyMsg(context, SingleChatActivity.class, PackageUtil.getAppLable(context), username + "\n" + notifyContent, notifyContent.toString(), Constants.kNotifyId);
+        Notification notification = Utils.notifyMsg(context, PackageUtil.getAppLable(context), username + "\n" + notifyContent, notifyContent.toString(), Constants.kNotifyId);
         getUserInfoFactory().configureNotification(notification);
     }
 

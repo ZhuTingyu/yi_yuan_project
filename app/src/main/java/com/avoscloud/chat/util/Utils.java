@@ -435,18 +435,29 @@ public class Utils {
         return wm.getConnectionInfo().getMacAddress();
     }
 
-    public static Notification notifyMsg(Context context, Class<?> clz, String title, String ticker, String msg, int notifyId) {
-        int icon = context.getApplicationInfo().icon;
 
+    public static Notification notifyMsg(Context context, String title, String ticker, String msg, int notifyId) {
+        PendingIntent pend = PendingIntent.getActivity(context, new Random().nextInt(), new Intent(), 0);
+
+        return notifyMsg(context, pend, title, ticker, msg, notifyId);
+    }
+
+    public static Notification notifyMsg(Context context, Class<?> clz, String title, String ticker, String msg, int notifyId) {
         //why Random().nextInt()
         //http://stackoverflow.com/questions/13838313/android-onnewintent-always-receives-same-intent
         PendingIntent pend = PendingIntent.getActivity(context, new Random().nextInt(), new Intent(context, clz), 0);
+
+        return notifyMsg(context, pend, title, ticker, msg, notifyId);
+    }
+
+    public static Notification notifyMsg(Context context, PendingIntent intent, String title, String ticker, String msg, int notifyId) {
+        int icon = context.getApplicationInfo().icon;
 
         Notification.Builder builder = new Notification.Builder(context);
         if (ticker == null) {
             ticker = msg;
         }
-        builder.setContentIntent(pend)
+        builder.setContentIntent(intent)
                 .setSmallIcon(icon)
                 .setWhen(System.currentTimeMillis())
                 .setTicker(ticker)
