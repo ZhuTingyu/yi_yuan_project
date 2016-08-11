@@ -99,7 +99,7 @@ public class SplashActivity extends FragmentActivity {
     // setup chat related environment
     private void setupChatManager() {
         final ChatManager chatManager = ChatManager.getInstance();
-        chatManager.init(this);
+        chatManager.init();
 
         if (AVUser.getCurrentUser() != null) {
             chatManager.setupDatabaseWithSelfId(AVUser.getCurrentUser().getObjectId());

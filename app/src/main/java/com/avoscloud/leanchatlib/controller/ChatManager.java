@@ -60,7 +60,6 @@ public class ChatManager extends AVIMClientEventHandler {
     private static final long NOTIFY_PERIOD = 1000;
     private static ChatManager chatManager;
     private static long lastNotifyTime = 0;
-    private static Context context;
     private static ConnectionListener defaultConnectListener = new ConnectionListener() {
         @Override
         public void onConnectionChanged(boolean connect) {
@@ -90,7 +89,7 @@ public class ChatManager extends AVIMClientEventHandler {
     }
 
     public static Context getContext() {
-        return context;
+        return DMApplication.getInstance();
     }
 
     public void fetchConversationWithUserId(final JSONObject param, final String userId, final AVIMConversationCreatedCallback callback) {
@@ -163,9 +162,7 @@ public class ChatManager extends AVIMClientEventHandler {
         getUserInfoFactory().configureNotification(notification);
     }
 
-    public void init(Context context) {
-        this.context = context;
-
+    public void init() {
         AVIMHouseMessage.registerMessageType();
 
         MsgHandler msgHandler = new MsgHandler();

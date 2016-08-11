@@ -25,7 +25,6 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
@@ -112,8 +111,6 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     private MessageAgent messageAgent;
     private String mChatMessage;            //需要转发或复制的信息
     private FragmentBBS mFragmentBBS;
-    private LinearLayout bottomLayout;
-    private String value;
     private List<JSONObject> houseInfos;
     private AVIMConversation conversation;
     private ConversationType conversationType;
@@ -673,8 +670,10 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                     mMoreAdapter.notifyDataSetChanged();
                 }
 
-                JSONObject object = constructFirstHouseInfo();
-                getWebViewFragment().getBridge().callHandler("getFirstHouseInfo", object.toString());
+                if (TextUtils.isEmpty(jsonFormatParams.optString("house_id"))) {
+                    JSONObject object = constructFirstHouseInfo();
+                    getWebViewFragment().getBridge().callHandler("getFirstHouseInfo", object.toString());
+                }
             }
 
             @Override
