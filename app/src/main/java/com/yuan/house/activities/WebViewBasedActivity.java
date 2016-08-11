@@ -989,6 +989,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     private void uploadFiles(final JSONArray filePaths, final String size, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
         String path = filePaths.optString(indexOfImageInUploadQueue);
 
+        // TODO: 8/11/16 compress image files before upload
         PostFormBuilder builder = OkHttpUtils.post().url(Constants.kWebServiceImageUpload)
                 .addHeader(Constants.kHttpReqKeyContentType, "multipart/form-data")
                 .addHeader(Constants.kHttpReqKeyAuthToken, AuthHelper.getInstance().getUserToken())

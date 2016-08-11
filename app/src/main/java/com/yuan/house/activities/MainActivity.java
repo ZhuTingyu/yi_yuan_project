@@ -19,7 +19,6 @@ import com.avos.avoscloud.AVInstallation;
 import com.avos.avoscloud.AVUser;
 import com.avos.avoscloud.LogInCallback;
 import com.avos.avoscloud.PushService;
-import com.avoscloud.chat.service.CacheService;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -142,10 +141,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
     }
 
     private void doAVUserLogin() {
-        ChatManager chatManager = ChatManager.getInstance();
-        chatManager.setupDatabaseWithSelfId(AVUser.getCurrentUser().getObjectId());
-        chatManager.openClientWithSelfId(AVUser.getCurrentUser().getObjectId(), null);
-        CacheService.registerUser(AVUser.getCurrentUser());
+        ChatManager.getInstance().avLogin();
     }
 
     @Override

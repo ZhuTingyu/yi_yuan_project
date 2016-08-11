@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.avos.avoscloud.AVUser;
 import com.avos.avoscloud.im.v2.AVIMClient;
 import com.avos.avoscloud.im.v2.AVIMClientEventHandler;
 import com.avos.avoscloud.im.v2.AVIMConversation;
@@ -18,6 +19,7 @@ import com.avos.avoscloud.im.v2.callback.AVIMClientCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationQueryCallback;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
+import com.avoscloud.chat.service.CacheService;
 import com.avoscloud.chat.ui.chat.SingleChatActivity;
 import com.avoscloud.chat.util.Utils;
 import com.avoscloud.leanchatlib.db.MsgsTable;
@@ -62,6 +64,7 @@ public class ChatManager extends AVIMClientEventHandler {
     private static ConnectionListener defaultConnectListener = new ConnectionListener() {
         @Override
         public void onConnectionChanged(boolean connect) {
+            // TODO: 8/11/16 reconnect if connection changed
             Logger.d("default connect listener");
         }
     };
@@ -209,6 +212,12 @@ public class ChatManager extends AVIMClientEventHandler {
 
     public String getSelfId() {
         return selfId;
+    }
+
+    public void avLogin() {
+        setupDatabaseWithSelfId(AVUser.getCurrentUser().getObjectId());
+        openClientWithSelfId(AVUser.getCurrentUser().getObjectId(), null);
+        CacheService.registerUser(AVUser.getCurrentUser());
     }
 
     public void openClientWithSelfId(String selfId, final AVIMClientCallback callback) {
