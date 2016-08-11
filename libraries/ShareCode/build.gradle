@@ -31,4 +31,6 @@ dependencies {
     compile 'de.greenrobot:eventbus:2.3.0'
 
     compile 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
+
+    compile 'id.zelory:compressor:1.0.2'
 }

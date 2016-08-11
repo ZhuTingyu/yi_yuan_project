@@ -43,6 +43,7 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baoyz.actionsheet.ActionSheet;
 import com.bugtags.library.Bugtags;
+import com.dimo.utils.BitmapUtil;
 import com.dimo.utils.DateUtil;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
@@ -371,24 +372,30 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             Timber.v("kActivityRequestCodeImagePickOnly");
             if (resultCode == RESULT_OK) {
                 // 获取到选取照片的本地文件路径
-                List<String> path = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
+                List<String> paths = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
                 // /storage/emulated/0/DCIM/IMG_-646584368.jpg
 
+                for (String path : paths) {
+                    BitmapUtil.compressImage(this, path);
+                }
+
                 JSONArray objects = new JSONArray();
-                for (int i = 0; i < path.size(); i++) {
-                    objects.put(path.get(i));
+                for (int i = 0; i < paths.size(); i++) {
+                    objects.put(paths.get(i));
                 }
                 mBridgeCallback.callback(objects.toString());
             }
         } else if (requestCode == kActivityRequestCodeImagePickThenUpload) {
             Timber.v("kActivityRequestCodeImagePickThenUpload");
 
-            List<String> files = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
-
+            List<String> paths = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
+            for (String path : paths) {
+                BitmapUtil.compressImage(this, path);
+            }
             Fragment fragment = getFragment(Constants.kFragmentTagProposal);
             if (fragment != null) {
                 ProposalFragment pfragment = (ProposalFragment) fragment;
-                for (String fileName : files) {
+                for (String fileName : paths) {
                     pfragment.uploadFile(fileName);
                 }
             }
@@ -396,13 +403,17 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 || requestCode == Constants.kActivityRequestCodeImagePickThenCropSquare) {
             Timber.v("kActivityRequestCodeImagePickThenCropRectangle");
 
-            List<String> path = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
+            List<String> paths = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
 
-            if (path == null) return;
+            if (paths == null) return;
+
+            for (String path : paths) {
+                BitmapUtil.compressImage(this, path);
+            }
 
             Intent intent = new Intent(mContext, CropActivity.class);
             intent.putExtra(Constants.kBundleExtraCropImageType, requestCode);
-            intent.putExtra(Constants.kBundleExtraCropImageName, path.get(0));
+            intent.putExtra(Constants.kBundleExtraCropImageName, paths.get(0));
             startActivityForResult(intent, kActivityRequestCodeImageCrop);
         } else if (requestCode == kActivityRequestCodeImageCrop) {
             // handle cropped image

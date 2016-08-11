@@ -2,23 +2,42 @@ package com.dimo.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.provider.MediaStore;
+
+import com.blankj.utilcode.utils.ScreenUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
+
+import id.zelory.compressor.Compressor;
 
 /**
  * Created by Alsor Zhou on 4/29/15.
  */
 public class BitmapUtil {
-
     private static float FIT_LENGTH = 260f;
+    private static int kImageCompressQuality = 60;
+
+    public static void compressImage(Context context, String filename) {
+        File file = new File(filename);
+
+        int width = ScreenUtils.getScreenWidth(context);
+        int height = ScreenUtils.getScreenHeight(context);
+
+        Bitmap bm = new Compressor.Builder(context)
+                .setMaxWidth(width)
+                .setMaxHeight(height)
+                .setQuality(kImageCompressQuality)
+                .setCompressFormat(Bitmap.CompressFormat.JPEG)
+                .build()
+                .compressToBitmap(file);
+
+        saveBitmap(context, bm, filename);
+    }
 
     public static void saveBitmap(Context context, Bitmap bm, String path) {
         OutputStream fOut = null;
@@ -27,7 +46,7 @@ public class BitmapUtil {
         try {
             fOut = new FileOutputStream(file);
 
-            bm.compress(Bitmap.CompressFormat.JPEG, 85, fOut); // saving the Bitmap to a file compressed as a JPEG with 85% compression rate
+            bm.compress(Bitmap.CompressFormat.JPEG, 40, fOut); // saving the Bitmap to a file compressed as a JPEG with 85% compression rate
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -49,7 +68,7 @@ public class BitmapUtil {
         }
     }
 
-    public static Bitmap zoomImg(Bitmap bm, float scale){
+    public static Bitmap zoomImg(Bitmap bm, float scale) {
         // 获得图片的宽高
         int width = bm.getWidth();
         int height = bm.getHeight();
@@ -61,16 +80,17 @@ public class BitmapUtil {
         return newbm;
     }
 
-    public static Bitmap getFitCropImg(Bitmap bm){
+    public static Bitmap getFitCropImg(Bitmap bm) {
         // 获得图片的宽高
         int width = bm.getWidth();
         int height = bm.getHeight();
-        int least = Math.min(width,height);
-        if(least < FIT_LENGTH){
+        int least = Math.min(width, height);
+        if (least < FIT_LENGTH) {
             float sclae = FIT_LENGTH / least;
-            return zoomImg(bm,sclae);
-        }else
+            return zoomImg(bm, sclae);
+        } else {
             return bm;
+        }
     }
 
 }
