@@ -188,9 +188,17 @@ public class RecordButton extends Button {
         if (recorder == null) {
             recorder = new MediaRecorder();
             recorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
-            recorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
-            recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
             recorder.setOutputFile(outputPath);
+
+//            recorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
+//            recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+
+// FIXME: 8/11/16 need tunning if recorded audio have poor performance
+            recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+            recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+            recorder.setAudioEncodingBitRate(16);
+            recorder.setAudioSamplingRate(44100);
+
             try {
                 recorder.prepare();
             } catch (IOException e) {
@@ -217,10 +225,9 @@ public class RecordButton extends Button {
 
             try {
                 recorder.stop();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
-            }finally {
+            } finally {
                 recorder.release();
                 recorder = null;
             }
