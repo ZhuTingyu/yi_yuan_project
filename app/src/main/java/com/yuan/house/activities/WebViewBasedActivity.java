@@ -357,6 +357,8 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             return;
         }
 
+        if (resultCode == RESULT_CANCELED) return;
+
         if (requestCode == kActivityRequestCodeWebActivity) {
             Timber.v("kActivityRequestCodeWebActivity");
 
