@@ -270,6 +270,11 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
             @Override
             public void onTabReselected(int position) {
+                switch (position) {
+                    case 1:
+                        switchToFragment(Constants.kFragmentTagMessage);
+                        break;
+                }
             }
         });
 
