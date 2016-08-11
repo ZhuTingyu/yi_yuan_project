@@ -944,6 +944,8 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
         getBridge().registerHandler("showSearchBar", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                if (getActivity() == null) return;
+
                 EditText searchBar = ButterKnife.findById(getActivity(), R.id.search_bar);
                 if (searchBar == null) {
                     searchBar = ButterKnife.findById(getActivity(), R.id.et_search);
