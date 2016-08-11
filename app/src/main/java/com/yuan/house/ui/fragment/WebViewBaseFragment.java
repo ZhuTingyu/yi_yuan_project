@@ -262,10 +262,12 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
         getBridge().registerHandler("showToast", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
-                ((WebViewBasedActivity) getActivity()).onBridgeDismissProgressDialog();
+                if (getActivity() != null) {
+                    ((WebViewBasedActivity) getActivity()).onBridgeDismissProgressDialog();
 
-                com.alibaba.fastjson.JSONObject object = JSON.parseObject(data);
-                ToastUtil.showShort(getActivity(), object.getString("msg"));
+                    com.alibaba.fastjson.JSONObject object = JSON.parseObject(data);
+                    ToastUtil.showShort(getActivity(), object.getString("msg"));
+                }
             }
         });
 
@@ -1150,7 +1152,9 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
 
     @Override
     public void OnBridgeWebViewPageStart() {
-        ((WebViewBasedActivity) getActivity()).onBridgeDismissProgressDialog();
+        if (getActivity() != null) {
+            ((WebViewBasedActivity) getActivity()).onBridgeDismissProgressDialog();
+        }
     }
 
     /**
