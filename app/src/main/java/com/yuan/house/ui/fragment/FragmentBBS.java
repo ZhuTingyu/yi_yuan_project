@@ -90,7 +90,9 @@ public class FragmentBBS extends WebViewBaseFragment {
         bridge.registerHandler("showSampleMessageBoard", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                mBridgeListener.onShowSampleMessageBoard();
+                if (mBridgeListener != null) {
+                    mBridgeListener.onShowSampleMessageBoard();
+                }
             }
         });
 
@@ -98,7 +100,9 @@ public class FragmentBBS extends WebViewBaseFragment {
 
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                mBridgeListener.onShowHalfMessageBoard();
+                if (mBridgeListener != null) {
+                    mBridgeListener.onShowHalfMessageBoard();
+                }
             }
         });
 
@@ -106,28 +110,36 @@ public class FragmentBBS extends WebViewBaseFragment {
 
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                mBridgeListener.onShowFullMessageBoard();
+                if (mBridgeListener != null) {
+                    mBridgeListener.onShowFullMessageBoard();
+                }
             }
         });
 
         bridge.registerHandler("webChangeHouse", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                mBridgeListener.onWebChangeHouse(data);
+                if (mBridgeListener != null) {
+                    mBridgeListener.onWebChangeHouse(data);
+                }
             }
         });
 
         bridge.registerHandler("setContractButton", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                mBridgeListener.onSetContractButton(data);
+                if (mBridgeListener != null) {
+                    mBridgeListener.onSetContractButton(data);
+                }
             }
         });
 
         bridge.registerHandler("setPreConditionButton", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                mBridgeListener.onSetPreConditionButton(data);
+                if (mBridgeListener != null) {
+                    mBridgeListener.onSetPreConditionButton(data);
+                }
             }
         });
 
@@ -138,7 +150,9 @@ public class FragmentBBS extends WebViewBaseFragment {
 
                 boolean shown = "1".equals(data);
 
-                mBridgeListener.onShowBBSView(shown);
+                if (mBridgeListener != null) {
+                    mBridgeListener.onShowBBSView(shown);
+                }
             }
         });
 
@@ -147,7 +161,9 @@ public class FragmentBBS extends WebViewBaseFragment {
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("getFirstHouseInfo got:" + data);
 
-                mBridgeListener.onGetFirstHouseInfo(data, callback);
+                if (mBridgeListener != null) {
+                    mBridgeListener.onGetFirstHouseInfo(data, callback);
+                }
             }
         });
 

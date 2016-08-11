@@ -53,9 +53,9 @@
         android:id="@id/fragmentBBS"
         android:name="com.yuan.house.ui.fragment.BBSFragment"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/topbar_height"
-        android:visibility="gone" />
+        android:visibility="invisible" />
 
     <LinearLayout
         android:id="@id/bottomLayout"
