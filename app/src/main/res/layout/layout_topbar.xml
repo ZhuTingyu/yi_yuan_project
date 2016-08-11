@@ -82,8 +82,7 @@
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_marginEnd="@dimen/topbar_button_margin"
-            android:layout_marginRight="@dimen/topbar_button_margin">
+            android:paddingRight="@dimen/topbar_button_margin">
 
             <ImageButton
                 android:id="@+id/topbar_right_btn"
