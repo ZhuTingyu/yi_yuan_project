@@ -217,7 +217,6 @@ public class DMApplication extends MultiDexApplication {
         PushService.setDefaultPushCallback(instance, SplashActivity.class);
         AVOSCloud.setDebugLogEnabled(debug);
         AVAnalytics.enableCrashReport(this, !debug);
-//        AVIMClient.setOfflineMessagePush(true);
 
         initImageLoader(instance);
 

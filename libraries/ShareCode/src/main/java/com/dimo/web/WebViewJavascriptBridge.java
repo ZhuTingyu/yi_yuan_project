@@ -107,7 +107,9 @@ public class WebViewJavascriptBridge implements Serializable {
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             super.onPageStarted(view, url, favicon);
 
-            if (mBridgeWebViewListener != null) mBridgeWebViewListener.OnBridgeWebViewPageStart();
+            if (mBridgeWebViewListener != null) {
+                mBridgeWebViewListener.OnBridgeWebViewPageStart();
+            }
         }
     }
 

@@ -984,17 +984,12 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
 
     @Override
     public void onGetFirstHouseInfo(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
-        JSONObject object = constructFirstHouseInfo();
-
         if (null != callback) {
-            callback.callback(object);
+            callback.callback(constructFirstHouseInfo());
         }
     }
 
     private void resizeBBSBoard(int height) {
-        DisplayMetrics dm = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(dm);
-
         FrameLayout frameLayout = (FrameLayout) findViewById(R.id.fragmentBBS);
 
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) frameLayout.getLayoutParams();
