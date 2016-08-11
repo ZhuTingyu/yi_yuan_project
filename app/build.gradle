@@ -12,17 +12,11 @@ configurations {
     apt
 }
 
-//应用插件
 apply plugin: 'com.bugtags.library.plugin'
 
-//自动上传插件
 bugtags {
-    appKey "8b503a091aab6e57b03e1df7d01c1b85"  //这里是你的 appKey
-    appSecret "19b3fe544aa03626d9831c03659ed7a3"    //这里是你的 appSecret，管理员在设置页可以查看
-    mappingUploadEnabled true
-
-    //网络跟踪功能配置(企业版)
-    trackingNetworkEnabled true
+    appKey "c0a589a1390e94a20f24ce42885311b7"
+    appSecret "4d5a9de126fba88ebb0ab9e363ad1431"
 }
 
 android {
