@@ -966,7 +966,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
             id = prefs.getString(Constants.kLastActivatedHouseId, null);
             tradeType = prefs.getString(Constants.kLastActivatedHouseTradeType, null);
 
-            if (TextUtils.isEmpty(id) && houseInfos != null) {
+            if (TextUtils.isEmpty(id) && houseInfos != null && houseInfos.size() > 0) {
                 id = houseInfos.get(0).optString("id");
                 tradeType = houseInfos.get(0).optString("trade_type");
             }
