@@ -183,7 +183,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         TextView area = ViewHolder.findViewById(conView, R.id.area);
         TextView hint = ViewHolder.findViewById(conView, R.id.hint_recommend);
 
-        if (object.getBoolean("recommended")) {
+        if (object.getBooleanValue("recommended")) {
             hint.setVisibility(View.VISIBLE);
         }
 
