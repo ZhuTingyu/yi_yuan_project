@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.greenrobot.event.EventBus;
+import timber.log.Timber;
 
 /**
  * Created by lzw on 15/2/10.
@@ -92,7 +93,17 @@ public class ChatManager extends AVIMClientEventHandler {
         return DMApplication.getInstance();
     }
 
+    /**
+     * 根据聊天双方的信息以及房源 ID 查找已存在的会话, 或者创建新的会话
+     *
+     * @param param    房源信息, 带 ID
+     * @param userId   对方用户 LeanMessage ID
+     * @param callback 创建成功之后
+     */
     public void fetchConversationWithUserId(final JSONObject param, final String userId, final AVIMConversationCreatedCallback callback) {
+        // FIXME: 8/12/16 why the conversation changed???
+        boolean isPeerTypeAgency = "agency".equals(param.optString("type"));
+
         String houseId = param.optString("house_id");
         if (TextUtils.isEmpty(houseId)) {
             houseId = param.optString("id");
@@ -117,25 +128,36 @@ public class ChatManager extends AVIMClientEventHandler {
         query.orderByDescending(KEY_UPDATED_AT);
 
         final String finalHouseId = houseId;
+        final boolean finalIsPeerTypeAgency = isPeerTypeAgency;
         query.findInBackground(new AVIMConversationQueryCallback() {
             @Override
             public void done(List<AVIMConversation> conversations, AVIMException e) {
                 if (e != null) {
                     callback.done(null, e);
                 } else {
+                    // TODO: 8/12/16 filter conversation here?
                     if (conversations.size() > 0) {
+                        // 使用已存在的会话
+                        Timber.w("FETCH CONV OLD - Peer Id : %s, House Id : %s, Conv Id : %s", userId, finalHouseId, conversations.get(0).getConversationId());
+
                         callback.done(conversations.get(0), null);
                     } else {
+                        // 创建新会话
                         ArrayList<Integer> ids = new ArrayList<>();
                         ids.add(Integer.parseInt(AuthHelper.getInstance().getUserId()));
                         ids.add(Integer.parseInt(param.optString("user_id")));
 
                         Map<String, Object> attrs = new HashMap<>();
                         attrs.put(ConversationType.TYPE_KEY, ConversationType.Single.getValue());
-                        if (!TextUtils.isEmpty(finalHouseId)) {
+                        if (!AuthHelper.getInstance().iAmUser()
+                                && finalIsPeerTypeAgency
+                                && !TextUtils.isEmpty(finalHouseId)) {
+                            // 中介和中介聊天, 会绑定 house Id
                             attrs.put("houseId", finalHouseId);
                         }
                         attrs.put("userIds", ids);
+
+                        Timber.w("FETCH CONV NEW - Peer Id : %s, House Id : %s", userId, finalHouseId);
 
                         imClient.createConversation(members, attrs, callback);
                     }

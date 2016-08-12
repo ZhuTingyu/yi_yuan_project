@@ -41,7 +41,9 @@ public class MessageAgent {
     }
 
     public void sendPresence(final AVIMTypedMessage msg) {
-        conv.sendMessage(msg, AVIMConversation.TRANSIENT_MESSAGE_FLAG, null);
+        if (conv != null && msg != null) {
+            conv.sendMessage(msg, AVIMConversation.TRANSIENT_MESSAGE_FLAG, null);
+        }
     }
 
     private void sendMsg(final AVIMTypedMessage msg, final String originPath, final SendCallback callback) {
@@ -63,7 +65,6 @@ public class MessageAgent {
                     msg.setTimestamp(System.currentTimeMillis());
                 }
 
-                // TODO: 16/7/20 slow operation
                 msgsTable.insertMsg(msg);
 
                 // FIXME: 16/6/24 hack, conv.members 第一个位置是发送者,最后一个位置是接收者
