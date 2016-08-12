@@ -146,11 +146,15 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".receiver.ConnectionReceiver">
+        <receiver
+            android:name=".receiver.ReachabilityReceiver"
+            android:enabled="true"
+            android:exported="false" >
             <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="com.yuan.house.reachability" />
             </intent-filter>
         </receiver>
+
 
         <!-- baidu location service -->
         <!-- http://lbsyun.baidu.com/apiconsole/key/update?app-id=8228474 -->
