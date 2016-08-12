@@ -303,27 +303,32 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
     }
 
     @Override
-    public void onGetReverseGeoCodeResult(ReverseGeoCodeResult reverseGeoCodeResult) {
-        if (reverseGeoCodeResult == null || reverseGeoCodeResult.error != SearchResult.ERRORNO.NO_ERROR) {
+    public void onGetReverseGeoCodeResult(ReverseGeoCodeResult result) {
+        if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
             Toast.makeText(mContext, "抱歉，未能找到结果", Toast.LENGTH_LONG).show();
             return;
         }
 
-        if (reverseGeoCodeResult.getAddressDetail() != null) {
-            city = reverseGeoCodeResult.getAddressDetail().city;
+        if (result.getAddressDetail() != null) {
+            city = result.getAddressDetail().city;
         }
 
-        tvLocationField.setText(reverseGeoCodeResult.getAddress());
+        tvLocationField.setText(result.getAddress());
 
         bdLocation.setLatitude(latitude);
         bdLocation.setLongitude(longitude);
-        Address address = new Address.Builder().province(reverseGeoCodeResult.getAddressDetail().province)
-                .city(reverseGeoCodeResult.getAddressDetail().city)
-                .district(reverseGeoCodeResult.getAddressDetail().district)
-                .street(reverseGeoCodeResult.getAddressDetail().street)
-                .build();
-        bdLocation.setAddr(address);
-        bdLocation.setAddrStr(reverseGeoCodeResult.getAddress());
+
+        ReverseGeoCodeResult.AddressComponent component = result.getAddressDetail();
+        if (component != null) {
+            Address address = new Address.Builder().province(component.province)
+                    .city(component.city)
+                    .district(component.district)
+                    .street(component.street)
+                    .build();
+            bdLocation.setAddr(address);
+        }
+
+        bdLocation.setAddrStr(result.getAddress());
     }
     //模糊查询返回结果
     @Override
