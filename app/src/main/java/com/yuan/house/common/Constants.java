@@ -47,8 +47,12 @@ public class Constants {
      * LeanCloud Application Settings.
      * https://leancloud.cn/app.html?appid=9hk99pr7gknwj83tdmfbbccqar1x2myge00ulspafnpcbab8#/key
      */
-    public static String kAVApplicationId = "IwzlUusBdjf4bEGlypaqNRIx-gzGzoHsz";
-    public static String kAVClientKey = "KLhHUoBqw5G1uMjrTsEqbaVR";
+//    public static String kAVApplicationId = "IwzlUusBdjf4bEGlypaqNRIx-gzGzoHsz";
+//    public static String kAVClientKey = "KLhHUoBqw5G1uMjrTsEqbaVR";
+
+    // LeanCloud Product Application
+    public static String kAVApplicationId = "YDKvErwgUXfzN2uN195jluu6-gzGzoHsz";
+    public static String kAVClientKey = "T0L2MXf76fHILzPrS1ewUnXN";
 
     public static String kCheckTypeHtml = "KidsParentHtmlPackage";
     public static String kCheckTypeLaunchImage = "KidsParentLaunchImage";
@@ -114,7 +118,7 @@ public class Constants {
     public static String kHttpReqKeyGeoCity = "city";
     public static String kHttpReqKeyGeoDistrict = "district";
 
-    
+
     public static int kNotifyId = 1;
     public static String kPrefsLastSelectedCity = "lastCity";
     public static String kPrefsLastSelectedDistrict = "lastDistrict";
