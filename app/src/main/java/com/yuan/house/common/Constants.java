@@ -8,7 +8,8 @@ import java.util.Locale;
  */
 public class Constants {
     public static final String kServiceCheckUpdate = "checkupdate";
-    public static final String kServiceLogin = "login";
+
+    public static final String kWebServiceHost = "http://www.house.com";
 
     // Development Server
 //    public static String kWebServiceEndpoint = "http://house.ieyuan.com";

@@ -26,12 +26,14 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.listener.multi.EmptyMultiplePermissionsListener;
+import com.yuan.house.BuildConfig;
 import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
 import com.yuan.house.event.AuthEvent;
 import com.yuan.house.event.LocationEvent;
+import com.yuan.house.event.NetworkReachabilityEvent;
 import com.yuan.house.event.PageEvent;
 import com.yuan.house.helper.AuthHelper;
 import com.yuan.house.ui.fragment.AgencyMainFragment;
@@ -42,6 +44,8 @@ import com.yuan.house.ui.fragment.UserMainFragment;
 import com.yuan.house.ui.fragment.UserMessageFragment;
 import com.yuan.house.ui.fragment.WebViewFragment;
 import com.yuan.house.utils.ToastUtil;
+
+import net.gotev.hostmonitor.HostMonitorConfig;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,7 +61,6 @@ import timber.log.Timber;
 public class MainActivity extends WebViewBasedActivity implements WebViewFragment.OnFragmentInteractionListener {
     public LocationClient locClient;
     public HouseLocationListener locationListener;
-
     private BottomNavigationBar bottomNavigationBar;
     private boolean doubleBackToExitPressedOnce = false;
 
@@ -128,6 +131,11 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                 bottomNavigationBar.selectTab(1);
             }
         }
+
+        new HostMonitorConfig(this)
+                .setBroadcastAction(BuildConfig.APPLICATION_ID)
+                .add(Constants.kWebServiceHost, 80)
+                .save();
     }
 
     private void checkIfNotificationEnabledInSettings() {
@@ -142,6 +150,14 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
     private void doAVUserLogin() {
         ChatManager.getInstance().avLogin();
+    }
+
+    public void onEvent(NetworkReachabilityEvent event) {
+        if (event.getEventType() == NetworkReachabilityEvent.NetworkReachabilityEventEnum.OFFLINE) {
+            ToastUtil.showShort(this, R.string.error_connection_failed);
+        } else {
+            ToastUtil.showShort(this, R.string.error_connection_okay);
+        }
     }
 
     @Override
