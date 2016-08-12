@@ -262,7 +262,6 @@ public abstract class ChatActivity extends WebViewBasedActivity implements OnCli
     public void onClick(View v) {
         //+++20160704 edward: use -1 instead of the unused id;
         if (v.getId() == -1) {
-            //R.id.btnImageFromGallery
             selectImage();
         } else if (v.getId() == R.id.btnModeSwitch) {
             switchInputMode();

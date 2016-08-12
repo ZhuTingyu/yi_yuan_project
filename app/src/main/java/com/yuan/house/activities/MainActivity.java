@@ -133,7 +133,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         }
 
         new HostMonitorConfig(this)
-                .setBroadcastAction(BuildConfig.APPLICATION_ID)
+                .setBroadcastAction(BuildConfig.APPLICATION_ID + ".reachability")
                 .add(Constants.kWebServiceHost, 80)
                 .save();
     }

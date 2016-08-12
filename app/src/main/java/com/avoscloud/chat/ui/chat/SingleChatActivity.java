@@ -41,7 +41,6 @@ import com.avoscloud.chat.service.CacheService;
 import com.avoscloud.chat.service.ConversationChangeEvent;
 import com.avoscloud.chat.util.Utils;
 import com.avoscloud.leanchatlib.activity.ChatActivity;
-import com.avoscloud.leanchatlib.activity.ImageBrowserActivity;
 import com.avoscloud.leanchatlib.adapter.ChatMessageAdapter;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.ConversationHelper;
@@ -409,9 +408,10 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
 
             @Override
             public void onImageViewClick(AVIMImageMessage imageMsg) {
-                ImageBrowserActivity.go(mContext,
-                        MessageHelper.getFilePath(imageMsg),
-                        imageMsg.getFileUrl());
+                ChatActivity chatActivity = (ChatActivity) mContext;
+                ArrayList<String> paths = new ArrayList<>();
+                paths.add(MessageHelper.getFilePath(imageMsg));
+                chatActivity.showImageGallery(paths);
             }
 
             @Override
@@ -619,6 +619,9 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
 
     private void updateWebViewSettings() {
         WebView webView = mFragmentBBS.getWebView();
+
+        if (webView == null) return;
+
         webView.setHorizontalScrollBarEnabled(false);
         webView.setVerticalScrollBarEnabled(false);
         webView.setOverScrollMode(View.OVER_SCROLL_NEVER);

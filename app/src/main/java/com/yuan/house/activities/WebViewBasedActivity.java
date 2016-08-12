@@ -839,6 +839,10 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
     @Override
     public void onBridgeShowImageGallery(List<String> images) {
+        showImageGallery(images);
+    }
+
+    public void showImageGallery(List<String> images) {
         Intent intent = new Intent(this, ImageViewPagerActivity.class);
 
         Bundle bundle = new Bundle();

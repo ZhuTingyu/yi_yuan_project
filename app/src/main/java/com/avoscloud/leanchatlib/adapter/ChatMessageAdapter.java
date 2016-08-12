@@ -45,19 +45,18 @@ import de.greenrobot.event.EventBus;
  * Created by edwardliu on 16/6/30.
  */
 public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
-
     protected org.json.JSONObject conversationObject;
     String peerAvatar;
     private ConversationType conversationType;
     private ChatMessageAdapter.ClickListener clickListener;
-    private Context context;
+    private Context mContext;
     private View placeView;
     private Activity activity;
 
     public ChatMessageAdapter(Context context, ConversationType conversationType, org.json.JSONObject object) {
         super(context);
 
-        this.context = context;
+        this.mContext = context;
         this.conversationType = conversationType;
         this.conversationObject = object;
         activity = (Activity) context;
@@ -129,7 +128,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 others = messageSentByOthers(houseInfoMessage);
                 conView = createViewByType(houseInfoMessage.getMessageType(), others);
                 initHouseMessageView(conView, houseInfoMessage, others);
-                bean.setMessage(context.getString(R.string.chat_house));
+                bean.setMessage(mContext.getString(R.string.chat_house));
             } else if (msg instanceof AVIMTypedMessage) {
                 AVIMTypedMessage typedMessage = (AVIMTypedMessage) msg;
                 others = messageSentByOthers(typedMessage);
@@ -142,7 +141,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         ImageView avatar = ButterKnife.findById(conView, R.id.avatar);
 
         if (others == true && !TextUtils.isEmpty(peerAvatar)) {
-            Picasso.with(context).load(peerAvatar).placeholder(R.drawable.photo_agent_boy).into(avatar);
+            Picasso.with(mContext).load(peerAvatar).placeholder(R.drawable.photo_agent_boy).into(avatar);
         }
 
         avatar.setOnClickListener(new View.OnClickListener() {
@@ -306,9 +305,6 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 break;
             case ImageMessageType:
                 AVIMImageMessage imageMsg = (AVIMImageMessage) msg;
-                /*ImageUtil.displayImageCacheElseNetwork(imageView, MessageHelper.getFilePath(imageMsg),
-                        imageMsg.getFileUrl());
-                setImageOnClickListener(imageView, imageMsg);*/
                 initImageView(imageView, imageMsg);
                 message.setMessage("[图片]");
                 activity.registerForContextMenu(imageView);
@@ -376,8 +372,10 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     }
 
     protected void initImageView(ImageView imageView, AVIMImageMessage imageMsg) {
-        PhotoUtils.displayImageCacheElseNetwork(imageView, MessageHelper.getFilePath(imageMsg),
-                imageMsg.getFileUrl());
+        PhotoUtils.displayImageCacheElseNetwork(imageView, MessageHelper.getFilePath(imageMsg), imageMsg.getFileUrl());
+//        String path = "file://" + MessageHelper.getFilePath(imageMsg);
+//        Picasso.with(mContext).load(path).into(imageView);
+
         setImageOnClickListener(imageView, imageMsg);
     }
 
@@ -467,7 +465,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     private void setContentLayoutLength(int time) {
         ViewGroup.LayoutParams params = placeView.getLayoutParams();
         int length = 150 + time * 20;
-        int max = (int) context.getResources().getDimension(R.dimen.chat_ContentMaxWidth);
+        int max = (int) mContext.getResources().getDimension(R.dimen.chat_ContentMaxWidth);
         if (length > max) {
             params.width = max;
         } else {

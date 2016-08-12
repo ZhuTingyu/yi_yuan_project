@@ -18,10 +18,8 @@ import com.avos.avoscloud.im.v2.messages.AVIMAudioMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMImageMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMLocationMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
-import com.avoscloud.leanchatlib.activity.ImageBrowserActivity;
 import com.avoscloud.leanchatlib.adapter.ChatMessageAdapter;
 import com.avoscloud.leanchatlib.controller.ChatManager;
-import com.avoscloud.leanchatlib.controller.MessageHelper;
 import com.avoscloud.leanchatlib.model.ConversationType;
 import com.avoscloud.leanchatlib.view.xlist.XListView;
 import com.baoyz.actionsheet.ActionSheet;
@@ -29,6 +27,7 @@ import com.dimo.utils.StringUtil;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.PauseOnScrollListener;
 import com.yuan.house.R;
+import com.yuan.house.activities.WebViewBasedActivity;
 import com.yuan.house.adapter.ProposalListAdapter;
 import com.yuan.house.application.Injector;
 import com.yuan.house.bean.BrokerInfo;
@@ -220,7 +219,10 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
 
             @Override
             public void onImageViewClick(AVIMImageMessage imageMsg) {
-                ImageBrowserActivity.go(getActivity(), MessageHelper.getFilePath(imageMsg), imageMsg.getFileUrl());
+                WebViewBasedActivity chatActivity = (WebViewBasedActivity) getActivity();
+                ArrayList<String> paths = new ArrayList<>();
+                paths.add(imageMsg.getText());
+                chatActivity.showImageGallery(paths);
             }
 
             @Override
