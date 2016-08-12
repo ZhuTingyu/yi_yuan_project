@@ -28,6 +28,7 @@ import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
 import com.baidu.location.BDLocation;
+import com.blankj.utilcode.utils.KeyboardUtils;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.lfy.dao.MessageDao;
@@ -1126,6 +1127,19 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
         redirectToLoadUrl(url, null);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        KeyboardUtils.hideSoftInput(getActivity());
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        KeyboardUtils.hideSoftInput(getActivity());
+    }
 
     @Override
     public void onAttach(Activity activity) {
