@@ -114,6 +114,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
 
         boolean others = false;
 
+        // TODO: 8/12/16 IMPORTANT : recyle use the review
         //if (conView == null)
         {
             Message bean = new Message();

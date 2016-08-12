@@ -30,6 +30,7 @@ import com.avos.avoscloud.AVUser;
 import com.avoscloud.leanchatlib.utils.DownloadUtils;
 import com.avoscloud.leanchatlib.utils.Logger;
 import com.yuan.house.R;
+import com.yuan.house.activities.MainActivity;
 import com.yuan.house.application.DMApplication;
 
 import org.apache.http.HttpEntity;
@@ -436,8 +437,18 @@ public class Utils {
     }
 
 
+    /**
+     * 显示通知消息,点击打开 APP
+     *
+     * @param context
+     * @param title
+     * @param ticker
+     * @param msg
+     * @param notifyId
+     * @return
+     */
     public static Notification notifyMsg(Context context, String title, String ticker, String msg, int notifyId) {
-        PendingIntent pend = PendingIntent.getActivity(context, new Random().nextInt(), new Intent(), 0);
+        PendingIntent pend = PendingIntent.getActivity(context, new Random().nextInt(), new Intent(context, MainActivity.class), 0);
 
         return notifyMsg(context, pend, title, ticker, msg, notifyId);
     }
@@ -697,7 +708,7 @@ public class Utils {
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setCancelable(true);
         dialog.setMessage(DMApplication.getInstance().getString(R.string.chat_utils_hardLoading));
-        if (!((Activity)context).isFinishing()) {
+        if (!((Activity) context).isFinishing()) {
             dialog.show();
         }
         return dialog;

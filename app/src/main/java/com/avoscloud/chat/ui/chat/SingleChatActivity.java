@@ -169,6 +169,8 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
             public void done(AVIMConversation conversation, AVIMException e) {
                 dialog.dismiss();
                 if (Utils.filterException(e)) {
+                    Timber.w("FETCH CONV - CONV Id : %s", conversation.getConversationId());
+
                     chatByConversation(from, conversation, params);
                 }
             }
@@ -1022,7 +1024,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
 
         @Override
         protected void doInBack() throws Exception {
-            String msgId = null;
+//            String msgId = null;
             long maxTime = System.currentTimeMillis() + 10 * 1000;
             int limit;
             long time;
@@ -1036,7 +1038,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                 }
             } else {
                 if (mMessageAdapter.getDatas().size() > 0) {
-                    msgId = mMessageAdapter.getDatas().get(0).getMessageId();
+//                    msgId = mMessageAdapter.getDatas().get(0).getMessageId();
                     AVIMTypedMessage firstMsg = mMessageAdapter.getDatas().get(0);
                     time = firstMsg.getTimestamp();
                 } else {
@@ -1067,7 +1069,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                         }
                     },200);
                 } else {
-                    List<AVIMTypedMessage> newMsgs = new ArrayList<AVIMTypedMessage>();
+                    List<AVIMTypedMessage> newMsgs = new ArrayList<>();
                     newMsgs.addAll(msgs);
                     newMsgs.addAll(mMessageAdapter.getDatas());
                     mMessageAdapter.setDatas(newMsgs);
@@ -1082,7 +1084,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
         }
 
         void cacheMsgs(List<AVIMTypedMessage> msgs) throws Exception {
-            Set<String> userIds = new HashSet<String>();
+            Set<String> userIds = new HashSet<>();
             for (AVIMTypedMessage msg : msgs) {
                 AVIMReservedMessageType type = AVIMReservedMessageType.getAVIMReservedMessageType(msg.getMessageType());
                 if (type == AVIMReservedMessageType.AudioMessageType) {
