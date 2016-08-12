@@ -40,6 +40,14 @@
                 android:layout_height="1dip" />
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/dur_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="5dp" />
+
     </LinearLayout>
 
     <TextView
