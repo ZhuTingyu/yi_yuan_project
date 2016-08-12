@@ -263,7 +263,7 @@ public class RestClient {
                         ret.put("data", response);
                     } else {
                         JSONObject data = new JSONObject();
-                        data.put("msg", "无法访问网络");
+                        data.put("error_msg", "无法访问网络, 请检查网络设置并重试");
                         ret.put("data", data);
                     }
                     if (headers != null && headers.length > 0) {
