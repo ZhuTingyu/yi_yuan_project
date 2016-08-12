@@ -209,7 +209,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
         setRightItem(R.drawable.btn_search, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String url = "resources.html";
+                String url = "resources.html?history";
 
                 JSONObject object = new JSONObject();
                 JSONObject innerObject = new JSONObject();

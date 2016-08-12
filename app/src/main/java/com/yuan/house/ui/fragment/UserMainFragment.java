@@ -29,9 +29,6 @@ import butterknife.OnClick;
  * Created by KevinLee on 2016/4/21.
  */
 public class UserMainFragment extends WebViewBaseFragment {
-
-    private static final int REQUEST_MAP_CODE = 0XFF01;
-
     @BindView(R.id.rl_center)
     LinearLayout center;
     @BindView(R.id.address)
@@ -104,7 +101,7 @@ public class UserMainFragment extends WebViewBaseFragment {
                 ((MainActivity) getActivity()).getBottomNavigationBar().selectTab(2);
                 break;
             case R.id.btn_arrow_down:
-                String url = "resources.html";
+                String url = "resources.html?history";
 
                 JSONObject object = new JSONObject();
                 JSONObject innerObject = new JSONObject();
