@@ -31,9 +31,6 @@
             android:maxWidth="@dimen/chat_ContentMaxWidth"
             android:minHeight="30dp"
             android:orientation="horizontal"
-            android:padding="10dp"
-            android:paddingStart="15dp"
-            android:paddingLeft="15dp"
             android:textColor="@color/chat_LeftText" />
     </LinearLayout>
 

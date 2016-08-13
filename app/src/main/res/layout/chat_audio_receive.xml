@@ -46,7 +46,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginRight="5dp" />
+            android:layout_marginLeft="5dp" />
 
     </LinearLayout>
 
@@ -59,6 +59,7 @@
         android:gravity="center"
         android:maxLines="1"
         android:text="username"
-        android:textSize="11sp" />
+        android:textSize="11sp"
+        android:visibility="gone"/>
 
 </LinearLayout>
