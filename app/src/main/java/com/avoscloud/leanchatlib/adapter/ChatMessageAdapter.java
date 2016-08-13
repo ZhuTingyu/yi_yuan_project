@@ -307,18 +307,18 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 AVIMImageMessage imageMsg = (AVIMImageMessage) msg;
                 initImageView(imageView, imageMsg);
                 message.setMessage("[图片]");
-                activity.registerForContextMenu(imageView);
+//                activity.registerForContextMenu(imageView);
                 break;
             case AudioMessageType:
                 AVIMAudioMessage audioMessage = (AVIMAudioMessage) msg;
                 initPlayBtn(msg, playBtn, audioMessage, timeAudio);
                 message.setMessage("[语音]");
-                activity.registerForContextMenu(audioView);
+//                activity.registerForContextMenu(audioView);
                 break;
             case LocationMessageType:
                 setLocationView(msg, locationView);
                 message.setMessage("[位置]");
-                activity.registerForContextMenu(locationView);
+//                activity.registerForContextMenu(locationView);
                 break;
             default:
                 break;
