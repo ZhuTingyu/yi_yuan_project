@@ -295,8 +295,8 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
         textView.setVisibility(View.VISIBLE);
 
         Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), resId);
-        int h = drawable.getIntrinsicHeight();
-        int w = drawable.getIntrinsicWidth();
+        int h = drawable.getIntrinsicHeight() * 2;
+        int w = drawable.getIntrinsicWidth() * 2;
 
         drawable.setBounds(0, 0, w, h);
         if (drawable != null) {
