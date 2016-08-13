@@ -37,6 +37,8 @@ import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.MessageAgent;
 import com.avoscloud.leanchatlib.controller.MessageHelper;
 import com.avoscloud.leanchatlib.model.AVIMHouseMessage;
+import com.avoscloud.leanchatlib.model.AVIMPresenceMessage;
+import com.avoscloud.leanchatlib.model.MessageEvent;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
@@ -57,12 +59,14 @@ import com.loopj.android.http.FileAsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.tasomaniac.android.widget.DelayedProgressDialog;
+import com.yuan.house.HouseMessageType;
 import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.base.BaseFragmentActivity;
 import com.yuan.house.bean.PayInfo;
 import com.yuan.house.common.Constants;
+import com.yuan.house.event.BridgeCallbackEvent;
 import com.yuan.house.event.NotificationEvent;
 import com.yuan.house.event.PageEvent;
 import com.yuan.house.event.WebBroadcastEvent;
@@ -94,6 +98,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -305,6 +310,47 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         }
     }
 
+    public void onEvent(MessageEvent messageEvent) {
+        AVIMTypedMessage msg = messageEvent.getMsg();
+        if (!messageEvent.getMsg().getClass().equals(AVIMPresenceMessage.class)) {
+            Timber.v("Received new message");
+
+            JSONObject object = updateLastMessage(msg, false);
+
+            EventBus.getDefault().post(new BridgeCallbackEvent(BridgeCallbackEvent.BridgeCallbackEventEnum.CALLBACK, object.toString()));
+        }
+    }
+
+    public JSONObject updateLastMessage(AVIMTypedMessage msg, boolean isRead) {
+        String resultMessage = MessageHelper.outlineOfMsg(msg).toString();
+        long date = msg.getTimestamp();
+
+        HouseMessageType msgType = HouseMessageType.getMessageType(msg.getMessageType());
+
+        String leanId = msg.getFrom();
+        String auditType = "0";
+        String houseId = null;
+        if (msgType == HouseMessageType.TextMessageType) {
+            houseId = ((AVIMTextMessage) msg).getAttrs().get("houseId").toString();
+        } else if (msgType == HouseMessageType.HouseMessageType) {
+            houseId = ((AVIMHouseMessage) msg).getAttrs().get("houseId").toString();
+        }
+
+        JSONObject object = new JSONObject();
+
+        try {
+            object.put("date", DateUtil.toDateString(new Date(date), Constants.kDateFormatStyleShort));
+            object.put("message", resultMessage);
+            object.put("houseId", houseId);
+            object.put("leanId", leanId);
+            object.put("is_read", isRead);
+            object.put("audit_type", auditType);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return object;
+    }
     public void onEvent(NotificationEvent event) {
         if (event.getEventType() == NotificationEvent.NotificationEventEnum.HOUSE_RECOMMENDED_MESSAGE) {
             getWebViewFragment().getBridge().callHandler("RecommendedNotification", event.getHolder());
@@ -485,7 +531,6 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
     @Override
     public void onBridgeShowErrorMessage(JSONObject data) {
-        // TODO: 16/7/17 加上错误样式
         ToastUtil.showShort(this, data.optString("msg"));
     }
 
@@ -568,7 +613,6 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     @Override
     public void onBridgeGetRecentChatList(String data, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
         AVIMConversationQuery query = ChatManager.getInstance().getImClient().getQuery();
-        // FIXME: 16/7/9 只获取最近的 20 条对话
         query.limit(20);
         query.findInBackground(new AVIMConversationQueryCallback() {
             @Override

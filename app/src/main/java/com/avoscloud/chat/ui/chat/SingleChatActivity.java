@@ -53,7 +53,6 @@ import com.avoscloud.leanchatlib.model.MessageEvent;
 import com.avoscloud.leanchatlib.utils.DownloadUtils;
 import com.avoscloud.leanchatlib.utils.NetAsyncTask;
 import com.avoscloud.leanchatlib.view.xlist.XListView;
-import com.dimo.utils.DateUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -78,7 +77,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -551,7 +549,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
         super.onFragmentInteraction(fragment);
 
         updateWebViewSettings();
-        doOtherStuff();
+        monitorMessageAndUpdate();
     }
 
     @Override
@@ -574,8 +572,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
         }
     }
 
-    // TODO: 16/6/6 WTF ???
-    private void doOtherStuff() {
+    private void monitorMessageAndUpdate() {
         mMessageAdapter.registerDataSetObserver(new DataSetObserver() {
             @Override
             public void onChanged() {
@@ -586,33 +583,10 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
 
                 AVIMTypedMessage msg = mMessageAdapter.getDatas().get(mMessageAdapter.getDatas().size() - 1);
 
-                String resultMessage = MessageHelper.outlineOfMsg(msg).toString();
-                long date = msg.getTimestamp();
-
-                String leanId = jsonFormatParams.optString("lean_id");
-                String auditType = jsonFormatParams.optString("audit_type");
-                String houseId = jsonFormatParams.optString("house_id");
-
-                JSONObject object = new JSONObject();
-
-                try {
-                    object.put("date", DateUtil.toDateString(new Date(date), Constants.kDateFormatStyleShort));
-                    object.put("message", resultMessage);
-                    object.put("houseId", houseId);
-                    object.put("leanId", leanId);
-                    object.put("is_read", true);
-                    object.put("audit_type", auditType);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                JSONObject object = updateLastMessage(msg, true);
 
                 // dispatch the event to WebViewBaseFragment
                 EventBus.getDefault().post(new BridgeCallbackEvent(BridgeCallbackEvent.BridgeCallbackEventEnum.CALLBACK, object.toString()));
-
-//                if (MessageHelper.fromMe(msg) && msg.getMessageStatus() == AVIMMessage.AVIMMessageStatus.AVIMMessageStatusSent) {
-//                    // FIXME: 16/6/22 有些时候 house id 是空的
-//                    ChatManager.getInstance().storeLastMessage(msg, object);
-//                }
             }
         });
     }
