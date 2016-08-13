@@ -460,7 +460,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     private void setupHeartBeatForPresenceCheckInSeconds() {
         scheduledExecutorServiceForPresenceCheckInSeconds = Executors.newSingleThreadScheduledExecutor();
 
-        long kIntervalForLiveCheck = 1;
+        long kIntervalForLiveCheck = 3;
         scheduledExecutorServiceForPresenceCheckInSeconds.scheduleAtFixedRate
                 (new Runnable() {
                     public void run() {
