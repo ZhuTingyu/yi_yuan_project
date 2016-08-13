@@ -104,6 +104,8 @@ import java.util.List;
 import java.util.Map;
 
 import butterknife.ButterKnife;
+import cn.sharesdk.framework.ShareSDK;
+import cn.sharesdk.onekeyshare.OnekeyShare;
 import de.greenrobot.event.EventBus;
 import me.nereo.multi_image_selector.MultiImageSelector;
 import me.nereo.multi_image_selector.MultiImageSelectorActivity;
@@ -321,6 +323,26 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         }
     }
 
+    /**
+     * 社会化分享
+     *
+     * @param imageUrl 图片地址
+     * @param title    标题
+     * @param content  文本
+     */
+    private void showShare(String imageUrl, String title, String content) {
+        ShareSDK.initSDK(this);
+
+        OnekeyShare oks = new OnekeyShare();
+        oks.disableSSOWhenAuthorize();
+
+        oks.setTitle(title);
+        oks.setText(content);
+        oks.setImageUrl(imageUrl);
+
+        oks.show(this);
+    }
+
     public JSONObject updateLastMessage(AVIMTypedMessage msg, boolean isRead) {
         String resultMessage = MessageHelper.outlineOfMsg(msg).toString();
         long date = msg.getTimestamp();
@@ -351,6 +373,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
         return object;
     }
+
     public void onEvent(NotificationEvent event) {
         if (event.getEventType() == NotificationEvent.NotificationEventEnum.HOUSE_RECOMMENDED_MESSAGE) {
             getWebViewFragment().getBridge().callHandler("RecommendedNotification", event.getHolder());
