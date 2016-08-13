@@ -116,8 +116,8 @@ public class Constants {
 
 
     public static int kNotifyId = 1;
-    public static String kPrefsLastSelectedCity = "lastCity";
-    public static String kPrefsLastSelectedDistrict = "lastDistrict";
+    public static String kPrefsLastSelectedCityFromMap = "lastCity";
+    public static String kPrefsLastSelectedDistrictFromMap = "lastDistrict";
 
     public static final Locale kForceLocale = Locale.US;
 }

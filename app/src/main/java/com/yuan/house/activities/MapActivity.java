@@ -153,8 +153,8 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
                         data.put("street", bdLocation.getStreet());
 
                         // save selected city + district
-                        prefs.edit().putString(Constants.kPrefsLastSelectedCity, city).apply();
-                        prefs.edit().putString(Constants.kPrefsLastSelectedDistrict, district).apply();
+                        prefs.edit().putString(Constants.kPrefsLastSelectedCityFromMap, city).apply();
+                        prefs.edit().putString(Constants.kPrefsLastSelectedDistrictFromMap, district).apply();
 
                     } catch (JSONException e) {
                         e.printStackTrace();

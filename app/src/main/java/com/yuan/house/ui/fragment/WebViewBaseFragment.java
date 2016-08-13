@@ -39,7 +39,6 @@ import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
 import com.yuan.house.event.BridgeCallbackEvent;
 import com.yuan.house.event.WebBroadcastEvent;
-import com.yuan.house.helper.AuthHelper;
 import com.yuan.house.http.RestClient;
 import com.yuan.house.ui.view.PickerPopWindow;
 import com.yuan.house.utils.ToastUtil;
@@ -692,13 +691,13 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("getChosenLocation");
 
-                String city = prefs.getString(Constants.kPrefsLastSelectedCity, "");
-                String district = prefs.getString(Constants.kPrefsLastSelectedDistrict, "");
+                String city = prefs.getString(Constants.kPrefsLastSelectedCityFromMap, "");
+                String district = prefs.getString(Constants.kPrefsLastSelectedDistrictFromMap, "");
 
-                if (!AuthHelper.getInstance().iAmUser()) {
-                    // 中介返回定位的位置
+                if (TextUtils.isEmpty(city) || TextUtils.isEmpty(district)) {
+                    // 如果用户/中介没有选择位置, 则直接返回定位位置
                     BDLocation location = DMApplication.getInstance().getLastActivatedLocation();
-                    if (location != null) {
+                    if (null != location) {
                         city = location.getCity();
                         district = location.getDistrict();
                     }
