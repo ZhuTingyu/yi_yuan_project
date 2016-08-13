@@ -121,7 +121,7 @@ public class ChatManager extends AVIMClientEventHandler {
         query.whereEqualTo(ConversationType.ATTR_TYPE_KEY, ConversationType.Single.getValue());
 
         // find with houseId if user is `agency`
-        if ("agency".equals(param.optString("type"))) {
+        if (isPeerTypeAgency && !AuthHelper.getInstance().iAmUser()) {
             query.whereEqualTo(ConversationType.ATTR_HOUSEID_KEY, houseId);
         }
 
