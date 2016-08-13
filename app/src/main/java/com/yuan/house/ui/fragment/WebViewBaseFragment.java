@@ -180,7 +180,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
 
                 JSONObject object = null;
 
-                if (map != null) {
+                if (null != map) {
                     String mapString = map.get("params");
 
                     try {
@@ -212,7 +212,9 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Log.i("reponse.data", data);
 
-                mBridgeListener.onBridgeRequestPurchase(data, callback);
+                if (null != mBridgeListener) {
+                    mBridgeListener.onBridgeRequestPurchase(data, callback);
+                }
             }
         });
 
@@ -229,7 +231,9 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                 }
 
                 String url = object.optString("url");
-                mBridgeListener.onBridgeOpenNewLink(url, object);
+                if (null != mBridgeListener) {
+                    mBridgeListener.onBridgeOpenNewLink(url, object);
+                }
 
                 if (null != callback) {
                     callback.callback("redirectPage answer");
@@ -252,7 +256,9 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                 }
 
                 String url = object.optString("url");
-                mBridgeListener.onBridgeReplaceLink(url, object);
+                if (null != mBridgeListener) {
+                    mBridgeListener.onBridgeReplaceLink(url, object);
+                }
 
                 if (null != callback) {
                     callback.callback("replacePage answer");
@@ -305,7 +311,9 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("showProgressDialog got:" + data);
 
-                mBridgeListener.onBridgeShowProgressDialog();
+                if (null != mBridgeListener) {
+                    mBridgeListener.onBridgeShowProgressDialog();
+                }
             }
         });
 
@@ -314,7 +322,9 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("dismissProgressDialog got:" + data);
 
-                mBridgeListener.onBridgeDismissProgressDialog();
+                if (null != mBridgeListener) {
+                    mBridgeListener.onBridgeDismissProgressDialog();
+                }
             }
         });
 
@@ -325,7 +335,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
 
                 try {
                     JSONObject object = new JSONObject(data);
-                    if (mBridgeListener != null) {
+                    if (null != mBridgeListener) {
                         mBridgeListener.onBridgeShowErrorMessage(object);
                     }
                 } catch (JSONException e) {
@@ -368,7 +378,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
 
                 String title = object.optString("text");
 
-                if (mBridgeListener != null) {
+                if (null != mBridgeListener) {
                     mBridgeListener.onBridgeSetTitle(title);
                 }
             }
@@ -378,7 +388,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 Timber.v("hideRightItem");
 
-                if (mBridgeListener != null) {
+                if (null != mBridgeListener) {
                     mBridgeListener.onBridgeHideRightItem();
                 }
             }
@@ -402,7 +412,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                         Resources resources = getResources();
                         String icon = content.substring(0, object.optString("content").indexOf("."));
                         int resourceId = resources.getIdentifier(icon, "drawable", getActivity().getPackageName());
-                        if (mBridgeListener != null) {
+                        if (null != mBridgeListener) {
                             mBridgeListener.onBridgeSetRightItem(resourceId, new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
@@ -413,7 +423,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                     }
                 } else {
                     // show a text button
-                    if (mBridgeListener != null) {
+                    if (null != mBridgeListener) {
                         mBridgeListener.onBridgeSetRightItem(content, new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -436,7 +446,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                if (object != null) {
+                if (null != object) {
                     final String phone = object.optString("phone");
                     // TODO: check if phone number is valid.
                     if (!TextUtils.isEmpty(phone)) {
@@ -530,7 +540,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
 
                 SharedPreferences.Editor editor = prefs.edit();
 
-                if (value == null || value.equals("null")) {
+                if (null == value || value.equals("null")) {
                     editor.remove(key);
                 } else {
                     editor.putString(key, value);
@@ -583,7 +593,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
 
                 SharedPreferences.Editor editor = prefs.edit();
 
-                if (value == null || value.equals("null")) {
+                if (null == value || value.equals("null")) {
                     editor.remove(key);
                 } else {
                     editor.putString(key, value);
@@ -603,7 +613,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("finishActivity" + data);
 
-                if (mBridgeListener != null) {
+                if (null != mBridgeListener) {
                     mBridgeListener.onBridgeFinishActivity(data);
                 }
             }
@@ -614,7 +624,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("openLinkWithBrowser" + data);
 
-                if (mBridgeListener != null) {
+                if (null != mBridgeListener) {
                     mBridgeListener.onBridgeOpenNewLinkWithExternalBrowser(data);
                 }
             }
@@ -625,7 +635,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("sendNoticeMessage" + data);
 
-                if (mBridgeListener != null) {
+                if (null != mBridgeListener) {
                     mBridgeListener.onBridgeSendNoticeMessage(data, callback);
                 }
             }
@@ -644,12 +654,12 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                     String[] ids = leanIds.split(",");
                     if (ids == null) {
                         Timber.e("Peer IDs can not be empty");
-                    } else if (ids.length == 1) {
-                        if (mBridgeListener != null) {
+                    } else if (1 == ids.length) {
+                        if (null != mBridgeListener) {
                             mBridgeListener.onBridgeStartSingleChat(object);
                         }
                     } else {
-                        if (mBridgeListener != null) {
+                        if (null != mBridgeListener) {
                             mBridgeListener.onBridgeStartGroupChat(object);
                         }
                     }
@@ -668,7 +678,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("chatWithCustomerService" + data);
 
-                if (mBridgeListener != null) {
+                if (null != mBridgeListener) {
                     mBridgeListener.onBridgeStartServiceChat();
                 }
             }
@@ -702,7 +712,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                     e.printStackTrace();
                 }
 
-                if (callback != null) {
+                if (null != callback) {
                     callback.callback(object.toString());
                 }
             }
@@ -730,11 +740,11 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                         e.printStackTrace();
                     }
 
-                    if (callback != null) {
+                    if (null != callback) {
                         callback.callback(object);
                     }
                 } else {
-                    if (mBridgeListener != null) {
+                    if (null != mBridgeListener) {
                         mBridgeListener.onBridgeRequestLocation(callback);
                     }
                 }
@@ -746,7 +756,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 mCallback = jsCallback;
 
-                if (mBridgeListener != null) {
+                if (null != mBridgeListener) {
                     mBridgeListener.onBridgeResizeOrCropImage();
                 }
             }
@@ -765,7 +775,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 mCallback = jsCallback;
 
-                if (mBridgeListener != null) {
+                if (null != mBridgeListener) {
                     mBridgeListener.onBridgeUploadFiles(data, jsCallback);
                 }
             }
@@ -774,12 +784,10 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
         getBridge().registerHandler("reviewImages", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-                Log.i("图片预览", data);
-
                 com.alibaba.fastjson.JSONArray jsonArray = JSON.parseObject(data).getJSONArray("urls");
 
                 List<String> images = JSON.parseArray(jsonArray.toString(), String.class);
-                if (mBridgeListener != null) {
+                if (null != mBridgeListener) {
                     mBridgeListener.onBridgeShowImageGallery(images);
                 }
             }
@@ -865,7 +873,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 Timber.v("showActionSheet");
-                if (mBridgeListener != null) {
+                if (null != mBridgeListener) {
                     mBridgeListener.onBridgeShowActionSheet(data, jsCallback);
                 }
             }
@@ -876,7 +884,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 Timber.v("getRecentChattingList");
 
-                if (mBridgeListener != null) {
+                if (null != mBridgeListener) {
                     mBridgeListener.onBridgeGetRecentChatList(data, jsCallback);
                 }
             }
@@ -887,12 +895,15 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 Timber.v("sendRecommendedMessage");
 
-                if (mBridgeListener != null) {
+                if (null != mBridgeListener) {
                     mBridgeListener.onBridgeSendRecommendedMessage(data);
                 }
             }
         });
 
+        /**
+         * 按房源显示消息列表
+         */
         getBridge().registerHandler("getLastMessageByHouse", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
@@ -954,7 +965,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                     // 如果找不到搜索框, 退出
                     if (searchBar == null) return;
 
-                    if (mBridgeListener != null) {
+                    if (null != mBridgeListener) {
                         mBridgeListener.onBridgeShowSearchBar(data);
                     }
                 }
