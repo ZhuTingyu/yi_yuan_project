@@ -23,13 +23,11 @@ import com.avoscloud.leanchatlib.controller.EmotionHelper;
 import com.avoscloud.leanchatlib.controller.MessageHelper;
 import com.avoscloud.leanchatlib.model.AVIMHouseMessage;
 import com.avoscloud.leanchatlib.model.ConversationType;
-import com.avoscloud.leanchatlib.model.UserInfo;
 import com.avoscloud.leanchatlib.utils.PhotoUtils;
 import com.avoscloud.leanchatlib.view.PlayButton;
 import com.avoscloud.leanchatlib.view.ViewHolder;
 import com.dimo.utils.DateUtil;
 import com.lfy.bean.Message;
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.squareup.picasso.Picasso;
 import com.yuan.house.HouseMessageType;
 import com.yuan.house.R;
@@ -262,13 +260,10 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
     protected void initReservedMessageView(View conView, int position, AVIMTypedMessage msg, boolean isComMsg, Message message) {
         TextView contentView = ViewHolder.findViewById(conView, R.id.textContent);
         ImageView imageView = ViewHolder.findViewById(conView, R.id.imageView);
-        ImageView avatarView = ViewHolder.findViewById(conView, R.id.avatar);
         final PlayButton playBtn = ViewHolder.findViewById(conView, R.id.playBtn);
         TextView timeAudio = ViewHolder.findViewById(conView, R.id.dur_time);
-        placeView = ViewHolder.findViewById(conView, R.id.audioPlaceView);
-        View audioView = ViewHolder.findViewById(conView, R.id.audioLL);
         TextView locationView = ViewHolder.findViewById(conView, R.id.locationView);
-        TextView usernameView = ViewHolder.findViewById(conView, R.id.username);
+        placeView = ViewHolder.findViewById(conView, R.id.audioPlaceView);
 
         View statusSendFailed = ViewHolder.findViewById(conView, R.id.status_send_failed);
         View statusSendStart = ViewHolder.findViewById(conView, R.id.status_send_start);
@@ -281,19 +276,6 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 }
             });
         }
-
-
-        UserInfo user = ChatManager.getInstance().getUserInfoFactory().getUserInfoById(msg.getFrom());
-        if (user == null) {
-            throw new NullPointerException("user is null");
-        }
-        if (isComMsg) {
-            if (conversationType == null) {
-                throw new NullPointerException("conv type is null");
-            }
-        }
-
-        ImageLoader.getInstance().displayImage(user.getAvatarUrl(), avatarView, PhotoUtils.avatarImageOptions);
 
         AVIMReservedMessageType type = AVIMReservedMessageType.getAVIMReservedMessageType(msg.getMessageType());
         switch (type) {
