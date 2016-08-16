@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ScrollView;
 
@@ -22,8 +23,9 @@ import com.avoscloud.leanchatlib.adapter.ChatMessageAdapter;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.model.ConversationType;
 import com.avoscloud.leanchatlib.view.xlist.XListView;
-import com.baoyz.actionsheet.ActionSheet;
 import com.dimo.utils.StringUtil;
+import com.flyco.dialog.listener.OnOperItemClickL;
+import com.flyco.dialog.widget.ActionSheetDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.PauseOnScrollListener;
 import com.yuan.house.R;
@@ -145,41 +147,37 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
     }
 
     private void showOptionSheet() {
-        ActionSheet.createBuilder(getContext(), getActivity().getSupportFragmentManager())
-                .setCancelButtonTitle(R.string.cancel)
-                .setOtherButtonTitles("上传图片", "投诉经纪人")
-                .setCancelableOnTouchOutside(true)
-                .setListener(new ActionSheet.ActionSheetListener() {
-                    @Override
-                    public void onDismiss(ActionSheet actionSheet, boolean isCancel) {
-                        actionSheet.dismiss();
-                    }
+        final String[] stringItems = {"上传图片", "投诉经纪人"};
+        final ActionSheetDialog dialog = new ActionSheetDialog(getActivity(), stringItems, null);
+        dialog.isTitleShow(false);
+        dialog.show();
 
-                    @Override
-                    public void onOtherButtonClick(ActionSheet actionSheet, int index) {
-                        switch (index) {
-                            case 0: {
-                                msg_type = ProposalMediaType.IMAGE;
-                                mBridgeListener.onSelectImageForProposal();
+        dialog.setOnOperItemClickL(new OnOperItemClickL() {
+            @Override
+            public void onOperItemClick(AdapterView<?> parent, View view, int position, long id) {
+                switch (position) {
+                    case 0: {
+                        msg_type = ProposalMediaType.IMAGE;
+                        mBridgeListener.onSelectImageForProposal();
+                    }
+                    break;
+                    case 1: {
+                        if (mBrokerPicker == null) {
+                            if (mBrokerList.size() > 0) {
+                                initBrokerView();
+                            } else {
+                                ToastUtil.showShort(getContext(), "没有经纪人列表");
                             }
-                            break;
-                            case 1: {
-                                if (mBrokerPicker == null) {
-                                    if (mBrokerList.size() > 0) {
-                                        initBrokerView();
-                                    } else {
-                                        ToastUtil.showShort(getContext(), "没有经纪人列表");
-                                    }
-                                } else {
-                                    mBrokerPicker.showPopWin(getActivity());
-                                }
-                            }
-                            break;
+                        } else {
+                            mBrokerPicker.showPopWin(getActivity());
                         }
-
-                        actionSheet.dismiss();
                     }
-                }).show();
+                    break;
+                }
+
+                dialog.dismiss();
+            }
+        });
     }
 
     private void initListView() {

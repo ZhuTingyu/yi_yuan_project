@@ -2,11 +2,8 @@
 
     <!-- Base application theme. -->
     <style name="MainTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="actionSheetStyle">@style/ActionSheetStyleiOS7</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowContentOverlay">@null</item>
-        <!--<item name="android:windowBackground">@color/bg_color_primary</item>-->
     </style>
 
     <style name="ActionBarTitleStyle">
@@ -155,22 +152,6 @@
 
     <style name="AlertDialogCustom" parent="Theme.AppCompat.Light.Dialog.Alert" />
 
-    <!-- iOS7 Style -->
-    <style name="ActionSheetStyleiOS7">
-        <item name="actionSheetBackground">@android:color/transparent</item>
-        <item name="cancelButtonBackground">@drawable/slt_as_ios7_cancel_bt</item>
-        <item name="otherButtonTopBackground">@drawable/slt_as_ios7_other_bt_top</item>
-        <item name="otherButtonMiddleBackground">@drawable/slt_as_ios7_other_bt_middle</item>
-        <item name="otherButtonBottomBackground">@drawable/slt_as_ios7_other_bt_bottom</item>
-        <item name="otherButtonSingleBackground">@drawable/slt_as_ios7_other_bt_single</item>
-        <item name="cancelButtonTextColor">#1E82FF</item>
-        <item name="otherButtonTextColor">#1E82FF</item>
-        <item name="actionSheetPadding">10dp</item>
-        <item name="otherButtonSpacing">0dp</item>
-        <item name="cancelButtonMarginTop">10dp</item>
-        <item name="actionSheetTextSize">16sp</item>
-    </style>
-
     <style name="SearchBarStyle">
         <item name="android:textColor">@color/primary_dark</item>
         <item name="android:textSize">12dp</item>
@@ -180,8 +161,6 @@
         <item name="android:drawableLeft">@drawable/img_search</item>
         <item name="android:background">@drawable/search_editsharp</item>
         <item name="android:imeActionLabel">@string/contact_search</item>
-        <!--<item name="android:imeOptions">actionSearch</item>-->
-        <!--<item name="android:maxLines">1</item>-->
     </style>
 
 </resources>

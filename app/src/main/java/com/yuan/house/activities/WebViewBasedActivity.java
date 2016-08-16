@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -45,7 +46,6 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
-import com.baoyz.actionsheet.ActionSheet;
 import com.bugtags.library.Bugtags;
 import com.dimo.utils.BitmapUtil;
 import com.dimo.utils.DateUtil;
@@ -56,6 +56,8 @@ import com.etiennelawlor.imagegallery.library.activities.FullScreenImageGalleryA
 import com.etiennelawlor.imagegallery.library.activities.ImageGalleryActivity;
 import com.etiennelawlor.imagegallery.library.adapters.FullScreenImageGalleryAdapter;
 import com.etiennelawlor.imagegallery.library.adapters.ImageGalleryAdapter;
+import com.flyco.dialog.listener.OnOperItemClickL;
+import com.flyco.dialog.widget.ActionSheetDialog;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.FileAsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -620,25 +622,20 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             e.printStackTrace();
         }
 
-        ActionSheet.createBuilder(mContext, getSupportFragmentManager())
-                .setCancelButtonTitle(R.string.cancel)
-                .setOtherButtonTitles(list.toArray(new String[list.size()]))
-                .setCancelableOnTouchOutside(true)
-                .setListener(new ActionSheet.ActionSheetListener() {
-                    @Override
-                    public void onDismiss(ActionSheet actionSheet, boolean isCancel) {
-                        actionSheet.dismiss();
-                    }
+        final String[] stringItems = list.toArray(new String[list.size()]);
+        final ActionSheetDialog dialog = new ActionSheetDialog(mContext, stringItems, null);
+        dialog.isTitleShow(false);
+        dialog.show();
 
-                    @Override
-                    public void onOtherButtonClick(ActionSheet actionSheet, int index) {
-                        if (jsCallback != null) {
-                            jsCallback.callback(index);
-                        }
-
-                        actionSheet.dismiss();
-                    }
-                }).show();
+        dialog.setOnOperItemClickL(new OnOperItemClickL() {
+            @Override
+            public void onOperItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (jsCallback != null) {
+                    jsCallback.callback(position);
+                }
+                dialog.dismiss();
+            }
+        });
     }
 
     @Override
