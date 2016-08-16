@@ -60,6 +60,7 @@ public class GroupChatActivity extends ChatActivity {
     private String cachedHouseTradeTypeForCurrentConv;
     private String cachedUserType;
     private String mLastMsgContent;
+    private int kIndexForLooperOfConversations;
 
     public static void chatByUserIds(final Activity from, final JSONObject params) {
         Intent intent = new Intent(from, GroupChatActivity.class);
@@ -115,6 +116,10 @@ public class GroupChatActivity extends ChatActivity {
             }
         });
 
+        convIds = new ArrayList<>();
+
+        kIndexForLooperOfConversations = 0;
+        
         updateConversations();
     }
 
@@ -160,24 +165,24 @@ public class GroupChatActivity extends ChatActivity {
      * 获取该群聊里头的所有会话
      */
     private void updateConversations() {
-        convIds = new ArrayList<>();
-
-        for (int i = 0; i < leanIds.length; i++) {
+        if (kIndexForLooperOfConversations < userIds.length) {
             JSONObject params = new JSONObject();
             try {
                 params.put("house_id", cachedHouseIdForCurrentConv);
                 params.put("audit_type", cachedHouseTradeTypeForCurrentConv);
                 params.put("type", cachedUserType);
-                params.put("user_id", userIds[i]);
+                params.put("user_id", userIds[kIndexForLooperOfConversations]);
 
-                final int finalI = i;
-                ChatManager.getInstance().fetchConversationWithUserId(params, leanIds[i], new AVIMConversationCreatedCallback() {
+                ChatManager.getInstance().fetchConversationWithUserId(params, leanIds[kIndexForLooperOfConversations], new AVIMConversationCreatedCallback() {
                     @Override
                     public void done(AVIMConversation conversation, AVIMException e) {
-                        if (Utils.filterException(e)) {
-                            conversations.add(finalI, conversation);
-//                            groupChatRowInfos.get(finalI).setConvId(conversation.getConversationId());
+                        if (e == null) {
+                            conversations.add(kIndexForLooperOfConversations, conversation);
                             convIds.add(conversation.getConversationId());
+                            kIndexForLooperOfConversations ++;
+                            updateConversations();
+                        } else {
+                            Utils.filterException(e);
                         }
                     }
                 });
