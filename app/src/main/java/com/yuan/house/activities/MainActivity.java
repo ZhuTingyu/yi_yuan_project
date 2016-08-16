@@ -279,6 +279,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
             public void onTabSelected(int position) {
                 switch (position) {
                     case kTabIndexOfCoupon:
+                        switchToFragment(Constants.kFragmentTagCoupon);
                         break;
                     case kTabIndexOfMain:
                         switchToFragment(Constants.kFragmentTagMain);
