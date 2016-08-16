@@ -119,7 +119,7 @@ public class GroupChatActivity extends ChatActivity {
         convIds = new ArrayList<>();
 
         kIndexForLooperOfConversations = 0;
-        
+
         updateConversations();
     }
 
@@ -226,7 +226,6 @@ public class GroupChatActivity extends ChatActivity {
 
     @Override
     protected void sendText() {
-        // TODO: 16/7/26 loop send text
         final String content = contentEdit.getText().toString();
 
         mLastMsgContent = content;
@@ -289,13 +288,11 @@ public class GroupChatActivity extends ChatActivity {
 
         @Override
         public void onSuccess(AVIMTypedMessage msg) {
-            // Send Callback, update last message
             updateLastMessageForConversation(msg);
         }
     }
 
     class GroupChatRowInfo {
-        String convId;
         String leanId;
         String avatar;
         String name;
@@ -330,14 +327,6 @@ public class GroupChatActivity extends ChatActivity {
 
         public void setMessage(String message) {
             this.message = message;
-        }
-
-        public String getConvId() {
-            return convId;
-        }
-
-        public void setConvId(String convId) {
-            this.convId = convId;
         }
     }
 
