@@ -908,6 +908,8 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 MessageDao messageDao = DMApplication.getInstance().getMessageDao();
 
+                if (messageDao == null) return;
+
                 // 返回一个这个 house 下边所有用户的最后一条消息的list
                 List<com.lfy.bean.Message> list = messageDao.queryBuilder().build().list();
 
