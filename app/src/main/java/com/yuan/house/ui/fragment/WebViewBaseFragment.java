@@ -115,6 +115,11 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
             holder.removeView(mWebView);
         }
 
+        if (mWebView != null) {
+            mWebView.removeAllViews();
+            mWebView.destroy();
+        }
+
         EventBus.getDefault().unregister(this);
 
         super.onDestroyView();
@@ -1165,11 +1170,6 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
     @Override
     public void onDetach() {
         super.onDetach();
-
-        if (mWebView != null) {
-            mWebView.removeAllViews();
-            mWebView.destroy();
-        }
 
         mFragmentListener = null;
         mBridgeListener = null;
