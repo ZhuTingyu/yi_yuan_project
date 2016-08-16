@@ -1,5 +1,7 @@
 package com.avoscloud.leanchatlib.controller;
 
+import android.text.TextUtils;
+
 import com.avos.avoscloud.im.v2.AVIMTypedMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMLocationMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
@@ -20,6 +22,10 @@ public class MessageHelper {
     public static boolean fromMe(AVIMTypedMessage msg) {
         ChatManager chatManager = ChatManager.getInstance();
         String selfId = chatManager.getSelfId();
+        if (msg == null || TextUtils.isEmpty(selfId)) {
+            return false;
+        }
+
         return selfId.equals(msg.getFrom());
     }
 
