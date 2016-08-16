@@ -408,7 +408,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
             public void onImageViewClick(AVIMImageMessage imageMsg) {
                 ChatActivity chatActivity = (ChatActivity) mContext;
                 ArrayList<String> paths = new ArrayList<>();
-                paths.add(MessageHelper.getFilePath(imageMsg));
+                paths.add(imageMsg.getFileUrl());
                 chatActivity.showImageGallery(paths);
             }
 
