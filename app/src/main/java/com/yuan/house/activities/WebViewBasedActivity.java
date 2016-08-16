@@ -914,11 +914,11 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     public void showImageGallery(List<String> images) {
-        Intent intent = new Intent(this, ImageViewPagerActivity.class);
+        Intent intent = new Intent(this, FullScreenImageGalleryActivity.class);
 
         Bundle bundle = new Bundle();
-        bundle.putStringArrayList(ImageViewPagerActivity.KEY_IMAGES, new ArrayList<>(images));
-        bundle.putString(ImageViewPagerActivity.KEY_TITLE, "图片库");
+        bundle.putStringArrayList(FullScreenImageGalleryActivity.KEY_IMAGES, new ArrayList<>(images));
+        bundle.putInt(FullScreenImageGalleryActivity.KEY_POSITION, 0);
         intent.putExtras(bundle);
 
         startActivity(intent);
