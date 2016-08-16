@@ -29,6 +29,8 @@ import com.avos.avoscloud.im.v2.AVIMTypedMessage;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationQueryCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMSingleMessageQueryCallback;
+import com.avos.avoscloud.im.v2.messages.AVIMAudioMessage;
+import com.avos.avoscloud.im.v2.messages.AVIMImageMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
 import com.avoscloud.chat.ui.chat.GroupChatActivity;
 import com.avoscloud.chat.ui.chat.ServiceChatActivity;
@@ -352,10 +354,16 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         String leanId = msg.getFrom();
         String auditType = "0";
         String houseId = null;
+
+        // FIXME: 8/16/16 shit code!!!
         if (msgType == HouseMessageType.TextMessageType) {
             houseId = ((AVIMTextMessage) msg).getAttrs().get("houseId").toString();
         } else if (msgType == HouseMessageType.HouseMessageType) {
             houseId = ((AVIMHouseMessage) msg).getAttrs().get("houseId").toString();
+        } else if (msgType == HouseMessageType.AudioMessageType) {
+            houseId = ((AVIMAudioMessage) msg).getAttrs().get("houseId").toString();
+        } else if (msgType == HouseMessageType.ImageMessageType) {
+            houseId = ((AVIMImageMessage) msg).getAttrs().get("houseId").toString();
         }
 
         JSONObject object = new JSONObject();

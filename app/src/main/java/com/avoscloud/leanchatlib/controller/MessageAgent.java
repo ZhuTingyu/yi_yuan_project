@@ -18,6 +18,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 import timber.log.Timber;
 
@@ -125,11 +126,26 @@ public class MessageAgent {
         sendMsg(msg, null, sendCallback);
     }
 
+    // Deprecated
     public void sendImage(String imagePath) {
         final String newPath = com.avoscloud.leanchatlib.utils.PathUtils.getChatFilePath(Utils.uuid());
         PhotoUtils.compressImage(imagePath, newPath);
         try {
             AVIMImageMessage imageMsg = new AVIMImageMessage(newPath);
+            sendMsg(imageMsg, newPath, sendCallback);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendImage(Map<String, Object> attrs, String imagePath) {
+        final String newPath = com.avoscloud.leanchatlib.utils.PathUtils.getChatFilePath(Utils.uuid());
+        PhotoUtils.compressImage(imagePath, newPath);
+
+        try {
+            AVIMImageMessage imageMsg = new AVIMImageMessage(newPath);
+            imageMsg.setAttrs(attrs);
+
             sendMsg(imageMsg, newPath, sendCallback);
         } catch (IOException e) {
             e.printStackTrace();
@@ -144,9 +160,21 @@ public class MessageAgent {
         sendMsg(locationMsg, null, sendCallback);
     }
 
+    // Deprecated
     public void sendAudio(String audioPath) {
         try {
             AVIMAudioMessage audioMsg = new AVIMAudioMessage(audioPath);
+            sendMsg(audioMsg, audioPath, sendCallback);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendAudio(Map<String, Object> attrs, String audioPath) {
+        try {
+            AVIMAudioMessage audioMsg = new AVIMAudioMessage(audioPath);
+            audioMsg.setAttrs(attrs);
+
             sendMsg(audioMsg, audioPath, sendCallback);
         } catch (IOException e) {
             e.printStackTrace();

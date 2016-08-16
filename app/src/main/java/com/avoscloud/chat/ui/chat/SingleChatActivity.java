@@ -313,14 +313,22 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     @Override
     protected void sendAudio(String audioPath) {
         if (messageAgent != null) {
-            messageAgent.sendAudio(audioPath);
+            Map<String, Object> attrs = new HashMap<>();
+            attrs.put("houseId", cachedHouseIdForCurrentConv);
+            attrs.put("username", jsonFormatParams.optString("nickname"));
+
+            messageAgent.sendAudio(attrs, audioPath);
         }
     }
 
     @Override
     protected void sendImage(String s) {
         if (messageAgent != null) {
-            messageAgent.sendImage(s);
+            Map<String, Object> attrs = new HashMap<>();
+            attrs.put("houseId", cachedHouseIdForCurrentConv);
+            attrs.put("username", jsonFormatParams.optString("nickname"));
+
+            messageAgent.sendImage(attrs, s);
         }
     }
 
