@@ -38,6 +38,7 @@ import com.yuan.house.event.PageEvent;
 import com.yuan.house.helper.AuthHelper;
 import com.yuan.house.ui.fragment.AgencyMainFragment;
 import com.yuan.house.ui.fragment.AgencyMessageFragment;
+import com.yuan.house.ui.fragment.CouponFragment;
 import com.yuan.house.ui.fragment.LoginFragment;
 import com.yuan.house.ui.fragment.ProposalFragment;
 import com.yuan.house.ui.fragment.UserMainFragment;
@@ -113,7 +114,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         initBaiduLocClient();
 
         if (prefs.getString(Constants.kWebDataKeyUserLogin, null) != null) {
-            switchToFragment(Constants.kFragmentTagMain);
+            switchToFragment(Constants.kFragmentTagCoupon);
 
 // configure chat service
 // 每次进入主界面都连接一下聊天服务器
@@ -132,7 +133,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         if (bundle != null) {
             boolean dtm = bundle.getBoolean("dropToMessage");
             if (dtm) {
-                bottomNavigationBar.selectTab(1);
+                bottomNavigationBar.selectTab(kTabIndexOfMessage);
             }
         }
 
@@ -188,7 +189,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         if (event.getEventType() == PageEvent.PageEventEnum.FINISHED) {
 
         } else if (event.getEventType() == PageEvent.PageEventEnum.FRIENDSHIP_UPDATE) {
-            bottomNavigationBar.selectTab(0);
+            bottomNavigationBar.selectTab(kTabIndexOfMain);
         } else if (event.getEventType() == PageEvent.PageEventEnum.DROP_TO_MESSAGE) {
             // TODO: 16/7/30 kill other child pages
             Intent intent = new Intent(this, MainActivity.class);
@@ -228,7 +229,9 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
             return f;
         }
 
-        if (tag.equals(Constants.kFragmentTagMain)) {
+        if (tag.equals(Constants.kFragmentTagCoupon)) {
+            f = CouponFragment.newInstance();
+        } else if (tag.equals(Constants.kFragmentTagMain)) {
             if (AuthHelper.getInstance().iAmUser()) {
                 f = UserMainFragment.newInstance();
             } else {
@@ -258,27 +261,32 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
     }
 
     public void setupTabbarAppearance() {
-        this.bottomNavigationBar = ButterKnife.findById(getTabBar(), R.id.bottom_navigation_bar);
+        bottomNavigationBar = ButterKnife.findById(getTabBar(), R.id.bottom_navigation_bar);
+        bottomNavigationBar.setMode(BottomNavigationBar.MODE_FIXED);
         bottomNavigationBar
+                .addItem(new BottomNavigationItem(R.drawable.ic_ticket, "优惠券")).setActiveColor(R.color.primary_color_scheme)
                 .addItem(new BottomNavigationItem(R.drawable.ic_home, "房源")).setActiveColor(R.color.primary_color_scheme)
                 .addItem(new BottomNavigationItem(R.drawable.ic_chat, "消息")).setActiveColor(R.color.primary_color_scheme)
                 .addItem(new BottomNavigationItem(R.drawable.ic_suggest, "建议")).setActiveColor(R.color.primary_color_scheme)
-                .setFirstSelectedPosition(0)
+                .setFirstSelectedPosition(kTabIndexOfCoupon)
                 .initialise();
     }
 
     private void setupTabbarClickListener() {
+
         bottomNavigationBar.setTabSelectedListener(new BottomNavigationBar.OnTabSelectedListener() {
             @Override
             public void onTabSelected(int position) {
                 switch (position) {
-                    case 0:
+                    case kTabIndexOfCoupon:
+                        break;
+                    case kTabIndexOfMain:
                         switchToFragment(Constants.kFragmentTagMain);
                         break;
-                    case 1:
+                    case kTabIndexOfMessage:
                         switchToFragment(Constants.kFragmentTagMessage);
                         break;
-                    case 2:
+                    case kTabIndexOfProposal:
                         switchToFragment(Constants.kFragmentTagProposal);
                         break;
                 }
@@ -291,10 +299,10 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
             @Override
             public void onTabReselected(int position) {
                 switch (position) {
-                    case 0:
+                    case kTabIndexOfMain:
                         switchToFragment(Constants.kFragmentTagMain);
                         break;
-                    case 1:
+                    case kTabIndexOfMessage:
                         switchToFragment(Constants.kFragmentTagMessage);
                         break;
                 }

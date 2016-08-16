@@ -18,6 +18,7 @@ import com.yuan.house.helper.AuthHelper;
 import com.yuan.house.http.WebService;
 import com.yuan.house.ui.fragment.AgencyMainFragment;
 import com.yuan.house.ui.fragment.AgencyMessageFragment;
+import com.yuan.house.ui.fragment.CouponFragment;
 import com.yuan.house.ui.fragment.FragmentBBS;
 import com.yuan.house.ui.fragment.LoginFragment;
 import com.yuan.house.ui.fragment.ProposalFragment;
@@ -41,6 +42,7 @@ import dagger.Module;
 
                         WebViewBaseFragment.class,
                         WebViewFragment.class,
+                        CouponFragment.class,
                         UserMainFragment.class,
                         AgencyMainFragment.class,
                         AgencyMessageFragment.class,
