@@ -29,7 +29,6 @@
             android:id="@+id/lvGroups"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="@dimen/topbar_height"
             android:background="#ebebeb"
             android:cacheColorHint="@android:color/transparent"
             android:divider="@null"
