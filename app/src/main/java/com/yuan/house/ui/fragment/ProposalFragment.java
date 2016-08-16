@@ -119,10 +119,10 @@ public class ProposalFragment extends WebViewBaseFragment implements XListView.I
         ButterKnife.bind(this, view);
 
         if (AuthHelper.getInstance().iAmUser()) {
-            redirectToLoadUrl(Constants.kWebpageUserCenter);
+            redirectToLoadUrl(Constants.kWebPageUserCenter);
             sourceType = ProposalSourceType.FROM_USER;
         } else {
-            redirectToLoadUrl(Constants.kWebpageAgencyCenter);
+            redirectToLoadUrl(Constants.kWebPageAgencyCenter);
             sourceType = ProposalSourceType.FROM_AGENCY;
         }
 

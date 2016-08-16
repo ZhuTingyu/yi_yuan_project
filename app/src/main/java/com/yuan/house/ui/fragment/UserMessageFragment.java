@@ -42,7 +42,7 @@ public class UserMessageFragment extends WebViewBaseFragment {
 
         ButterKnife.bind(this, view);
 
-        redirectToLoadUrl(Constants.kWebpageUserMessage);
+        redirectToLoadUrl(Constants.kWebPageUserMessage);
 
         return view;
     }

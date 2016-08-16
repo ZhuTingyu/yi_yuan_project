@@ -173,7 +173,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         AVIMHouseMessage message = (AVIMHouseMessage) msg;
 
         Map<String, Object> map = message.getAttrs();
-        JSONObject object = (JSONObject) JSON.toJSON(map);
+        final JSONObject object = (JSONObject) JSON.toJSON(map);
 
         if (object.size() == 0) return;
 
@@ -191,7 +191,7 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
             @Override
             public void onClick(View v) {
                 String param;
-                String houseId = conversationObject.optString("house_id");
+                String houseId = object.getString("houseId");
 
                 if (AuthHelper.getInstance().iAmUser()) {
                     param = String.format("details.html?history&%s", houseId);
@@ -307,18 +307,15 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 AVIMImageMessage imageMsg = (AVIMImageMessage) msg;
                 initImageView(imageView, imageMsg);
                 message.setMessage("[图片]");
-//                activity.registerForContextMenu(imageView);
                 break;
             case AudioMessageType:
                 AVIMAudioMessage audioMessage = (AVIMAudioMessage) msg;
                 initPlayBtn(msg, playBtn, audioMessage, timeAudio);
                 message.setMessage("[语音]");
-//                activity.registerForContextMenu(audioView);
                 break;
             case LocationMessageType:
                 setLocationView(msg, locationView);
                 message.setMessage("[位置]");
-//                activity.registerForContextMenu(locationView);
                 break;
             default:
                 break;
@@ -373,9 +370,6 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
 
     protected void initImageView(ImageView imageView, AVIMImageMessage imageMsg) {
         PhotoUtils.displayImageCacheElseNetwork(imageView, MessageHelper.getFilePath(imageMsg), imageMsg.getFileUrl());
-//        String path = "file://" + MessageHelper.getFilePath(imageMsg);
-//        Picasso.with(mContext).load(path).into(imageView);
-
         setImageOnClickListener(imageView, imageMsg);
     }
 

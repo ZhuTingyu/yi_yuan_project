@@ -711,7 +711,11 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 AVIMHouseMessage message = new AVIMHouseMessage();
 
                 Map<String, Object> attrs = new HashMap<>();
-                attrs.put("houseId", houseInfo.optString("house_id"));
+                String houseId = houseInfo.optString("house_id");
+                if (TextUtils.isEmpty(houseId)) {
+                    houseId = houseInfo.optString("id");
+                }
+                attrs.put("houseId", houseId);
                 JSONArray images = houseInfo.optJSONArray("images");
 
                 if (images == null || images.length() == 0) {
