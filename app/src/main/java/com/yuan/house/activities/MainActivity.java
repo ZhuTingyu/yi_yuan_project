@@ -25,7 +25,10 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.karumi.dexter.Dexter;
-import com.karumi.dexter.listener.multi.EmptyMultiplePermissionsListener;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.yuan.house.BuildConfig;
 import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
@@ -50,6 +53,8 @@ import net.gotev.hostmonitor.HostMonitorConfig;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
 
 import butterknife.ButterKnife;
 import de.greenrobot.event.EventBus;
@@ -83,13 +88,21 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         mContext = this;
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Dexter.checkPermissions(new EmptyMultiplePermissionsListener(),
+            Dexter.checkPermissions(new MultiplePermissionsListener() {
+                                        @Override
+                                        public void onPermissionsChecked(MultiplePermissionsReport report) {
+                                        }
+
+                                        @Override
+                                        public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                                            token.continuePermissionRequest();
+                                        }
+                                    },
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.RECORD_AUDIO,
                     Manifest.permission.CAMERA,
                     Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-            );
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
 
         setupTabbarAppearance();
