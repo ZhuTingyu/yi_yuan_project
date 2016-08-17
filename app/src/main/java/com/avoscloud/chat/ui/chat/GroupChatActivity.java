@@ -226,7 +226,7 @@ public class GroupChatActivity extends ChatActivity {
 
     @Override
     protected void sendText() {
-        final String content = contentEdit.getText().toString();
+        final String content = chatTextInputField.getText().toString();
 
         mLastMsgContent = content;
 
@@ -247,7 +247,7 @@ public class GroupChatActivity extends ChatActivity {
                 messageAgent.sendEncapsulatedTypedMessage(message);
             }
 
-            contentEdit.setText("");
+            chatTextInputField.setText("");
         }
     }
 
