@@ -208,7 +208,14 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
         setRightItem(R.drawable.btn_search, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String url = "resources.html?history";
+                StringBuilder sb = new StringBuilder();
+                sb.append("resources.html?");
+
+                if (AuthHelper.getInstance().iAmUser()) {
+                    sb.append("history");
+                } else {
+                    sb.append("agency");
+                }
 
                 JSONObject object = new JSONObject();
                 JSONObject innerObject = new JSONObject();
@@ -221,7 +228,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
 
                 try {
                     object.put("params", innerObject);
-                    openLinkInNewActivity(url, object);
+                    openLinkInNewActivity(sb.toString(), object);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
