@@ -120,9 +120,6 @@ public class RestClient {
     }
 
     public void post(String url, HashMap<String, String> headers, HttpEntity entity, AsyncHttpResponseHandler responseHandler) {
-        AsyncHttpClient httpClient = new AsyncHttpClient();
-        httpClient.setResponseTimeout(20000);
-
         String rawUrl;
         if (url.startsWith("http://") || url.startsWith("https://")) {
             rawUrl = url;
@@ -135,21 +132,17 @@ public class RestClient {
             while (it.hasNext()) {
                 Map.Entry pair = (Map.Entry) it.next();
                 Timber.v(pair.getKey() + " = " + pair.getValue());
-                httpClient.addHeader(pair.getKey().toString(), pair.getValue().toString());
+                getClient().addHeader(pair.getKey().toString(), pair.getValue().toString());
                 it.remove(); // avoids a ConcurrentModificationException
             }
         }
 
-//        httpClient.addHeader(Constants.kHttpReqKeyContentType, entity.getContentType().getValue());
-        addHeader(httpClient);
+        addHeader(getClient());
 
-        httpClient.post(null, rawUrl, entity, null, responseHandler);
+        getClient().post(null, rawUrl, entity, null, responseHandler);
     }
 
     public void post(String url, HashMap<String, String> headers, RequestParams requestParams, AsyncHttpResponseHandler responseHandler) {
-        AsyncHttpClient httpClient = new AsyncHttpClient();
-        httpClient.setResponseTimeout(20000);
-
         String rawUrl;
         if (url.startsWith("http://") || url.startsWith("https://")) {
             rawUrl = url;
@@ -162,14 +155,14 @@ public class RestClient {
             while (it.hasNext()) {
                 Map.Entry pair = (Map.Entry) it.next();
                 Timber.v(pair.getKey() + " = " + pair.getValue());
-                httpClient.addHeader(pair.getKey().toString(), pair.getValue().toString());
+                getClient().addHeader(pair.getKey().toString(), pair.getValue().toString());
                 it.remove(); // avoids a ConcurrentModificationException
             }
         }
 
-        addHeader(httpClient);
+        addHeader(getClient());
 
-        httpClient.post(rawUrl, requestParams, responseHandler);
+        getClient().post(rawUrl, requestParams, responseHandler);
     }
 
     public void bridgeRequest(JSONObject params, int requestMethod, final WebViewJavascriptBridge.WVJBResponseCallback callback) {
@@ -283,7 +276,6 @@ public class RestClient {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String response, Throwable throwable) {
-                Timber.e(response);
                 JSONObject ret = new JSONObject();
                 try {
                     ret.put("status", statusCode);
