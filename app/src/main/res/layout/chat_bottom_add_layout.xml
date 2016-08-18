@@ -6,5 +6,6 @@
     android:layout_centerHorizontal="true"
     android:layout_marginTop="10dp"
     android:numColumns="4"
+    android:background="@color/white"
     android:paddingBottom="20dip"
     android:paddingTop="20dip" />
