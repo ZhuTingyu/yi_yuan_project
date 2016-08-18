@@ -20,17 +20,12 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.avos.avoscloud.im.v2.AVIMReservedMessageType;
-import com.avos.avoscloud.im.v2.AVIMTypedMessage;
-import com.avos.avoscloud.im.v2.messages.AVIMAudioMessage;
 import com.avoscloud.leanchatlib.adapter.ChatEmotionGridAdapter;
 import com.avoscloud.leanchatlib.adapter.ChatEmotionPagerAdapter;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.EmotionHelper;
-import com.avoscloud.leanchatlib.controller.MessageHelper;
 import com.avoscloud.leanchatlib.db.MsgsTable;
 import com.avoscloud.leanchatlib.db.RoomsTable;
-import com.avoscloud.leanchatlib.utils.DownloadUtils;
 import com.avoscloud.leanchatlib.utils.PathUtils;
 import com.avoscloud.leanchatlib.view.EmotionEditText;
 import com.avoscloud.leanchatlib.view.RecordButton;
@@ -40,11 +35,8 @@ import com.yuan.house.activities.WebViewBasedActivity;
 
 import org.apache.commons.lang3.NotImplementedException;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import butterknife.ButterKnife;
 import de.greenrobot.event.EventBus;
@@ -375,25 +367,5 @@ public abstract class ChatActivity extends WebViewBasedActivity implements OnCli
         super.onResume();
 
         chatManager.cancelNotification();
-    }
-
-    void cacheMsgs(List<AVIMTypedMessage> msgs) throws Exception {
-        Set<String> userIds = new HashSet<>();
-        for (AVIMTypedMessage msg : msgs) {
-            AVIMReservedMessageType type = AVIMReservedMessageType.getAVIMReservedMessageType(msg.getMessageType());
-            if (type == AVIMReservedMessageType.AudioMessageType) {
-                File file = new File(MessageHelper.getFilePath(msg));
-                if (!file.exists()) {
-                    AVIMAudioMessage audioMsg = (AVIMAudioMessage) msg;
-                    String url = audioMsg.getFileUrl();
-                    DownloadUtils.downloadFileIfNotExists(url, file);
-                }
-            }
-            userIds.add(msg.getFrom());
-        }
-        if (chatManager.getUserInfoFactory() == null) {
-            throw new NullPointerException("chat user factory is null");
-        }
-        chatManager.getUserInfoFactory().cacheUserInfoByIdsInBackground(new ArrayList<>(userIds));
     }
 }
