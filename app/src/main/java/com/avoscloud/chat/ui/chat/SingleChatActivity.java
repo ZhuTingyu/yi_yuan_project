@@ -292,11 +292,11 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
             @Override
             public void onVisibilityChanged(boolean isOpen) {
                 if (isOpen) {
-                    // FIXME: 8/17/16 hide bbs board
                     showOriginSizeBBS();
 
-                    // TODO: 8/17/16 hide assistant input grid
                     hideBottomLayout();
+                } else {
+                    showHalfSizeBBS();
                 }
             }
         });
@@ -628,22 +628,31 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
         webView.setHorizontalScrollBarEnabled(false);
         webView.setVerticalScrollBarEnabled(false);
         webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        webView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                    final int y = (int) event.getY();
 
-                    if (y < mLastY) return true;
+        disableVerticalScrollInWebView(webView, true);
+    }
 
-                    mLastY = y;
+    private void disableVerticalScrollInWebView(WebView webView, boolean disable) {
+        if (disable) {
+            webView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                        final int y = (int) event.getY();
+
+                        if (y < mLastY) return true;
+
+                        mLastY = y;
+                    }
+
+                    if (event.getAction() == MotionEvent.ACTION_UP) mLastY = 0;
+
+                    return false;
                 }
-
-                if (event.getAction() == MotionEvent.ACTION_UP) mLastY = 0;
-
-                return false;
-            }
-        });
+            });
+        } else {
+            webView.setOnTouchListener(null);
+        }
     }
 
     private void initSuggestedHouseInfos() {
@@ -950,6 +959,8 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     }
 
     private void showOriginSizeBBS() {
+        disableVerticalScrollInWebView(mFragmentBBS.getWebView(), true);
+
         int height = ((int) (getHeightS() * getResources().getDisplayMetrics().density));
 
         resizeBBSBoard(height);
@@ -957,6 +968,12 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
 
     @Override
     public void onShowHalfMessageBoard() {
+        showHalfSizeBBS();
+    }
+
+    private void showHalfSizeBBS() {
+        disableVerticalScrollInWebView(mFragmentBBS.getWebView(), false);
+
         int height = ((int) (getHeightM() * getResources().getDisplayMetrics().density));
 
         resizeBBSBoard(height);
@@ -1117,8 +1134,8 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
 //                throw new NullPointerException("chat user factory is null");
 //            }
             if (chatManager.getUserInfoFactory() != null) {
-            chatManager.getUserInfoFactory().cacheUserInfoByIdsInBackground(new ArrayList<>(userIds));
-        }
+                chatManager.getUserInfoFactory().cacheUserInfoByIdsInBackground(new ArrayList<>(userIds));
+            }
         }
 
     }
