@@ -111,7 +111,7 @@ public class BitmapUtil {
             } else {
                 scale = windowHeight / bmHeight;
             }
-            if(scale == 1){
+            if(scale <= 1){
                 return bm;
             }
             return zoomImg(bm, scale);
