@@ -1111,10 +1111,14 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                 }
                 userIds.add(msg.getFrom());
             }
-            if (chatManager.getUserInfoFactory() == null) {
-                throw new NullPointerException("chat user factory is null");
-            }
+
+            // FIXME: 8/18/16 avoid throw user factory null exception
+//            if (chatManager.getUserInfoFactory() == null) {
+//                throw new NullPointerException("chat user factory is null");
+//            }
+            if (chatManager.getUserInfoFactory() != null) {
             chatManager.getUserInfoFactory().cacheUserInfoByIdsInBackground(new ArrayList<>(userIds));
+        }
         }
 
     }
