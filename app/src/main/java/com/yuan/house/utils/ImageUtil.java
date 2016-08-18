@@ -8,7 +8,7 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.squareup.picasso.Callback;
+import com.dimo.utils.StringUtil;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayInputStream;
@@ -178,28 +178,21 @@ public class ImageUtil {
         } else {
             Picasso.with(iv.getContext())
                     .load(resourceId)
-//              .resize(dimension, dimension)
-//              .centerCrop()
                     .into(iv);
         }
     }
 
     public static void loadFullScreenImage(final ImageView iv, String imageUrl, int width, final LinearLayout bgLinearLayout) {
         if (!TextUtils.isEmpty(imageUrl)) {
-            Picasso.with(iv.getContext())
-                    .load(imageUrl)
-//                    .resize(width, 0)
-                    .into(iv, new Callback() {
-                        @Override
-                        public void onSuccess() {
-
-                        }
-
-                        @Override
-                        public void onError() {
-
-                        }
-                    });
+            if (StringUtil.isValidHTTPUrl(imageUrl)) {
+                Picasso.with(iv.getContext())
+                        .load(imageUrl)
+                        .into(iv);
+            } else {
+                Picasso.with(iv.getContext())
+                        .load("file://" + imageUrl)
+                        .into(iv);
+            }
         } else {
             iv.setImageDrawable(null);
         }
