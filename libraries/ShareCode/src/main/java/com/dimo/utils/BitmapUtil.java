@@ -1,9 +1,11 @@
 package com.dimo.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
 
 import com.blankj.utilcode.utils.ScreenUtils;
 
@@ -15,11 +17,14 @@ import java.io.OutputStream;
 
 import id.zelory.compressor.Compressor;
 
+import static android.R.attr.factor;
+import static android.R.attr.width;
+
 /**
  * Created by Alsor Zhou on 4/29/15.
  */
 public class BitmapUtil {
-    private static float FIT_LENGTH = 260f;
+    private static float FIT_LENGTH = 270f;
     private static int kImageCompressQuality = 60;
 
     public static void compressImage(Context context, String filename) {
@@ -76,21 +81,41 @@ public class BitmapUtil {
         Matrix matrix = new Matrix();
         matrix.postScale(scale, scale);
         // 得到新的图片
-        Bitmap newbm = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
-        return newbm;
+        Bitmap newBm = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
+        return newBm;
     }
 
-    public static Bitmap getFitCropImg(Bitmap bm) {
+    public static Bitmap getFitCropImg(Bitmap bm, Activity activity, int imageType) {
+
+        DisplayMetrics metric = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(metric);
+
+        float windowWidth = metric.widthPixels;     // 屏幕宽度（像素）
+        float windowHeight = metric.widthPixels;
         // 获得图片的宽高
-        int width = bm.getWidth();
-        int height = bm.getHeight();
-        int least = Math.min(width, height);
-        if (least < FIT_LENGTH) {
-            float sclae = FIT_LENGTH / least;
-            return zoomImg(bm, sclae);
+        int bmWidth = bm.getWidth();
+        int bmHeight = bm.getHeight();
+        //剪切头像
+        if (imageType == 13) {
+            int least = Math.min(bmWidth, bmHeight);
+            if (least < FIT_LENGTH) {
+                float scale = FIT_LENGTH / least;
+                return zoomImg(bm, scale);
+            } else {
+                return bm;
+            }
         } else {
-            return bm;
+            float scale;
+            if (bmWidth >= bmHeight) {
+                scale = windowWidth / bmWidth;
+            } else {
+                scale = windowHeight / bmHeight;
+            }
+            if(scale == 1){
+                return bm;
+            }
+            return zoomImg(bm, scale);
         }
     }
-
 }
+

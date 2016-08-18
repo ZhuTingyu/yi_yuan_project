@@ -80,7 +80,7 @@ public class CropActivity extends BaseFragmentActivity {
 
     private void configureCropImageView(int imageType, String imageName) {
         Bitmap bm = BitmapFactory.decodeFile(imageName);
-        cropImageView.setImageBitmap(BitmapUtil.getFitCropImg(bm));
+        cropImageView.setImageBitmap(BitmapUtil.getFitCropImg(bm, this, imageType));
 
         imagePath = imageClippedPath();
         cropImageView.setFixedAspectRatio(true);
