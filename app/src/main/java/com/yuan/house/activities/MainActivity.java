@@ -29,7 +29,6 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
-import com.yuan.house.BuildConfig;
 import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
@@ -48,8 +47,6 @@ import com.yuan.house.ui.fragment.UserMainFragment;
 import com.yuan.house.ui.fragment.UserMessageFragment;
 import com.yuan.house.ui.fragment.WebViewFragment;
 import com.yuan.house.utils.ToastUtil;
-
-import net.gotev.hostmonitor.HostMonitorConfig;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -150,10 +147,12 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
             }
         }
 
-        new HostMonitorConfig(this)
-                .setBroadcastAction(BuildConfig.APPLICATION_ID + ".reachability")
-                .add(Constants.kWebServiceHost, 80)
-                .save();
+//        new HostMonitorConfig(this)
+//                .setBroadcastAction(BuildConfig.APPLICATION_ID + ".reachability")
+//                .setCheckIntervalInSeconds(10)
+//                .setSocketTimeoutInMilliseconds(1000)
+//                .add(Constants.kWebServiceHost, 80)
+//                .save();
     }
 
     private void checkIfNotificationEnabledInSettings() {

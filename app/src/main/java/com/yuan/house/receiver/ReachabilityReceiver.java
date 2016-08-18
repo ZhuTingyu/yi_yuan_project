@@ -17,7 +17,7 @@ public class ReachabilityReceiver extends HostMonitorBroadcastReceiver {
     public void onHostStatusChanged(HostStatus status) {
         Timber.w("onHostStatusChanged : %s", status.toString());
 
-        if (status.isReachable()) {
+        if (status.isReachable() != status.isPreviousReachable()) {
             EventBus.getDefault().post(new NetworkReachabilityEvent(NetworkReachabilityEvent.NetworkReachabilityEventEnum.ONLINE, null));
         } else {
             EventBus.getDefault().post(new NetworkReachabilityEvent(NetworkReachabilityEvent.NetworkReachabilityEventEnum.OFFLINE, null));
