@@ -120,7 +120,6 @@ public class ImageUtil {
      * load from url
      */
     public static void loadImageThumbnail(ImageView iv, String imageUrl, int dimension) {
-
         if (TextUtils.isEmpty(imageUrl)) {
             iv.setImageDrawable(null);
             return;
@@ -136,8 +135,6 @@ public class ImageUtil {
             } else {
                 Picasso.with(iv.getContext())
                         .load(imageUrl)
-//                    .resize(dimension, dimension)
-//                    .centerCrop()
                         .into(iv);
             }
         } else {
@@ -160,8 +157,6 @@ public class ImageUtil {
             } else {
                 Picasso.with(iv.getContext())
                         .load(imageFile)
-//                    .resize(dimension, dimension)
-//                    .centerCrop()
                         .into(iv);
             }
         } else {

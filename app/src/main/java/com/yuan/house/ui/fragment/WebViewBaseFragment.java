@@ -115,8 +115,10 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
             holder.removeView(mWebView);
         }
 
-        mWebView.removeAllViews();
-        mWebView.destroy();
+        if (mWebView != null) {
+            mWebView.removeAllViews();
+            mWebView.destroy();
+        }
 
         EventBus.getDefault().unregister(this);
 
@@ -907,6 +909,8 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
                 MessageDao messageDao = DMApplication.getInstance().getMessageDao();
+
+                if (messageDao == null) return;
 
                 // 返回一个这个 house 下边所有用户的最后一条消息的list
                 List<com.lfy.bean.Message> list = messageDao.queryBuilder().build().list();

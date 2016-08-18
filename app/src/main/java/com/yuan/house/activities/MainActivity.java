@@ -25,7 +25,10 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.karumi.dexter.Dexter;
-import com.karumi.dexter.listener.multi.EmptyMultiplePermissionsListener;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.yuan.house.BuildConfig;
 import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
@@ -38,6 +41,7 @@ import com.yuan.house.event.PageEvent;
 import com.yuan.house.helper.AuthHelper;
 import com.yuan.house.ui.fragment.AgencyMainFragment;
 import com.yuan.house.ui.fragment.AgencyMessageFragment;
+import com.yuan.house.ui.fragment.CouponFragment;
 import com.yuan.house.ui.fragment.LoginFragment;
 import com.yuan.house.ui.fragment.ProposalFragment;
 import com.yuan.house.ui.fragment.UserMainFragment;
@@ -50,6 +54,8 @@ import net.gotev.hostmonitor.HostMonitorConfig;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 import butterknife.ButterKnife;
 import de.greenrobot.event.EventBus;
 import timber.log.Timber;
@@ -59,6 +65,10 @@ import timber.log.Timber;
  */
 
 public class MainActivity extends WebViewBasedActivity implements WebViewFragment.OnFragmentInteractionListener {
+    private final int kTabIndexOfCoupon = 0;
+    private final int kTabIndexOfMain = 1;
+    private final int kTabIndexOfMessage = 2;
+    private final int kTabIndexOfProposal = 3;
     public LocationClient locClient;
     public HouseLocationListener locationListener;
     private BottomNavigationBar bottomNavigationBar;
@@ -78,13 +88,21 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         mContext = this;
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Dexter.checkPermissions(new EmptyMultiplePermissionsListener(),
+            Dexter.checkPermissions(new MultiplePermissionsListener() {
+                                        @Override
+                                        public void onPermissionsChecked(MultiplePermissionsReport report) {
+                                        }
+
+                                        @Override
+                                        public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                                            token.continuePermissionRequest();
+                                        }
+                                    },
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.RECORD_AUDIO,
                     Manifest.permission.CAMERA,
                     Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-            );
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
 
         setupTabbarAppearance();
@@ -109,7 +127,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         initBaiduLocClient();
 
         if (prefs.getString(Constants.kWebDataKeyUserLogin, null) != null) {
-            switchToFragment(Constants.kFragmentTagMain);
+            switchToFragment(Constants.kFragmentTagCoupon);
 
 // configure chat service
 // 每次进入主界面都连接一下聊天服务器
@@ -128,7 +146,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         if (bundle != null) {
             boolean dtm = bundle.getBoolean("dropToMessage");
             if (dtm) {
-                bottomNavigationBar.selectTab(1);
+                bottomNavigationBar.selectTab(kTabIndexOfMessage);
             }
         }
 
@@ -184,7 +202,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         if (event.getEventType() == PageEvent.PageEventEnum.FINISHED) {
 
         } else if (event.getEventType() == PageEvent.PageEventEnum.FRIENDSHIP_UPDATE) {
-            bottomNavigationBar.selectTab(0);
+            bottomNavigationBar.selectTab(kTabIndexOfMain);
         } else if (event.getEventType() == PageEvent.PageEventEnum.DROP_TO_MESSAGE) {
             // TODO: 16/7/30 kill other child pages
             Intent intent = new Intent(this, MainActivity.class);
@@ -224,7 +242,9 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
             return f;
         }
 
-        if (tag.equals(Constants.kFragmentTagMain)) {
+        if (tag.equals(Constants.kFragmentTagCoupon)) {
+            f = CouponFragment.newInstance();
+        } else if (tag.equals(Constants.kFragmentTagMain)) {
             if (AuthHelper.getInstance().iAmUser()) {
                 f = UserMainFragment.newInstance();
             } else {
@@ -254,27 +274,33 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
     }
 
     public void setupTabbarAppearance() {
-        this.bottomNavigationBar = ButterKnife.findById(getTabBar(), R.id.bottom_navigation_bar);
+        bottomNavigationBar = ButterKnife.findById(getTabBar(), R.id.bottom_navigation_bar);
+        bottomNavigationBar.setMode(BottomNavigationBar.MODE_FIXED);
         bottomNavigationBar
+                .addItem(new BottomNavigationItem(R.drawable.ic_ticket, "优惠券")).setActiveColor(R.color.primary_color_scheme)
                 .addItem(new BottomNavigationItem(R.drawable.ic_home, "房源")).setActiveColor(R.color.primary_color_scheme)
                 .addItem(new BottomNavigationItem(R.drawable.ic_chat, "消息")).setActiveColor(R.color.primary_color_scheme)
                 .addItem(new BottomNavigationItem(R.drawable.ic_suggest, "建议")).setActiveColor(R.color.primary_color_scheme)
-                .setFirstSelectedPosition(0)
+                .setFirstSelectedPosition(kTabIndexOfCoupon)
                 .initialise();
     }
 
     private void setupTabbarClickListener() {
+
         bottomNavigationBar.setTabSelectedListener(new BottomNavigationBar.OnTabSelectedListener() {
             @Override
             public void onTabSelected(int position) {
                 switch (position) {
-                    case 0:
+                    case kTabIndexOfCoupon:
+                        switchToFragment(Constants.kFragmentTagCoupon);
+                        break;
+                    case kTabIndexOfMain:
                         switchToFragment(Constants.kFragmentTagMain);
                         break;
-                    case 1:
+                    case kTabIndexOfMessage:
                         switchToFragment(Constants.kFragmentTagMessage);
                         break;
-                    case 2:
+                    case kTabIndexOfProposal:
                         switchToFragment(Constants.kFragmentTagProposal);
                         break;
                 }
@@ -287,10 +313,10 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
             @Override
             public void onTabReselected(int position) {
                 switch (position) {
-                    case 0:
+                    case kTabIndexOfMain:
                         switchToFragment(Constants.kFragmentTagMain);
                         break;
-                    case 1:
+                    case kTabIndexOfMessage:
                         switchToFragment(Constants.kFragmentTagMessage);
                         break;
                 }

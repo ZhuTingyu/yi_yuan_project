@@ -70,6 +70,9 @@ import com.yuan.house.utils.ToastUtil;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
+
 import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -208,7 +211,14 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
         setRightItem(R.drawable.btn_search, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String url = "resources.html?history";
+                StringBuilder sb = new StringBuilder();
+                sb.append("resources.html?");
+
+                if (AuthHelper.getInstance().iAmUser()) {
+                    sb.append("history");
+                } else {
+                    sb.append("agency");
+                }
 
                 JSONObject object = new JSONObject();
                 JSONObject innerObject = new JSONObject();
@@ -221,7 +231,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
 
                 try {
                     object.put("params", innerObject);
-                    openLinkInNewActivity(url, object);
+                    openLinkInNewActivity(sb.toString(), object);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -277,6 +287,19 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                 }
             }
         });
+
+        KeyboardVisibilityEvent.setEventListener(this, new KeyboardVisibilityEventListener() {
+            @Override
+            public void onVisibilityChanged(boolean isOpen) {
+                if (isOpen) {
+                    // FIXME: 8/17/16 hide bbs board
+                    showOriginSizeBBS();
+
+                    // TODO: 8/17/16 hide assistant input grid
+                    hideBottomLayout();
+                }
+            }
+        });
     }
 
     @Override
@@ -313,14 +336,22 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     @Override
     protected void sendAudio(String audioPath) {
         if (messageAgent != null) {
-            messageAgent.sendAudio(audioPath);
+            Map<String, Object> attrs = new HashMap<>();
+            attrs.put("houseId", cachedHouseIdForCurrentConv);
+            attrs.put("username", jsonFormatParams.optString("nickname"));
+
+            messageAgent.sendAudio(attrs, audioPath);
         }
     }
 
     @Override
     protected void sendImage(String s) {
         if (messageAgent != null) {
-            messageAgent.sendImage(s);
+            Map<String, Object> attrs = new HashMap<>();
+            attrs.put("houseId", cachedHouseIdForCurrentConv);
+            attrs.put("username", jsonFormatParams.optString("nickname"));
+
+            messageAgent.sendImage(attrs, s);
         }
     }
 
@@ -408,7 +439,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
             public void onImageViewClick(AVIMImageMessage imageMsg) {
                 ChatActivity chatActivity = (ChatActivity) mContext;
                 ArrayList<String> paths = new ArrayList<>();
-                paths.add(MessageHelper.getFilePath(imageMsg));
+                paths.add(imageMsg.getFileUrl());
                 chatActivity.showImageGallery(paths);
             }
 
@@ -523,14 +554,12 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
 
-                // TODO: 16/7/11 update activity title
                 JSONObject to = response.optJSONObject("to");
                 String name = to.optString("name");
                 setTitleItem(name);
 
                 String avatar = to.optString("avatar");
 
-                // TODO: 16/7/11 update mMessageAdapter incoming avatar
                 if (!TextUtils.isEmpty(avatar)) {
                     mMessageAdapter.updatePeerAvatar(avatar);
                     mMessageAdapter.notifyDataSetChanged();
@@ -672,7 +701,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
 
     @Override
     protected void sendText() {
-        String content = contentEdit.getText().toString();
+        String content = chatTextInputField.getText().toString();
         if (!TextUtils.isEmpty(content)) {
             AVIMTextMessage message = new AVIMTextMessage();
 
@@ -686,7 +715,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
 
             messageAgent.sendEncapsulatedTypedMessage(message);
 
-            contentEdit.setText("");
+            chatTextInputField.setText("");
         }
     }
 
@@ -904,7 +933,11 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
 
     @Override
     public void onShowBBSView(boolean data) {
-        if (data) {
+        showBBSView(data);
+    }
+
+    private void showBBSView(boolean show) {
+        if (show) {
             findViewById(R.id.fragmentBBS).setVisibility(View.VISIBLE);
         } else {
             findViewById(R.id.fragmentBBS).setVisibility(View.GONE);
@@ -913,6 +946,10 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
 
     @Override
     public void onShowSampleMessageBoard() {
+        showOriginSizeBBS();
+    }
+
+    private void showOriginSizeBBS() {
         int height = ((int) (getHeightS() * getResources().getDisplayMetrics().density));
 
         resizeBBSBoard(height);
@@ -1044,7 +1081,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                         public void run() {
                             scrollToLast();
                         }
-                    },200);
+                    }, 200);
                 } else {
                     List<AVIMTypedMessage> newMsgs = new ArrayList<>();
                     newMsgs.addAll(msgs);

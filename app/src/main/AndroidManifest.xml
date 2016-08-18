@@ -115,11 +115,12 @@
             android:theme="@style/ImageGalleryTheme" />
 
         <activity
-            android:name=".activities.ImageViewPagerActivity"
+            android:name="com.etiennelawlor.imagegallery.library.activities.FullScreenImageGalleryActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label=""
             android:screenOrientation="portrait"
+            android:label=""
             android:theme="@style/ImageGalleryTheme" />
+
 
         <activity android:name=".activities.SegmentalWebActivity"
             android:screenOrientation="portrait"/>

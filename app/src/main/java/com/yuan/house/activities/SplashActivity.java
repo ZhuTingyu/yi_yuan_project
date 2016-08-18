@@ -4,7 +4,6 @@ package com.yuan.house.activities;
 import android.app.Notification;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -19,8 +18,6 @@ import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.UserInfoFactory;
 import com.avoscloud.leanchatlib.model.UserInfo;
 import com.dimo.utils.FileUtil;
-import com.lfy.dao.DaoMaster;
-import com.lfy.dao.DaoSession;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -79,21 +76,7 @@ public class SplashActivity extends FragmentActivity {
             prefs.edit().putBoolean(Constants.kWebPackageExtracted, true).apply();
 //        }
 
-        // TODO: 16/7/21 move this to heavy operation job.
-        initDatabase();
-
         setupChatManager();
-    }
-
-    private void initDatabase() {
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "chat-db", null);
-        SQLiteDatabase db = helper.getWritableDatabase();
-        // 注意：该数据库连接属于 DaoMaster，所以多个 Session 指的是相同的数据库连接。
-
-        DaoMaster daoMaster = new DaoMaster(db);
-        DaoSession daoSession = daoMaster.newSession();
-
-        DMApplication.getInstance().setMessageDao(daoSession.getMessageDao());
     }
 
     // setup chat related environment

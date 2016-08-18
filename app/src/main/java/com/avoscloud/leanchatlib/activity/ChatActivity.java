@@ -64,7 +64,7 @@ public abstract class ChatActivity extends WebViewBasedActivity implements OnCli
     protected ImageButton btnModeSwitch, showAddBtn;
     protected TextView sendMsgBtn;
     protected ViewPager emotionPager;
-    protected EmotionEditText contentEdit;
+    protected EmotionEditText chatTextInputField;
     protected XListView lvMessages;
     protected ListView lvGroups;
     protected RecordButton recordBtn;
@@ -90,7 +90,7 @@ public abstract class ChatActivity extends WebViewBasedActivity implements OnCli
 
         setSoftInputMode();
 
-        contentEdit.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        chatTextInputField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEND) {
@@ -113,7 +113,6 @@ public abstract class ChatActivity extends WebViewBasedActivity implements OnCli
     }
 
     private void initTitleView() {
-        // FIXME: 16/6/11 conversation title
         setLeftItem(R.drawable.btn_back, new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -126,7 +125,7 @@ public abstract class ChatActivity extends WebViewBasedActivity implements OnCli
         lvMessages = (XListView) findViewById(R.id.lvMessages);
         lvGroups = (ListView) findViewById(R.id.lvGroups);
 
-        contentEdit = (EmotionEditText) findViewById(R.id.editChatField);
+        chatTextInputField = (EmotionEditText) findViewById(R.id.editChatField);
         chatTextLayout = findViewById(R.id.rl_field_textmode);
         btnModeSwitch = (ImageButton) findViewById(R.id.btnModeSwitch);
         recordBtn = (RecordButton) findViewById(R.id.recordBtn);
@@ -138,13 +137,13 @@ public abstract class ChatActivity extends WebViewBasedActivity implements OnCli
         emotionPager = (ViewPager) findViewById(R.id.emotionPager);
         assistLayout = findViewById(R.id.chatMoreLayout);
 
-        contentEdit.setOnClickListener(this);
+        chatTextInputField.setOnClickListener(this);
         btnModeSwitch.setOnClickListener(this);
         showAddBtn.setOnClickListener(this);
         sendMsgBtn.setOnClickListener(this);
         showEmotionBtn.setOnClickListener(this);
 
-        contentEdit.addTextChangedListener(new TextWatcher() {
+        chatTextInputField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -192,12 +191,12 @@ public abstract class ChatActivity extends WebViewBasedActivity implements OnCli
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String emotionText = (String) parent.getAdapter().getItem(position);
-                int start = contentEdit.getSelectionStart();
-                StringBuffer sb = new StringBuffer(contentEdit.getText());
-                sb.replace(contentEdit.getSelectionStart(), contentEdit.getSelectionEnd(), emotionText);
-                contentEdit.setText(sb.toString());
+                int start = chatTextInputField.getSelectionStart();
+                StringBuffer sb = new StringBuffer(chatTextInputField.getText());
+                sb.replace(chatTextInputField.getSelectionStart(), chatTextInputField.getSelectionEnd(), emotionText);
+                chatTextInputField.setText(sb.toString());
 
-                CharSequence info = contentEdit.getText();
+                CharSequence info = chatTextInputField.getText();
                 if (info instanceof Spannable) {
                     Spannable spannable = (Spannable) info;
                     Selection.setSelection(spannable, start + emotionText.length());
@@ -272,8 +271,6 @@ public abstract class ChatActivity extends WebViewBasedActivity implements OnCli
         } else if (v.getId() == R.id.editChatField) {
             hideBottomLayoutAndScrollToLast();
         } else if (v.getId() == -1) {
-            // 显示推荐房源
-            //R.id.btnSwitchHouse
             showSuggestedHouses();
         } else if (v.getId() == R.id.btnMoreSend) {
             sendText();
@@ -321,7 +318,6 @@ public abstract class ChatActivity extends WebViewBasedActivity implements OnCli
             hideSoftInputView();
         }
     }
-
 
     private void toggleBottomAddLayout() {
         if (assistLayout.getVisibility() == View.VISIBLE) {

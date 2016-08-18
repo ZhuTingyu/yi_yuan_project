@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -29,6 +30,8 @@ import com.avos.avoscloud.im.v2.AVIMTypedMessage;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationQueryCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMSingleMessageQueryCallback;
+import com.avos.avoscloud.im.v2.messages.AVIMAudioMessage;
+import com.avos.avoscloud.im.v2.messages.AVIMImageMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
 import com.avoscloud.chat.ui.chat.GroupChatActivity;
 import com.avoscloud.chat.ui.chat.ServiceChatActivity;
@@ -43,7 +46,6 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
-import com.baoyz.actionsheet.ActionSheet;
 import com.bugtags.library.Bugtags;
 import com.dimo.utils.BitmapUtil;
 import com.dimo.utils.DateUtil;
@@ -54,6 +56,8 @@ import com.etiennelawlor.imagegallery.library.activities.FullScreenImageGalleryA
 import com.etiennelawlor.imagegallery.library.activities.ImageGalleryActivity;
 import com.etiennelawlor.imagegallery.library.adapters.FullScreenImageGalleryAdapter;
 import com.etiennelawlor.imagegallery.library.adapters.ImageGalleryAdapter;
+import com.flyco.dialog.listener.OnOperItemClickL;
+import com.flyco.dialog.widget.ActionSheetDialog;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.FileAsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -352,10 +356,16 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         String leanId = msg.getFrom();
         String auditType = "0";
         String houseId = null;
+
+        // FIXME: 8/16/16 shit code!!!
         if (msgType == HouseMessageType.TextMessageType) {
             houseId = ((AVIMTextMessage) msg).getAttrs().get("houseId").toString();
         } else if (msgType == HouseMessageType.HouseMessageType) {
             houseId = ((AVIMHouseMessage) msg).getAttrs().get("houseId").toString();
+        } else if (msgType == HouseMessageType.AudioMessageType) {
+            houseId = ((AVIMAudioMessage) msg).getAttrs().get("houseId").toString();
+        } else if (msgType == HouseMessageType.ImageMessageType) {
+            houseId = ((AVIMImageMessage) msg).getAttrs().get("houseId").toString();
         }
 
         JSONObject object = new JSONObject();
@@ -612,25 +622,20 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             e.printStackTrace();
         }
 
-        ActionSheet.createBuilder(mContext, getSupportFragmentManager())
-                .setCancelButtonTitle(R.string.cancel)
-                .setOtherButtonTitles(list.toArray(new String[list.size()]))
-                .setCancelableOnTouchOutside(true)
-                .setListener(new ActionSheet.ActionSheetListener() {
-                    @Override
-                    public void onDismiss(ActionSheet actionSheet, boolean isCancel) {
-                        actionSheet.dismiss();
-                    }
+        final String[] stringItems = list.toArray(new String[list.size()]);
+        final ActionSheetDialog dialog = new ActionSheetDialog(mContext, stringItems, null);
+        dialog.isTitleShow(false);
+        dialog.show();
 
-                    @Override
-                    public void onOtherButtonClick(ActionSheet actionSheet, int index) {
-                        if (jsCallback != null) {
-                            jsCallback.callback(index);
-                        }
-
-                        actionSheet.dismiss();
-                    }
-                }).show();
+        dialog.setOnOperItemClickL(new OnOperItemClickL() {
+            @Override
+            public void onOperItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (jsCallback != null) {
+                    jsCallback.callback(position);
+                }
+                dialog.dismiss();
+            }
+        });
     }
 
     @Override
@@ -711,7 +716,11 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 AVIMHouseMessage message = new AVIMHouseMessage();
 
                 Map<String, Object> attrs = new HashMap<>();
-                attrs.put("houseId", houseInfo.optString("house_id"));
+                String houseId = houseInfo.optString("house_id");
+                if (TextUtils.isEmpty(houseId)) {
+                    houseId = houseInfo.optString("id");
+                }
+                attrs.put("houseId", houseId);
                 JSONArray images = houseInfo.optJSONArray("images");
 
                 if (images == null || images.length() == 0) {
@@ -910,11 +919,11 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     public void showImageGallery(List<String> images) {
-        Intent intent = new Intent(this, ImageViewPagerActivity.class);
+        Intent intent = new Intent(this, FullScreenImageGalleryActivity.class);
 
         Bundle bundle = new Bundle();
-        bundle.putStringArrayList(ImageViewPagerActivity.KEY_IMAGES, new ArrayList<>(images));
-        bundle.putString(ImageViewPagerActivity.KEY_TITLE, "图片库");
+        bundle.putStringArrayList(FullScreenImageGalleryActivity.KEY_IMAGES, new ArrayList<>(images));
+        bundle.putInt(FullScreenImageGalleryActivity.KEY_POSITION, 0);
         intent.putExtras(bundle);
 
         startActivity(intent);

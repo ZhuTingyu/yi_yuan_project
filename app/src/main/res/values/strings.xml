@@ -102,5 +102,6 @@
     <string name="error_leancloud_login_failed">消息服务器登陆失败, 请检查手机的时间设置是否正确</string>
     <string name="hint_cancel_voice_send">手指上滑，取消发送</string>
     <string name="placeholder_send_msg">发送新消息</string>
+    <string name="title_coupon">优惠券</string>
 
 </resources>

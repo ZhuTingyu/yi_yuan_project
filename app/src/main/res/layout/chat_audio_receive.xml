@@ -37,7 +37,7 @@
             <View
                 android:id="@+id/audioPlaceView"
                 android:layout_width="30dp"
-                android:layout_height="1dip" />
+                android:layout_height="30dp" />
 
         </LinearLayout>
 
