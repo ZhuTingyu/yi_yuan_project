@@ -292,11 +292,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
             @Override
             public void onVisibilityChanged(boolean isOpen) {
                 if (isOpen) {
-                    showOriginSizeBBS();
-
                     hideBottomLayout();
-                } else {
-                    showHalfSizeBBS();
                 }
             }
         });
