@@ -3,7 +3,6 @@ package com.dimo.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
-import android.provider.MediaStore;
 
 import com.blankj.utilcode.utils.ScreenUtils;
 
@@ -58,14 +57,15 @@ public class BitmapUtil {
             e.printStackTrace();
         }
 
-        try {
-            MediaStore.Images.Media.insertImage(context.getContentResolver(),
-                    file.getAbsolutePath(),
-                    file.getName(),
-                    file.getName());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        bm.recycle();
+//        try {
+//            MediaStore.Images.Media.insertImage(context.getContentResolver(),
+//                    file.getAbsolutePath(),
+//                    file.getName(),
+//                    file.getName());
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public static Bitmap zoomImg(Bitmap bm, float scale) {
