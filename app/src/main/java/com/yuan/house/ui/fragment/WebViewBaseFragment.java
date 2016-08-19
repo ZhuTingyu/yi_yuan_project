@@ -2,6 +2,7 @@ package com.yuan.house.ui.fragment;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -32,6 +33,7 @@ import com.blankj.utilcode.utils.KeyboardUtils;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.lfy.dao.MessageDao;
+import com.yuan.house.BuildConfig;
 import com.yuan.house.R;
 import com.yuan.house.activities.WebViewBasedActivity;
 import com.yuan.house.application.DMApplication;
@@ -59,6 +61,8 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import de.greenrobot.event.EventBus;
 import timber.log.Timber;
+
+import static android.content.Context.CLIPBOARD_SERVICE;
 
 /**
  * Created by Alsor Zhou on 8/13/15.
@@ -275,6 +279,43 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
 
                     com.alibaba.fastjson.JSONObject object = JSON.parseObject(data);
                     ToastUtil.showShort(getActivity(), object.getString("msg"));
+                }
+            }
+        });
+
+        getBridge().registerHandler("shareOnSocial", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
+                try {
+                    JSONObject object = new JSONObject(data);
+                    String title = object.optString("title");
+                    String content = object.optString("content");
+                    String url = object.optString("url");
+
+                    ((WebViewBasedActivity) getActivity()).shareOnSocial(url, title, content);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        getBridge().registerHandler("getClipboardText", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
+                if (null != callback) {
+                    ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(CLIPBOARD_SERVICE);
+
+                    callback.callback(clipboard.getText());
+                }
+            }
+        });
+
+        getBridge().registerHandler("getAPPVersion", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
+                if (null != callback) {
+                    String version = BuildConfig.VERSION_NAME;
+                    callback.callback(version);
                 }
             }
         });
