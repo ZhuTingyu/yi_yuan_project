@@ -203,11 +203,12 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         } else if (event.getEventType() == PageEvent.PageEventEnum.FRIENDSHIP_UPDATE) {
             bottomNavigationBar.selectTab(kTabIndexOfMain);
         } else if (event.getEventType() == PageEvent.PageEventEnum.DROP_TO_MESSAGE) {
-            // TODO: 16/7/30 kill other child pages
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.putExtra("dropToMessage", true);
             startActivity(intent);
+        } else if (event.getEventType() == PageEvent.PageEventEnum.GET_LOCATION) {
+            openMapActivity();
         }
     }
 

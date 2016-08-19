@@ -22,7 +22,7 @@ public class PageEvent {
     }
 
     public enum PageEventEnum {
-        FINISHED(1), REDIRECT(2), FRIENDSHIP_UPDATE(5), DROP_TO_MESSAGE(6);
+        FINISHED(1), REDIRECT(2), FRIENDSHIP_UPDATE(5), DROP_TO_MESSAGE(6), GET_LOCATION(7);
 
         private int value;
 

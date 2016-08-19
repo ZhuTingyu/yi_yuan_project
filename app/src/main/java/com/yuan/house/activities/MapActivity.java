@@ -119,7 +119,6 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
         }
 
         setLeftItem(R.drawable.btn_back, new View.OnClickListener() {
@@ -177,7 +176,6 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         baiduMap.setOnMapLoadedCallback(new BaiduMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
-                // TODO: 16/7/20 direct to lat/lng if already has address passin
                 locClient.start();
             }
         });
@@ -185,19 +183,19 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
 
     private void initLocation() {
         baiduMap.setMyLocationEnabled(true);
-        LatLng cenpt = new LatLng(mLocation.optDouble("lat"), mLocation.optDouble("lng"));
-        //定义地图状态
-        MapStatus mMapStatus = new MapStatus.Builder()
-                .target(cenpt)
-                .zoom(18)
-                .build();
-        //定义MapStatusUpdate对象，以便描述地图状态将要发生的变化
+        if (mLocation != null) {
+            LatLng cenpt = new LatLng(mLocation.optDouble("lat"), mLocation.optDouble("lng"));
+            //定义地图状态
+            MapStatus mMapStatus = new MapStatus.Builder()
+                    .target(cenpt)
+                    .zoom(18)
+                    .build();
+            //定义MapStatusUpdate对象，以便描述地图状态将要发生的变化
 
-
-        MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mMapStatus);
-        //改变地图状态
-        baiduMap.setMapStatus(mMapStatusUpdate);
-
+            MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mMapStatus);
+            //改变地图状态
+            baiduMap.setMapStatus(mMapStatusUpdate);
+        }
         //获取当前位置
         locClient = new LocationClient(this);
         locClient.registerLocationListener(locationListener);

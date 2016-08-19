@@ -334,7 +334,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
      * @param title    标题
      * @param content  文本
      */
-    private void showShare(String imageUrl, String title, String content) {
+    public void shareOnSocial(String imageUrl, String title, String content) {
         ShareSDK.initSDK(this);
 
         OnekeyShare oks = new OnekeyShare();
@@ -988,6 +988,14 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     public void onBridgeSelectMapLocation(String data) {
+        openMapActivity(data);
+    }
+
+    protected void openMapActivity() {
+        openMapActivity(null);
+    }
+
+    private void openMapActivity(String data) {
         Intent intent = new Intent(mContext, MapActivity.class);
 
         if (!TextUtils.isEmpty(data)) {
@@ -1197,8 +1205,6 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         return super.dispatchTouchEvent(event);
     }
 
-    // region ImageGalleryAdapter.ImageThumbnailLoader Methods
-
     /**
      * load from url
      */
@@ -1206,8 +1212,6 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         ImageUtil.loadImageThumbnail(iv, imageUrl, dimension);
     }
 
-
-    // region FullScreenImageGalleryAdapter.FullScreenImageLoader
     public void loadFullScreenImage(final ImageView iv, String imageUrl, int width, final LinearLayout bgLinearLayout) {
         ImageUtil.loadFullScreenImage(iv, imageUrl, width, bgLinearLayout);
     }
@@ -1236,7 +1240,6 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             }
         }
     }
-    // endregion
 
     private void downloadFileAndPrepareInstallation() {
         String url = prefs.getString(Constants.kNewAppDownloadUrl, null);
