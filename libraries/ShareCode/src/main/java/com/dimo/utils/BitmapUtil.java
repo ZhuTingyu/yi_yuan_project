@@ -80,7 +80,7 @@ public class BitmapUtil {
         activity.getWindowManager().getDefaultDisplay().getMetrics(metric);
 
         float windowWidth = metric.widthPixels;     // 屏幕宽度（像素）
-        float windowHeight = metric.widthPixels;
+        float windowHeight = metric.heightPixels;
         // 获得图片的宽高
         int bmWidth = bm.getWidth();
         int bmHeight = bm.getHeight();
