@@ -230,6 +230,8 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
         //退订之后需要重新保存 Installation
         AVInstallation.getCurrentInstallation().saveInBackground();
+
+        EventBus.getDefault().unregister(this);
     }
 
     protected Fragment getFragment(String tag) {
