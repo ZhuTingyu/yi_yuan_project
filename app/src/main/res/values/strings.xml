@@ -83,6 +83,7 @@
     <string name="user_type_agency">经纪人</string>
     <string name="user_type_user">用户</string>
     <string name="chat_house">房源</string>
+    <string name="chat_card">卡片</string>
     <string name="txt_online">在线</string>
     <string name="permission_location_title">定位权限</string>
     <string name="permission_location_description">我们需要您打开定位权限用于定位附近的房屋</string>

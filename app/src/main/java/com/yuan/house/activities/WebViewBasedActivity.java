@@ -39,6 +39,7 @@ import com.avoscloud.chat.ui.chat.SingleChatActivity;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.MessageAgent;
 import com.avoscloud.leanchatlib.controller.MessageHelper;
+import com.avoscloud.leanchatlib.model.AVIMCardMessage;
 import com.avoscloud.leanchatlib.model.AVIMHouseMessage;
 import com.avoscloud.leanchatlib.model.AVIMPresenceMessage;
 import com.avoscloud.leanchatlib.model.MessageEvent;
@@ -743,6 +744,63 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 ChatManager.getInstance().storeLastMessage(message);
             }
         });
+    }
+
+    /**
+     * 发送卡片消息
+     *
+     * @param cardInfo 卡片信息
+     */
+    private void sendCardMessage(final JSONObject cardInfo) {
+        String peerId = cardInfo.optString("targetObjectId");
+
+        final String icon = cardInfo.optString("icon");
+        final String title = cardInfo.optString("title");
+        final String content = cardInfo.optString("content");
+        final String url = cardInfo.optString("url");
+
+        ChatManager.getInstance().fetchConversationWithUserId(cardInfo, peerId, new AVIMConversationCreatedCallback() {
+            @Override
+            public void done(AVIMConversation avimConversation, AVIMException e) {
+                if (e != null) {
+                    e.printStackTrace();
+                    return;
+                }
+
+                AVIMCardMessage message = new AVIMCardMessage();
+
+                Map<String, Object> attrs = new HashMap<>();
+
+                attrs.put("cardIcon", icon);
+                attrs.put("cardTitle", title);
+                attrs.put("cardContent", content);
+                attrs.put("cardUrl", url);
+
+                message.setAttrs(attrs);
+
+                MessageAgent messageAgent = new MessageAgent(avimConversation);
+                messageAgent.sendEncapsulatedTypedMessage(message);
+
+                // 发送成功之后需要缓存该条消息到本地
+                ChatManager.getInstance().storeLastMessage(message);
+            }
+        });
+    }
+
+    @Override
+    public void onBridgeSendCardMessage(String data) {
+        JSONObject peerLeanId = null;
+
+        JSONObject object;
+        try {
+            object = new JSONObject(data);
+        // TODO: 8/20/16 Send Card Message
+        sendCardMessage(object);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override

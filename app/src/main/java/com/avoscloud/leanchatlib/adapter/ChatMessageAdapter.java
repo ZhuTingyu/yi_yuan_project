@@ -21,6 +21,7 @@ import com.avoscloud.leanchatlib.controller.AudioHelper;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.avoscloud.leanchatlib.controller.EmotionHelper;
 import com.avoscloud.leanchatlib.controller.MessageHelper;
+import com.avoscloud.leanchatlib.model.AVIMCardMessage;
 import com.avoscloud.leanchatlib.model.AVIMHouseMessage;
 import com.avoscloud.leanchatlib.model.ConversationType;
 import com.avoscloud.leanchatlib.utils.PhotoUtils;
@@ -127,6 +128,12 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
                 conView = createViewByType(houseInfoMessage.getMessageType(), others);
                 initHouseMessageView(conView, houseInfoMessage, others);
                 bean.setMessage(mContext.getString(R.string.chat_house));
+            } else if (msg instanceof AVIMCardMessage) {
+                AVIMCardMessage cardMessage = (AVIMCardMessage) msg;
+                others = messageSentByOthers(cardMessage);
+                conView = createViewByType(cardMessage.getMessageType(), others);
+                initCardMessageView(conView, cardMessage, others);
+                bean.setMessage(mContext.getString(R.string.chat_card));
             } else if (msg instanceof AVIMTypedMessage) {
                 AVIMTypedMessage typedMessage = (AVIMTypedMessage) msg;
                 others = messageSentByOthers(typedMessage);
@@ -165,6 +172,67 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
 //        activity.registerForContextMenu(contentLayout);
 
         return conView;
+    }
+
+    private void initCardMessageView(View conView, AVIMTypedMessage msg, boolean isMessageSentByMe) {
+        AVIMCardMessage message = (AVIMCardMessage) msg;
+
+        Map<String, Object> map = message.getAttrs();
+        final JSONObject object = (JSONObject) JSON.toJSON(map);
+
+        if (object.size() == 0) return;
+
+        View houseView = ViewHolder.findViewById(conView, R.id.houseRL);
+        ImageView img = ViewHolder.findViewById(conView, R.id.image);
+        TextView title = ViewHolder.findViewById(conView, R.id.title);
+        TextView area = ViewHolder.findViewById(conView, R.id.area);
+
+        houseView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String url = object.getString("url");
+
+                EventBus.getDefault().post(new PageEvent(PageEvent.PageEventEnum.REDIRECT, url));
+            }
+        });
+
+
+        View statusSendFailed = ViewHolder.findViewById(conView, R.id.status_send_failed);
+        View statusSendStart = ViewHolder.findViewById(conView, R.id.status_send_start);
+
+        String imageUrl = object.getString("icon");
+        if (TextUtils.isEmpty(imageUrl)) {
+            Picasso.with(ctx).load(R.drawable.img_placeholder).fit().into(img);
+        } else {
+            Picasso.with(ctx).load(imageUrl).placeholder(R.drawable.img_placeholder).into(img);
+        }
+
+        String houseName = object.getString("title");
+        if (TextUtils.isEmpty(houseName)) {
+            title.setVisibility(View.INVISIBLE);
+        }
+        title.setText(houseName);
+
+        area.setText(object.getString("content"));
+
+        if (isMessageSentByMe == false) {
+            hideStatusViews(statusSendStart, statusSendFailed);
+            setSendFailedBtnListener(statusSendFailed, msg);
+            switch (msg.getMessageStatus()) {
+                case AVIMMessageStatusFailed:
+                    statusSendFailed.setVisibility(View.VISIBLE);
+                    break;
+                case AVIMMessageStatusSent:
+                    break;
+                case AVIMMessageStatusNone:
+                case AVIMMessageStatusSending:
+                    statusSendStart.setVisibility(View.VISIBLE);
+                    break;
+                case AVIMMessageStatusReceipt:
+                    break;
+            }
+        }
+        activity.registerForContextMenu(houseView);
     }
 
     private void initHouseMessageView(View conView, AVIMTypedMessage msg, boolean isMessageSentByMe) {
@@ -425,12 +493,14 @@ public class ChatMessageAdapter extends BaseListAdapter<AVIMTypedMessage> {
         return baseView;
     }
 
-    // TODO: 16/7/11 wtf, refactor to use HouseInfoMessageType
     public View createViewByType(int type, boolean comeMsg) {
         View baseView;
         switch (type) {
             case 2:
                 baseView = inflater.inflate(comeMsg ? R.layout.chat_house_info_receive : R.layout.chat_house_info_send, null);
+                break;
+            case 3:
+                baseView = inflater.inflate(comeMsg ? R.layout.chat_card_receive : R.layout.chat_card_send, null);
                 break;
             default:
                 throw new IllegalStateException();

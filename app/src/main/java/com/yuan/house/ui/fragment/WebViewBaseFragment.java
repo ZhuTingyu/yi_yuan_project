@@ -932,6 +932,9 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
             }
         });
 
+        /**
+         * 发送推荐房源消息
+         */
         getBridge().registerHandler("sendRecommendedMessage", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
@@ -939,6 +942,20 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
 
                 if (null != mBridgeListener) {
                     mBridgeListener.onBridgeSendRecommendedMessage(data);
+                }
+            }
+        });
+
+        /**
+         * 发送通用卡片消息
+         */
+        getBridge().registerHandler("sendCardMessage", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                Timber.v("sendCardMessage");
+
+                if (null != mBridgeListener) {
+                    mBridgeListener.onBridgeSendCardMessage(data);
                 }
             }
         });
@@ -1294,6 +1311,8 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
         void onBridgeShowErrorMessage(JSONObject data);
 
         void onBridgeSendRecommendedMessage(String data);
+
+        void onBridgeSendCardMessage(String data);
 
         void onBridgeUpdateUserMessage(String data);
 
