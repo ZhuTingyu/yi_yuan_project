@@ -331,11 +331,11 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     /**
      * 社会化分享
      *
-     * @param imageUrl 图片地址
-     * @param title    标题
-     * @param content  文本
+     * @param url     图片地址
+     * @param title   标题
+     * @param content 文本
      */
-    public void shareOnSocial(String imageUrl, String title, String content) {
+    public void shareOnSocial(String url, String title, String content) {
         ShareSDK.initSDK(this);
 
         OnekeyShare oks = new OnekeyShare();
@@ -343,7 +343,10 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
         oks.setTitle(title);
         oks.setText(content);
-        oks.setImageUrl(imageUrl);
+
+        oks.setImageUrl("http://test.house.ieyuan.com/img_placeholder.png");
+
+        oks.setUrl(url);
 
         oks.show(this);
     }
@@ -502,7 +505,9 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
             String path = data.getStringExtra("data");
             JSONArray datum = new JSONArray();
             datum.put(path);
-            mBridgeCallback.callback(datum.toString());
+            if (null != mBridgeCallback) {
+                mBridgeCallback.callback(datum.toString());
+            }
         } else if (requestCode == kActivityRequestCodeSelectMapLocation) {
             Timber.v("kActivityRequestCodeSelectMapLocation");
             // reverse callback the selected map location
@@ -789,18 +794,15 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
     @Override
     public void onBridgeSendCardMessage(String data) {
-        JSONObject peerLeanId = null;
-
         JSONObject object;
         try {
             object = new JSONObject(data);
-        // TODO: 8/20/16 Send Card Message
-        sendCardMessage(object);
+            // TODO: 8/20/16 Send Card Message
+            sendCardMessage(object);
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -1056,8 +1058,15 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     private void openMapActivity(String data) {
         Intent intent = new Intent(mContext, MapActivity.class);
 
-        if (!TextUtils.isEmpty(data)) {
-            intent.putExtra("location", data);
+        try {
+            if (!TextUtils.isEmpty(data)) {
+                JSONObject object = new JSONObject(data);
+                if (object.length() > 0) {
+                    intent.putExtra("location", data);
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
         startActivityForResult(intent, kActivityRequestCodeSelectMapLocation);
