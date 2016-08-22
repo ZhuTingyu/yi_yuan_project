@@ -2,6 +2,7 @@ package com.yuan.house.ui.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,6 +53,11 @@ public class AgencyMainFragment extends WebViewBaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        String city = prefs.getString(Constants.kPrefsLastSelectedCityFromMap, null);
+        if (!TextUtils.isEmpty(city)) {
+            rightItem.setText(city);
+        }
+
         rightItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -65,6 +71,8 @@ public class AgencyMainFragment extends WebViewBaseFragment {
             BDLocation location = event.getHolder();
             Address address = location.getAddress();
             rightItem.setText(address.city);
+
+            getWebView().reload();
         }
     }
 }
