@@ -62,6 +62,8 @@ import timber.log.Timber;
  */
 
 public class MainActivity extends WebViewBasedActivity implements WebViewFragment.OnFragmentInteractionListener {
+    private final boolean kDebugCoupon = true;
+
     private final int kTabIndexOfCoupon = 0;
     private final int kTabIndexOfMain = 1;
     private final int kTabIndexOfMessage = 2;
@@ -124,7 +126,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         initBaiduLocClient();
 
         if (prefs.getString(Constants.kWebDataKeyUserLogin, null) != null) {
-            switchToFragment(Constants.kFragmentTagCoupon);
+            switchToFragment(Constants.kFragmentTagMain);
 
 // configure chat service
 // 每次进入主界面都连接一下聊天服务器
@@ -281,7 +283,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                 .addItem(new BottomNavigationItem(R.drawable.ic_home, "房源")).setActiveColor(R.color.primary_color_scheme)
                 .addItem(new BottomNavigationItem(R.drawable.ic_chat, "消息")).setActiveColor(R.color.primary_color_scheme)
                 .addItem(new BottomNavigationItem(R.drawable.ic_suggest, "建议")).setActiveColor(R.color.primary_color_scheme)
-                .setFirstSelectedPosition(kTabIndexOfCoupon)
+                .setFirstSelectedPosition(kTabIndexOfMain)
                 .initialise();
     }
 
@@ -292,7 +294,9 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
             public void onTabSelected(int position) {
                 switch (position) {
                     case kTabIndexOfCoupon:
-                        switchToFragment(Constants.kFragmentTagCoupon);
+                        if (kDebugCoupon) {
+                            switchToFragment(Constants.kFragmentTagCoupon);
+                        }
                         break;
                     case kTabIndexOfMain:
                         switchToFragment(Constants.kFragmentTagMain);
