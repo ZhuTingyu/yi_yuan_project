@@ -13,6 +13,7 @@ import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.SyncHttpClient;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.common.Constants;
+import com.yuan.house.event.NetworkReachabilityEvent;
 import com.yuan.house.event.NotificationEvent;
 import com.yuan.house.helper.AuthHelper;
 
@@ -246,6 +247,11 @@ public class RestClient {
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject response) {
                 if (statusCode == kHttpStatusCodeErrorKickOut) {
                     EventBus.getDefault().post(new NotificationEvent(NotificationEvent.NotificationEventEnum.KICK_OUT, null));
+                    return;
+                }
+
+                if (throwable != null) {
+                    EventBus.getDefault().post(new NetworkReachabilityEvent(NetworkReachabilityEvent.NetworkReachabilityEventEnum.OFFLINE, null));
                     return;
                 }
 
