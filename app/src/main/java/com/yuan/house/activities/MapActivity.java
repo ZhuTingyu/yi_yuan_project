@@ -62,7 +62,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
     public MapLocationListener locationListener = new MapLocationListener();
     protected MapView mMapView;
     protected BaiduMap baiduMap;
-    protected LocationClient locClient;
+    protected LocationClient locationClient;
     boolean isFirstLoc = true;// 是否首次定位
     BDLocation bdLocation;
     @Nullable
@@ -169,7 +169,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         baiduMap.setOnMapLoadedCallback(new BaiduMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
-                locClient.start();
+                locationClient.start();
             }
         });
 
@@ -192,15 +192,15 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         }
 
         //获取当前位置
-        locClient = new LocationClient(this);
-        locClient.registerLocationListener(locationListener);
+        locationClient = new LocationClient(this);
+        locationClient.registerLocationListener(locationListener);
         LocationClientOption option = new LocationClientOption();
         option.setOpenGps(true);
         option.setScanSpan(5000);
         option.setCoorType("bd09ll");
         option.setIsNeedAddress(true);
         option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
-        locClient.setLocOption(option);
+        locationClient.setLocOption(option);
     }
 
     private void initMapConfig() {
@@ -356,12 +356,13 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         super.onDestroy();
 
         baiduMap.setMyLocationEnabled(false);
-        locClient.stop();
+        locationClient.stop();
     }
 
     public class MapLocationListener implements BDLocationListener {
         @Override
         public void onReceiveLocation(BDLocation location) {
+            // FIXME: 8/22/16 update location ONLY once.
             targetPoint = new LatLng(location.getLatitude(), location.getLongitude());
 
             int locType = location.getLocType();
@@ -390,6 +391,8 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
                     startReverseGeoCode(ll);
                 }
             }
+
+            locationClient.stop();
         }
     }
 }

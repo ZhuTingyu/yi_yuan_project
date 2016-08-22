@@ -105,5 +105,8 @@
     <string name="placeholder_send_msg">发送新消息</string>
     <string name="title_coupon">优惠券</string>
     <string name="dummy_city">成都市</string>
+    <string name="hint_found_new_version">发现新版本</string>
+    <string name="hint_found_new_version_description">我们检测到有新版本刚刚发布, 强烈建议您立刻更新到该版本。是否现在更新?</string>
+    <string name="error_upgrade_app">升级程序异常,请稍后重试</string>
 
 </resources>

@@ -2,13 +2,17 @@ package com.yuan.house.activities;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationManagerCompat;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
@@ -29,6 +33,7 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.loopj.android.http.FileAsyncHttpResponseHandler;
 import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
@@ -38,6 +43,7 @@ import com.yuan.house.event.LocationEvent;
 import com.yuan.house.event.NetworkReachabilityEvent;
 import com.yuan.house.event.PageEvent;
 import com.yuan.house.helper.AuthHelper;
+import com.yuan.house.http.RestClient;
 import com.yuan.house.ui.fragment.AgencyMainFragment;
 import com.yuan.house.ui.fragment.AgencyMessageFragment;
 import com.yuan.house.ui.fragment.CouponFragment;
@@ -48,9 +54,11 @@ import com.yuan.house.ui.fragment.UserMessageFragment;
 import com.yuan.house.ui.fragment.WebViewFragment;
 import com.yuan.house.utils.ToastUtil;
 
+import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -62,13 +70,13 @@ import timber.log.Timber;
  */
 
 public class MainActivity extends WebViewBasedActivity implements WebViewFragment.OnFragmentInteractionListener {
-    private final boolean kDebugCoupon = true;
+    private final boolean kDebugCoupon = false;
 
     private final int kTabIndexOfCoupon = 0;
     private final int kTabIndexOfMain = 1;
     private final int kTabIndexOfMessage = 2;
     private final int kTabIndexOfProposal = 3;
-    public LocationClient locClient;
+    public LocationClient locationClient;
     public HouseLocationListener locationListener;
     private BottomNavigationBar bottomNavigationBar;
     private boolean doubleBackToExitPressedOnce = false;
@@ -123,16 +131,12 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
         AVAnalytics.trackAppOpened(getIntent());
 
-        initBaiduLocClient();
+        initLocationClient();
 
         if (prefs.getString(Constants.kWebDataKeyUserLogin, null) != null) {
             switchToFragment(Constants.kFragmentTagMain);
 
-// configure chat service
-// 每次进入主界面都连接一下聊天服务器
-//            if (AVUser.getCurrentUser() != null) {
-            doAVUserLogin();
-//            }
+            doAVUserLogin();            // 每次进入主界面都连接一下聊天服务器
         } else {
             switchToFragment(Constants.kFragmentTagLogin);
         }
@@ -219,7 +223,8 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
             // 注销已完成, 重新显示登录界面
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);        }
+            startActivity(intent);
+        }
     }
 
     @Override
@@ -414,39 +419,96 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                 });
     }
 
-    private void initBaiduLocClient() {
-        locClient = new LocationClient(mContext);
+    private void initLocationClient() {
+        locationClient = new LocationClient(mContext);
         LocationClientOption option = new LocationClientOption();
         option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
         option.setScanSpan(5000);
         option.setCoorType("bd09ll");
         option.setIsNeedAddress(true);
-        locClient.setLocOption(option);
+        locationClient.setLocOption(option);
 
         locationListener = new HouseLocationListener();
-        locClient.registerLocationListener(locationListener);
-        locClient.start();
+        locationClient.registerLocationListener(locationListener);
+        locationClient.start();
+    }
+
+    protected void executeAppVersionCheck() {
+        boolean hasNewVersion = prefs.getString(Constants.kAppHasNewVersion, "0").equals("1");
+
+        if (hasNewVersion) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.hint_found_new_version);
+            builder.setMessage(R.string.hint_found_new_version_description);
+
+            builder.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    downloadFileAndPrepareInstallation();
+                }
+            });
+            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+            if (!isFinishing()) {
+                builder.create().show();
+            }
+        }
+    }
+
+    private void downloadFileAndPrepareInstallation() {
+        String url = prefs.getString(Constants.kNewAppDownloadUrl, null);
+        if (TextUtils.isEmpty(url)) {
+            Toast.makeText(mContext, R.string.error_upgrade_app, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        final ProgressDialog progressDialog = new ProgressDialog(mContext);
+        progressDialog.setTitle(R.string.txt_downloading);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressDialog.setMax(100);
+        if (!isFinishing()) {
+            progressDialog.show();
+        }
+
+        RestClient.getInstance().get(url, null, new FileAsyncHttpResponseHandler(getApplicationContext()) {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, File file) {
+                Timber.e(throwable.toString());
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, File file) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                file.setReadable(true, false);
+                intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+                mContext.startActivity(intent);
+            }
+
+            @Override
+            public void onProgress(int bytesWritten, int totalSize) {
+                double por = (bytesWritten * 1.0 / totalSize) * 100;
+                progressDialog.setProgress((int) por);
+                if (bytesWritten == totalSize) {
+                    progressDialog.dismiss();
+                }
+                super.onProgress(bytesWritten, totalSize);
+            }
+        });
+
     }
 
     public class HouseLocationListener implements BDLocationListener {
         @Override
         public void onReceiveLocation(BDLocation location) {
-            double latitude = location.getLatitude();
-            double longitude = location.getLongitude();
-
-            int locType = location.getLocType();
-
-            Timber.v("onReceiveLocation latitude=" + latitude +
-                    " longitude=" + longitude +
-                    " locType=" + locType +
-                    " address=" + location.getAddrStr());
-
             DMApplication.getInstance().setLastActivatedLocation(location);
 
             // tell subscriber to update location
             EventBus.getDefault().post(new LocationEvent(LocationEvent.LocationEventEnum.UPDATED, location));
 
-            locClient.stop();
+            locationClient.stop();
         }
     }
 }
