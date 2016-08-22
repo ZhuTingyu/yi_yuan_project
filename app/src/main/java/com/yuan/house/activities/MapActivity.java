@@ -54,7 +54,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.greenrobot.event.EventBus;
-import timber.log.Timber;
 
 /**
  * Created by KevinLee on 2016/5/2.
@@ -66,31 +65,26 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
     protected LocationClient locClient;
     boolean isFirstLoc = true;// 是否首次定位
     BDLocation bdLocation;
-    private ArrayList<String> keys;
-
     @Nullable
     @BindView(R.id.tv_location_field)
     TextView tvLocationField;
-
     @Nullable
     @BindView(R.id.search_button)
     Button search_button;
-
     @Nullable
     @BindView(R.id.search_edit)
     EditText searchText;
-
+    private ArrayList<String> keys;
     private ListView mListView;
 
     private SuggestionSearch mSuggestSearch;
     private GeoCoder mSearch;
-    private LatLng center;
-    private double latitude = 0.0;
-    private double longitude = 0.0;
     private String city;    //当前城市
     private JSONObject mLocation;
     private MyLocationConfiguration.LocationMode mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
     private ConnectivityManager conn;
+    private LatLng targetPoint;
+    private float kDefaultMapZoomLevel = 18;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,9 +107,8 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
             try {
                 mLocation = new JSONObject(extra);
 
-                mLocation.optString("lat");
-                mLocation.optString("lng");
-                mLocation.optString("addr");
+                tvLocationField.setText(mLocation.optString("addr"));
+                targetPoint = new LatLng(mLocation.optDouble("lat"), mLocation.optDouble("lng"));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -179,23 +172,25 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
                 locClient.start();
             }
         });
+
+        if (targetPoint != null) {
+            startReverseGeoCode(targetPoint);
+        }
     }
 
     private void initLocation() {
         baiduMap.setMyLocationEnabled(true);
         if (mLocation != null) {
-            LatLng cenpt = new LatLng(mLocation.optDouble("lat"), mLocation.optDouble("lng"));
-            //定义地图状态
+            targetPoint = new LatLng(mLocation.optDouble("lat"), mLocation.optDouble("lng"));
             MapStatus mMapStatus = new MapStatus.Builder()
-                    .target(cenpt)
-                    .zoom(18)
+                    .target(targetPoint)
+                    .zoom(kDefaultMapZoomLevel)
                     .build();
-            //定义MapStatusUpdate对象，以便描述地图状态将要发生的变化
 
             MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mMapStatus);
-            //改变地图状态
             baiduMap.setMapStatus(mMapStatusUpdate);
         }
+
         //获取当前位置
         locClient = new LocationClient(this);
         locClient.registerLocationListener(locationListener);
@@ -212,6 +207,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         // 初始化搜索模块，注册事件监听
         mSearch = GeoCoder.newInstance();
         mSearch.setOnGetGeoCodeResultListener(this);
+
         //初始化模糊搜索模块
         mSuggestSearch = SuggestionSearch.newInstance();
         mSuggestSearch.setOnGetSuggestionResultListener(this);
@@ -220,28 +216,22 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         baiduMap.setOnMapStatusChangeListener(new BaiduMap.OnMapStatusChangeListener() {
             @Override
             public void onMapStatusChangeStart(MapStatus mapStatus) {
-
             }
 
             @Override
             public void onMapStatusChange(MapStatus mapStatus) {
-                //发起搜索状态改变后更新反地理编码
-                center = mapStatus.target;
-                LatLng ptCenter = new LatLng(center.latitude, center.longitude);
-                mSearch.reverseGeoCode(new ReverseGeoCodeOption()
-                        .location(ptCenter));
             }
 
             @Override
             public void onMapStatusChangeFinish(MapStatus mapStatus) {
-                center = mapStatus.target;
-                latitude = center.latitude;
-                longitude = center.longitude;
-                LatLng ptCenter = new LatLng(center.latitude, center.longitude);
-                mSearch.reverseGeoCode(new ReverseGeoCodeOption().location(ptCenter));
+                targetPoint = mapStatus.target;
+                startReverseGeoCode(targetPoint);
             }
         });
+    }
 
+    private void startReverseGeoCode(LatLng latLng) {
+        mSearch.reverseGeoCode(new ReverseGeoCodeOption().location(latLng));
     }
 
     private void initViewConfig() {
@@ -250,8 +240,10 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mSearch.geocode(new GeoCodeOption().city(city).address(keys.get(position)));
+
                 mListView.setVisibility(View.GONE);
                 searchText.setText("");
+                tvLocationField.setText("");
                 hideSoftInputView();
             }
         });
@@ -264,7 +256,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(TextUtils.isEmpty(s)){
+                if (TextUtils.isEmpty(s)) {
                     mListView.setVisibility(View.GONE);
                     hideSoftInputView();
                 }
@@ -272,7 +264,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(!TextUtils.isEmpty(s) && !TextUtils.isEmpty(city)){
+                if (!TextUtils.isEmpty(s) && !TextUtils.isEmpty(city)) {
                     mSuggestSearch.requestSuggestion(new SuggestionSearchOption().city(city).keyword(s.toString()));
                 }
             }
@@ -281,7 +273,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         search_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!TextUtils.isEmpty(city)){
+                if (!TextUtils.isEmpty(city)) {
                     mSearch.geocode(new GeoCodeOption().city(city).address(searchText.getText().toString()));
                     mListView.setVisibility(View.GONE);
                     hideSoftInputView();
@@ -298,6 +290,7 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
             return;
         }
         baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(geoCodeResult.getLocation()));
+        startReverseGeoCode(geoCodeResult.getLocation());
     }
 
     @Override
@@ -313,8 +306,8 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
 
         tvLocationField.setText(result.getAddress());
 
-        bdLocation.setLatitude(latitude);
-        bdLocation.setLongitude(longitude);
+        bdLocation.setLatitude(targetPoint.latitude);
+        bdLocation.setLongitude(targetPoint.longitude);
 
         ReverseGeoCodeResult.AddressComponent component = result.getAddressDetail();
         if (component != null) {
@@ -328,20 +321,21 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
 
         bdLocation.setAddrStr(result.getAddress());
     }
+
     //模糊查询返回结果
     @Override
     public void onGetSuggestionResult(SuggestionResult suggestionResult) {
         List<SuggestionResult.SuggestionInfo> suggestions = suggestionResult.getAllSuggestions();
-        if(suggestions != null){
+        if (suggestions != null) {
             keys = new ArrayList<>();
-            for(SuggestionResult.SuggestionInfo result : suggestions){
+            for (SuggestionResult.SuggestionInfo result : suggestions) {
                 keys.add(result.key);
             }
-            ArrayAdapter adapter = new ArrayAdapter(mContext,android.R.layout.simple_expandable_list_item_1,keys);
+            ArrayAdapter adapter = new ArrayAdapter(mContext, android.R.layout.simple_expandable_list_item_1, keys);
             mListView.setAdapter(adapter);
             mListView.setVisibility(View.VISIBLE);
-        }else {
-            Toast.makeText(mContext,"没搜索到结果",Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(mContext, "没搜索到结果", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -368,41 +362,34 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
     public class MapLocationListener implements BDLocationListener {
         @Override
         public void onReceiveLocation(BDLocation location) {
-            latitude = location.getLatitude();
-            longitude = location.getLongitude();
+            targetPoint = new LatLng(location.getLatitude(), location.getLongitude());
 
-            // map view 销毁后不在处理新接收的位置
-            if (location == null) {
-                return;
-            }
             int locType = location.getLocType();
-            if (locType == BDLocation.TypeGpsLocation
-                    || locType == BDLocation.TypeNetWorkLocation) {
-                MyLocationData locData = new MyLocationData.Builder()
-                        .accuracy(70).direction(0)
+            if (locType == BDLocation.TypeGpsLocation || locType == BDLocation.TypeNetWorkLocation) {
+                MyLocationData datum = new MyLocationData.Builder()
+                        .accuracy(70)
+                        .direction(0)
                         .latitude(location.getLatitude())
-                        .longitude(location.getLongitude()).build();
-                baiduMap.setMyLocationData(locData);
+                        .longitude(location.getLongitude())
+                        .build();
 
-                MyLocationConfiguration config = new MyLocationConfiguration(
-                        mCurrentMode, true, null);
+                baiduMap.setMyLocationData(datum);
+
+                MyLocationConfiguration config = new MyLocationConfiguration(mCurrentMode, true, null);
                 baiduMap.setMyLocationConfigeration(config);
 
-                LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
+                if (mLocation == null) {
+                    LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
 
-                if (isFirstLoc) {
-                    isFirstLoc = false;
-                    MapStatusUpdate u = MapStatusUpdateFactory.newLatLngZoom(ll, 17);
-                    baiduMap.animateMapStatus(u);
+                    if (isFirstLoc) {
+                        isFirstLoc = false;
+                        MapStatusUpdate u = MapStatusUpdateFactory.newLatLngZoom(ll, kDefaultMapZoomLevel);
+                        baiduMap.animateMapStatus(u);
+                    }
 
-//                    LatLng ptCenter = new LatLng(latitude, longitude);
-//                    mSearch.reverseGeoCode(new ReverseGeoCodeOption()
-//                            .location(ptCenter));
+                    startReverseGeoCode(ll);
                 }
             }
-
-            Timber.v("onReceiveLocation latitude=" + latitude + " longitude=" + longitude
-                    + " locType=" + locType + " address=" + location.getAddrStr());
         }
     }
 }

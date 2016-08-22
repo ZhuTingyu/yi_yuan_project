@@ -90,7 +90,7 @@ public class UserMainFragment extends WebViewBaseFragment {
                     if (location != null) {
                         data.put("lat", location.getLatitude());
                         data.put("lng", location.getLongitude());
-                        data.put("addr", location.getAddress());
+                        data.put("addr", location.getAddrStr());
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
