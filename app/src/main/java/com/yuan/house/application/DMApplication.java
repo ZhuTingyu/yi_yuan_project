@@ -157,7 +157,7 @@ public class DMApplication extends MultiDexApplication {
 //        if (BuildConfig.DEBUG) {
         Timber.plant(new Timber.DebugTree());
 //        } else {
-            Bugtags.start(Constants.kBugTagsKey, this, Bugtags.BTGInvocationEventBubble);
+            Bugtags.start(Constants.kBugTagsKey, this, Bugtags.BTGInvocationEventShake);
 //        }
 
         PackageInfo pInfo = null;
