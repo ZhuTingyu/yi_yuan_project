@@ -280,6 +280,8 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                     getWebViewFragment().getBridge().callHandler("ClickContractButton", 2);
                 } else if (text.equals("前置留言板")) {
                     getWebViewFragment().getBridge().callHandler("onPreConditionButtonClick");
+                } else if (text.equals("优惠券")) {
+                    getWebViewFragment().getBridge().callHandler("onCouponButtonClick");
                 } else if (text.equals("房源")) {
                     showSuggestedHouses();
                 } else if (text.equals("照片")) {
@@ -842,6 +844,13 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
         roomsTable.insertRoom(convid);
         roomsTable.clearUnread(conversation.getConversationId());
         conversationType = ConversationHelper.typeOfConv(conversation);
+    }
+
+    @Override
+    public void onSetCouponButton(String data) {
+        String text = "优惠券";
+        mMoreAdapter.addItem(text, -1);
+        mMoreAdapter.notifyDataSetChanged();
     }
 
     @Override

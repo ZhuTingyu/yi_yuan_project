@@ -61,6 +61,7 @@ public class InputMoreAdapter extends BaseAdapter {
         if (null == convertView) {
             convertView = new TextView(mContext);
         }
+
         final String text = (String) getItem(position);
         if (!TextUtils.isEmpty(text)) {
             TextView tv = (TextView) convertView;
@@ -76,6 +77,8 @@ public class InputMoreAdapter extends BaseAdapter {
                 tv.setTag("contract");
             } else if (text.equals("前置留言板")) {
                 resId = R.drawable.btn_leave_message;
+            } else if (text.equals("优惠券")) {
+                resId = R.drawable.btn_discount;
             } else if (text.equals("房源")) {
                 resId = R.drawable.btn_need;
             } else if (text.equals("照片")) {
@@ -91,6 +94,7 @@ public class InputMoreAdapter extends BaseAdapter {
             tv.setGravity(Gravity.CENTER);
             tv.setText(text);
         }
+
         return convertView;
     }
 }

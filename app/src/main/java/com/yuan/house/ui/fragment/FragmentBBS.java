@@ -125,6 +125,15 @@ public class FragmentBBS extends WebViewBaseFragment {
             }
         });
 
+        bridge.registerHandler("setCouponButton", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                if (mBridgeListener != null) {
+                    mBridgeListener.onSetCouponButton(data);
+                }
+            }
+        });
+
         bridge.registerHandler("setContractButton", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
@@ -211,5 +220,7 @@ public class FragmentBBS extends WebViewBaseFragment {
         void onGetFirstHouseInfo(String data, WebViewJavascriptBridge.WVJBResponseCallback callback);
 
         void onShowBBSView(boolean data);
+
+        void onSetCouponButton(String data);
     }
 }

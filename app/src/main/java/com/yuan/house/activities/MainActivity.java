@@ -70,12 +70,11 @@ import timber.log.Timber;
  */
 
 public class MainActivity extends WebViewBasedActivity implements WebViewFragment.OnFragmentInteractionListener {
-    private final boolean kDebugCoupon = false;
-
     private final int kTabIndexOfCoupon = 0;
     private final int kTabIndexOfMain = 1;
     private final int kTabIndexOfMessage = 2;
     private final int kTabIndexOfProposal = 3;
+
     public LocationClient locationClient;
     public HouseLocationListener locationListener;
     private BottomNavigationBar bottomNavigationBar;
@@ -299,7 +298,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
             public void onTabSelected(int position) {
                 switch (position) {
                     case kTabIndexOfCoupon:
-                        if (kDebugCoupon) {
+                        if (Constants.kDebugCouponFeature) {
                             switchToFragment(Constants.kFragmentTagCoupon);
                         }
                         break;
