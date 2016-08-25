@@ -206,6 +206,8 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         if (event.getEventType() == PageEvent.PageEventEnum.FINISHED) {
 
         } else if (event.getEventType() == PageEvent.PageEventEnum.FRIENDSHIP_UPDATE) {
+            prefs.edit().putBoolean(Constants.kPrefsHasAgencyFriends, true).apply();
+
             bottomNavigationBar.selectTab(kTabIndexOfMain);
         } else if (event.getEventType() == PageEvent.PageEventEnum.DROP_TO_MESSAGE) {
             Intent intent = new Intent(this, MainActivity.class);
@@ -246,7 +248,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
     protected Fragment getFragment(String tag) {
         Fragment f = mFragmentManager.findFragmentByTag(tag);
 
-        if (f != null && (f.getClass() == ProposalFragment.class || f.getClass() == UserMainFragment.class)) {
+        if (f != null && f.getClass() == ProposalFragment.class) {
             Timber.i("Found Fragment : " + tag);
 
             return f;

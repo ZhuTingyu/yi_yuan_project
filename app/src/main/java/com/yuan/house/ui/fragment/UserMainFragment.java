@@ -18,7 +18,6 @@ import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
 import com.yuan.house.event.LocationEvent;
-import com.yuan.house.event.PageEvent;
 import com.yuan.house.helper.AuthHelper;
 
 import org.json.JSONException;
@@ -79,7 +78,8 @@ public class UserMainFragment extends WebViewBaseFragment {
             JSONObject object = new JSONObject(loginInfo);
             boolean hasAgencyFriends = object.optBoolean("has_agency_friend");
 
-            if (hasAgencyFriends) {
+            boolean prefsHasAgencyFriends = prefs.getBoolean(Constants.kPrefsHasAgencyFriends, false);
+            if (hasAgencyFriends || prefsHasAgencyFriends) {
                 rightItem.setVisibility(View.VISIBLE);
             } else {
                 url = Constants.kWebPageUserIndexFirst;
@@ -89,13 +89,6 @@ public class UserMainFragment extends WebViewBaseFragment {
         }
 
         redirectToLoadUrl(url);
-    }
-
-    public void onEvent(PageEvent event) {
-        if (event.getEventType() == PageEvent.PageEventEnum.FRIENDSHIP_UPDATE) {
-            rightItem.setVisibility(View.VISIBLE);
-            redirectToLoadUrl(Constants.kWebPageUserIndex);
-        }
     }
 
     @OnClick({R.id.rl_center, R.id.position, R.id.btn_arrow_down})
