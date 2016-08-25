@@ -257,6 +257,8 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
 
         setupPresenceGuardian();
 
+        setupHeartBeatForPresenceCheckInSeconds();
+
         bindAdapter(jsonFormatParams);
 
         cachedHouseIdForCurrentConv = jsonFormatParams.optString("house_id");
@@ -403,7 +405,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     private void setupPresenceGuardian() {
         scheduledExecutorServiceForPresence = Executors.newSingleThreadScheduledExecutor();
 
-        long kTickForPresenceSending = 5;
+        long kTickForPresenceSending = 4;
         scheduledExecutorServiceForPresence.scheduleAtFixedRate
                 (new Runnable() {
                     public void run() {
@@ -487,7 +489,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     private void setupHeartBeatForPresenceCheckInSeconds() {
         scheduledExecutorServiceForPresenceCheckInSeconds = Executors.newSingleThreadScheduledExecutor();
 
-        long kIntervalForLiveCheck = 3;
+        long kIntervalForLiveCheck = 1;
         scheduledExecutorServiceForPresenceCheckInSeconds.scheduleAtFixedRate
                 (new Runnable() {
                     public void run() {
@@ -500,8 +502,6 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                                     setTitleItemDrawable(R.drawable.offline);
                                 }
                             });
-
-                            scheduledExecutorServiceForPresenceCheckInSeconds.shutdown();
                         }
                     }
                 }, 0, kIntervalForLiveCheck, TimeUnit.SECONDS);
@@ -741,10 +741,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                 // update presence status
                 setTitleItemDrawable(R.drawable.online);
 
-                int kTickForLiveCheck = 6;
-                mHeartBeatTimesForRemainLive = kTickForLiveCheck;
-
-                setupHeartBeatForPresenceCheckInSeconds();
+                mHeartBeatTimesForRemainLive = 6;
             }
 
             roomsTable.clearUnread(conversation.getConversationId());
