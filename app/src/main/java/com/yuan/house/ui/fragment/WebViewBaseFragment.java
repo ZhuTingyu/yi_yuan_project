@@ -1113,6 +1113,17 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
             }
         });
 
+        getBridge().registerHandler("dropToCentre", new WebViewJavascriptBridge.WVJBHandler() {
+            @Override
+            public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
+                Timber.v("dropToCentre");
+
+                if (mBridgeListener != null) {
+                    mBridgeListener.onBridgeDropToCenter();
+                }
+            }
+        });
+
         getBridge().registerHandler("updateFriendRelationship", new WebViewJavascriptBridge.WVJBHandler() {
             @Override
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
@@ -1323,5 +1334,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
         void onBridgeStartSingleChat(JSONObject object);
 
         void onBridgeStartServiceChat();
+
+        void onBridgeDropToCenter();
     }
 }

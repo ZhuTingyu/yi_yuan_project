@@ -1076,6 +1076,11 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     @Override
+    public void onBridgeDropToCenter() {
+        EventBus.getDefault().post(new PageEvent(PageEvent.PageEventEnum.DROP_TO_CENTER, null));
+    }
+
+    @Override
     public void onBridgeSignIn(String data) {
         throw new NotImplementedException("NOT IMPLEMENTED");
     }
