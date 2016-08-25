@@ -8,6 +8,7 @@ import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
 import com.avoscloud.leanchatlib.model.UserInfo;
 import com.yuan.house.HouseMessageType;
 import com.yuan.house.R;
+import com.yuan.house.application.DMApplication;
 
 import java.util.List;
 
@@ -37,20 +38,22 @@ public class MessageHelper {
         HouseMessageType type = HouseMessageType.getMessageType(msg.getMessageType());
         switch (type) {
             case TextMessageType:
-                return EmotionHelper.replace(ChatManager.getContext(), ((AVIMTextMessage) msg).getText());
+                return EmotionHelper.replace(DMApplication.getInstance(), ((AVIMTextMessage) msg).getText());
             case ImageMessageType:
-                return bracket(ChatManager.getContext().getString(R.string.chat_image));
+                return bracket(DMApplication.getInstance().getString(R.string.chat_image));
             case LocationMessageType:
                 AVIMLocationMessage locMsg = (AVIMLocationMessage) msg;
                 String address = locMsg.getText();
                 if (address == null) {
                     address = "";
                 }
-                return bracket(ChatManager.getContext().getString(R.string.chat_position)) + address;
+                return bracket(DMApplication.getInstance().getString(R.string.chat_position)) + address;
             case AudioMessageType:
-                return bracket(ChatManager.getContext().getString(R.string.chat_audio));
+                return bracket(DMApplication.getInstance().getString(R.string.chat_audio));
             case HouseMessageType:
-                return bracket(ChatManager.getContext().getString(R.string.chat_house));
+                return bracket(DMApplication.getInstance().getString(R.string.chat_house));
+            case CardMessageType:
+                return bracket(DMApplication.getInstance().getString(R.string.chat_card));
         }
         return null;
     }

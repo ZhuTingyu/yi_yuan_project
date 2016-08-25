@@ -207,6 +207,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
         } else if (event.getEventType() == PageEvent.PageEventEnum.FRIENDSHIP_UPDATE) {
             bottomNavigationBar.selectTab(kTabIndexOfMain);
+            // TODO: 8/24/16 把房源页换成index，然后把放大镜放出来
         } else if (event.getEventType() == PageEvent.PageEventEnum.DROP_TO_MESSAGE) {
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -223,6 +224,8 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
+        } else if (event.getEventType() == AuthEvent.AuthEventEnum.NEED_LOGIN_AGAIN) {
+            doAVUserLogin();
         }
     }
 

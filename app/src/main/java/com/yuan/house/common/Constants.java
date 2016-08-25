@@ -76,6 +76,7 @@ public class Constants {
     public static String kWebPageUserBBS = "user_bbs.html";
     public static String kWebPageAgencyBBS = "agency_bbs.html";
     public static String kWebPageUserIndex = "user_index.html";
+    public static String kWebPageUserIndexFirst = "user_index_first.html";
     public static String kWebPageAgencyIndex = "agency_index.html";
     public static String kWebPageAgencyMessage = "agency_message.html";
     public static String kWebPageUserMessage = "user_message.html";

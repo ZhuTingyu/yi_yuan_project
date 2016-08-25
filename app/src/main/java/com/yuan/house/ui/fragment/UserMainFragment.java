@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -17,6 +18,7 @@ import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
 import com.yuan.house.event.LocationEvent;
+import com.yuan.house.helper.AuthHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,6 +35,8 @@ public class UserMainFragment extends WebViewBaseFragment {
     LinearLayout center;
     @BindView(R.id.address)
     TextView address;
+    @BindView(R.id.rightItem)
+    ImageView rightItem;
 
     private BDLocation location;
 
@@ -52,8 +56,6 @@ public class UserMainFragment extends WebViewBaseFragment {
 
         ButterKnife.bind(this, view);
 
-        redirectToLoadUrl(Constants.kWebPageUserIndex);
-
         return view;
     }
 
@@ -68,6 +70,25 @@ public class UserMainFragment extends WebViewBaseFragment {
 
             address.setText(city + " " + district);
         }
+
+        String url = Constants.kWebPageUserIndex;
+
+        String loginInfo = AuthHelper.getInstance().getUserLoginInfo();
+        try {
+            JSONObject object = new JSONObject(loginInfo);
+            boolean hasAgencyFriends = object.optBoolean("has_agency_friend");
+
+            if (hasAgencyFriends) {
+                rightItem.setVisibility(View.VISIBLE);
+            } else {
+                url = Constants.kWebPageUserIndexFirst;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        redirectToLoadUrl(url);
+
     }
 
     @Override

@@ -31,6 +31,10 @@ public class AuthHelper {
         return instance;
     }
 
+    public String getUserLoginInfo() {
+        return userLoginInfo;
+    }
+
     private UserType getUserType(String data) {
         if (TextUtils.isEmpty(data)) return UserType.USER;
 

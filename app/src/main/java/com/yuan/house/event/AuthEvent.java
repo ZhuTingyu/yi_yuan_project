@@ -23,7 +23,7 @@ public class AuthEvent {
     }
 
     public enum AuthEventEnum {
-        LOGOUT(1);
+        LOGOUT(1), NEED_LOGIN_AGAIN(2);
 
         private int value;
 

@@ -19,6 +19,7 @@ import com.yuan.house.helper.AuthHelper;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.client.HttpResponseException;
 import org.apache.http.message.BasicHeader;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -250,7 +251,7 @@ public class RestClient {
                     return;
                 }
 
-                if (throwable != null) {
+                if (!(throwable instanceof HttpResponseException)) {
                     EventBus.getDefault().post(new NetworkReachabilityEvent(NetworkReachabilityEvent.NetworkReachabilityEventEnum.OFFLINE, null));
                     return;
                 }

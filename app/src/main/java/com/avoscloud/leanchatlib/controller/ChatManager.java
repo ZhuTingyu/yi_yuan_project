@@ -39,6 +39,7 @@ import com.lfy.dao.MessageDao;
 import com.yuan.house.HouseMessageType;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.common.Constants;
+import com.yuan.house.event.AuthEvent;
 import com.yuan.house.helper.AuthHelper;
 
 import org.json.JSONObject;
@@ -230,6 +231,9 @@ public class ChatManager extends AVIMClientEventHandler {
     }
 
     public String getSelfId() {
+        if (TextUtils.isEmpty(selfId)) {
+            EventBus.getDefault().post(new AuthEvent(AuthEvent.AuthEventEnum.NEED_LOGIN_AGAIN, null));
+        }
         return selfId;
     }
 

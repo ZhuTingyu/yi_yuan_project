@@ -5,7 +5,8 @@ package com.yuan.house;
  */
 
 public enum HouseMessageType {
-    HouseMessageType(0),
+    CardMessageType(3),
+    HouseMessageType(2),
     UnsupportedMessageType(0),
     TextMessageType(-1),
     ImageMessageType(-2),
@@ -42,6 +43,8 @@ public enum HouseMessageType {
                 return UnsupportedMessageType;
             case 2:
                 return HouseMessageType;
+            case 3:
+                return CardMessageType;
             default:
                 return UnsupportedMessageType;
         }
