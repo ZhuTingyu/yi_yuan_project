@@ -1,8 +1,5 @@
 package com.yuan.house.activities;
 
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -13,7 +10,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebView;
@@ -60,7 +56,6 @@ import com.etiennelawlor.imagegallery.library.adapters.ImageGalleryAdapter;
 import com.flyco.dialog.listener.OnOperItemClickL;
 import com.flyco.dialog.widget.ActionSheetDialog;
 import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.FileAsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.tasomaniac.android.widget.DelayedProgressDialog;
@@ -231,7 +226,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         // use other method to keep the old fragment than use this simple and rude `replace`
         mFragmentTransaction = mFragmentManager.beginTransaction();
         mFragmentTransaction.replace(R.id.content_frame, getFragment(tag), tag);
-        mFragmentTransaction.commit();
+        mFragmentTransaction.commitAllowingStateLoss();
     }
 
     protected Fragment getFragment(String tag) {
