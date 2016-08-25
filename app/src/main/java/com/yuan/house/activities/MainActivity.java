@@ -246,7 +246,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
     protected Fragment getFragment(String tag) {
         Fragment f = mFragmentManager.findFragmentByTag(tag);
 
-        if (f != null && f.getClass() == ProposalFragment.class) {
+        if (f != null && (f.getClass() == ProposalFragment.class || f.getClass() == UserMainFragment.class)) {
             Timber.i("Found Fragment : " + tag);
 
             return f;
