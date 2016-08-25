@@ -153,6 +153,8 @@ public class UserMainFragment extends WebViewBaseFragment {
             String district = TextUtils.isEmpty(location.getDistrict()) ? "" : location.getDistrict();
 
             address.setText(city + " " + district);
+
+            DMApplication.getInstance().setLastActivatedLocation(location);
         }
     }
 }
