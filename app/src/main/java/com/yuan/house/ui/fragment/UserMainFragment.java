@@ -18,6 +18,7 @@ import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
 import com.yuan.house.event.LocationEvent;
+import com.yuan.house.event.PageEvent;
 import com.yuan.house.helper.AuthHelper;
 
 import org.json.JSONException;
@@ -88,17 +89,13 @@ public class UserMainFragment extends WebViewBaseFragment {
         }
 
         redirectToLoadUrl(url);
-
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
+    public void onEvent(PageEvent event) {
+        if (event.getEventType() == PageEvent.PageEventEnum.FRIENDSHIP_UPDATE) {
+            rightItem.setVisibility(View.VISIBLE);
+            redirectToLoadUrl(Constants.kWebPageUserIndex);
+        }
     }
 
     @OnClick({R.id.rl_center, R.id.position, R.id.btn_arrow_down})
