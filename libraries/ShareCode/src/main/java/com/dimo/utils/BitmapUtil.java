@@ -37,6 +37,8 @@ public class BitmapUtil {
                 .build()
                 .compressToBitmap(file);
 
+        DebugUtil.assertNotNull(filename);
+
         saveBitmap(context, bm, filename);
     }
 
