@@ -280,6 +280,7 @@ public class DMApplication extends MultiDexApplication {
     public void logout() {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(Constants.kWebDataKeyUserLogin, null);
+        editor.putBoolean(Constants.kPrefsHasAgencyFriends, false);
         editor.apply();
 
         pruneChatManager();
