@@ -2,6 +2,8 @@ package com.avoscloud.chat.ui.chat;
 
 import android.app.ActionBar;
 import android.app.ProgressDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -324,7 +326,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                 ToastUtil.showShort(mContext, "转发" + mChatMessage);
                 return true;
             case R.id.menu_copy:
-                ToastUtil.showShort(mContext, "复制" + mChatMessage);
+                CopyChatMessage(mChatMessage);
                 return true;
             case R.id.menu_more:
                 return true;

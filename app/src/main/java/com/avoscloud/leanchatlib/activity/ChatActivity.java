@@ -1,5 +1,8 @@
 package com.avoscloud.leanchatlib.activity;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -63,6 +66,8 @@ public abstract class ChatActivity extends WebViewBasedActivity implements OnCli
     private boolean mVoiceMode = false;
     private View assistLayout;
     private int kActivityRequestCodeImagePickAndSend = 10;
+    private ClipboardManager mClipboard = null;
+
 
     private boolean mHideText = false;
 
@@ -367,5 +372,15 @@ public abstract class ChatActivity extends WebViewBasedActivity implements OnCli
         super.onResume();
 
         chatManager.cancelNotification();
+    }
+
+    protected void CopyChatMessage(String ChatMessage){
+        if (null == mClipboard) {
+            mClipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        }
+
+        ClipData clip = ClipData.newPlainText("simple text", ChatMessage);
+
+        mClipboard.setPrimaryClip(clip);
     }
 }
