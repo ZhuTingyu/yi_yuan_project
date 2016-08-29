@@ -125,8 +125,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
         // 订阅频道，当该频道消息到来的时候，打开对应的 Activity
         PushService.subscribe(this, "public", MainActivity.class);
-        PushService.subscribe(this, "private", MainActivity.class);
-        PushService.subscribe(this, "protected", MainActivity.class);
 
         AVAnalytics.trackAppOpened(getIntent());
 
@@ -235,12 +233,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Timber.v("onDestroy");
-
-        PushService.unsubscribe(this, "public");
-
-        //退订之后需要重新保存 Installation
-        AVInstallation.getCurrentInstallation().saveInBackground();
 
         EventBus.getDefault().unregister(this);
     }
