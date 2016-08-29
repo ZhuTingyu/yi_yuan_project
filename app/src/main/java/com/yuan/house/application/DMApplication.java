@@ -258,6 +258,8 @@ public class DMApplication extends MultiDexApplication {
      * 关闭聊天相关服务
      */
     private void pruneChatManager() {
+        PushService.unsubscribe(this, "public");
+
         AVInstallation installation = AVInstallation.getCurrentInstallation();
         installation.put("user_id", null);
         installation.put("agency_id", null);
@@ -280,6 +282,7 @@ public class DMApplication extends MultiDexApplication {
     public void logout() {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(Constants.kWebDataKeyUserLogin, null);
+        editor.putBoolean(Constants.kPrefsHasAgencyFriends, false);
         editor.apply();
 
         pruneChatManager();
