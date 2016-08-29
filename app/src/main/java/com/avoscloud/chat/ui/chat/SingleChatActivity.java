@@ -253,8 +253,6 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
 
         initSuggestedHouseInfos();
 
-        sendPresenceMessage();
-
         setupPresenceGuardian();
 
         setupHeartBeatForPresenceCheckInSeconds();
@@ -816,9 +814,12 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
 
         super.onResume();
 
+        sendPresenceMessage();
+
         if (conversation == null) {
             throw new IllegalStateException("conv is null");
         }
+
         setCurrentChattingConvid(conversation.getConversationId());
     }
 
