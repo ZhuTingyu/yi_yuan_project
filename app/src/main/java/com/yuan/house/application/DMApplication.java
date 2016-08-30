@@ -76,13 +76,11 @@ public class DMApplication extends MultiDexApplication {
     Context mContext;
     String mLatestVersion;
     private ThinDownloadManager downloadManager;
-
+    private boolean allowUserToUseFullFeatureVersion = true;
     private String rootDataFolder;
     private String rootPagesFolder;
     private String htmlExtractedFolder;
-
     private BDLocation lastActivatedLocation;
-
     private MessageDao messageDao;
 
     /**
@@ -129,6 +127,14 @@ public class DMApplication extends MultiDexApplication {
         return instance;
     }
 
+    public boolean isAllowUserToUseFullFeatureVersion() {
+        return allowUserToUseFullFeatureVersion;
+    }
+
+    public void setAllowUserToUseFullFeatureVersion(boolean allowUserToUseFullFeatureVersion) {
+        this.allowUserToUseFullFeatureVersion = allowUserToUseFullFeatureVersion;
+    }
+
     public BDLocation getLastActivatedLocation() {
         return lastActivatedLocation;
     }
@@ -155,7 +161,7 @@ public class DMApplication extends MultiDexApplication {
 //        if (BuildConfig.DEBUG) {
         Timber.plant(new Timber.DebugTree());
 //        } else {
-            Bugtags.start(Constants.kBugTagsKey, this, Bugtags.BTGInvocationEventShake);
+        Bugtags.start(Constants.kBugTagsKey, this, Bugtags.BTGInvocationEventShake);
 //        }
 
         PackageInfo pInfo = null;

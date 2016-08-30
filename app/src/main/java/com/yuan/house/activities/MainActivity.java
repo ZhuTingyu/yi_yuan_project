@@ -23,6 +23,7 @@ import com.avos.avoscloud.AVInstallation;
 import com.avos.avoscloud.AVUser;
 import com.avos.avoscloud.LogInCallback;
 import com.avos.avoscloud.PushService;
+import com.avoscloud.chat.util.Utils;
 import com.avoscloud.leanchatlib.controller.ChatManager;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -308,6 +309,12 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         bottomNavigationBar.setTabSelectedListener(new BottomNavigationBar.OnTabSelectedListener() {
             @Override
             public void onTabSelected(int position) {
+                if (!DMApplication.getInstance().isAllowUserToUseFullFeatureVersion()) {
+                    Utils.alertDialog(MainActivity.this, "本版本已被禁用");
+
+                    return;
+                }
+
                 switch (position) {
                     case kTabIndexOfCoupon:
                         if (Constants.kDebugCouponFeature) {

@@ -22,6 +22,18 @@ public class AuthHelper {
     private String userToken;
     private String userId;
     private String userLoginInfo;
+    private JSONObject userLoginObject;
+
+    public JSONObject getUserLoginObject() {
+        JSONObject object = null;
+        try {
+            object = new JSONObject(userLoginInfo);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return object;
+    }
+
     private UserType userType;
 
     public AuthHelper() {
