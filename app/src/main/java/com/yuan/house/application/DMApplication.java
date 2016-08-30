@@ -16,7 +16,6 @@ import com.avos.avoscloud.AVAnalytics;
 import com.avos.avoscloud.AVInstallation;
 import com.avos.avoscloud.AVOSCloud;
 import com.avos.avoscloud.AVObject;
-import com.avos.avoscloud.PushService;
 import com.avos.avoscloud.im.v2.AVIMClient;
 import com.avos.avoscloud.im.v2.AVIMException;
 import com.avos.avoscloud.im.v2.AVIMMessageManager;
@@ -48,7 +47,6 @@ import com.thin.downloadmanager.DownloadRequest;
 import com.thin.downloadmanager.DownloadStatusListener;
 import com.thin.downloadmanager.ThinDownloadManager;
 import com.yuan.house.BuildConfig;
-import com.yuan.house.activities.SplashActivity;
 import com.yuan.house.common.Constants;
 import com.yuan.house.event.AuthEvent;
 import com.yuan.house.http.RestClient;
@@ -182,7 +180,6 @@ public class DMApplication extends MultiDexApplication {
 
         editor.apply();
 
-
 //        try {
 //            PackageInfo info = getPackageManager().getPackageInfo(Constants.kApplicationId, PackageManager.GET_SIGNATURES);
 //            for (Signature signature : info.signatures) {
@@ -211,13 +208,7 @@ public class DMApplication extends MultiDexApplication {
 
         AVObject.registerSubclass(UpdateInfo.class);
 
-        AVInstallation.getCurrentInstallation().saveInBackground();
-        Timber.v("Installation id: " + AVInstallation.getCurrentInstallation().getInstallationId());
-
-        String avInstallId = AVInstallation.getCurrentInstallation().getInstallationId();
-        prefs.edit().putString("AVInstallationId", avInstallId).apply();
-
-        PushService.setDefaultPushCallback(instance, SplashActivity.class);
+//        PushService.setDefaultPushCallback(instance, SplashActivity.class);
         AVOSCloud.setDebugLogEnabled(debug);
         AVAnalytics.enableCrashReport(this, !debug);
 
@@ -258,8 +249,6 @@ public class DMApplication extends MultiDexApplication {
      * 关闭聊天相关服务
      */
     private void pruneChatManager() {
-        PushService.unsubscribe(this, "public");
-
         AVInstallation installation = AVInstallation.getCurrentInstallation();
         installation.put("user_id", null);
         installation.put("agency_id", null);

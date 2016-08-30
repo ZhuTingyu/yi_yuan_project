@@ -125,6 +125,14 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
         // 订阅频道，当该频道消息到来的时候，打开对应的 Activity
         PushService.subscribe(this, "public", MainActivity.class);
+        PushService.subscribe(this, "private", MainActivity.class);
+        PushService.subscribe(this, "protected", MainActivity.class);
+
+        AVInstallation.getCurrentInstallation().saveInBackground();
+        Timber.v("Installation id: " + AVInstallation.getCurrentInstallation().getInstallationId());
+
+        String avInstallId = AVInstallation.getCurrentInstallation().getInstallationId();
+        prefs.edit().putString("AVInstallationId", avInstallId).apply();
 
         AVAnalytics.trackAppOpened(getIntent());
 
@@ -234,6 +242,12 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
     protected void onDestroy() {
         super.onDestroy();
 
+        PushService.unsubscribe(this, "public");
+        PushService.unsubscribe(this, "private");
+        PushService.unsubscribe(this, "protected");
+
+        AVInstallation.getCurrentInstallation().saveInBackground();
+
         EventBus.getDefault().unregister(this);
     }
 
@@ -328,7 +342,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                 }
             }
         });
-
     }
 
     /**
