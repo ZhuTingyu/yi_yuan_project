@@ -114,19 +114,19 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
     public void onDestroyView() {
         WebStorage.getInstance().deleteAllData();
 
-        ViewGroup holder = ButterKnife.findById(getActivity(), R.id.webview_parent);
-        if (holder != null) {
-            holder.removeView(mWebView);
-        }
-
-        if (mWebView != null) {
-            mWebView.removeAllViews();
-            mWebView.destroy();
-        }
-
         EventBus.getDefault().unregister(this);
 
         super.onDestroyView();
+
+        ViewGroup holder = ButterKnife.findById(getActivity(), R.id.webview_parent);
+        if (holder != null) {
+            holder.removeView(mWebView);
+
+            if (mWebView != null) {
+                mWebView.removeAllViews();
+                mWebView.destroy();
+            }
+        }
 
         unbinder.unbind();
     }
