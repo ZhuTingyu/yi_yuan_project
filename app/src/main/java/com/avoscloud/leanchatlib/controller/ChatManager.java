@@ -289,7 +289,8 @@ public class ChatManager extends AVIMClientEventHandler {
             throw new NullPointerException("message id is null");
         }
         if (!ConversationHelper.isValidConv(conversation)) {
-            throw new IllegalStateException("receive msg from invalid conversation");
+            Timber.e("receive msg from invalid conversation");
+//            throw new IllegalStateException("receive msg from invalid conversation");
         }
         if (lookUpConversationById(conversation.getConversationId()) == null) {
             registerConversation(conversation);
