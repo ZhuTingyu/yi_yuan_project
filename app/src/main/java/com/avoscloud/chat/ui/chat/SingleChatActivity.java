@@ -118,6 +118,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     private ConversationType conversationType;
     private JSONObject jsonFormatParams;
     private int mLastY = 0;
+    private int mChatMessageCount = 0;
     private GestureDetector.OnGestureListener onGestureListener =
             new GestureDetector.SimpleOnGestureListener() {
                 @Override
@@ -1095,21 +1096,25 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                     lvMessages.stopRefresh();
                 }
                 if (loadHistory == false) {
-                    mMessageAdapter.setDatas(msgs);
-                    mMessageAdapter.notifyDataSetChanged();
-                    lvMessages.setSelection(ListView.FOCUS_DOWN);
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            scrollToLast();
-                        }
-                    }, 200);
+                    if(mChatMessageCount == 0 || mChatMessageCount < msgs.size()){
+                        mMessageAdapter.setDatas(msgs);
+                        mMessageAdapter.notifyDataSetChanged();
+                        mChatMessageCount =  msgs.size();
+                        lvMessages.setSelection(ListView.FOCUS_DOWN);
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                scrollToLast();
+                            }
+                        }, 200);
+                    }
                 } else {
                     List<AVIMTypedMessage> newMsgs = new ArrayList<>();
                     newMsgs.addAll(msgs);
                     newMsgs.addAll(mMessageAdapter.getDatas());
                     mMessageAdapter.setDatas(newMsgs);
                     mMessageAdapter.notifyDataSetChanged();
+                    mChatMessageCount = newMsgs.size();
                     if (msgs.size() > 0) {
                         lvMessages.setSelection(msgs.size() - 1);
                     } else {
