@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.avos.avoscloud.im.v2.AVIMClient;
 import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.AVIMConversationQuery;
 import com.avos.avoscloud.im.v2.AVIMException;
@@ -641,7 +642,14 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
     @Override
     public void onBridgeGetRecentChatList(String data, final WebViewJavascriptBridge.WVJBResponseCallback jsCallback) {
-        AVIMConversationQuery query = ChatManager.getInstance().getImClient().getQuery();
+        AVIMClient avimClient = ChatManager.getInstance().getImClient();
+        if (avimClient == null) {
+            // 连接失败, 尝试重新连接
+            ChatManager.getInstance().avLogin();
+            return;
+        }
+
+        AVIMConversationQuery query = avimClient.getQuery();
         query.limit(20);
         query.findInBackground(new AVIMConversationQueryCallback() {
             @Override

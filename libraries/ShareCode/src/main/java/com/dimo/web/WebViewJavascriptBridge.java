@@ -238,7 +238,9 @@ public class WebViewJavascriptBridge implements Serializable {
         mContext.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mWebView.loadUrl(javascriptCommand);
+                if (mWebView != null) {
+                    mWebView.loadUrl(javascriptCommand);
+                }
             }
         });
     }

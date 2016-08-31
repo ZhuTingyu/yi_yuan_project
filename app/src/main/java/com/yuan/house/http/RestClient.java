@@ -239,7 +239,7 @@ public class RestClient {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                if (callback != null) {
+                if (callback != null && ret != null) {
                     callback.callback(ret);
                 }
             }
