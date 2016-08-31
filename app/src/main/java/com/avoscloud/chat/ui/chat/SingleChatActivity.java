@@ -2,8 +2,6 @@ package com.avoscloud.chat.ui.chat;
 
 import android.app.ActionBar;
 import android.app.ProgressDialog;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -118,7 +116,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     private ConversationType conversationType;
     private JSONObject jsonFormatParams;
     private int mLastY = 0;
-    private int mChatMessageCount = 0;
+//    private int mChatMessageCount = 0;
     private GestureDetector.OnGestureListener onGestureListener =
             new GestureDetector.SimpleOnGestureListener() {
                 @Override
@@ -1096,10 +1094,10 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                     lvMessages.stopRefresh();
                 }
                 if (loadHistory == false) {
-                    if(mChatMessageCount == 0 || mChatMessageCount < msgs.size()){
+//                    if(mChatMessageCount == 0 || mChatMessageCount < msgs.size()){
                         mMessageAdapter.setDatas(msgs);
                         mMessageAdapter.notifyDataSetChanged();
-                        mChatMessageCount =  msgs.size();
+//                        mChatMessageCount =  msgs.size();
                         lvMessages.setSelection(ListView.FOCUS_DOWN);
                         new Handler().postDelayed(new Runnable() {
                             @Override
@@ -1107,14 +1105,14 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                                 scrollToLast();
                             }
                         }, 200);
-                    }
+//                    }
                 } else {
                     List<AVIMTypedMessage> newMsgs = new ArrayList<>();
                     newMsgs.addAll(msgs);
                     newMsgs.addAll(mMessageAdapter.getDatas());
                     mMessageAdapter.setDatas(newMsgs);
                     mMessageAdapter.notifyDataSetChanged();
-                    mChatMessageCount = newMsgs.size();
+//                    mChatMessageCount = newMsgs.size();
                     if (msgs.size() > 0) {
                         lvMessages.setSelection(msgs.size() - 1);
                     } else {
