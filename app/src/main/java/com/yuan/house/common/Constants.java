@@ -1,6 +1,8 @@
 package com.yuan.house.common;
 
 
+import com.yuan.house.BuildConfig;
+
 import java.util.Locale;
 
 /**
@@ -8,8 +10,6 @@ import java.util.Locale;
  */
 public class Constants {
     public static final String kServiceCheckUpdate = "checkupdate";
-
-    public static final boolean kDebugCouponFeature = true;
 
     public static final String kWebServiceHost = "http://www.baidu.com";
 
@@ -19,10 +19,9 @@ public class Constants {
     public static String kHouseParamsForChatRoom = "kHouseParamsForChatRoom";
     public static String kHouseSwitchParamsForChatRoom = "kHouseSwitchParamsForChatRoom";
     public static Locale kForceLocale = Locale.US;
-    // Test Server
-    public static String kWebServiceEndpoint = "http://test.house.ieyuan.com";
+
     public static String kFileServerEndpoint = "http://static.eye5250.com/api";
-    public static String kWebServiceAPIEndpoint = kWebServiceEndpoint + "/api";
+    public static String kWebServiceAPIEndpoint = BuildConfig.kWebServiceEndpoint + "/api";
     /**
      * Web Service Url
      */

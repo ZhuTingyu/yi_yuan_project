@@ -35,6 +35,7 @@ import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.loopj.android.http.FileAsyncHttpResponseHandler;
+import com.yuan.house.BuildConfig;
 import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
@@ -317,7 +318,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
                 switch (position) {
                     case kTabIndexOfCoupon:
-                        if (Constants.kDebugCouponFeature) {
+                        if (BuildConfig.kDebugCouponFeature) {
                             switchToFragment(Constants.kFragmentTagCoupon);
                         }
                         break;
