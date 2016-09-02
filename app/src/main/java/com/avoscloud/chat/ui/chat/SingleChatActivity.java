@@ -116,7 +116,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     private ConversationType conversationType;
     private JSONObject jsonFormatParams;
     private int mLastY = 0;
-//    private int mChatMessageCount = 0;
+    //    private int mChatMessageCount = 0;
     private GestureDetector.OnGestureListener onGestureListener =
             new GestureDetector.SimpleOnGestureListener() {
                 @Override
@@ -952,6 +952,9 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     }
 
     private void showBBSView(boolean show) {
+        int audit = jsonFormatParams.optInt("audit_type");
+        if (audit != 0) return;
+
         if (show) {
             findViewById(R.id.fragmentBBS).setVisibility(View.VISIBLE);
         } else {
@@ -1097,16 +1100,16 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                 }
                 if (loadHistory == false) {
 //                    if(mChatMessageCount == 0 || mChatMessageCount < msgs.size()){
-                        mMessageAdapter.setDatas(msgs);
-                        mMessageAdapter.notifyDataSetChanged();
+                    mMessageAdapter.setDatas(msgs);
+                    mMessageAdapter.notifyDataSetChanged();
 //                        mChatMessageCount =  msgs.size();
-                        lvMessages.setSelection(ListView.FOCUS_DOWN);
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                scrollToLast();
-                            }
-                        }, 200);
+                    lvMessages.setSelection(ListView.FOCUS_DOWN);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            scrollToLast();
+                        }
+                    }, 200);
 //                    }
                 } else {
                     List<AVIMTypedMessage> newMsgs = new ArrayList<>();
