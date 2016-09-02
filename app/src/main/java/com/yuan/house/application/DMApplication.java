@@ -16,6 +16,7 @@ import com.avos.avoscloud.AVAnalytics;
 import com.avos.avoscloud.AVInstallation;
 import com.avos.avoscloud.AVOSCloud;
 import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.PushService;
 import com.avos.avoscloud.im.v2.AVIMClient;
 import com.avos.avoscloud.im.v2.AVIMException;
 import com.avos.avoscloud.im.v2.AVIMMessageManager;
@@ -260,12 +261,14 @@ public class DMApplication extends MultiDexApplication {
         installation.put("agency_id", null);
         installation.saveInBackground();
 
+        PushService.unsubscribe(this, "public");
+        PushService.unsubscribe(this, "private");
+        PushService.unsubscribe(this, "protected");
+
         final ChatManager chatManager = ChatManager.getInstance();
         chatManager.closeWithCallback(new AVIMClientCallback() {
             @Override
             public void done(AVIMClient avimClient, AVIMException e) {
-                Timber.v("LeanMessage : user logout success.");
-
                 EventBus.getDefault().post(new AuthEvent(AuthEvent.AuthEventEnum.LOGOUT, null));
             }
         });

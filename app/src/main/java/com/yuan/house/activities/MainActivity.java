@@ -125,17 +125,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         // Set default Activity when push comes
         PushService.setDefaultPushCallback(this, MainActivity.class);
 
-        // 订阅频道，当该频道消息到来的时候，打开对应的 Activity
-        PushService.subscribe(this, "public", MainActivity.class);
-        PushService.subscribe(this, "private", MainActivity.class);
-        PushService.subscribe(this, "protected", MainActivity.class);
-
-        AVInstallation.getCurrentInstallation().saveInBackground();
-        Timber.v("Installation id: " + AVInstallation.getCurrentInstallation().getInstallationId());
-
-        String avInstallId = AVInstallation.getCurrentInstallation().getInstallationId();
-        prefs.edit().putString("AVInstallationId", avInstallId).apply();
-
         AVAnalytics.trackAppOpened(getIntent());
 
         initLocationClient();
@@ -311,7 +300,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
             @Override
             public void onTabSelected(int position) {
                 if (!DMApplication.getInstance().isAllowUserToUseFullFeatureVersion()) {
-                    Utils.alertDialog(MainActivity.this, "本版本已被禁用");
+                    Utils.alertDialog(MainActivity.this, "请先领券优惠券");
 
                     return;
                 }
@@ -383,6 +372,11 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                 JSONObject holder = new JSONObject(value);
                 JSONObject user;
 
+                // 订阅频道，当该频道消息到来的时候，打开对应的 Activity
+                PushService.subscribe(this, "public", MainActivity.class);
+                PushService.subscribe(this, "private", MainActivity.class);
+                PushService.subscribe(this, "protected", MainActivity.class);
+
                 // save `user_id' or `agency_id' in AVInstallation
                 AVInstallation installation = AVInstallation.getCurrentInstallation();
                 user = holder.optJSONObject("user_info");
@@ -394,6 +388,9 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                 }
 
                 installation.saveInBackground();
+                Timber.v("Installation id: " + installation.getInstallationId());
+
+                prefs.edit().putString("AVInstallationId", installation.getInstallationId()).apply();
 
                 String userName = user.optString("lean_user");
                 String passwd = user.optString("lean_passwd");
