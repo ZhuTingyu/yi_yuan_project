@@ -630,6 +630,8 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     }
 
     private void disableVerticalScrollInWebView(WebView webView, boolean disable) {
+        if (webView == null) return;
+
         if (disable) {
             webView.setOnTouchListener(new View.OnTouchListener() {
                 @Override
