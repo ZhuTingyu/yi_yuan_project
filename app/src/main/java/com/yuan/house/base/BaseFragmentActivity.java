@@ -24,7 +24,6 @@ import com.yuan.house.application.Injector;
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
-import de.keyboardsurfer.android.widget.crouton.Crouton;
 import timber.log.Timber;
 
 /**
@@ -60,14 +59,6 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
 
         Injector.inject(this);
-    }
-
-    @Override
-    protected void onDestroy() {
-
-        super.onDestroy();
-
-        Crouton.cancelAllCroutons();
     }
 
     @Override

@@ -125,8 +125,9 @@ dependencies {
     compile project(':libraries:ChatDaoGenerator')
 
     /** Android .           */
-    compile 'com.android.support:support-v4:24.1.1'
-    compile 'com.android.support:appcompat-v7:24.1.1'
+    compile 'com.android.support:support-v4:24.2.0'
+    compile 'com.android.support:design:24.2.0'
+    compile 'com.android.support:appcompat-v7:24.2.0'
 
     //app:transformClassesWithDexForDebug error
     compile 'com.android.support:multidex:1.0.1'
@@ -181,11 +182,7 @@ dependencies {
 
     /** Permissions .    */
     compile 'com.karumi:dexter:2.3.0'
-    /** Crouton */
-    compile('de.keyboardsurfer.android.widget:crouton:1.8.5@aar') {
-        // exclusion is not necessary, but generally a good idea.
-        exclude group: 'com.google.android', module: 'support-v4'
-    }
+
 }
 
 android.applicationVariants.all { variant ->
