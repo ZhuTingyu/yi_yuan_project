@@ -238,6 +238,9 @@ public class ChatManager extends AVIMClientEventHandler {
     }
 
     public void avLogin() {
+        if (AVUser.getCurrentUser() == null) {
+            return;
+        }
         setupDatabaseWithSelfId(AVUser.getCurrentUser().getObjectId());
         openClientWithSelfId(AVUser.getCurrentUser().getObjectId(), null);
         CacheService.registerUser(AVUser.getCurrentUser());
