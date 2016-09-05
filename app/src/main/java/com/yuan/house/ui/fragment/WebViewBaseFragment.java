@@ -30,7 +30,6 @@ import android.widget.TextView;
 import com.alibaba.fastjson.JSON;
 import com.baidu.location.BDLocation;
 import com.blankj.utilcode.utils.KeyboardUtils;
-import com.dimo.helper.EmojiHelper;
 import com.dimo.utils.StringUtil;
 import com.dimo.web.WebViewJavascriptBridge;
 import com.lfy.dao.MessageDao;
@@ -982,9 +981,9 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
                     JSONObject object = new JSONObject();
                     try {
                         String msg = message.getMessage();
-                        String modifiedString = EmojiHelper.demojizedTextInWebFormat(msg);
+//                        String modifiedString = EmojiHelper.demojizedTextInWebFormat(msg);
 
-                        object.put("message", modifiedString);
+                        object.put("message", msg);
                         object.put("date", message.getDate());
                         object.put("is_read", message.getIs_read());
                     } catch (JSONException e) {
