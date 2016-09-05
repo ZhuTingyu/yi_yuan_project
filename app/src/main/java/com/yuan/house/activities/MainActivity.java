@@ -35,7 +35,6 @@ import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.loopj.android.http.FileAsyncHttpResponseHandler;
-import com.yuan.house.BuildConfig;
 import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
 import com.yuan.house.application.Injector;
@@ -130,7 +129,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
         initLocationClient();
 
         if (prefs.getString(Constants.kWebDataKeyUserLogin, null) != null) {
-            switchToFragment(Constants.kFragmentTagMain);
+            switchToFragment(Constants.kFragmentTagCoupon);
 
             doAVUserLogin();            // 每次进入主界面都连接一下聊天服务器
         } else {
@@ -290,7 +289,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
                 .addItem(new BottomNavigationItem(R.drawable.ic_home, "房源")).setActiveColor(R.color.primary_color_scheme)
                 .addItem(new BottomNavigationItem(R.drawable.ic_chat, "消息")).setActiveColor(R.color.primary_color_scheme)
                 .addItem(new BottomNavigationItem(R.drawable.ic_suggest, "建议")).setActiveColor(R.color.primary_color_scheme)
-                .setFirstSelectedPosition(kTabIndexOfMain)
+                .setFirstSelectedPosition(kTabIndexOfCoupon)
                 .initialise();
     }
 
@@ -307,9 +306,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
                 switch (position) {
                     case kTabIndexOfCoupon:
-                        if (BuildConfig.kDebugCouponFeature) {
-                            switchToFragment(Constants.kFragmentTagCoupon);
-                        }
+                        switchToFragment(Constants.kFragmentTagCoupon);
                         break;
                     case kTabIndexOfMain:
                         switchToFragment(Constants.kFragmentTagMain);
@@ -425,7 +422,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
                             doAVUserLogin();
 
-                            switchToFragment(Constants.kFragmentTagMain);
+                            switchToFragment(Constants.kFragmentTagCoupon);
 
                             getBottomNavigationBar().clearAll();
                             setupTabbarAppearance();
