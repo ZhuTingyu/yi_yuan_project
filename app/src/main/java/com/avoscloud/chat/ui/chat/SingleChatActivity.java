@@ -498,6 +498,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
+                                    Timber.v("mHeartBeatTimesForRemainLive - " + mHeartBeatTimesForRemainLive);
                                     setTitleItemDrawable(R.drawable.offline);
                                 }
                             });
@@ -581,14 +582,6 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     @Override
     protected void onStop() {
         super.onStop();
-
-        if (scheduledExecutorServiceForPresence != null) {
-            scheduledExecutorServiceForPresence.shutdown();
-        }
-
-        if (scheduledExecutorServiceForPresenceCheckInSeconds != null) {
-            scheduledExecutorServiceForPresenceCheckInSeconds.shutdown();
-        }
 
         if (!TextUtils.isEmpty(cachedHouseIdForCurrentConv)) {
             prefs.edit().putString(Constants.kLastActivatedHouseId, cachedHouseIdForCurrentConv).apply();
@@ -743,6 +736,9 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                 setTitleItemDrawable(R.drawable.online);
 
                 mHeartBeatTimesForRemainLive = 6;
+
+                Timber.v("mHeartBeatTimesForRemainLive - online -" + mHeartBeatTimesForRemainLive);
+
             }
 
             roomsTable.clearUnread(conversation.getConversationId());
@@ -817,7 +813,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
 
         super.onResume();
 
-        sendPresenceMessage();
+        //setupPresenceGuardian();
 
         if (conversation == null) {
             throw new IllegalStateException("conv is null");
@@ -829,6 +825,14 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     @Override
     protected void onDestroy() {
         CacheService.setCurConv(null);
+
+        if (scheduledExecutorServiceForPresence != null) {
+            scheduledExecutorServiceForPresence.shutdown();
+        }
+
+        if (scheduledExecutorServiceForPresenceCheckInSeconds != null) {
+            scheduledExecutorServiceForPresenceCheckInSeconds.shutdown();
+        }
 
         super.onDestroy();
     }
