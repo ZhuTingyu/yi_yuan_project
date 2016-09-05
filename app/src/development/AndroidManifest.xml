@@ -49,6 +49,16 @@
         tools:replace="android:label, android:icon, android:theme">
 
         <activity
+            android:label="@string/app_name_debug"
+            android:name=".activities.IPSettingActivity"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".activities.SplashActivity"
             android:screenOrientation="portrait">
             <intent-filter>
