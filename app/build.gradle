@@ -92,6 +92,14 @@ android {
 
             signingConfig signingConfigs.release
         }
+
+        development {
+            buildConfigField("String", "kWebServiceEndpoint", "\"http://at.eye5250.com\"")
+            versionNameSuffix "-BETA"
+            minifyEnabled false
+
+            signingConfig signingConfigs.release
+        }
     }
 
     packagingOptions {
