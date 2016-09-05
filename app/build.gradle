@@ -82,6 +82,12 @@ android {
             versionNameSuffix "-RELEASE"
             minifyEnabled false
 
+            FileCollection proGuardFileCollection = files { file('.././proguard').listFiles() }
+            proGuardFileCollection.each {
+                proguardFile it
+            }
+//            proguardFiles(proGuardFileCollection)
+
             signingConfig signingConfigs.release
         }
 
