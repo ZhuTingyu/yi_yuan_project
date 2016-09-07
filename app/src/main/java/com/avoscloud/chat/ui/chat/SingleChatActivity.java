@@ -2,9 +2,11 @@ package com.avoscloud.chat.ui.chat;
 
 import android.app.ActionBar;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.DataSetObserver;
 import android.os.Bundle;
@@ -116,6 +118,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     private ConversationType conversationType;
     private JSONObject jsonFormatParams;
     private int mLastY = 0;
+    private BroadcastReceiver mScreenStatusReceiver;
     //    private int mChatMessageCount = 0;
     private GestureDetector.OnGestureListener onGestureListener =
             new GestureDetector.SimpleOnGestureListener() {
@@ -299,6 +302,9 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                 }
             }
         });
+
+        registerScreenStatusReceriver();
+
     }
 
     @Override
@@ -412,6 +418,28 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                         sendPresenceMessage();
                     }
                 }, 0, kTickForPresenceSending, TimeUnit.SECONDS);
+    }
+
+    private void registerScreenStatusReceriver(){
+        final IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
+        filter.addAction(Intent.ACTION_USER_PRESENT);
+
+        mScreenStatusReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                if(action.equals(Intent.ACTION_SCREEN_OFF)){
+                    if(scheduledExecutorServiceForPresence != null){
+                        scheduledExecutorServiceForPresence.shutdown();
+                    }
+                }else {
+                    setupPresenceGuardian();
+                }
+            }
+        };
+
+        registerReceiver(mScreenStatusReceiver,filter);
     }
 
     protected void bindAdapter(JSONObject object) {
@@ -833,6 +861,8 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
         if (scheduledExecutorServiceForPresenceCheckInSeconds != null) {
             scheduledExecutorServiceForPresenceCheckInSeconds.shutdown();
         }
+
+        unregisterReceiver(mScreenStatusReceiver);
 
         super.onDestroy();
     }
