@@ -294,7 +294,6 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
     }
 
     private void setupTabbarClickListener() {
-
         bottomNavigationBar.setTabSelectedListener(new BottomNavigationBar.OnTabSelectedListener() {
             @Override
             public void onTabSelected(int position) {
@@ -326,6 +325,12 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
 
             @Override
             public void onTabReselected(int position) {
+                if (!DMApplication.getInstance().isAllowUserToUseFullFeatureVersion()) {
+                    Utils.alertDialog(MainActivity.this, "请先领券优惠券");
+
+                    return;
+                }
+
                 switch (position) {
                     case kTabIndexOfMain:
                         switchToFragment(Constants.kFragmentTagMain);
