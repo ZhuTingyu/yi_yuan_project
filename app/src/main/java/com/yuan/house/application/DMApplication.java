@@ -77,7 +77,7 @@ public class DMApplication extends MultiDexApplication {
     Context mContext;
     String mLatestVersion;
     private ThinDownloadManager downloadManager;
-    private boolean allowUserToUseFullFeatureVersion = true;
+    private boolean allowUserToUseFullFeatureVersion = false;
     private String rootDataFolder;
     private String rootPagesFolder;
     private String htmlExtractedFolder;

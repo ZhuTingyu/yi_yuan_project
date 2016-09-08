@@ -354,6 +354,8 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         HouseMessageType msgType = HouseMessageType.getMessageType(msg.getMessageType());
 
         String leanId = msg.getFrom();
+
+        // FIXME: 9/6/16 auditType 没有传对
         String auditType = "0";
         String houseId = null;
 

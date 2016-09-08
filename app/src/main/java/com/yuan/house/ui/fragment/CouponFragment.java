@@ -68,7 +68,7 @@ public class CouponFragment extends WebViewBaseFragment {
                 // 都要检查该 字段;
                 //
                 // 如果 setCouponSwitchEnable 为 false, 则开放所有功能
-                boolean switchEnable = Boolean.getBoolean(data);
+                boolean switchEnable = Boolean.parseBoolean(data);
                 if (switchEnable) {
                     JSONObject object = AuthHelper.getInstance().getUserLoginObject();
                     if (object.optBoolean("has_one_ticket")) {
