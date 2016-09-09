@@ -3,6 +3,7 @@ package com.yuan.house.helper;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
 
+import com.yuan.house.application.Injector;
 import com.yuan.house.common.Constants;
 
 import org.json.JSONException;
@@ -22,12 +23,12 @@ public class AuthHelper {
     private String userToken;
     private String userId;
     private String userLoginInfo;
-    private JSONObject userLoginObject;
 
     public JSONObject getUserLoginObject() {
+        String info = prefs.getString(Constants.kWebDataKeyUserLogin, null);
         JSONObject object = null;
         try {
-            object = new JSONObject(userLoginInfo);
+            object = new JSONObject(info);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -37,6 +38,7 @@ public class AuthHelper {
     private UserType userType;
 
     public AuthHelper() {
+        Injector.inject(this);
     }
 
     public static AuthHelper getInstance() {
