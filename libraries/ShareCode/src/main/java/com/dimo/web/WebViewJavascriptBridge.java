@@ -101,6 +101,10 @@ public class WebViewJavascriptBridge implements Serializable {
         @Override
         public void onPageFinished(WebView webView, String url) {
             loadWebViewJavascriptBridgeJs(webView);
+
+            if (mBridgeWebViewListener != null) {
+                mBridgeWebViewListener.OnBridgeWebViewPageStop();
+            }
         }
 
         @Override
@@ -207,6 +211,8 @@ public class WebViewJavascriptBridge implements Serializable {
     }
     public interface OnBridgeWebViewListener {
         void OnBridgeWebViewPageStart();
+
+        void OnBridgeWebViewPageStop();
     }
 
     public void send(String data) {

@@ -1253,9 +1253,16 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
     }
 
     @Override
-    public void OnBridgeWebViewPageStart() {
+    public void OnBridgeWebViewPageStop() {
         if (getActivity() != null) {
             ((WebViewBasedActivity) getActivity()).onBridgeDismissProgressDialog();
+        }
+    }
+
+    @Override
+    public void OnBridgeWebViewPageStart() {
+        if (getActivity() != null) {
+            ((WebViewBasedActivity) getActivity()).onBridgeShowProgressDialog();
         }
     }
 
