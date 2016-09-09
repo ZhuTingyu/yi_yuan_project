@@ -45,6 +45,7 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.bugtags.library.Bugtags;
+import com.crystal.crystalpreloaders.widgets.CrystalPreloader;
 import com.dimo.utils.BitmapUtil;
 import com.dimo.utils.DateUtil;
 import com.dimo.utils.StringUtil;
@@ -59,7 +60,6 @@ import com.flyco.dialog.widget.ActionSheetDialog;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.tasomaniac.android.widget.DelayedProgressDialog;
 import com.yuan.house.HouseMessageType;
 import com.yuan.house.R;
 import com.yuan.house.application.DMApplication;
@@ -104,6 +104,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.sharesdk.framework.ShareSDK;
 import cn.sharesdk.onekeyshare.OnekeyShare;
@@ -126,7 +127,8 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     private final int kActivityRequestCodeSelectMapLocation = 20;
     protected FragmentManager mFragmentManager;
     protected FragmentTransaction mFragmentTransaction;
-    protected DelayedProgressDialog mLoadingDialog;
+    @BindView(R.id.progressBar)
+    protected CrystalPreloader mLoadingDialog;
     String mUrl;
     WebViewBaseFragment webViewFragment;
     private AliPay aliPay;
@@ -910,7 +912,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
     private void dismissProgressDialog() {
         if (mLoadingDialog != null) {
-            mLoadingDialog.dismiss();
+            mLoadingDialog.setVisibility(View.GONE);
         }
     }
 
@@ -919,10 +921,8 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     public void onBridgeShowProgressDialog() {
-        if (mLoadingDialog == null) {
-            mLoadingDialog = DelayedProgressDialog.showDelayed(mContext, null, getString(R.string.loading), true, true);
-        } else {
-            mLoadingDialog.show();
+        if (mLoadingDialog != null) {
+            mLoadingDialog.setVisibility(View.VISIBLE);
         }
     }
 

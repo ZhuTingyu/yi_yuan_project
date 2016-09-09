@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -9,4 +10,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:focusableInTouchMode="true"/>
+
+    <com.crystal.crystalpreloaders.widgets.CrystalPreloader
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        app:crs_pl_bg_color="#fff"
+        app:crs_pl_fg_color="@color/primary_color_scheme"
+        app:crs_pl_size="small"
+        app:crs_pl_style="ball_scale" />
 </RelativeLayout>

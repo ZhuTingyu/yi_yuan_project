@@ -192,7 +192,7 @@ dependencies {
     compile 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:1.0.1'
 
     /** UI .        */
-    compile 'com.tasomaniac:delayed-progress:0.3'
+    compile 'com.crystal:crystalpreloaders:1.0.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.wx.wheelview:wheelview:1.3.4'
     compile 'com.github.lovetuzitong:MultiImageSelector:1.1'
