@@ -95,7 +95,6 @@
             android:launchMode="singleTask" />
         <activity
             android:name=".activities.CropActivity"
-            android:launchMode="singleTask"
             android:screenOrientation="portrait" />
         <activity
             android:name="com.etiennelawlor.imagegallery.library.activities.ImageGalleryActivity"
@@ -117,7 +116,6 @@
 
         <activity
             android:name="me.nereo.multi_image_selector.MultiImageSelectorActivity"
-            android:launchMode="singleTask"
             android:screenOrientation="portrait" />
 
         <activity
