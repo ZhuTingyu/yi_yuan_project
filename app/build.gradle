@@ -78,7 +78,7 @@ android {
         }
 
         release {
-            buildConfigField("String", "kWebServiceEndpoint", "\"http://test.house.ieyuan.com\"")
+            buildConfigField("String", "kWebServiceEndpoint", "\"http://api.eye5250.com\"")
             versionNameSuffix "-RELEASE"
             minifyEnabled false
 
