@@ -68,12 +68,12 @@ public class SplashActivity extends FragmentActivity {
     private void runHeavyLoadTaskInBackground() {
 
 // FIXME: 16/7/25 uncomment when in production mode
-//        if (!prefs.getBoolean(Constants.kWebPackageExtracted, false)) {
+//        if (!prefs.getBoolean(Constants.kPrefsHtmlPackageExtracted, false)) {
             Timber.v("Copy HTML asset to folder");
 
             FileUtil.copyAssetFolder(getAssets(), "html", DMApplication.getInstance().getHtmlExtractedFolder());
 
-            prefs.edit().putBoolean(Constants.kWebPackageExtracted, true).apply();
+            prefs.edit().putBoolean(Constants.kPrefsHtmlPackageExtracted, true).apply();
 //        }
 
         setupChatManager();
@@ -196,7 +196,7 @@ public class SplashActivity extends FragmentActivity {
                     } else {
                         int onlineVersionCode = Integer.parseInt(version);
 
-                        int packageVersion = Integer.parseInt(prefs.getString(Constants.kAppVersionCode, "0"));
+                        int packageVersion = Integer.parseInt(prefs.getString(Constants.kPrefsNativeAppVersion, "0"));
                         if (packageVersion < onlineVersionCode) {
                             hasNewVersion = "1";
                         } else {
@@ -204,8 +204,8 @@ public class SplashActivity extends FragmentActivity {
                         }
                     }
 
-                    editor.putString(Constants.kAppHasNewVersion, hasNewVersion);
-                    editor.putString(Constants.kNewAppDownloadUrl, url);
+                    editor.putString(Constants.kPrefsAppHasNewVersion, hasNewVersion);
+                    editor.putString(Constants.kPrefsNewAppDownloadUrl, url);
                     editor.apply();
                 } catch (JSONException e) {
                     e.printStackTrace();

@@ -451,7 +451,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
     }
 
     protected void executeAppVersionCheck() {
-        boolean hasNewVersion = prefs.getString(Constants.kAppHasNewVersion, "0").equals("1");
+        boolean hasNewVersion = prefs.getString(Constants.kPrefsAppHasNewVersion, "0").equals("1");
 
         if (hasNewVersion) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -476,7 +476,7 @@ public class MainActivity extends WebViewBasedActivity implements WebViewFragmen
     }
 
     private void downloadFileAndPrepareInstallation() {
-        String url = prefs.getString(Constants.kNewAppDownloadUrl, null);
+        String url = prefs.getString(Constants.kPrefsNewAppDownloadUrl, null);
         if (TextUtils.isEmpty(url)) {
             Toast.makeText(mContext, R.string.error_upgrade_app, Toast.LENGTH_SHORT).show();
             return;

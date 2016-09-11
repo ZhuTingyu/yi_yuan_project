@@ -47,11 +47,14 @@ android {
             targetSdkVersion Integer.parseInt(project.ANDROID_TARGET_SDK_VERSION)
             multiDexEnabled true
 
-            setProperty("archivesBaseName", "Yuan-House-$versionName")
+//            setProperty("archivesBaseName", "Yuan-House-$versionName")
         }
     } else {
         throw new GradleException("Could not read version.properties!")
     }
+
+    def htmlMainCode = "\"1\""
+    def htmlVersionCode = "\"5\""
 
     signingConfigs {
         debug {
@@ -72,6 +75,11 @@ android {
     buildTypes {
         debug {
             buildConfigField("String", "kWebServiceEndpoint", "\"http://test.house.ieyuan.com\"")
+            buildConfigField("String", "kFileServerEndpoint", "\"http://static.eye5250.com/api\"")
+            buildConfigField("String", "kBugTagsKey", "\"c0a589a1390e94a20f24ce42885311b7\"")
+            buildConfigField("String", "kHtmlMainCodeDefault", htmlMainCode)
+            buildConfigField("String", "kHtmlVersionCodeDefault", htmlVersionCode)
+
             versionNameSuffix "-DEBUG"
 
             signingConfig signingConfigs.debug
@@ -79,6 +87,11 @@ android {
 
         release {
             buildConfigField("String", "kWebServiceEndpoint", "\"http://api.eye5250.com\"")
+            buildConfigField("String", "kFileServerEndpoint", "\"http://static.eye5250.com/api\"")
+            buildConfigField("String", "kBugTagsKey", "\"c0a589a1390e94a20f24ce42885311b7\"")
+            buildConfigField("String", "kHtmlMainCodeDefault", htmlMainCode)
+            buildConfigField("String", "kHtmlVersionCodeDefault", htmlVersionCode)
+
             versionNameSuffix "-RELEASE"
             minifyEnabled false
 
@@ -95,6 +108,11 @@ android {
 
         development {
             buildConfigField("String", "kWebServiceEndpoint", "\"http://test.house.ieyuan.com\"")
+            buildConfigField("String", "kFileServerEndpoint", "\"http://static.eye5250.com/api\"")
+            buildConfigField("String", "kBugTagsKey", "\"c0a589a1390e94a20f24ce42885311b7\"")
+            buildConfigField("String", "kHtmlMainCodeDefault", htmlMainCode)
+            buildConfigField("String", "kHtmlVersionCodeDefault", htmlVersionCode)
+
             versionNameSuffix "-BETA"
             minifyEnabled false
 
@@ -103,6 +121,11 @@ android {
 
         beta {
             buildConfigField("String", "kWebServiceEndpoint", "\"http://at.eye5250.com\"")
+            buildConfigField("String", "kFileServerEndpoint", "\"http://static.eye5250.com/api\"")
+            buildConfigField("String", "kBugTagsKey", "\"c0a589a1390e94a20f24ce42885311b7\"")
+            buildConfigField("String", "kHtmlMainCodeDefault", htmlMainCode)
+            buildConfigField("String", "kHtmlVersionCodeDefault", htmlVersionCode)
+
             versionNameSuffix "-BETA"
             minifyEnabled false
 

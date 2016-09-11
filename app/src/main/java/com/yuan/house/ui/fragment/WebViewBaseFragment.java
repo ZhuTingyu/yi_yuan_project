@@ -401,7 +401,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
             public void handle(String data, WebViewJavascriptBridge.WVJBResponseCallback callback) {
                 Timber.v("getCurrentPackageVersion got:" + data);
                 if (null != callback) {
-                    String version = prefs.getString(Constants.kApplicationPackageVersion, "100");
+                    String version = prefs.getString(Constants.kPrefsNativeAppCode, "100");
 
                     callback.callback(version);
                 }

@@ -38,9 +38,6 @@ import com.karumi.dexter.Dexter;
 import com.lfy.dao.DaoMaster;
 import com.lfy.dao.DaoSession;
 import com.lfy.dao.MessageDao;
-import com.loopj.android.http.FileAsyncHttpResponseHandler;
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
@@ -51,17 +48,15 @@ import com.yuan.house.BuildConfig;
 import com.yuan.house.common.Constants;
 import com.yuan.house.event.AuthEvent;
 import com.yuan.house.http.RestClient;
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.StringCallback;
 
-import org.apache.http.Header;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.File;
-import java.io.IOException;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
 
 import de.greenrobot.event.EventBus;
+import okhttp3.Call;
 import timber.log.Timber;
 
 import static android.os.Build.VERSION.SDK_INT;
@@ -75,7 +70,7 @@ public class DMApplication extends MultiDexApplication {
     SharedPreferences prefs;
     @Inject
     Context mContext;
-    String mLatestVersion;
+    String mLatestVersionCode;
     private ThinDownloadManager downloadManager;
     private boolean allowUserToUseFullFeatureVersion = false;
     private String rootDataFolder;
@@ -83,6 +78,8 @@ public class DMApplication extends MultiDexApplication {
     private String htmlExtractedFolder;
     private BDLocation lastActivatedLocation;
     private MessageDao messageDao;
+    private String mLatestMainCode;
+    private String mLatestVersionNo;
 
     /**
      * Create main application
@@ -162,7 +159,7 @@ public class DMApplication extends MultiDexApplication {
 //        if (BuildConfig.DEBUG) {
         Timber.plant(new Timber.DebugTree());
 //        } else {
-        Bugtags.start(Constants.kBugTagsKey, this, Bugtags.BTGInvocationEventShake);
+        Bugtags.start(BuildConfig.kBugTagsKey, this, Bugtags.BTGInvocationEventShake);
 //        }
 
         PackageInfo pInfo = null;
@@ -182,31 +179,13 @@ public class DMApplication extends MultiDexApplication {
             Timber.v("Not First launch");
         }
 
-        editor.putString(Constants.kApplicationPackageVersion, version);
-        editor.putString(Constants.kAppVersionCode, Integer.toString(BuildConfig.VERSION_CODE));
+        editor.putString(Constants.kPrefsNativeAppCode, version);
+        editor.putString(Constants.kPrefsNativeAppVersion, Integer.toString(BuildConfig.VERSION_CODE));
 
         editor.apply();
 
-//        try {
-//            PackageInfo info = getPackageManager().getPackageInfo(Constants.kApplicationId, PackageManager.GET_SIGNATURES);
-//            for (Signature signature : info.signatures) {
-//                MessageDigest md = MessageDigest.getInstance("SHA");
-//                md.update(signature.toByteArray());
-//                String sign = Base64.encodeToString(md.digest(), Base64.DEFAULT);
-//                Timber.e("KEY HASH:" + sign);
-//            }
-//        } catch (PackageManager.NameNotFoundException e) {
-//            e.printStackTrace();
-//        } catch (NoSuchAlgorithmException e) {
-//            e.printStackTrace();
-//        }
-
         // init download manager
         downloadManager = new ThinDownloadManager(DOWNLOAD_THREAD_POOL_SIZE);
-
-        // check web package at every launch
-//        determineWebUpdate(Constants.kWebPackageVersionCached, Constants.kCheckTypeHtml);
-//        determineWebUpdate(Constants.kWebLaunchImageVersionCached, Constants.kCheckTypeLaunchImage);
 
         RestClient.getInstance().setHostname(Constants.kWebServiceAPIEndpoint);
 
@@ -215,7 +194,6 @@ public class DMApplication extends MultiDexApplication {
 
         AVObject.registerSubclass(UpdateInfo.class);
 
-//        PushService.setDefaultPushCallback(instance, SplashActivity.class);
         AVOSCloud.setDebugLogEnabled(debug);
         AVAnalytics.enableCrashReport(this, !debug);
 
@@ -235,6 +213,8 @@ public class DMApplication extends MultiDexApplication {
         configLocalWebPackageSettings();
 
         initDatabase();
+
+        determineWebUpdate();
     }
 
     private void initDatabase() {
@@ -337,69 +317,42 @@ public class DMApplication extends MultiDexApplication {
     /**
      * Check if there has new web content available to download
      */
-    public void determineWebUpdate(String prefsKey, final String product) {
-        String cachedVersion = prefs.getString(prefsKey, "0.0.1");
+    public void determineWebUpdate() {
+        String cachedMain = prefs.getString(Constants.kPrefsHtmlMainCode, null);
+        String cachedVersion = prefs.getString(Constants.kPrefsHtmlVersionCode, null);
 
-        RequestParams requestParams = new RequestParams();
-        requestParams.put("product", product);
-        requestParams.put("version", cachedVersion);
+        if (StringUtils.isEmpty(cachedMain) || StringUtils.isEmpty(cachedVersion)) {
+            cachedMain = BuildConfig.kHtmlMainCodeDefault;
+            cachedVersion = BuildConfig.kHtmlVersionCodeDefault;
+        }
 
-        RestClient.getInstance().get(Constants.kServiceCheckUpdate, null, requestParams, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                super.onSuccess(statusCode, headers, response);
+        String requestUrl = Constants.kWebServiceHTMLPackageVersion + "/" + cachedMain + "/" + cachedVersion;
 
-                // download latest web package
-                if (response != null) {
-                    String url;
-                    try {
-                        JSONObject result = response.getJSONObject("Result");
-
-                        mLatestVersion = result.getString("Version");
-
-                        url = result.getString("DownloadUrl");
-
-                        if (product.equals(Constants.kCheckTypeLaunchImage)) {
-                            RestClient.getInstance().get(url, null, new FileAsyncHttpResponseHandler(mContext) {
-                                @Override
-                                public void onSuccess(int statusCode, Header[] headers, File response) {
-                                    Timber.v("Download Launch Image Success");
-
-                                    // overwrite the launch image locally
-                                    File target = new File(FileUtil.getLaunchImagePath(mContext));
-
-                                    try {
-                                        FileUtil.copyFile(response, target);
-                                    } catch (IOException e) {
-                                        Timber.e("ERROR: copy the launch image to data folder");
-
-                                        e.printStackTrace();
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(int statusCode, Header[] headers, Throwable throwable, File file) {
-                                    Timber.e("Download Launch Image Failed");
-                                }
-                            });
-                        } else {
-                            downloadTarBallFromUrl(url);
-                        }
-                    } catch (JSONException e) {
+        OkHttpUtils.get().url(requestUrl)
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
                         e.printStackTrace();
                     }
-                } else {
-                    final Uri destinationUri = Uri.parse(getExternalCacheDir().toString() + "/demo.zip");
 
-                    extractZipFileToDocumentFolder(destinationUri.getPath());
-                }
-            }
+                    @Override
+                    public void onResponse(String response, int id) {
+                        com.alibaba.fastjson.JSONObject object = com.alibaba.fastjson.JSONObject.parseObject(response);
 
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-            }
-        });
+                        boolean available = object.getBooleanValue("upgrade");
+                        if (available) {
+
+                            mLatestVersionCode = object.getString("version_code");
+                            mLatestMainCode = object.getString("main_version");
+                            mLatestVersionNo = object.getString("version_no");
+
+                            String url = object.getString("file_path");
+
+                            downloadTarBallFromUrl(url);
+                        }
+                    }
+                });
     }
 
     /**
@@ -420,8 +373,6 @@ public class DMApplication extends MultiDexApplication {
                 .setDownloadListener(new DownloadStatusListener() {
                     @Override
                     public void onDownloadComplete(int id) {
-                        Timber.v("onDownloadComplete");
-
                         extractZipFileToDocumentFolder(destinationUri.getPath());
                     }
 
@@ -441,11 +392,13 @@ public class DMApplication extends MultiDexApplication {
     private void extractZipFileToDocumentFolder(String destUri) {
         String targetFolder = FileUtil.getDataDirectory(this);
 
-        Timber.v("From : " + destUri + " To : " + targetFolder);
-
         ZipUtil.unzip(destUri, targetFolder);
 
-        prefs.edit().putString(Constants.kApplicationPackageVersion, mLatestVersion).apply();
+        prefs.edit()
+                .putString(Constants.kPrefsHtmlMainCode, mLatestMainCode)
+                .putString(Constants.kPrefsHtmlVersionCode, mLatestVersionCode)
+                .putString(Constants.kPrefsHtmlVersionNo, mLatestVersionNo)
+                .apply();
     }
 
     public String getRootPagesFolder() {

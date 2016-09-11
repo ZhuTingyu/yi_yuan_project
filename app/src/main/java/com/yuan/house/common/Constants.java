@@ -18,9 +18,8 @@ public class Constants {
      * Web Service Url
      */
     public static final String kWebServiceAPIEndpoint = BuildConfig.kWebServiceEndpoint + "/api";
-    private static final String kFileServerEndpoint = "http://static.eye5250.com/api";
-    public static final String kWebServiceFileUpload = kFileServerEndpoint + "/file-upload/feedback";
-    public static final String kWebServiceImageUpload = kFileServerEndpoint + "/image-upload";
+    public static final String kWebServiceFileUpload = BuildConfig.kFileServerEndpoint + "/file-upload/feedback";
+    public static final String kWebServiceImageUpload = BuildConfig.kFileServerEndpoint + "/image-upload";
     public static final String kWebServiceSendFeedback = kWebServiceAPIEndpoint + "/feedback";
     public static final String kWebServiceGetFeedback = kWebServiceAPIEndpoint + "/feedback?page=";
     public static final String kWebServiceGetBrokers = kWebServiceAPIEndpoint + "/agency/complain";
@@ -44,7 +43,6 @@ public class Constants {
     public static final String kFragmentTagMessage = "kFragmentTagMessage";
     public static final String kFragmentTagBBS = "kFragmentTagBBS";
 
-    public static final String kBugTagsKey = "c0a589a1390e94a20f24ce42885311b7";
     public static final String kLeanChatCurrentUserObjectId = "kLeanChatCurrentUserObjectId";
     public static final String kWebDataKeyUserLogin = "userLogin";
     public static final String kHttpReqKeyContentType = "Content-Type";
@@ -101,16 +99,11 @@ public class Constants {
 
     public static final String kPrefsFirstLaunch = "kPrefsFirstLaunch";
     public static final String kPrefsAppHasNewVersion = "hasNewVersionAvailable";
+    public static final String kPrefsNativeAppCode = "kPrefsNativeAppCode";
     public static final String kPrefsNativeAppVersion = "kPrefsNativeAppVersion";
     public static final String kPrefsNewAppDownloadUrl = "kPrefsNewAppDownloadUrl";
 
     public static final String kPrefsHasAgencyFriends = "kPrefsHasAgencyFriends";
     public static final String kPrefsLastSelectedCityFromMap = "lastCity";
     public static final String kPrefsLastSelectedDistrictFromMap = "lastDistrict";
-
-    /**
-     * HTML Package Version
-     */
-    public static final String kHtmlMainCodeDefault = "1";
-    public static final String kHtmlVersionCodeDefault = "5";
 }
