@@ -338,12 +338,42 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
         }
     }
 
+    // 定期发送在线状态
+    private void sendPresenceMessage() {
+        AVIMPresenceMessage msg = new AVIMPresenceMessage();
+        msg.setOp(getString(R.string.txt_online));
+
+        messageAgent.sendPresence(msg);
+    }
+
+    @Override
+    protected void sendText() {
+        String content = chatTextInputField.getText().toString();
+        if (!TextUtils.isEmpty(content)) {
+            AVIMTextMessage message = new AVIMTextMessage();
+
+            Map<String, Object> attrs = new HashMap<>();
+            attrs.put("houseId", cachedHouseIdForCurrentConv);
+            attrs.put("username", jsonFormatParams.optString("nickname"));
+            attrs.put("auditType", jsonFormatParams.optString("audit_type"));
+
+            message.setAttrs(attrs);
+
+            message.setText(content);
+
+            messageAgent.sendEncapsulatedTypedMessage(message);
+
+            chatTextInputField.setText("");
+        }
+    }
+
     @Override
     protected void sendAudio(String audioPath) {
         if (messageAgent != null) {
             Map<String, Object> attrs = new HashMap<>();
             attrs.put("houseId", cachedHouseIdForCurrentConv);
             attrs.put("username", jsonFormatParams.optString("nickname"));
+            attrs.put("auditType", jsonFormatParams.optString("audit_type"));
 
             messageAgent.sendAudio(attrs, audioPath);
         }
@@ -355,6 +385,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
             Map<String, Object> attrs = new HashMap<>();
             attrs.put("houseId", cachedHouseIdForCurrentConv);
             attrs.put("username", jsonFormatParams.optString("nickname"));
+            attrs.put("auditType", jsonFormatParams.optString("audit_type"));
 
             messageAgent.sendImage(attrs, s);
         }
@@ -718,34 +749,6 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                 super.onFailure(statusCode, headers, throwable, errorResponse);
             }
         });
-    }
-
-    // 定期发送在线状态
-    private void sendPresenceMessage() {
-        AVIMPresenceMessage msg = new AVIMPresenceMessage();
-        msg.setOp(getString(R.string.txt_online));
-
-        messageAgent.sendPresence(msg);
-    }
-
-    @Override
-    protected void sendText() {
-        String content = chatTextInputField.getText().toString();
-        if (!TextUtils.isEmpty(content)) {
-            AVIMTextMessage message = new AVIMTextMessage();
-
-            Map<String, Object> attrs = new HashMap<>();
-            attrs.put("houseId", cachedHouseIdForCurrentConv);
-            attrs.put("username", jsonFormatParams.optString("nickname"));
-
-            message.setAttrs(attrs);
-
-            message.setText(content);
-
-            messageAgent.sendEncapsulatedTypedMessage(message);
-
-            chatTextInputField.setText("");
-        }
     }
 
     @Override

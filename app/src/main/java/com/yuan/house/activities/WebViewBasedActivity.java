@@ -804,9 +804,8 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         JSONObject object;
         try {
             object = new JSONObject(data);
-            // TODO: 8/20/16 Send Card Message
-            sendCardMessage(object);
 
+            sendCardMessage(object);
         } catch (JSONException e) {
             e.printStackTrace();
         }

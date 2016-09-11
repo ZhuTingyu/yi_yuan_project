@@ -102,7 +102,6 @@ public class ChatManager extends AVIMClientEventHandler {
      * @param callback 创建成功之后
      */
     public void fetchConversationWithUserId(final JSONObject param, final String userId, final AVIMConversationCreatedCallback callback) {
-        // FIXME: 8/12/16 why the conversation changed???
         boolean isPeerTypeAgency = "agency".equals(param.optString("type"));
 
         String houseId = param.optString("house_id");
@@ -136,7 +135,6 @@ public class ChatManager extends AVIMClientEventHandler {
                 if (e != null) {
                     callback.done(null, e);
                 } else {
-                    // TODO: 8/12/16 filter conversation here?
                     if (conversations.size() > 0) {
                         // 使用已存在的会话
                         Timber.w("FETCH CONV OLD - Peer Id : %s, House Id : %s, Conv Id : %s", userId, finalHouseId, conversations.get(0).getConversationId());
@@ -386,6 +384,7 @@ public class ChatManager extends AVIMClientEventHandler {
         } else {
             message.setIs_read(true);
         }
+
         message.setMessage(text);
 
         message.setDate(dateString);
