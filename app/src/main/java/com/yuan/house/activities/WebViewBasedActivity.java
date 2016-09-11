@@ -398,12 +398,18 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     }
 
     public void onEvent(NotificationEvent event) {
-        if (event.getEventType() == NotificationEvent.NotificationEventEnum.HOUSE_RECOMMENDED_MESSAGE) {
-            getWebViewFragment().getBridge().callHandler("RecommendedNotification", event.getHolder());
+        if (event.getEventType() == NotificationEvent.NotificationEventEnum.NOTICE_MESSAGE) {
+            getWebViewFragment().getBridge().callHandler("MessageNotification", event.getHolder().toString());
+        } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.NEW_TRANSACTION) {
+            getWebViewFragment().getBridge().callHandler("userTransactionNotification", event.getHolder().toString());
+        } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.NEW_AGENCY_TRANSATION) {
+            getWebViewFragment().getBridge().callHandler("agencyTransactionNotification", event.getHolder().toString());
+        } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.HOUSE_RECOMMENDED_MESSAGE) {
+            getWebViewFragment().getBridge().callHandler("RecommendedNotification", event.getHolder().toString());
         } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.NEW_HOUSE_AUDIT) {
-            getWebViewFragment().getBridge().callHandler("AuditorNotification", event.getHolder());
+            getWebViewFragment().getBridge().callHandler("AuditorNotification", event.getHolder().toString());
         } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.NEW_EXCLUSIVE_CONTRACT) {
-            getWebViewFragment().getBridge().callHandler("AuditorNotification", event.getHolder());
+            getWebViewFragment().getBridge().callHandler("AuditorNotification", event.getHolder().toString());
         } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.NEW_PREORDER_CONTRACT) {
             JSONObject object = new JSONObject();
             try {
@@ -413,7 +419,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 e.printStackTrace();
             }
 
-            getWebViewFragment().getBridge().callHandler("AuditorNotification", object);
+            getWebViewFragment().getBridge().callHandler("AuditorNotification", object.toString());
         } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.NEW_BUSINESS_CONTRACT) {
             JSONObject object = new JSONObject();
             try {
@@ -423,7 +429,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                 e.printStackTrace();
             }
 
-            getWebViewFragment().getBridge().callHandler("AuditorNotification", event.getHolder());
+            getWebViewFragment().getBridge().callHandler("AuditorNotification", event.getHolder().toString());
         } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.KICK_OUT) {
             JSONObject object = event.getHolder();
 
@@ -1300,7 +1306,5 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
     public void loadFullScreenImage(final ImageView iv, String imageUrl, int width, final LinearLayout bgLinearLayout) {
         ImageUtil.loadFullScreenImage(iv, imageUrl, width, bgLinearLayout);
     }
-
-
     // endregion
 }

@@ -305,7 +305,6 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
         });
 
         registerScreenStatusReceriver();
-
     }
 
     @Override
@@ -806,13 +805,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     }
 
     public void onEvent(NotificationEvent event) {
-        if (event.getEventType() == NotificationEvent.NotificationEventEnum.NOTICE_MESSAGE) {
-            getWebViewFragment().getBridge().callHandler("MessageNotification", event.getHolder());
-        } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.NEW_TRANSACTION) {
-            getWebViewFragment().getBridge().callHandler("userTransactionNotification", event.getHolder());
-        } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.NEW_AGENCY_TRANSATION) {
-            getWebViewFragment().getBridge().callHandler("agencyTransactionNotification", event.getHolder());
-        } else if (event.getEventType() == NotificationEvent.NotificationEventEnum.BBS_MESSAGE) {
+        if (event.getEventType() == NotificationEvent.NotificationEventEnum.BBS_MESSAGE) {
             getWebViewFragment().getBridge().callHandler("BBSNotification", event.getHolder());
         }
     }
