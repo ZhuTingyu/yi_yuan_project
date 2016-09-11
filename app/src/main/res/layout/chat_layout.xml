@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/rl_chatroom"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -55,6 +56,16 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/topbar_height"
         android:visibility="gone" />
+
+    <com.crystal.crystalpreloaders.widgets.CrystalPreloader
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        app:crs_pl_bg_color="#fff"
+        app:crs_pl_fg_color="@color/primary_color_scheme"
+        app:crs_pl_size="small"
+        app:crs_pl_style="ball_scale" />
 
     <LinearLayout
         android:id="@id/bottomLayout"
