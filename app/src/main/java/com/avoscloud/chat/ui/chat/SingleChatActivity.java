@@ -75,6 +75,7 @@ import com.zhy.http.okhttp.callback.StringCallback;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -355,7 +356,12 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
             Map<String, Object> attrs = new HashMap<>();
             attrs.put("houseId", cachedHouseIdForCurrentConv);
             attrs.put("username", jsonFormatParams.optString("nickname"));
-            attrs.put("auditType", jsonFormatParams.optString("audit_type"));
+
+            String audit = "0";
+            if (!StringUtils.isEmpty(jsonFormatParams.optString("audit_type"))) {
+                audit = jsonFormatParams.optString("audit_type");
+            }
+            attrs.put("auditType", audit);
 
             message.setAttrs(attrs);
 
@@ -373,7 +379,12 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
             Map<String, Object> attrs = new HashMap<>();
             attrs.put("houseId", cachedHouseIdForCurrentConv);
             attrs.put("username", jsonFormatParams.optString("nickname"));
-            attrs.put("auditType", jsonFormatParams.optString("audit_type"));
+
+            String audit = "0";
+            if (!StringUtils.isEmpty(jsonFormatParams.optString("audit_type"))) {
+                audit = jsonFormatParams.optString("audit_type");
+            }
+            attrs.put("auditType", audit);
 
             messageAgent.sendAudio(attrs, audioPath);
         }
@@ -385,7 +396,12 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
             Map<String, Object> attrs = new HashMap<>();
             attrs.put("houseId", cachedHouseIdForCurrentConv);
             attrs.put("username", jsonFormatParams.optString("nickname"));
-            attrs.put("auditType", jsonFormatParams.optString("audit_type"));
+
+            String audit = "0";
+            if (!StringUtils.isEmpty(jsonFormatParams.optString("audit_type"))) {
+                audit = jsonFormatParams.optString("audit_type");
+            }
+            attrs.put("auditType", audit);
 
             messageAgent.sendImage(attrs, s);
         }
