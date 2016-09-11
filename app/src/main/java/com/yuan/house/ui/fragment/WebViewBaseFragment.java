@@ -1164,7 +1164,7 @@ public class WebViewBaseFragment extends Fragment implements WebViewJavascriptBr
     }
 
     public void onEvent(BridgeCallbackEvent event) {
-        // TODO: 16/7/14 加一个参数 result.refreshAll = true | false;
+        // 加一个参数 result.refreshAll = true | false;
         try {
             JSONObject object = new JSONObject(event.getHolder());
             object.put("refreshAll", true);

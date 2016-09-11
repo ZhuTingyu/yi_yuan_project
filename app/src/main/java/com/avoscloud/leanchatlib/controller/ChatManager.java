@@ -18,6 +18,8 @@ import com.avos.avoscloud.im.v2.AVIMTypedMessageHandler;
 import com.avos.avoscloud.im.v2.callback.AVIMClientCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationQueryCallback;
+import com.avos.avoscloud.im.v2.messages.AVIMAudioMessage;
+import com.avos.avoscloud.im.v2.messages.AVIMImageMessage;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
 import com.avoscloud.chat.service.CacheService;
 import com.avoscloud.chat.ui.chat.SingleChatActivity;
@@ -42,6 +44,7 @@ import com.yuan.house.common.Constants;
 import com.yuan.house.event.AuthEvent;
 import com.yuan.house.helper.AuthHelper;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -340,28 +343,41 @@ public class ChatManager extends AVIMClientEventHandler {
 
     public void storeLastMessage(AVIMTypedMessage msg, JSONObject params) {
         String leanId;
-
-        String auditType = null;
+        String auditType = "0";
         String houseId = "";
         String text;
+
+        HouseMessageType msgType = HouseMessageType.getMessageType(msg.getMessageType());
+        text = MessageHelper.outlineOfMsg(msg).toString();
+
+        Map<String, Object> objectMap = null;
+
+        // FIXME: 8/16/16 shit code!!!
+        if (msgType == HouseMessageType.TextMessageType) {
+            objectMap = ((AVIMTextMessage) msg).getAttrs();
+            text = ((AVIMTextMessage) msg).getText();
+        } else if (msgType == HouseMessageType.HouseMessageType) {
+            objectMap = ((AVIMHouseMessage) msg).getAttrs();
+        } else if (msgType == HouseMessageType.AudioMessageType) {
+            objectMap = ((AVIMAudioMessage) msg).getAttrs();
+        } else if (msgType == HouseMessageType.ImageMessageType) {
+            objectMap = ((AVIMImageMessage) msg).getAttrs();
+        }
+
+        if (objectMap != null) {
+            houseId = objectMap.get("houseId").toString();
+            if (objectMap.get("auditType") != null) {
+                if (!StringUtils.isEmpty(objectMap.get("auditType").toString())) {
+                    auditType = objectMap.get("auditType").toString();
+                }
+            }
+        }
 
         if (params != null) {
             auditType = params.optString("audit_type");
             leanId = params.optString("lean_id");
         } else {
             leanId = msg.getFrom();
-        }
-
-        if (TextUtils.isEmpty(auditType)) auditType = "0";
-
-        HouseMessageType msgType = HouseMessageType.getMessageType(msg.getMessageType());
-        text = MessageHelper.outlineOfMsg(msg).toString();
-
-        if (msgType == HouseMessageType.TextMessageType) {
-            houseId = ((AVIMTextMessage) msg).getAttrs().get("houseId").toString();
-            text = ((AVIMTextMessage) msg).getText();
-        } else if (msgType == HouseMessageType.HouseMessageType) {
-            houseId = ((AVIMHouseMessage) msg).getAttrs().get("houseId").toString();
         }
 
         MessageDao dao = DMApplication.getInstance().getMessageDao();

@@ -90,6 +90,7 @@ import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventList
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -357,19 +358,27 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
         String leanId = msg.getFrom();
 
-        // FIXME: 9/6/16 auditType 没有传对
         String auditType = "0";
         String houseId = null;
 
+        Map<String, Object> objectMap = null;
+
         // FIXME: 8/16/16 shit code!!!
         if (msgType == HouseMessageType.TextMessageType) {
-            houseId = ((AVIMTextMessage) msg).getAttrs().get("houseId").toString();
+            objectMap = ((AVIMTextMessage) msg).getAttrs();
         } else if (msgType == HouseMessageType.HouseMessageType) {
-            houseId = ((AVIMHouseMessage) msg).getAttrs().get("houseId").toString();
+            objectMap = ((AVIMHouseMessage) msg).getAttrs();
         } else if (msgType == HouseMessageType.AudioMessageType) {
-            houseId = ((AVIMAudioMessage) msg).getAttrs().get("houseId").toString();
+            objectMap = ((AVIMAudioMessage) msg).getAttrs();
         } else if (msgType == HouseMessageType.ImageMessageType) {
-            houseId = ((AVIMImageMessage) msg).getAttrs().get("houseId").toString();
+            objectMap = ((AVIMImageMessage) msg).getAttrs();
+        }
+
+        if (objectMap != null) {
+            houseId = objectMap.get("houseId").toString();
+            if (!StringUtils.isEmpty(objectMap.get("auditType").toString())) {
+                auditType = objectMap.get("auditType").toString();
+            }
         }
 
         JSONObject object = new JSONObject();
