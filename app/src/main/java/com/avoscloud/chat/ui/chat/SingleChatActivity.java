@@ -303,15 +303,6 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
                 }
             }
         });
-
-        registerScreenStatusReceriver();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        setCurrentChattingConvid(null);
     }
 
     @Override
@@ -851,6 +842,8 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     protected void onResume() {
         CacheService.setCurConv(conversation);
 
+        registerScreenStatusReceriver();
+
         super.onResume();
 
         //setupPresenceGuardian();
@@ -860,6 +853,15 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
         }
 
         setCurrentChattingConvid(conversation.getConversationId());
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        unregisterReceiver(mScreenStatusReceiver);
+
+        setCurrentChattingConvid(null);
     }
 
     @Override
@@ -873,8 +875,6 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
         if (scheduledExecutorServiceForPresenceCheckInSeconds != null) {
             scheduledExecutorServiceForPresenceCheckInSeconds.shutdown();
         }
-
-        unregisterReceiver(mScreenStatusReceiver);
 
         super.onDestroy();
     }
