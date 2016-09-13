@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <RelativeLayout
         android:id="@+id/map_topbar"
@@ -36,6 +37,16 @@
         android:layout_height="match_parent"
         android:layout_below="@+id/map_topbar"
         android:clickable="true" />
+
+    <com.crystal.crystalpreloaders.widgets.CrystalPreloader
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        app:crs_pl_bg_color="#fff"
+        app:crs_pl_fg_color="@color/primary_color_scheme"
+        app:crs_pl_size="small"
+        app:crs_pl_style="ball_scale" />
 
     <LinearLayout
         android:id="@+id/map_control"

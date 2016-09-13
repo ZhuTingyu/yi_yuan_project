@@ -45,6 +45,7 @@ public class Constants {
 
     public static final String kLeanChatCurrentUserObjectId = "kLeanChatCurrentUserObjectId";
     public static final String kWebDataKeyUserLogin = "userLogin";
+    public static final String kWebDataKeyLoginType = "LoginType";
     public static final String kHttpReqKeyContentType = "Content-Type";
     public static final String kHttpReqKeyAuthToken = "token";
 

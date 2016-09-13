@@ -13,6 +13,7 @@ import android.os.StrictMode;
 import android.support.multidex.MultiDexApplication;
 
 import com.avos.avoscloud.AVAnalytics;
+import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVInstallation;
 import com.avos.avoscloud.AVOSCloud;
 import com.avos.avoscloud.AVObject;
@@ -239,11 +240,12 @@ public class DMApplication extends MultiDexApplication {
         AVInstallation installation = AVInstallation.getCurrentInstallation();
         installation.put("user_id", null);
         installation.put("agency_id", null);
-        installation.saveInBackground();
 
-        PushService.unsubscribe(this, "public");
-        PushService.unsubscribe(this, "private");
-        PushService.unsubscribe(this, "protected");
+        try {
+            installation.save();
+        } catch (AVException e) {
+            e.printStackTrace();
+        }
 
         final ChatManager chatManager = ChatManager.getInstance();
         chatManager.closeWithCallback(new AVIMClientCallback() {
@@ -259,7 +261,8 @@ public class DMApplication extends MultiDexApplication {
      */
     public void logout() {
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(Constants.kWebDataKeyUserLogin, null);
+        editor.remove(Constants.kWebDataKeyUserLogin);
+        editor.remove(Constants.kWebDataKeyLoginType);
         editor.putBoolean(Constants.kPrefsHasAgencyFriends, false);
         editor.apply();
 

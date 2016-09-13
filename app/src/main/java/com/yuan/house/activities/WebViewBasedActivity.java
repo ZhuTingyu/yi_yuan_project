@@ -376,8 +376,10 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
 
         if (objectMap != null) {
             houseId = objectMap.get("houseId").toString();
-            if (!StringUtils.isEmpty(objectMap.get("auditType").toString())) {
-                auditType = objectMap.get("auditType").toString();
+            if (objectMap.get("auditType") != null) {
+                if (!StringUtils.isEmpty(objectMap.get("auditType").toString())){
+                    auditType = objectMap.get("auditType").toString();
+                }
             }
         }
 
