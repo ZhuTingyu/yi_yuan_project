@@ -645,8 +645,26 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     }
 
     @Override
+    protected void onRestart() {
+        super.onRestart();
+
+        setupHeartBeatForPresenceCheckInSeconds();
+
+        setupPresenceGuardian();
+
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
+
+        if (scheduledExecutorServiceForPresence != null) {
+            scheduledExecutorServiceForPresence.shutdown();
+        }
+
+        if (scheduledExecutorServiceForPresenceCheckInSeconds != null) {
+            scheduledExecutorServiceForPresenceCheckInSeconds.shutdown();
+        }
 
         if (!TextUtils.isEmpty(cachedHouseIdForCurrentConv)) {
             prefs.edit().putString(Constants.kLastActivatedHouseId, cachedHouseIdForCurrentConv).apply();
@@ -842,7 +860,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     protected void onResume() {
         CacheService.setCurConv(conversation);
 
-        registerScreenStatusReceriver();
+        //registerScreenStatusReceriver();
 
         super.onResume();
 
@@ -859,7 +877,7 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     protected void onPause() {
         super.onPause();
 
-        unregisterReceiver(mScreenStatusReceiver);
+        //unregisterReceiver(mScreenStatusReceiver);
 
         setCurrentChattingConvid(null);
     }
@@ -867,14 +885,6 @@ public class SingleChatActivity extends ChatActivity implements FragmentBBS.OnBB
     @Override
     protected void onDestroy() {
         CacheService.setCurConv(null);
-
-        if (scheduledExecutorServiceForPresence != null) {
-            scheduledExecutorServiceForPresence.shutdown();
-        }
-
-        if (scheduledExecutorServiceForPresenceCheckInSeconds != null) {
-            scheduledExecutorServiceForPresenceCheckInSeconds.shutdown();
-        }
 
         super.onDestroy();
     }
