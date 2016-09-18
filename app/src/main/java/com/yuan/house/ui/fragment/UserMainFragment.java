@@ -20,6 +20,7 @@ import com.yuan.house.common.Constants;
 import com.yuan.house.event.LocationEvent;
 import com.yuan.house.helper.AuthHelper;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -74,20 +75,23 @@ public class UserMainFragment extends WebViewBaseFragment {
         String url = Constants.kWebPageUserIndex;
 
         String loginInfo = AuthHelper.getInstance().getUserLoginInfo();
-        try {
-            JSONObject object = new JSONObject(loginInfo);
-            boolean hasAgencyFriends = object.optBoolean("has_agency_friend");
+        if (StringUtils.isEmpty(loginInfo)) {
+            url = Constants.kWebPageUserIndexFirst;
+        } else {
+            try {
+                JSONObject object = new JSONObject(loginInfo);
+                boolean hasAgencyFriends = object.optBoolean("has_agency_friend");
 
-            boolean prefsHasAgencyFriends = prefs.getBoolean(Constants.kPrefsHasAgencyFriends, false);
-            if (hasAgencyFriends || prefsHasAgencyFriends) {
-                rightItem.setVisibility(View.VISIBLE);
-            } else {
-                url = Constants.kWebPageUserIndexFirst;
+                boolean prefsHasAgencyFriends = prefs.getBoolean(Constants.kPrefsHasAgencyFriends, false);
+                if (hasAgencyFriends || prefsHasAgencyFriends) {
+                    rightItem.setVisibility(View.VISIBLE);
+                } else {
+                    url = Constants.kWebPageUserIndexFirst;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
-
         redirectToLoadUrl(url);
     }
 
