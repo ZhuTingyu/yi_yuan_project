@@ -86,16 +86,6 @@ public class BitmapUtil {
         // 获得图片的宽高
         int bmWidth = bm.getWidth();
         int bmHeight = bm.getHeight();
-        //剪切头像
-        if (imageType == 13) {
-            int least = Math.min(bmWidth, bmHeight);
-            if (least < FIT_LENGTH) {
-                float scale = FIT_LENGTH / least;
-                return zoomImg(bm, scale);
-            } else {
-                return bm;
-            }
-        } else {
             float scale;
             if (bmWidth >= bmHeight) {
                 scale = windowWidth / bmWidth;
@@ -106,7 +96,6 @@ public class BitmapUtil {
                 return bm;
             }
             return zoomImg(bm, scale);
-        }
     }
 }
 
