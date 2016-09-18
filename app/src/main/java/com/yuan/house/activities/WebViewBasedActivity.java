@@ -343,7 +343,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
         oks.setTitle(title);
         oks.setText(content);
 
-        oks.setImageUrl("http://test.house.ieyuan.com/img_placeholder.png");
+        oks.setImageUrl("http://static.eye5250.com/img_placeholder.png");
 
         oks.setUrl(url);
 
