@@ -54,6 +54,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.greenrobot.event.EventBus;
+import timber.log.Timber;
 
 /**
  * Created by KevinLee on 2016/5/2.
@@ -216,14 +217,21 @@ public class MapActivity extends WebViewBasedActivity implements OnGetGeoCoderRe
         baiduMap.setOnMapStatusChangeListener(new BaiduMap.OnMapStatusChangeListener() {
             @Override
             public void onMapStatusChangeStart(MapStatus mapStatus) {
+                Timber.v("onMapStatusChangeStart");
             }
 
             @Override
             public void onMapStatusChange(MapStatus mapStatus) {
+                Timber.v("onMapStatusChange");
+
+                targetPoint = mapStatus.target;
+                startReverseGeoCode(targetPoint);
             }
 
             @Override
             public void onMapStatusChangeFinish(MapStatus mapStatus) {
+                Timber.v("onMapStatusChangeFinish");
+
                 targetPoint = mapStatus.target;
                 startReverseGeoCode(targetPoint);
             }
