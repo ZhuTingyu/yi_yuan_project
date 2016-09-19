@@ -5,7 +5,7 @@
 
     <SinaWeibo
         Id="1"
-        SortId="1"
+        SortId="3"
         AppKey="1831282997"
         AppSecret="d04be8d155bfea1ca61703073f41e65f"
         RedirectUrl="http://www.sharesdk.cn"
@@ -15,7 +15,7 @@
     <!-- FIXME: 如果不绕过微信审核, 会导致分享失败-->
     <Wechat
         Id="4"
-        SortId="4"
+        SortId="2"
         AppId="wx8fb07970651726a1"
         AppSecret="a9b5e57b8712efdc352aa52d2e5226f9"
         BypassApproval="false"
@@ -23,7 +23,7 @@
     
     <WechatMoments
         Id="5"
-        SortId="5"
+        SortId="1"
         AppId="wx8fb07970651726a1"
         AppSecret="a9b5e57b8712efdc352aa52d2e5226f9"
         BypassApproval="false"
