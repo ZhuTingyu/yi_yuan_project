@@ -691,6 +691,7 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                                 JSONObject object = new JSONObject();
 
                                 String otherId = "0";
+                                String otherRole = "user";
                                 com.alibaba.fastjson.JSONArray ids = (com.alibaba.fastjson.JSONArray) conversation.getAttribute("userIds");
                                 if (ids == null || ids.size() == 0) {
                                     otherId = "0";
@@ -698,6 +699,8 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                                     for (int j = 0; j < ids.size(); j++) {
                                         if (Integer.parseInt(AuthHelper.getInstance().getUserId()) != ids.getInteger(j)) {
                                             otherId = ids.getString(j);
+
+                                            otherRole = (String) conversation.getAttribute(otherId);
                                             break;
                                         }
                                     }
@@ -708,9 +711,11 @@ public abstract class WebViewBasedActivity extends BaseFragmentActivity implemen
                                     object.put("message", MessageHelper.outlineOfMsg(message));
                                     object.put("is_read", true);
                                     object.put("otherId", conversation.getMembers().get(0));
+                                    // FIXME: 9/19/16 一直给 audittype 为 0 是否有问题?
                                     object.put("auditType", "0");
                                     object.put("houseId", conversation.getAttribute("houseId"));
                                     object.put("otherUserId", otherId);
+                                    object.put("type", otherRole);
                                 } catch (JSONException e1) {
                                     e1.printStackTrace();
                                 }

@@ -105,7 +105,7 @@ public class ChatManager extends AVIMClientEventHandler {
      * @param callback 创建成功之后
      */
     public void fetchConversationWithUserId(final JSONObject param, final String userId, final AVIMConversationCreatedCallback callback) {
-        boolean isPeerTypeAgency = "agency".equals(param.optString("type"));
+        final boolean isPeerTypeAgency = "agency".equals(param.optString("type"));
 
         String houseId = param.optString("house_id");
         if (TextUtils.isEmpty(houseId)) {
@@ -157,7 +157,11 @@ public class ChatManager extends AVIMClientEventHandler {
                             // 中介和中介聊天, 会绑定 house Id
                             attrs.put("houseId", finalHouseId);
                         }
+
                         attrs.put("userIds", ids);
+
+                        attrs.put(userId, finalIsPeerTypeAgency ? "agency" : "user");
+                        attrs.put(selfId, !AuthHelper.getInstance().iAmUser() ? "agency" : "user");
 
                         Timber.w("FETCH CONV NEW - Peer Id : %s, House Id : %s", userId, finalHouseId);
 
