@@ -29,6 +29,7 @@ import android.widget.Toast;
 import com.avos.avoscloud.AVUser;
 import com.avoscloud.leanchatlib.utils.DownloadUtils;
 import com.avoscloud.leanchatlib.utils.Logger;
+import com.yuan.house.BuildConfig;
 import com.yuan.house.R;
 import com.yuan.house.activities.MainActivity;
 import com.yuan.house.application.DMApplication;
@@ -582,7 +583,7 @@ public class Utils {
     }
 
     public static void toast(String s, String exceptionMsg) {
-        if (DMApplication.getInstance().debug) {
+        if (BuildConfig.useDebug) {
             s = s + exceptionMsg;
         }
         toast(s);
@@ -690,7 +691,7 @@ public class Utils {
     }
 
     public static void printException(Exception e) {
-        if (DMApplication.getInstance().debug) {
+        if (BuildConfig.useDebug) {
             e.printStackTrace();
         }
     }

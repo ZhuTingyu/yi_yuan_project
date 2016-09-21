@@ -79,6 +79,7 @@ android {
             buildConfigField("String", "kBugTagsKey", "\"c0a589a1390e94a20f24ce42885311b7\"")
             buildConfigField("String", "kHtmlMainCodeDefault", htmlMainCode)
             buildConfigField("String", "kHtmlVersionCodeDefault", htmlVersionCode)
+            buildConfigField("boolean", "useDebug", "true")
 
             versionNameSuffix "-DEBUG"
 
@@ -91,6 +92,7 @@ android {
             buildConfigField("String", "kBugTagsKey", "\"c0a589a1390e94a20f24ce42885311b7\"")
             buildConfigField("String", "kHtmlMainCodeDefault", htmlMainCode)
             buildConfigField("String", "kHtmlVersionCodeDefault", htmlVersionCode)
+            buildConfigField("boolean", "useDebug", "false")
 
             versionNameSuffix "-RELEASE"
             minifyEnabled false
