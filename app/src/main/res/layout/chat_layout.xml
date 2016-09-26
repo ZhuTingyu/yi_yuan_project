@@ -28,13 +28,14 @@
         <!--Hide Groups by default-->
         <ListView
             android:id="@+id/lvGroups"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
             android:background="#ebebeb"
             android:cacheColorHint="@android:color/transparent"
             android:divider="@null"
-            android:dividerHeight="1dp"
+            android:dividerHeight="5dp"
             android:listSelector="@android:color/transparent"
+            android:layout_marginTop="@dimen/tabbar_height"
             android:scrollbarStyle="outsideOverlay"
             android:visibility="gone"/>
 

@@ -127,6 +127,8 @@ public class GroupChatActivity extends ChatActivity {
     protected void onResume() {
         super.onResume();
 
+        onBridgeDismissProgressDialog();
+
         updateLastMessageForConversation(null);
     }
 
